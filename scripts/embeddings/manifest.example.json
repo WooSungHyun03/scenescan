@@ -1,0 +1,7 @@
+[
+  {
+    "locationId": "replace-with-real-location-uuid",
+    "imagePath": "./licensed-location-image.jpg",
+    "imageUrl": "https://your-project.supabase.co/storage/v1/object/public/location-images/licensed-location-image.jpg"
+  }
+]

@@ -1,0 +1,6 @@
+packages:
+  - .
+
+# Single package. The only native install hook needed for offline CLIP preprocessing.
+onlyBuiltDependencies:
+  - onnxruntime-node
