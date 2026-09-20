@@ -1,24 +1,68 @@
-import { readFile, writeFile } from "node:fs/promises";
-import { pipeline, RawImage } from "@huggingface/transformers";
+import { readFile } from "node:fs/promises";
+import { pathToFileURL } from "node:url";
+import { pipeline } from "@huggingface/transformers";
+import {
+  CLIP_MODEL_ID,
+  CLIP_MODEL_REVISION,
+} from "../../src/lib/ai/embedding-service.ts";
+import { decodeLocalImage, prepareEmbeddings } from "./pipeline.ts";
 
-type ManifestEntry = { locationId: string; imagePath: string; imageUrl: string };
+type CliOptions = {
+  manifestPath: string;
+  outputPath: string;
+  batchSize: number;
+  retries: number;
+  resume: boolean;
+};
 
-async function main() {
-  const [manifestPath, outputPath] = process.argv.slice(2);
-  if (!manifestPath || !outputPath) throw new Error("Usage: pnpm embeddings:prepare <manifest.json> <output.json>");
-  const entries = JSON.parse(await readFile(manifestPath, "utf8")) as ManifestEntry[];
-  if (!Array.isArray(entries)) throw new Error("Manifest must be an array");
-  const extractor = await pipeline("image-feature-extraction", "Xenova/clip-vit-base-patch32");
-  const output = [];
-  for (const entry of entries) {
-    const image = await RawImage.fromBlob(new Blob([await readFile(entry.imagePath)]));
-    const features = await extractor(image);
-    const embedding = Array.from(features.data, Number);
-    if (embedding.length !== 512) throw new Error(`Unexpected embedding size for ${entry.imagePath}: ${embedding.length}`);
-    output.push({ locationId: entry.locationId, imageUrl: entry.imageUrl, embedding });
+export function parseCliArgs(args: string[]): CliOptions {
+  const [manifestPath, outputPath, ...flags] = args;
+  if (!manifestPath || !outputPath) {
+    throw new Error("Usage: pnpm embeddings:prepare <manifest.json> <output.json> [--batch-size N] [--retries N] [--no-resume]");
   }
-  await writeFile(outputPath, JSON.stringify(output, null, 2));
-  console.log(`Wrote ${output.length} embeddings to ${outputPath}`);
+  const options: CliOptions = { manifestPath, outputPath, batchSize: 8, retries: 1, resume: true };
+  for (let index = 0; index < flags.length; index += 1) {
+    const flag = flags[index];
+    if (flag === "--no-resume") options.resume = false;
+    else if (flag === "--batch-size") options.batchSize = Number(flags[++index]);
+    else if (flag === "--retries") options.retries = Number(flags[++index]);
+    else throw new Error(`Unknown option: ${flag}`);
+  }
+  return options;
 }
 
-main().catch((error) => { console.error(error); process.exitCode = 1; });
+async function transformersVersion(): Promise<string> {
+  const packageJson = JSON.parse(
+    await readFile(new URL("../../node_modules/@huggingface/transformers/package.json", import.meta.url), "utf8"),
+  ) as { version?: unknown };
+  if (typeof packageJson.version !== "string") throw new Error("Unable to determine Transformers.js version");
+  return packageJson.version;
+}
+
+async function main(): Promise<void> {
+  const options = parseCliArgs(process.argv.slice(2));
+  const version = await transformersVersion();
+  const result = await prepareEmbeddings(options, {
+    transformersVersion: version,
+    decodeImage: decodeLocalImage,
+    loadExtractor: async () => {
+      const extractor = await pipeline("image-feature-extraction", CLIP_MODEL_ID, {
+        revision: CLIP_MODEL_REVISION,
+      });
+      return async (images) => (
+        await extractor(images as Parameters<typeof extractor>[0])
+      ).data;
+    },
+    onProgress: console.log,
+  });
+  console.log(`Embedding output: completed=${result.output.items.length}, failed=${result.output.failures.length}, resumed=${result.resumed}`);
+  if (result.output.failures.length > 0) process.exitCode = 1;
+}
+
+const isDirectExecution = process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href;
+if (isDirectExecution) {
+  main().catch((error) => {
+    console.error(error);
+    process.exitCode = 1;
+  });
+}

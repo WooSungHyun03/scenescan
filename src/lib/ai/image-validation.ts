@@ -3,7 +3,7 @@ import {
   MAX_IMAGE_DIMENSION,
   MAX_IMAGE_PIXELS,
   SUPPORTED_IMAGE_MIME_TYPES,
-} from "./embedding-service";
+} from "./embedding-service.ts";
 
 export function validateImageBlob(image: Blob): void {
   if (image.size === 0) throw new Error("Image file is empty");

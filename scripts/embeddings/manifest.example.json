@@ -1,7 +1,13 @@
-[
-  {
-    "locationId": "replace-with-real-location-uuid",
-    "imagePath": "./licensed-location-image.jpg",
-    "imageUrl": "https://your-project.supabase.co/storage/v1/object/public/location-images/licensed-location-image.jpg"
-  }
-]
+{
+  "schema_version": 1,
+  "items": [
+    {
+      "image_id": "00000000-0000-4000-8000-000000000001",
+      "location_id": "00000000-0000-4000-8000-000000000101",
+      "image_path": "./licensed-location-image.png",
+      "image_url": "https://your-project.supabase.co/storage/v1/object/public/location-images/licensed-location-image.png",
+      "source": "Replace with the owner or authorized dataset name",
+      "source_url": "https://example.com/replace-with-license-or-source-record"
+    }
+  ]
+}

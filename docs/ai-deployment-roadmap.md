@@ -52,17 +52,25 @@ Verification:
 
 ## DAY 3 — Offline Embedding Pipeline
 
-Status: not started
+Status: complete (2026-09-21)
 
-- [ ] Define and validate manifest fields: `location_id`, `image_id`, `source`, `source_url`, and local image path.
-- [ ] Validate image type, size, decoded dimensions, and source metadata.
-- [ ] Reuse the exact runtime CLIP model and preprocessing contract.
-- [ ] Emit finite 512-D embeddings with model/version metadata.
-- [ ] Add configurable batching.
-- [ ] Add resumable, idempotent output.
-- [ ] Add failed-item retry without duplicating completed records.
-- [ ] Guarantee deterministic ordering and validate malformed vectors.
-- [ ] Add focused tests and usage documentation.
+- [x] Define and validate manifest fields: `location_id`, `image_id`, `source`, `source_url`, and local image path.
+- [x] Validate image type, size, decoded dimensions, and source metadata.
+- [x] Reuse the exact runtime CLIP model and preprocessing contract.
+- [x] Emit finite 512-D embeddings with model/version metadata.
+- [x] Add configurable batching.
+- [x] Add resumable, idempotent output.
+- [x] Add failed-item retry without duplicating completed records.
+- [x] Guarantee deterministic ordering and validate malformed vectors.
+- [x] Add focused tests and usage documentation.
+
+Verification:
+
+- Real model run: two synthetic PNGs processed in one batch; 2/2 completed, zero failures.
+- Output: `Xenova/clip-vit-base-patch32`, revision `main`, Transformers.js `4.3.0`, two finite 512-D vectors.
+- Resume run: 2/2 records resumed with no model initialization or inference.
+- Deterministic resume: output SHA-256 remained `41e4f0f341802424cf20efb97f4569a9b3dd619fdbf4e97e9674988bd7152d95`.
+- Automated suite after DAY 3 implementation: 48 tests passed.
 
 ## DAY 4 — Supabase pgvector Integration
 

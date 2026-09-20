@@ -1,4 +1,4 @@
-import { CLIP_EMBEDDING_DIMENSION } from "./embedding-service";
+import { CLIP_EMBEDDING_DIMENSION } from "./embedding-service.ts";
 
 export function toValidatedEmbedding(values: ArrayLike<number | bigint>): number[] {
   if (values.length !== CLIP_EMBEDDING_DIMENSION) {

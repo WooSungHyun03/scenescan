@@ -39,10 +39,10 @@ pnpm lint
 pnpm typecheck
 pnpm test
 pnpm build
-pnpm embeddings:prepare scripts/embeddings/manifest.example.json output.json
+pnpm embeddings:prepare scripts/embeddings/manifest.example.json output.json --batch-size 8 --retries 1
 ```
 
-The embedding command is for licensed local images after replacing the example manifest paths and UUIDs. It downloads the CLIP model and writes JSON for a reviewed import; it does not write to Supabase.
+The embedding command is for licensed local images after replacing the example manifest paths, UUIDs, and provenance fields. It validates image bytes and metadata, processes configurable batches, writes an atomic resumable JSON checkpoint after every batch, and retries prior failures on the next run. It does not write to Supabase. See [offline embeddings](docs/offline-embeddings.md).
 
 ## Team and deployment
 
