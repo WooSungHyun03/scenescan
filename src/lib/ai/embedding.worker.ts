@@ -1,19 +1,19 @@
 import { pipeline, RawImage } from "@huggingface/transformers";
-import { CLIP_EMBEDDING_DIMENSION, CLIP_MODEL_ID } from "./embedding-service";
+import { CLIP_MODEL_ID } from "./embedding-service";
+import { createEmbeddingWorkerHandler } from "./embedding-worker-runtime";
+import type { EmbeddingWorkerRequest } from "./embedding-worker-protocol";
 
-let extractorPromise: ReturnType<typeof pipeline<"image-feature-extraction">> | null = null;
+const handleRequest = createEmbeddingWorkerHandler({
+  loadExtractor: (onProgress) => pipeline("image-feature-extraction", CLIP_MODEL_ID, {
+    progress_callback: (event) => {
+      if (event.status === "progress_total") onProgress(event.progress);
+    },
+  }),
+  decodeImage: (image) => RawImage.fromBlob(image),
+  getDimensions: (image) => ({ width: image.width, height: image.height }),
+  postMessage: (message) => self.postMessage(message),
+});
 
-self.onmessage = async (event: MessageEvent<{ id: number; image: Blob }>) => {
-  const { id, image } = event.data;
-  try {
-    extractorPromise ??= pipeline("image-feature-extraction", CLIP_MODEL_ID);
-    const extractor = await extractorPromise;
-    const rawImage = await RawImage.fromBlob(image);
-    const features = await extractor(rawImage);
-    const embedding = Array.from(features.data, Number);
-    if (embedding.length !== CLIP_EMBEDDING_DIMENSION) throw new Error(`Expected ${CLIP_EMBEDDING_DIMENSION} dimensions, got ${embedding.length}`);
-    self.postMessage({ id, embedding });
-  } catch (error) {
-    self.postMessage({ id, error: error instanceof Error ? error.message : "Embedding failed" });
-  }
+self.onmessage = (event: MessageEvent<EmbeddingWorkerRequest>) => {
+  void handleRequest(event.data);
 };

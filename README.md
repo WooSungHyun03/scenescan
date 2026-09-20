@@ -17,6 +17,8 @@ pnpm dev
 
 Open `http://localhost:3000`, choose **이미지 업로드**, select an image, and run a mock search. No account, model download, map key, or Supabase project is needed in mock mode.
 
+Real browser AI mode accepts JPEG, PNG, and WebP images up to 15 MB, 8192 px per axis, and 20 megapixels. Its first search downloads the public CLIP model; later requests reuse the same worker and model instance.
+
 ## Environment variables
 
 | Variable | Purpose |
