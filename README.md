@@ -28,8 +28,10 @@ Real browser AI mode accepts JPEG, PNG, and WebP images up to 15 MB, 8192 px per
 | `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL for real data |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Public anon key; RLS restricts writes |
 | `NEXT_PUBLIC_KAKAO_MAP_KEY` | Kakao JavaScript key and registered domain for real map |
+| `SUPABASE_URL` | Server-only project URL used by the local embedding importer |
+| `SUPABASE_SERVICE_ROLE_KEY` | Server-only service role used only for controlled local imports |
 
-Never commit `.env.local` or a Supabase service role key. Public `NEXT_PUBLIC_*` variables are visible in the browser bundle.
+Never commit `.env.local` or a Supabase service role key. Public `NEXT_PUBLIC_*` variables are visible in the browser bundle. The importer rejects a service role placed in `NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY`.
 
 ## Scripts
 
@@ -40,9 +42,11 @@ pnpm typecheck
 pnpm test
 pnpm build
 pnpm embeddings:prepare scripts/embeddings/manifest.example.json output.json --batch-size 8 --retries 1
+pnpm embeddings:import output.json --validate-only
+pnpm embeddings:audit-schema
 ```
 
-The embedding command is for licensed local images after replacing the example manifest paths, UUIDs, and provenance fields. It validates image bytes and metadata, processes configurable batches, writes an atomic resumable JSON checkpoint after every batch, and retries prior failures on the next run. It does not write to Supabase. See [offline embeddings](docs/offline-embeddings.md).
+The preparation command is for licensed local images after replacing the example manifest paths, UUIDs, and provenance fields. It validates image bytes and metadata, processes configurable batches, writes an atomic resumable JSON checkpoint after every batch, and retries prior failures on the next run. Import defaults to credential-free validation; database dry-run and apply modes are documented in [offline embeddings](docs/offline-embeddings.md).
 
 ## Team and deployment
 

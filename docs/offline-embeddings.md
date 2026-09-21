@@ -47,12 +47,45 @@ Resume refuses output created by a different Transformers.js version. If manifes
 
 The process exits non-zero when failures remain, but the valid checkpoint stays available. Fix the source problem and rerun the same command; successful items will be skipped and failed items retried.
 
-## Review before import
+## Validate and import
+
+Validation is the default and needs no database credentials:
+
+```bash
+pnpm embeddings:import path/to/output.json
+pnpm embeddings:import path/to/output.json --validate-only
+```
+
+It rejects unresolved failures, empty output, duplicate IDs or public URLs, wrong model metadata, non-finite or non-512-D vectors, and zero-norm vectors. Before any write, dry-run connects to Supabase, confirms that every `location_id` exists, prevents an existing image UUID from being reassigned to another location, and probes the cosine-search RPC:
+
+```bash
+SUPABASE_URL=https://PROJECT.supabase.co \
+SUPABASE_SERVICE_ROLE_KEY=... \
+pnpm embeddings:import path/to/output.json --dry-run
+
+SUPABASE_URL=https://PROJECT.supabase.co \
+SUPABASE_SERVICE_ROLE_KEY=... \
+pnpm embeddings:import path/to/output.json --apply --batch-size 100
+```
+
+`--batch-size` accepts 1–500. Apply uses UUID-based upsert only after all preflight checks pass. It will update the authorized `image_url` and embedding for the same image UUID, but refuses to move that UUID between locations. Run one importer at a time and retain the reviewed output as the reproducible source.
+
+The service role bypasses RLS. Keep it in a shell or uncommitted server-only environment, never a `NEXT_PUBLIC_*` variable, browser bundle, CI log, or Vercel client environment. Rotate it immediately if exposed. Public application traffic continues to use the anon key and select-only RLS.
+
+Audit the committed SQL contract independently with:
+
+```bash
+pnpm embeddings:audit-schema
+```
+
+This checks pgvector placement, 512-D columns/RPC, keys, index, RLS/read policy, cosine distance, bounded result count, and invoker rights. It does not prove that a remote migration has been applied; `--dry-run` is the remote preflight.
+
+## Review checklist
 
 Before DAY 4 database import, review:
 
 1. `failures` is empty.
 2. Every UUID refers to the intended controlled database record.
 3. `source`, `source_url`, `image_url`, and `DATA_LICENSES.md` agree.
-4. Root and item model metadata match the importer configuration.
+4. Root and item model metadata match the importer configuration and every vector has a non-zero norm.
 5. No local path, credential, or unlicensed asset is being published accidentally.

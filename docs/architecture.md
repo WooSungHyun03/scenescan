@@ -31,5 +31,5 @@ The offline pipeline imports the same model ID, revision, dimension, image envel
 - Mock search ranking is synthetic and only proves the end-to-end contract. The percentage badge is not a measured visual match in mock mode.
 - The real RPC retrieves at most 200 top images before app-side region/category filtering. A larger dataset may need SQL-side filters to avoid excluding eligible lower-ranked images.
 - Real-mode similar-location ranking is reserved for Member 1 and 3; the UI currently shows an empty state.
-- The offline script emits validated JSON for review; database import/storage upload is a later task. No external records or images are bundled.
+- The offline preparation script emits deterministic JSON for review. A separate importer defaults to offline validation, performs remote foreign-key/RPC preflight in dry-run mode, and requires an explicit apply mode plus a server-only service role for controlled upsert. No external records or images are bundled.
 - This public read-only MVP has no authentication or authoring UI. Production data insertion uses controlled Supabase tooling.

@@ -7,7 +7,10 @@ export const locationFilterSchema = z.object({
 });
 
 export const searchRequestSchema = z.object({
-  embedding: z.array(z.number().finite()).length(512),
+  embedding: z.array(z.number().finite()).length(512).refine(
+    (embedding) => embedding.some((value) => value !== 0),
+    "Embedding must have a non-zero norm",
+  ),
   filters: locationFilterSchema.default({}),
 });
 

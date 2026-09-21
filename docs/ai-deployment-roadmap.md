@@ -74,15 +74,23 @@ Verification:
 
 ## DAY 4 — Supabase pgvector Integration
 
-Status: not started
+Status: local implementation complete (2026-09-22); remote integration blocked until project credentials and authorized rows are available
 
-- [ ] Verify pgvector extension and `vector(512)` schema.
-- [ ] Review foreign keys, indexes, and RLS with the backend/data owners.
-- [ ] Add a controlled import/upsert workflow with duplicate prevention.
-- [ ] Reject invalid vectors and keep service-role credentials server-only.
-- [ ] Verify cosine RPC threshold, count, empty-data, and malformed-query behavior.
-- [ ] Run real integration checks when credentials/data are available.
-- [ ] Document migration and import operations.
+- [x] Verify pgvector extension and `vector(512)` schema.
+- [x] Review foreign keys, indexes, and RLS against the committed backend migration.
+- [x] Add a controlled validate/dry-run/apply upsert workflow with duplicate prevention.
+- [x] Reject invalid and zero-norm vectors and keep service-role credentials server-only.
+- [x] Verify cosine normalization utilities, RPC bounds in SQL, empty result handling, and malformed query rejection locally.
+- [ ] Run real integration checks when credentials and authorized location rows are available.
+- [x] Document migration and import operations.
+
+Verification:
+
+- Static migration audit: 12 checks passed for pgvector, vector dimension, keys/index/RLS, RPC cosine semantics, threshold/count bounds, and invoker rights.
+- Import preflight tests cover missing locations, cross-location UUID replacement, duplicate URL, unresolved failure, zero norm, invalid RPC similarity, dry-run no-write behavior, and apply batching.
+- Search request validation rejects non-finite, wrong-dimension, and all-zero query vectors before RPC execution.
+- Automated suite after local DAY 4 implementation: 62 tests passed.
+- Remote dry-run/apply remains intentionally unverified because no Supabase service-role credential or authorized production rows were available on this host.
 
 ## DAY 5 — Search Ranking
 

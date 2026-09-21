@@ -11,7 +11,7 @@ The source of truth for TypeScript shapes is `src/types/domain.ts` and `src/type
 | `getSimilarLocations` | string ID | `LocationSearchResult[]` | Member 1 with 3 |
 | `getSolarPosition` | `GeoPoint`, JavaScript `Date` | `SolarPosition` (degrees) | Member 4 |
 
-`LocationFilter`: optional `region` (`서울`, `부산`, `인천`, `경기`) and `category` (`urban`, `nature`, `industrial`, `interior`). Search request validation uses Zod and rejects non-finite numbers or arrays with a length other than 512. `POST /api/search` returns 400 for invalid JSON/body and 503 for unavailable data access. `similarity` is cosine similarity in real mode and a synthetic UI value in mock mode. Images are grouped by location using the highest image score; a top-k mean option can be added as a small pure function later.
+`LocationFilter`: optional `region` (`서울`, `부산`, `인천`, `경기`) and `category` (`urban`, `nature`, `industrial`, `interior`). Search request validation uses Zod and rejects non-finite values, arrays with a length other than 512, and all-zero vectors for which cosine similarity is undefined. `POST /api/search` returns 400 for invalid JSON/body and 503 for unavailable data access. `similarity` is cosine similarity in real mode and a synthetic UI value in mock mode. Images are grouped by location using the highest image score; a top-k mean option can be added as a small pure function later.
 
 `ImageEmbeddingService` also exposes `getStatus()` and `subscribe(listener)`. Status is one of `idle`, `loading`, `ready`, or `error`; loading status can include progress from 0 to 100. Both mock and real modes accept JPEG, PNG, and WebP inputs with the limits documented in `docs/architecture.md`. The default inference timeout is 120 seconds.
 
