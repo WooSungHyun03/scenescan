@@ -4,7 +4,7 @@ SceneScan is an open-source student project for finding filming locations from a
 
 ## Architecture
 
-One Next.js App Router app serves pages and a search API. In real mode, browser Transformers.js produces a 512-dimensional CLIP embedding in a Web Worker; Supabase pgvector ranks location images; server code groups the strongest image per location and returns up to eight locations. Location image embeddings are prepared offline. See [architecture](docs/architecture.md), [contracts](docs/api-contracts.md), and [database](docs/database.md).
+One Next.js App Router app serves pages and a search API. In real mode, browser Transformers.js produces a 512-dimensional CLIP embedding in a Web Worker; Supabase pgvector ranks location images; server code groups the strongest image per location and returns up to eight locations. Location image embeddings are prepared offline. See [architecture](docs/architecture.md), [contracts](docs/api-contracts.md), [search ranking](docs/search-ranking.md), and [database](docs/database.md).
 
 ## Local development
 

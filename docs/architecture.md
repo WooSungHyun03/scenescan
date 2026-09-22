@@ -11,7 +11,7 @@ Single Next.js App Router project with strict TypeScript, Tailwind CSS, shadcn/u
 ```text
 Runtime: image → browser ImageEmbeddingService → Web Worker CLIP (or mock)
        → POST /api/search → mock repository or Supabase RPC
-       → image matches → max-per-location grouping → Top 8
+       → validated image matches → deterministic max-per-location grouping → Top 8
 
 Offline: licensed location image → scripts/embeddings/prepare.ts
        → validated manifest → batched/resumable 512D CLIP vector JSON
@@ -29,6 +29,7 @@ The offline pipeline imports the same model ID, revision, dimension, image envel
 ## Known scaffold limits
 
 - Mock search ranking is synthetic and only proves the end-to-end contract. The percentage badge is not a measured visual match in mock mode.
+- Max-per-location is the production aggregation default. A pure top-k mean alternative exists for DAY 7 evaluation but is not enabled without retrieval evidence. See `docs/search-ranking.md`.
 - The real RPC retrieves at most 200 top images before app-side region/category filtering. A larger dataset may need SQL-side filters to avoid excluding eligible lower-ranked images.
 - Real-mode similar-location ranking is reserved for Member 1 and 3; the UI currently shows an empty state.
 - The offline preparation script emits deterministic JSON for review. A separate importer defaults to offline validation, performs remote foreign-key/RPC preflight in dry-run mode, and requires an explicit apply mode plus a server-only service role for controlled upsert. No external records or images are bundled.

@@ -94,14 +94,25 @@ Verification:
 
 ## DAY 5 — Search Ranking
 
-Status: not started
+Status: complete (2026-09-23)
 
-- [ ] Verify raw image-hit grouping and max-similarity aggregation.
-- [ ] Implement and evaluate top-k mean as a pure alternative.
-- [ ] Guarantee deterministic ordering, deduplication, and tie handling.
-- [ ] Handle missing metadata and orphan image records.
-- [ ] Verify threshold, empty results, and Top 8 enforcement.
-- [ ] Add tests and document the selected aggregation default.
+- [x] Verify raw image-hit grouping and max-similarity aggregation.
+- [x] Implement and behaviorally compare top-k mean as a pure alternative.
+- [x] Guarantee deterministic ordering, deduplication, and tie handling.
+- [x] Handle missing metadata and orphan image records.
+- [x] Verify threshold, empty results, and Top 8 enforcement.
+- [x] Add tests and document the selected aggregation default.
+
+Verification:
+
+- Max aggregation preserves the strongest image per location and remains the production default.
+- Synthetic comparison `A=[1.0, 0.1]`, `B=[0.8, 0.7]` ranks A first with max and B first with top-2 mean; this validates behavior only, not retrieval quality.
+- Ties resolve by ascending location ID and then image ID, independent of input order.
+- Duplicate images are collapsed before aggregation; blank IDs, non-finite/out-of-range scores, and orphan locations are excluded.
+- Inclusive threshold, empty candidates, filtered-empty metadata, default Top 8, and source immutability have regression coverage.
+- Top-k mean remains evaluation-only until DAY 7 provides authorized-dataset evidence.
+- Local Node 22 diagnostic benchmark: 200 image hits / 50 locations, 10,000 warmed max-ranking iterations in 152.03 ms (0.0152 ms/iteration); this is not a browser or retrieval-quality benchmark.
+- Automated suite after DAY 5 implementation: 72 tests passed; lint, typecheck, and webpack production build passed.
 
 ## DAY 6 — Similar Locations
 
