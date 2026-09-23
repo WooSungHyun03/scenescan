@@ -1,18 +1,19 @@
 import { NextResponse } from "next/server";
+import { searchByImage } from "@/domains/locations/server/repository";
+import { badRequest } from "@/shared/errors/application-error";
+import { apiErrorResponse } from "@/shared/http/api-error-response";
 import { searchRequestSchema } from "@/types/contracts";
-import { searchByImage } from "@/server/repositories/locations";
 
 export async function POST(request: Request) {
   let body: unknown;
   try { body = await request.json(); }
-  catch { return NextResponse.json({ error: "Invalid JSON" }, { status: 400 }); }
+  catch { return apiErrorResponse(badRequest("Invalid JSON"), "search.parse"); }
   const parsed = searchRequestSchema.safeParse(body);
-  if (!parsed.success) return NextResponse.json({ error: "Invalid search request" }, { status: 400 });
+  if (!parsed.success) return apiErrorResponse(badRequest("Invalid search request"), "search.validate");
   try {
     const results = await searchByImage(parsed.data.embedding, parsed.data.filters);
     return NextResponse.json({ results });
   } catch (error) {
-    console.error("Search failed", error);
-    return NextResponse.json({ error: "Search unavailable" }, { status: 503 });
+    return apiErrorResponse(error, "search.execute");
   }
 }

@@ -1,5 +1,5 @@
-import { SearchWorkspace } from "@/features/search/components/search-workspace";
-import { getLocations } from "@/server/repositories/locations";
+import { getLocations } from "@/domains/locations/server/repository";
+import { SearchWorkspace } from "@/domains/search/components/search-workspace";
 
 export default async function SearchPage() {
   const examples = await getLocations();

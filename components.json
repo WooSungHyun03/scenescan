@@ -4,6 +4,6 @@
   "rsc": true,
   "tsx": true,
   "tailwind": { "css": "src/app/globals.css", "baseColor": "neutral", "cssVariables": true },
-  "aliases": { "components": "@/components", "utils": "@/lib/utils", "ui": "@/components/ui" },
+  "aliases": { "components": "@/shared", "utils": "@/shared/ui/cn", "ui": "@/shared/ui" },
   "iconLibrary": "lucide"
 }

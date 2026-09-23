@@ -2,10 +2,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, MapPin } from "lucide-react";
-import { LocationCard } from "@/components/common/location-card";
-import { LocationMap } from "@/features/map/components/location-map";
-import { SolarPanel } from "@/features/solar/components/solar-panel";
-import { getLocation, getSimilarLocations } from "@/server/repositories/locations";
+import { LocationCard } from "@/domains/locations/components/location-card";
+import { LocationMap } from "@/domains/locations/components/location-map";
+import { SolarPanel } from "@/domains/locations/components/solar-panel";
+import { getLocation, getSimilarLocations } from "@/domains/locations/server/repository";
 
 export default async function LocationPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;

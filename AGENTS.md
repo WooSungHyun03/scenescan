@@ -9,17 +9,17 @@ SceneScan is a four-student open-source location hunting MVP. One Next.js App Ro
 ## Ownership
 
 - Member 1, AI / Deployment: `src/lib/ai/**`, `scripts/embeddings/**`, deployment configuration and docs, vector search integration in coordination with Member 3.
-- Member 2, Frontend / UX: `src/app/**` except `src/app/api/**`, `src/components/**`, `src/features/*/components/**`.
-- Member 3, Backend / Application: `src/server/**`, `src/app/api/**`, `src/lib/supabase/**`, `supabase/migrations/**` in coordination with Member 1 and 4.
-- Member 4, Data / Geo: `src/lib/geo/**`, `src/lib/maps/**`, `scripts/data/**`, `src/features/solar/**` except UI components, `src/features/production-info/**` except UI components.
+- Member 2, Frontend / UX: `src/app/**` except `src/app/api/**`, `src/domains/*/components/**`, `src/shared/ui/**`.
+- Member 3, Backend / Application: `src/domains/*/server/**`, `src/app/api/**`, `src/infrastructure/supabase/**`, `supabase/migrations/**` in coordination with Member 1 and 4.
+- Member 4, Data / Geo: location-domain services under `src/domains/locations/services/**` for geo, maps, solar, and production metadata, plus `scripts/data/**`.
 
-Shared files (`src/types/**`, `src/mocks/**`, `package.json`, root config) require coordination. Keep edits inside your area unless the team agrees on a cross-area change. Do not let Codex rewrite another owner's implementation for convenience.
+Shared files (`src/types/**`, `src/shared/**`, domain composition files, `package.json`, root config) require coordination. Keep edits inside your area unless the team agrees on a cross-area change. Do not let Codex rewrite another owner's implementation for convenience.
 
 ## Contracts and dependency direction
 
 - Domain types and API request/response types live only in `src/types/**`. `docs/api-contracts.md` is the written contract. Do not define a second `Location`, `GeoPoint`, `SearchResponse`, etc. in a feature folder.
 - UI imports types, feature functions, and calls API; it does not query Supabase or implement CLIP directly.
-- API uses server repositories. Repositories may call Supabase; mock repositories use fixtures. AI worker does inference in the browser.
+- API uses domain repositories. Repositories may call infrastructure adapters such as Supabase; mock repositories use domain fixtures. AI worker does inference in the browser.
 - Before implementing a feature, search the repository for an existing type, utility, service, adapter, or component with the same responsibility. Extend existing code instead of creating duplicate implementations.
 
 ## Working rules

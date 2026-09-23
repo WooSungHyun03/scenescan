@@ -2,7 +2,7 @@
 
 ## Decision
 
-Single Next.js App Router project with strict TypeScript, Tailwind CSS, shadcn/ui-owned components, Zod, Supabase Postgres/pgvector/Storage, Kakao Maps SDK, SunCalc, and Transformers.js. pnpm manages dependencies. Deploy the app on Vercel Hobby and data on Supabase Free. No Python service, monorepo, paid AI API, or container orchestration.
+Single Next.js App Router project with strict TypeScript, Tailwind CSS, shadcn/ui-owned components, Zod, Supabase Postgres/pgvector/Storage, Kakao Maps SDK, SunCalc, and Transformers.js. pnpm manages dependencies. Deploy the app on Vercel Hobby and data on Supabase Free. A standalone production image supports portable self-hosting and CI verification; there is no separate AI service, monorepo, paid AI API, or container orchestrator.
 
 `pnpm-workspace.yaml` lists only the root package; it exists solely to allow the native ONNX Runtime install hook used by the offline preprocessing script.
 
@@ -24,7 +24,17 @@ Runtime AI accepts JPEG, PNG, and WebP files up to 15 MB, 8192 px on either axis
 
 The offline pipeline imports the same model ID, revision, dimension, image envelope, and decoded-dimension validators as runtime AI. Its versioned manifest records image/location UUIDs plus source provenance. Output has deterministic manifest order and no timestamps; it records the installed Transformers.js version and writes an atomic checkpoint after each batch. A normal rerun resumes matching completed records and retries failures. See `docs/offline-embeddings.md`.
 
-`src/types/**` defines shared shapes. Pages and components call application APIs or repository-backed server components; repositories own data access. The `src/lib/maps` boundary switches between a Kakao adapter and a no-key preview. `src/features/solar/solar-position.ts` is pure except for SunCalc.
+## Module boundaries
+
+- `src/domains/search/**` owns the search experience; `src/domains/locations/**` owns location display, ranking, geo/map/solar services, fixtures, and repositories.
+- `src/lib/ai/**` is the cross-runtime CLIP boundary shared by browser inference and offline tooling.
+- `src/infrastructure/**` contains external-system clients. Domain repositories may depend on infrastructure; infrastructure never imports UI.
+- `src/shared/**` contains genuinely cross-domain UI primitives, structured application errors, API error mapping, and logging. Feature-specific helpers stay in their domain.
+- `src/types/**` is the only home for shared domain and HTTP contracts.
+
+Pages compose domains and call application APIs or repository-backed server components. API routes validate shared contracts before calling domain repositories. The location map service switches between a Kakao adapter and a no-key preview, while solar calculation remains a pure domain service except for SunCalc. Exceptions cross the API boundary through one structured mapper, and server/client error surfaces use the shared logger.
+
+The Docker build uses Next.js standalone output, installs dependencies in a dedicated stage, and runs the final image as an unprivileged user. `/api/health` is the container and deployment liveness endpoint. GitHub Actions runs lint, type checking, tests, the Next.js build, image build, and container smoke checks inside Docker. Vercel's existing Git integration remains the only production deploy trigger, avoiding a duplicate CI deployment.
 
 ## Known scaffold limits
 

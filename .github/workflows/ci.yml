@@ -1,0 +1,98 @@
+name: CI
+
+on:
+  pull_request:
+    paths-ignore:
+      - "docs/**"
+      - "**/*.md"
+  push:
+    branches: [main]
+    paths-ignore:
+      - "docs/**"
+      - "**/*.md"
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build CI image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          target: ci
+          load: true
+          tags: scenescan-ci:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Lint
+        run: docker run --rm scenescan-ci:${{ github.sha }} pnpm lint
+
+      - name: Type check
+        run: docker run --rm scenescan-ci:${{ github.sha }} pnpm typecheck
+
+      - name: Test
+        run: docker run --rm scenescan-ci:${{ github.sha }} pnpm test
+
+      - name: Build standalone application
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          target: builder
+          load: true
+          tags: scenescan-builder:${{ github.sha }}
+          build-args: |
+            NEXT_PUBLIC_USE_MOCK_DATA=true
+            NEXT_PUBLIC_USE_MOCK_AI=true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build production Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          target: runner
+          load: true
+          tags: scenescan:${{ github.sha }}
+          build-args: |
+            NEXT_PUBLIC_USE_MOCK_DATA=true
+            NEXT_PUBLIC_USE_MOCK_AI=true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Smoke test production image
+        run: |
+          docker run --detach --name scenescan-ci-app --publish 3000:3000 scenescan:${{ github.sha }}
+          ready=0
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:3000/api/health; then
+              ready=1
+              break
+            fi
+            sleep 1
+          done
+          if [ "$ready" -ne 1 ]; then
+            docker logs scenescan-ci-app
+            exit 1
+          fi
+          curl --fail --silent --output /dev/null http://127.0.0.1:3000/
+          curl --fail --silent --output /dev/null http://127.0.0.1:3000/search
+          curl --fail --silent --output /dev/null http://127.0.0.1:3000/locations/demo-01
+
+      - name: Clean up smoke container
+        if: always()
+        run: docker rm --force scenescan-ci-app || true

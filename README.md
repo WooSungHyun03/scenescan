@@ -6,6 +6,8 @@ SceneScan is an open-source student project for finding filming locations from a
 
 One Next.js App Router app serves pages and a search API. In real mode, browser Transformers.js produces a 512-dimensional CLIP embedding in a Web Worker; Supabase pgvector ranks location images; server code groups the strongest image per location and returns up to eight locations. Location image embeddings are prepared offline. See [architecture](docs/architecture.md), [contracts](docs/api-contracts.md), [search ranking](docs/search-ranking.md), and [database](docs/database.md).
 
+Business code is grouped into the `search` and `locations` domains. External clients live in `src/infrastructure`, cross-domain errors/logging/UI primitives in `src/shared`, and shared contracts in `src/types`.
+
 ## Local development
 
 Use Node.js 22 and pnpm 10. Copy `.env.example` to `.env.local`, or leave it absent to use the default mock mode.
@@ -41,6 +43,8 @@ pnpm lint
 pnpm typecheck
 pnpm test
 pnpm build
+pnpm docker:build
+pnpm docker:up
 pnpm embeddings:prepare scripts/embeddings/manifest.example.json output.json --batch-size 8 --retries 1
 pnpm embeddings:import output.json --validate-only
 pnpm embeddings:audit-schema
@@ -50,7 +54,7 @@ The preparation command is for licensed local images after replacing the example
 
 ## Team and deployment
 
-Four path owners are defined in [team ownership](docs/team-ownership.md) and [AGENTS.md](AGENTS.md). Contribution steps are in [CONTRIBUTING.md](CONTRIBUTING.md). Deploy on Vercel Hobby and Supabase Free following [deployment](docs/deployment.md). Mock mode also deploys without Supabase.
+Four path owners are defined in [team ownership](docs/team-ownership.md) and [AGENTS.md](AGENTS.md). Contribution steps are in [CONTRIBUTING.md](CONTRIBUTING.md). Production runs at [beceleb.org](https://beceleb.org) on Vercel Hobby with Cloudflare DNS; Supabase Free backs real data when enabled. The same standalone app can be built and smoke-tested with Docker. See [deployment](docs/deployment.md).
 
 ## License
 

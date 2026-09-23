@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { ArrowRight, ImagePlus } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { LocationCard } from "@/components/common/location-card";
-import { getLocations } from "@/server/repositories/locations";
+import { LocationCard } from "@/domains/locations/components/location-card";
+import { getLocations } from "@/domains/locations/server/repository";
+import { Button } from "@/shared/ui/button";
 
 export default async function HomePage() {
   const examples = (await getLocations()).slice(0, 4);

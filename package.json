@@ -11,6 +11,8 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
+    "docker:build": "docker build -t scenescan:local .",
+    "docker:up": "docker compose up --build",
     "embeddings:prepare": "node --experimental-strip-types scripts/embeddings/prepare.ts",
     "embeddings:import": "node --experimental-strip-types scripts/embeddings/import.ts",
     "embeddings:audit-schema": "node --experimental-strip-types scripts/embeddings/audit-schema.ts"
