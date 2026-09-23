@@ -7,6 +7,7 @@ const mapping = parseSourceMapping({
   source: { name: "licensed-source", defaultSourceUrl: "https://example.com/license" },
   recordsPath: "payload.places",
   fields: {
+    id: "location_uuid",
     name: "title",
     description: "details.summary",
     category: "kind",
@@ -22,7 +23,7 @@ const mapping = parseSourceMapping({
     contactPhone: "production.contact.phone",
     note: "production.note",
   },
-  images: { path: "media.images", url: "url", alt: "caption" },
+  images: { path: "media.images", url: "url", alt: "caption", localPath: "local_path" },
   categoryMap: { warehouse: "industrial" },
   regionMap: { Seoul: "서울" },
   defaults: { description: "", permitType: "정보 확인 필요" },
@@ -33,6 +34,7 @@ describe("normalizeDataset", () => {
     const output = normalizeDataset({
       payload: {
         places: [{
+          location_uuid: "00000000-0000-4000-8000-000000000101",
           title: "  Sample Warehouse  ",
           details: { summary: "  Licensed sample  " },
           kind: "warehouse",
@@ -44,8 +46,8 @@ describe("normalizeDataset", () => {
             note: "Weekdays only",
           },
           media: { images: [
-            { url: "https://example.com/one.jpg", caption: "Exterior" },
-            { url: "https://example.com/two.jpg", caption: "" },
+            { url: "https://example.com/one.jpg", caption: "Exterior", local_path: "images/one.jpg" },
+            { url: "https://example.com/two.jpg", caption: "", local_path: "images/two.jpg" },
           ] },
           links: { source: "https://example.com/places/1" },
         }],
@@ -56,6 +58,7 @@ describe("normalizeDataset", () => {
       schemaVersion: 1,
       source: { name: "licensed-source" },
       locations: [{
+        id: "00000000-0000-4000-8000-000000000101",
         name: "Sample Warehouse",
         description: "Licensed sample",
         category: "industrial",
@@ -70,8 +73,8 @@ describe("normalizeDataset", () => {
           note: "Weekdays only",
         },
         images: [
-          { imageUrl: "https://example.com/one.jpg", alt: "Exterior" },
-          { imageUrl: "https://example.com/two.jpg", alt: "Sample Warehouse" },
+          { imagePath: "images/one.jpg", imageUrl: "https://example.com/one.jpg", alt: "Exterior" },
+          { imagePath: "images/two.jpg", imageUrl: "https://example.com/two.jpg", alt: "Sample Warehouse" },
         ],
         sourceUrl: "https://example.com/places/1",
       }],

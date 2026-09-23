@@ -77,9 +77,11 @@ function imageRecords(record: JsonObject, mapping: SourceMapping["images"], name
   return items.map((item, index) => {
     let imageUrl: unknown;
     let alt: unknown;
+    let imagePath: unknown;
     if (mapping.url) {
       imageUrl = readPath(item, mapping.url);
       alt = mapping.alt ? readPath(item, mapping.alt) : undefined;
+      imagePath = mapping.localPath ? readPath(item, mapping.localPath) : undefined;
     } else {
       imageUrl = item;
     }
@@ -89,8 +91,15 @@ function imageRecords(record: JsonObject, mapping: SourceMapping["images"], name
     if (alt !== undefined && alt !== null && typeof alt !== "string") {
       throw new Error(`images[${index}].alt must be a string`);
     }
+    if (imagePath !== undefined && imagePath !== null && (typeof imagePath !== "string" || imagePath.trim().length === 0)) {
+      throw new Error(`images[${index}].imagePath must be a non-empty string`);
+    }
     const normalizedAlt = typeof alt === "string" && alt.trim().length > 0 ? alt.trim() : name;
-    return { imageUrl: imageUrl.trim(), alt: normalizedAlt };
+    return {
+      ...(typeof imagePath === "string" ? { imagePath: imagePath.trim() } : {}),
+      imageUrl: imageUrl.trim(),
+      alt: normalizedAlt,
+    };
   });
 }
 
@@ -108,6 +117,7 @@ export function normalizeRecord(record: unknown, mapping: SourceMapping): Canoni
   if (!isObject(record)) throw new Error("Raw location must be an object");
 
   const name = requiredText(record, mapping.fields.name, "name");
+  const id = optionalText(record, mapping.fields.id);
   const description = optionalText(record, mapping.fields.description) ?? mapping.defaults.description;
   const sourceUrl = optionalText(record, mapping.fields.sourceUrl) ?? mapping.source.defaultSourceUrl;
   if (!sourceUrl) {
@@ -115,6 +125,7 @@ export function normalizeRecord(record: unknown, mapping: SourceMapping): Canoni
   }
 
   const normalized: CanonicalLocationRecord = {
+    ...(id ? { id } : {}),
     name,
     description,
     category: mappedValue(

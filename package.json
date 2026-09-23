@@ -14,6 +14,7 @@
     "docker:build": "docker build -t scenescan:local .",
     "docker:up": "docker compose up --build",
     "data:normalize": "node --experimental-strip-types scripts/data/normalize.ts",
+    "data:validate": "node --experimental-strip-types scripts/data/validate.ts",
     "embeddings:prepare": "node --experimental-strip-types scripts/embeddings/prepare.ts",
     "embeddings:import": "node --experimental-strip-types scripts/embeddings/import.ts",
     "embeddings:audit-schema": "node --experimental-strip-types scripts/embeddings/audit-schema.ts"

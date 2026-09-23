@@ -6,6 +6,7 @@
   },
   "recordsPath": "records",
   "fields": {
+    "id": "location_uuid",
     "name": "place_name",
     "description": "summary",
     "category": "place_type",
@@ -24,7 +25,8 @@
   "images": {
     "path": "photos",
     "url": "public_url",
-    "alt": "alt_text"
+    "alt": "alt_text",
+    "localPath": "local_path"
   },
   "categoryMap": {
     "city": "urban",

@@ -16,7 +16,12 @@ const fieldPath = nonEmptyString.refine(
   "Field path contains an empty or unsafe segment",
 );
 
+export type CanonicalLocationImage = Pick<LocationImage, "imageUrl" | "alt"> & {
+  imagePath?: string;
+};
+
 export type CanonicalLocationRecord = {
+  id?: Location["id"];
   name: Location["name"];
   description: Location["description"];
   category: Location["category"];
@@ -25,11 +30,12 @@ export type CanonicalLocationRecord = {
   latitude: Location["point"]["latitude"];
   longitude: Location["point"]["longitude"];
   permit: Location["permit"];
-  images: Array<Pick<LocationImage, "imageUrl" | "alt">>;
+  images: CanonicalLocationImage[];
   sourceUrl: NonNullable<Location["sourceUrl"]>;
 };
 
 export const canonicalLocationRecordSchema: z.ZodType<CanonicalLocationRecord> = z.object({
+  id: nonEmptyString.optional(),
   name: nonEmptyString,
   description: z.string().trim(),
   category: z.enum(locationCategories),
@@ -44,6 +50,7 @@ export const canonicalLocationRecordSchema: z.ZodType<CanonicalLocationRecord> =
     note: nonEmptyString.nullable(),
   }).strict(),
   images: z.array(z.object({
+    imagePath: nonEmptyString.optional(),
     imageUrl: httpUrl,
     alt: nonEmptyString,
   }).strict()),
@@ -58,6 +65,7 @@ export const sourceMappingSchema = z.object({
   }).strict(),
   recordsPath: fieldPath.optional(),
   fields: z.object({
+    id: fieldPath.optional(),
     name: fieldPath,
     description: fieldPath.optional(),
     category: fieldPath,
@@ -77,6 +85,7 @@ export const sourceMappingSchema = z.object({
     path: fieldPath,
     url: fieldPath.optional(),
     alt: fieldPath.optional(),
+    localPath: fieldPath.optional(),
   }).strict().refine(
     (value) => value.url !== undefined || value.alt === undefined,
     { message: "images.alt requires images.url", path: ["alt"] },
