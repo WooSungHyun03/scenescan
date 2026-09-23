@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "name": "authorized-location-dataset",
+    "defaultSourceUrl": "https://example.com/dataset-license"
+  },
+  "recordsPath": "records",
+  "fields": {
+    "name": "place_name",
+    "description": "summary",
+    "category": "place_type",
+    "region": "area_name",
+    "address": "road_address",
+    "latitude": "coordinates.lat",
+    "longitude": "coordinates.lng",
+    "sourceUrl": "record_url"
+  },
+  "permit": {
+    "type": "filming.permit_type",
+    "contactName": "filming.contact_name",
+    "contactPhone": "filming.contact_phone",
+    "note": "filming.note"
+  },
+  "images": {
+    "path": "photos",
+    "url": "public_url",
+    "alt": "alt_text"
+  },
+  "categoryMap": {
+    "city": "urban",
+    "park": "nature",
+    "factory": "industrial",
+    "studio": "interior"
+  },
+  "regionMap": {
+    "Seoul": "서울",
+    "Busan": "부산",
+    "Incheon": "인천",
+    "Gyeonggi": "경기"
+  },
+  "defaults": {
+    "description": "",
+    "permitType": "정보 확인 필요"
+  }
+}
