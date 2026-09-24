@@ -49,6 +49,42 @@ describe("location normalization CLI", () => {
     const output = await normalizeLocationFile({ rawPath, mappingPath, outputPath });
 
     expect(output.locations).toHaveLength(1);
+    expect(output.reviewQueue).toEqual([]);
+    expect(await readFile(rawPath, "utf8")).toBe(rawText);
+    expect(JSON.parse(await readFile(outputPath, "utf8"))).toEqual(output);
+  });
+
+  it("writes unresolved categories to the review queue while preserving the raw file", async () => {
+    const root = await mkdtemp(join(tmpdir(), "scenescan-category-review-"));
+    temporaryDirectories.push(root);
+    const rawPath = join(root, "raw.json");
+    const mappingPath = join(root, "mapping.json");
+    const outputPath = join(root, "normalized.json");
+    const rawText = JSON.stringify([{ id: "source-7", name: "Ambiguous", category: "mixed-use" }]);
+    await writeFile(rawPath, rawText, "utf8");
+    await writeFile(mappingPath, JSON.stringify({
+      schemaVersion: 1,
+      source: { name: "source", defaultSourceUrl: "https://example.com/source" },
+      fields: {
+        id: "id",
+        name: "name",
+        category: "category",
+        region: "region",
+        address: "address",
+        latitude: "latitude",
+        longitude: "longitude",
+      },
+    }), "utf8");
+
+    const output = await normalizeLocationFile({ rawPath, mappingPath, outputPath });
+
+    expect(output.locations).toEqual([]);
+    expect(output.reviewQueue).toEqual([expect.objectContaining({
+      recordIndex: 0,
+      sourceRecordId: "source-7",
+      sourceCategory: "mixed-use",
+      reason: "UNKNOWN_CATEGORY",
+    })]);
     expect(await readFile(rawPath, "utf8")).toBe(rawText);
     expect(JSON.parse(await readFile(outputPath, "utf8"))).toEqual(output);
   });

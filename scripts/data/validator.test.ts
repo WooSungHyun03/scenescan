@@ -98,4 +98,21 @@ describe("validateLocationDataset", () => {
       }],
     });
   });
+
+  it("blocks import while category review items remain", async () => {
+    const input = {
+      ...dataset([validLocation()]),
+      reviewQueue: [{ recordIndex: 1, sourceCategory: "mixed-use", reason: "UNKNOWN_CATEGORY" }],
+    };
+    const report = await validateLocationDataset(input, { inspectImagePath: async () => "ok" });
+
+    expect(report.valid).toBe(false);
+    expect(report.errors).toContainEqual({
+      code: "CATEGORY_REVIEW_REQUIRED",
+      locationIndex: null,
+      locationId: null,
+      field: "reviewQueue",
+      message: "1 source record(s) require category review before import",
+    });
+  });
 });

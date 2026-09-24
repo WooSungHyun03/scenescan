@@ -24,7 +24,42 @@ pnpm data:normalize \
 
 The versioned output contains `name`, `description`, `category`, `region`, `address`, flattened `latitude` and `longitude`, `permit`, `images`, and `sourceUrl`. These field types are derived from `src/types/domain.ts`. Map `fields.id` to a controlled location UUID and `images.localPath` to each licensed local image when preparing data for validation and import. Both fields remain optional during initial normalization so a provider extract can be reviewed before database IDs and local assets are assigned.
 
-Validation rejects unknown mapping fields, unsafe object paths, missing required text, unmapped category or region values, non-finite or out-of-range coordinates, non-HTTP(S) image/source URLs, and missing provenance. Numeric coordinate strings and numeric category/region codes are accepted because they are common in JSON converted from CSV. Missing descriptions use the configured default. Missing permit details receive explicit nulls and the configurable `정보 확인 필요` type; no permission decision is inferred.
+### Category mapping and review queue
+
+`category-mapping.ts` is the single category conversion point. It accepts only exact values from its explicit common table or the current source's `categoryMap`. Matching trims whitespace, applies Unicode NFKC normalization, and ignores Latin letter case. It does not use substrings, fuzzy matching, or keyword inference.
+
+The conservative common table contains the four canonical values and their direct Korean labels:
+
+| Source value | SceneScan category |
+| --- | --- |
+| `urban`, `도시` | `urban` |
+| `nature`, `자연` | `nature` |
+| `industrial`, `산업` | `industrial` |
+| `interior`, `실내` | `interior` |
+
+Provider terms such as `city`, `park`, `factory`, and `studio` must be declared in that provider's mapping file. The source-specific table takes precedence, so a provider's documented semantics can override a common label when necessary.
+
+Unknown, missing, and invalid category values are not assigned a category. Their records are omitted from `locations` and added to `reviewQueue` with the raw record index, available source ID and name, original category text, normalized lookup key, and reason. The raw dataset remains the source of truth, so the queue stores references instead of copying the full raw record.
+
+```json
+{
+  "locations": [],
+  "reviewQueue": [
+    {
+      "recordIndex": 7,
+      "sourceRecordId": "provider-107",
+      "name": "Mixed-use complex",
+      "sourceCategory": "mixed-use",
+      "normalizedSourceCategory": "mixed-use",
+      "reason": "UNKNOWN_CATEGORY"
+    }
+  ]
+}
+```
+
+Review the provider documentation, add an explicit entry to that source's `categoryMap`, and run normalization again. Normalization still writes this reviewable output when the queue is non-empty, but exits with status 1. Validation also reports `CATEGORY_REVIEW_REQUIRED`, preventing the dataset from passing an import gate until the queue is empty.
+
+Validation rejects unknown mapping fields, unsafe object paths, missing required text, unmapped region values, non-finite or out-of-range coordinates, non-HTTP(S) image/source URLs, and missing provenance. Unmapped categories enter the review queue described above. Numeric coordinate strings and numeric category/region codes are accepted because they are common in JSON converted from CSV. Missing descriptions use the configured default. Missing permit details receive explicit nulls and the configurable `정보 확인 필요` type; no permission decision is inferred.
 
 This command only reads local JSON and writes reviewed JSON. It does not download images, call a provider API, or write to Supabase. A source URL records provenance but does not establish redistribution rights; document the license and attribution in `DATA_LICENSES.md` before committing real records or images.
 

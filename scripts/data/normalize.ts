@@ -66,7 +66,10 @@ export async function normalizeLocationFile(options: NormalizeCliOptions): Promi
 async function main(): Promise<void> {
   const options = parseNormalizeCliArgs(process.argv.slice(2));
   const output = await normalizeLocationFile(options);
-  console.log(`Location normalization: source=${output.source.name}, normalized=${output.locations.length}, output=${options.outputPath}`);
+  console.log(
+    `Location normalization: source=${output.source.name}, normalized=${output.locations.length}, review=${output.reviewQueue.length}, output=${options.outputPath}`,
+  );
+  if (output.reviewQueue.length > 0) process.exitCode = 1;
 }
 
 const isDirectExecution = process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href;

@@ -12,6 +12,7 @@ export type DataValidationErrorCode =
   | "DATASET_INVALID"
   | "SCHEMA_VERSION_INVALID"
   | "SOURCE_INVALID"
+  | "CATEGORY_REVIEW_REQUIRED"
   | "LOCATION_INVALID"
   | "LOCATION_ID_REQUIRED"
   | "LOCATION_ID_INVALID"
@@ -226,6 +227,17 @@ export async function validateLocationDataset(
   }
   if (!isObject(value.source) || !nonEmptyText(value.source.name)) {
     rootErrors.push(error("SOURCE_INVALID", null, null, "source.name", "Source name is required"));
+  }
+  if (value.reviewQueue !== undefined && !Array.isArray(value.reviewQueue)) {
+    rootErrors.push(error("DATASET_INVALID", null, null, "reviewQueue", "Category review queue must be an array"));
+  } else if (Array.isArray(value.reviewQueue) && value.reviewQueue.length > 0) {
+    rootErrors.push(error(
+      "CATEGORY_REVIEW_REQUIRED",
+      null,
+      null,
+      "reviewQueue",
+      `${value.reviewQueue.length} source record(s) require category review before import`,
+    ));
   }
   if (!Array.isArray(value.locations)) {
     rootErrors.push(error("DATASET_INVALID", null, null, "locations", "Dataset locations must be an array"));

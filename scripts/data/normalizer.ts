@@ -1,10 +1,13 @@
 import {
   canonicalLocationRecordSchema,
   normalizedLocationOutputSchema,
+  type CategoryReviewItem,
   type CanonicalLocationRecord,
   type NormalizedLocationOutput,
   type SourceMapping,
 } from "./contracts.ts";
+import { mapLocationCategory } from "./category-mapping.ts";
+import type { LocationCategory } from "../../src/types/domain.ts";
 
 type JsonObject = Record<string, unknown>;
 
@@ -69,6 +72,15 @@ function mappedValue<T extends string>(
   return mapped;
 }
 
+function referenceText(record: JsonObject, path: string | undefined): string | null {
+  if (!path) return null;
+  const value = readPath(record, path);
+  if (typeof value === "number" && Number.isFinite(value)) return String(value);
+  if (typeof value !== "string") return null;
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : null;
+}
+
 function imageRecords(record: JsonObject, mapping: SourceMapping["images"], name: string): CanonicalLocationRecord["images"] {
   if (!mapping) return [];
   const raw = readPath(record, mapping.path);
@@ -113,9 +125,11 @@ function rawRecords(raw: unknown, recordsPath: string | undefined): unknown[] {
   return value;
 }
 
-export function normalizeRecord(record: unknown, mapping: SourceMapping): CanonicalLocationRecord {
-  if (!isObject(record)) throw new Error("Raw location must be an object");
-
+function normalizeRecordWithCategory(
+  record: JsonObject,
+  mapping: SourceMapping,
+  category: LocationCategory,
+): CanonicalLocationRecord {
   const name = requiredText(record, mapping.fields.name, "name");
   const id = optionalText(record, mapping.fields.id);
   const description = optionalText(record, mapping.fields.description) ?? mapping.defaults.description;
@@ -128,13 +142,7 @@ export function normalizeRecord(record: unknown, mapping: SourceMapping): Canoni
     ...(id ? { id } : {}),
     name,
     description,
-    category: mappedValue(
-      record,
-      mapping.fields.category,
-      mapping.categoryMap,
-      ["urban", "nature", "industrial", "interior"],
-      "category",
-    ),
+    category,
     region: mappedValue(
       record,
       mapping.fields.region,
@@ -158,10 +166,35 @@ export function normalizeRecord(record: unknown, mapping: SourceMapping): Canoni
   return canonicalLocationRecordSchema.parse(normalized);
 }
 
+export function normalizeRecord(record: unknown, mapping: SourceMapping): CanonicalLocationRecord {
+  if (!isObject(record)) throw new Error("Raw location must be an object");
+  const category = mapLocationCategory(readPath(record, mapping.fields.category), mapping.categoryMap);
+  if (category.status === "review") {
+    const sourceCategory = category.sourceCategory === null ? "missing or invalid" : `"${category.sourceCategory}"`;
+    throw new Error(`category ${sourceCategory} requires review (${category.reason})`);
+  }
+  return normalizeRecordWithCategory(record, mapping, category.category);
+}
+
 export function normalizeDataset(raw: unknown, mapping: SourceMapping): NormalizedLocationOutput {
-  const locations = rawRecords(raw, mapping.recordsPath).map((record, index) => {
+  const locations: CanonicalLocationRecord[] = [];
+  const reviewQueue: CategoryReviewItem[] = [];
+  rawRecords(raw, mapping.recordsPath).forEach((record, index) => {
     try {
-      return normalizeRecord(record, mapping);
+      if (!isObject(record)) throw new Error("Raw location must be an object");
+      const category = mapLocationCategory(readPath(record, mapping.fields.category), mapping.categoryMap);
+      if (category.status === "review") {
+        reviewQueue.push({
+          recordIndex: index,
+          sourceRecordId: referenceText(record, mapping.fields.id),
+          name: referenceText(record, mapping.fields.name),
+          sourceCategory: category.sourceCategory,
+          normalizedSourceCategory: category.normalizedSourceCategory,
+          reason: category.reason,
+        });
+        return;
+      }
+      locations.push(normalizeRecordWithCategory(record, mapping, category.category));
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       throw new Error(`Unable to normalize raw record ${index}: ${message}`, { cause: error });
@@ -172,5 +205,6 @@ export function normalizeDataset(raw: unknown, mapping: SourceMapping): Normaliz
     schemaVersion: 1,
     source: { name: mapping.source.name },
     locations,
+    reviewQueue,
   });
 }

@@ -1,5 +1,6 @@
 import { z } from "zod";
 import type { Location, LocationImage } from "../../src/types/domain.ts";
+import type { CategoryReviewReason } from "./category-mapping.ts";
 
 const locationCategories = ["urban", "nature", "industrial", "interior"] as const;
 const regions = ["서울", "부산", "인천", "경기"] as const;
@@ -32,6 +33,15 @@ export type CanonicalLocationRecord = {
   permit: Location["permit"];
   images: CanonicalLocationImage[];
   sourceUrl: NonNullable<Location["sourceUrl"]>;
+};
+
+export type CategoryReviewItem = {
+  recordIndex: number;
+  sourceRecordId: string | null;
+  name: string | null;
+  sourceCategory: string | null;
+  normalizedSourceCategory: string | null;
+  reason: CategoryReviewReason;
 };
 
 export const canonicalLocationRecordSchema: z.ZodType<CanonicalLocationRecord> = z.object({
@@ -105,8 +115,19 @@ export const normalizedLocationOutputSchema = z.object({
   source: z.object({
     name: nonEmptyString,
   }).strict(),
-  locations: z.array(canonicalLocationRecordSchema).min(1),
-}).strict();
+  locations: z.array(canonicalLocationRecordSchema),
+  reviewQueue: z.array(z.object({
+    recordIndex: z.number().int().nonnegative(),
+    sourceRecordId: nonEmptyString.nullable(),
+    name: nonEmptyString.nullable(),
+    sourceCategory: nonEmptyString.nullable(),
+    normalizedSourceCategory: nonEmptyString.nullable(),
+    reason: z.enum(["MISSING_CATEGORY", "INVALID_CATEGORY", "UNKNOWN_CATEGORY"]),
+  }).strict()).default([]),
+}).strict().refine(
+  (value) => value.locations.length + value.reviewQueue.length > 0,
+  { message: "Normalized output must contain at least one location or category review item" },
+);
 
 export type NormalizedLocationOutput = z.infer<typeof normalizedLocationOutputSchema>;
 

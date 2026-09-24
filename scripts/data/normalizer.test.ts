@@ -78,6 +78,7 @@ describe("normalizeDataset", () => {
         ],
         sourceUrl: "https://example.com/places/1",
       }],
+      reviewQueue: [],
     });
   });
 
@@ -112,16 +113,27 @@ describe("normalizeDataset", () => {
     });
   });
 
-  it("reports the raw record index when a mapped value or coordinate is invalid", () => {
-    expect(() => normalizeDataset({ payload: { places: [{
+  it("keeps unknown categories in a review queue without validating them as locations", () => {
+    expect(normalizeDataset({ payload: { places: [{
+      location_uuid: "provider-location-1",
       title: "Invalid",
-      details: { summary: "Bad category" },
       kind: "unknown",
-      area: "Seoul",
-      location: { address: "Address", lat: 37.5, lon: 127 },
-      links: { source: "https://example.com/invalid" },
-    }] } }, mapping)).toThrow("raw record 0");
+    }] } }, mapping)).toEqual({
+      schemaVersion: 1,
+      source: { name: "licensed-source" },
+      locations: [],
+      reviewQueue: [{
+        recordIndex: 0,
+        sourceRecordId: "provider-location-1",
+        name: "Invalid",
+        sourceCategory: "unknown",
+        normalizedSourceCategory: "unknown",
+        reason: "UNKNOWN_CATEGORY",
+      }],
+    });
+  });
 
+  it("reports the raw record index when a non-category field is invalid", () => {
     expect(() => normalizeDataset({ payload: { places: [{
       title: "Invalid coordinate",
       details: { summary: "Bad latitude" },
