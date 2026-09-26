@@ -22,7 +22,7 @@ pnpm data:normalize \
   data-work/normalized/provider.json
 ```
 
-The versioned output contains `name`, `description`, `category`, `region`, `address`, flattened `latitude` and `longitude`, `permit`, `images`, and `sourceUrl`. These field types are derived from `src/types/domain.ts`. Map `fields.id` to a controlled location UUID and `images.localPath` to each licensed local image when preparing data for validation and import. Both fields remain optional during initial normalization so a provider extract can be reviewed before database IDs and local assets are assigned.
+Normalized output schema version 2 contains `name`, `description`, `category`, `region`, `address`, flattened `latitude` and `longitude`, `permit`, `parking`, `images`, `sourceUrl`, and structured `provenance`. Shared field types are derived from `src/types/domain.ts`. Map `fields.id` to a controlled location UUID and `images.localPath` to each licensed local image when preparing data for validation and import. Both fields remain optional during initial normalization so a provider extract can be reviewed before database IDs and local assets are assigned.
 
 ### Category mapping and review queue
 
@@ -82,9 +82,31 @@ Do not store provider booleans such as `can_film: true`, or decision text such a
 
 Missing or blank source status uses the safe `defaults.permitType`, which defaults to `문의 필요`. A present but unknown status fails normalization instead of being guessed.
 
-`contactName` and `contactPhone` are read only from the paths explicitly configured under `permit`. When a source does not provide those paths or values, normalization stores `null`. It does not derive contacts from the location name, permit guidance, address, or similarly named unmapped fields. The location `sourceUrl` remains the provenance reference for the stored guidance.
+`contactName` and `contactPhone` are read only from the paths explicitly configured under `permit`. When a source does not provide those paths or values, normalization stores `null`. It does not derive contacts from the location name, permit guidance, address, or similarly named unmapped fields. Permit provenance records the source used for the stored guidance.
 
-Validation rejects unknown mapping fields, unsafe object paths, missing required text, unmapped region values, unsafe permit guidance, non-finite or out-of-range coordinates, non-HTTP(S) image/source URLs, and missing provenance. Unmapped categories enter the review queue described above. Numeric coordinate strings and numeric category/region codes are accepted because they are common in JSON converted from CSV. Missing descriptions use the configured default. Missing permit contacts receive explicit nulls and missing permit guidance uses the configurable `문의 필요` default; no permission decision is inferred.
+### Data provenance
+
+Every normalized location, permit object, and parking entry contains frontend-readable provenance:
+
+```json
+{
+  "source": "City parking API",
+  "sourceUrl": "https://example.com/parking/1",
+  "referenceDate": "2026-09-02",
+  "lastVerifiedAt": "2026-09-22T10:00:00Z"
+}
+```
+
+- `source` and HTTP(S) `sourceUrl` are always required.
+- `referenceDate` is a real ISO calendar date (`YYYY-MM-DD`) or `null`.
+- `lastVerifiedAt` is an ISO 8601 timestamp with a timezone or `null`.
+- The normalizer never inserts the current time. Missing dates remain `null` so generated output stays deterministic and does not claim a verification that did not occur.
+
+Dataset-level values under `source` provide the fallback provenance. `provenance.location` can map record-specific location fields. `provenance.permit` and `parking.provenance` can then override their own source, URL, dates, or verification timestamp. Unspecified permit and parking provenance fields inherit the location provenance, which keeps every output entry traceable while preserving more specific source metadata whenever the provider supplies it.
+
+The legacy location `sourceUrl` remains in the normalized record for the current import contract and matches `provenance.sourceUrl`. Parking data is optional; when configured, each source parking object is normalized to `name`, flattened coordinates, capacity, opening hours, price information, and its own provenance object.
+
+Validation rejects unknown mapping fields, unsafe object paths, missing required text, unmapped region values, unsafe permit guidance, malformed provenance dates, non-finite or out-of-range coordinates, non-HTTP(S) image/source URLs, and missing provenance. Unmapped categories enter the review queue described above. Numeric coordinate strings and numeric category/region codes are accepted because they are common in JSON converted from CSV. Missing descriptions use the configured default. Missing permit contacts receive explicit nulls and missing permit guidance uses the configurable `문의 필요` default; no permission decision is inferred.
 
 This command only reads local JSON and writes reviewed JSON. It does not download images, call a provider API, or write to Supabase. A source URL records provenance but does not establish redistribution rights; document the license and attribution in `DATA_LICENSES.md` before committing real records or images.
 
@@ -106,6 +128,7 @@ The command writes a deterministic report with `valid`, aggregate counts, and ev
 - canonical category and region values;
 - finite latitude `[-90, 90]` and longitude `[-180, 180]`;
 - safe permit guidance, explicit nullable contact fields, and HTTP(S) source/image URLs;
+- location, permit, and parking provenance names, URLs, reference dates, and verification timestamps;
 - at least one image, non-blank alt text, a local image path, and whether that path is a regular file.
 
 Validation reads file metadata only. It does not upload, modify, or decode images, and it does not connect to Supabase. A passing report means the checked structure is safe to hand to the next import review; it does not prove data accuracy, licensing, or authorization.

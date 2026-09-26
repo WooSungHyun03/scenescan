@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { Location, LocationImage } from "../../src/types/domain.ts";
+import type { Location, LocationImage, ParkingInfo } from "../../src/types/domain.ts";
 import type { CategoryReviewReason } from "./category-mapping.ts";
 import { PERMIT_GUIDANCE_VALUES } from "./permit-information.ts";
 
@@ -12,6 +12,8 @@ const httpUrl = nonEmptyString.url().refine(
   (value) => value.startsWith("https://") || value.startsWith("http://"),
   "URL must use http or https",
 );
+const isoDate = z.iso.date();
+const isoDateTime = z.iso.datetime({ offset: true });
 
 const fieldPath = nonEmptyString.refine(
   (value) => value.split(".").every((segment) => segment.length > 0 && !unsafePathSegments.has(segment)),
@@ -20,6 +22,28 @@ const fieldPath = nonEmptyString.refine(
 
 export type CanonicalLocationImage = Pick<LocationImage, "imageUrl" | "alt"> & {
   imagePath?: string;
+};
+
+export type DataProvenance = {
+  source: string;
+  sourceUrl: string;
+  referenceDate: string | null;
+  lastVerifiedAt: string | null;
+};
+
+export type CanonicalPermitInfo = Location["permit"] & {
+  provenance: DataProvenance;
+};
+
+export type CanonicalParkingRecord = {
+  id?: ParkingInfo["id"];
+  name: ParkingInfo["name"];
+  latitude: ParkingInfo["point"]["latitude"];
+  longitude: ParkingInfo["point"]["longitude"];
+  capacity: ParkingInfo["capacity"];
+  openingHours: ParkingInfo["openingHours"];
+  priceInfo: ParkingInfo["priceInfo"];
+  provenance: DataProvenance;
 };
 
 export type CanonicalLocationRecord = {
@@ -31,9 +55,11 @@ export type CanonicalLocationRecord = {
   address: Location["address"];
   latitude: Location["point"]["latitude"];
   longitude: Location["point"]["longitude"];
-  permit: Location["permit"];
+  permit: CanonicalPermitInfo;
+  parking: CanonicalParkingRecord[];
   images: CanonicalLocationImage[];
   sourceUrl: NonNullable<Location["sourceUrl"]>;
+  provenance: DataProvenance;
 };
 
 export type CategoryReviewItem = {
@@ -44,6 +70,13 @@ export type CategoryReviewItem = {
   normalizedSourceCategory: string | null;
   reason: CategoryReviewReason;
 };
+
+export const dataProvenanceSchema: z.ZodType<DataProvenance> = z.object({
+  source: nonEmptyString,
+  sourceUrl: httpUrl,
+  referenceDate: isoDate.nullable(),
+  lastVerifiedAt: isoDateTime.nullable(),
+}).strict();
 
 export const canonicalLocationRecordSchema: z.ZodType<CanonicalLocationRecord> = z.object({
   id: nonEmptyString.optional(),
@@ -59,13 +92,32 @@ export const canonicalLocationRecordSchema: z.ZodType<CanonicalLocationRecord> =
     contactName: nonEmptyString.nullable(),
     contactPhone: nonEmptyString.nullable(),
     note: nonEmptyString.nullable(),
+    provenance: dataProvenanceSchema,
   }).strict(),
+  parking: z.array(z.object({
+    id: nonEmptyString.optional(),
+    name: nonEmptyString,
+    latitude: z.number().finite().min(-90).max(90),
+    longitude: z.number().finite().min(-180).max(180),
+    capacity: z.number().int().nonnegative().nullable(),
+    openingHours: nonEmptyString.nullable(),
+    priceInfo: nonEmptyString.nullable(),
+    provenance: dataProvenanceSchema,
+  }).strict()),
   images: z.array(z.object({
     imagePath: nonEmptyString.optional(),
     imageUrl: httpUrl,
     alt: nonEmptyString,
   }).strict()),
   sourceUrl: httpUrl,
+  provenance: dataProvenanceSchema,
+}).strict();
+
+const provenanceFieldMappingSchema = z.object({
+  source: fieldPath.optional(),
+  sourceUrl: fieldPath.optional(),
+  referenceDate: fieldPath.optional(),
+  lastVerifiedAt: fieldPath.optional(),
 }).strict();
 
 export const sourceMappingSchema = z.object({
@@ -73,6 +125,8 @@ export const sourceMappingSchema = z.object({
   source: z.object({
     name: nonEmptyString,
     defaultSourceUrl: httpUrl.optional(),
+    referenceDate: isoDate.optional(),
+    lastVerifiedAt: isoDateTime.optional(),
   }).strict(),
   recordsPath: fieldPath.optional(),
   fields: z.object({
@@ -92,6 +146,21 @@ export const sourceMappingSchema = z.object({
     contactPhone: fieldPath.optional(),
     note: fieldPath.optional(),
   }).strict().default({}),
+  provenance: z.object({
+    location: provenanceFieldMappingSchema.default({}),
+    permit: provenanceFieldMappingSchema.default({}),
+  }).strict().default({ location: {}, permit: {} }),
+  parking: z.object({
+    path: fieldPath,
+    id: fieldPath.optional(),
+    name: fieldPath,
+    latitude: fieldPath,
+    longitude: fieldPath,
+    capacity: fieldPath.optional(),
+    openingHours: fieldPath.optional(),
+    priceInfo: fieldPath.optional(),
+    provenance: provenanceFieldMappingSchema.default({}),
+  }).strict().optional(),
   images: z.object({
     path: fieldPath,
     url: fieldPath.optional(),
@@ -113,7 +182,7 @@ export const sourceMappingSchema = z.object({
 export type SourceMapping = z.infer<typeof sourceMappingSchema>;
 
 export const normalizedLocationOutputSchema = z.object({
-  schemaVersion: z.literal(1),
+  schemaVersion: z.literal(2),
   source: z.object({
     name: nonEmptyString,
   }).strict(),

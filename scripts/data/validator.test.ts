@@ -4,6 +4,12 @@ import { validateLocationDataset, type DataValidationErrorCode } from "./validat
 const locationId = "00000000-0000-4000-8000-000000000101";
 
 function validLocation() {
+  const provenance = {
+    source: "Authorized source",
+    sourceUrl: "https://example.com/locations/1",
+    referenceDate: "2026-09-01",
+    lastVerifiedAt: "2026-09-20T00:00:00Z",
+  };
   return {
     id: locationId,
     name: "Sample location",
@@ -13,18 +19,29 @@ function validLocation() {
     address: "1 Example-ro",
     latitude: 37.55,
     longitude: 126.97,
-    permit: { type: "문의 필요", contactName: null, contactPhone: null, note: null },
+    permit: { type: "문의 필요", contactName: null, contactPhone: null, note: null, provenance },
+    parking: [{
+      id: "parking-1",
+      name: "Example parking",
+      latitude: 37.551,
+      longitude: 126.971,
+      capacity: 20,
+      openingHours: null,
+      priceInfo: null,
+      provenance: { ...provenance, sourceUrl: "https://example.com/parking/1" },
+    }],
     images: [{
       imagePath: "images/location.jpg",
       imageUrl: "https://example.com/location.jpg",
       alt: "Sample location exterior",
     }],
     sourceUrl: "https://example.com/locations/1",
+    provenance,
   };
 }
 
 function dataset(locations: unknown[]) {
-  return { schemaVersion: 1, source: { name: "authorized-source" }, locations };
+  return { schemaVersion: 2, source: { name: "authorized-source" }, locations };
 }
 
 describe("validateLocationDataset", () => {
@@ -120,10 +137,10 @@ describe("validateLocationDataset", () => {
     const location = {
       ...validLocation(),
       permit: {
+        ...validLocation().permit,
         type: "허가 가능",
         contactName: "   ",
         contactPhone: undefined,
-        note: null,
       },
     };
     const report = await validateLocationDataset(dataset([location]), { inspectImagePath: async () => "ok" });
@@ -133,5 +150,34 @@ describe("validateLocationDataset", () => {
       "PERMIT_CONTACT_INVALID",
       "PERMIT_GUIDANCE_UNSAFE",
     ]);
+  });
+
+  it("reports missing and malformed provenance for location, permit, and parking", async () => {
+    const location = {
+      ...validLocation(),
+      provenance: undefined,
+      permit: { ...validLocation().permit, provenance: { source: "", sourceUrl: "not-a-url" } },
+      parking: [{
+        ...validLocation().parking[0],
+        provenance: {
+          source: "Parking API",
+          sourceUrl: "https://example.com/parking/1",
+          referenceDate: "2026-02-30",
+          lastVerifiedAt: "yesterday",
+        },
+      }],
+    };
+    const report = await validateLocationDataset(dataset([location]), { inspectImagePath: async () => "ok" });
+
+    expect(report.errors.map((item) => item.field)).toEqual([
+      "parking[0].provenance.lastVerifiedAt",
+      "parking[0].provenance.referenceDate",
+      "permit.provenance.lastVerifiedAt",
+      "permit.provenance.referenceDate",
+      "permit.provenance.source",
+      "permit.provenance.sourceUrl",
+      "provenance",
+    ]);
+    expect(report.errors.every((item) => item.code === "PROVENANCE_INVALID")).toBe(true);
   });
 });

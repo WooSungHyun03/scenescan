@@ -4,7 +4,12 @@ import { normalizeDataset } from "./normalizer.ts";
 
 const mapping = parseSourceMapping({
   schemaVersion: 1,
-  source: { name: "licensed-source", defaultSourceUrl: "https://example.com/license" },
+  source: {
+    name: "licensed-source",
+    defaultSourceUrl: "https://example.com/license",
+    referenceDate: "2026-08-31",
+    lastVerifiedAt: "2026-09-20T00:00:00Z",
+  },
   recordsPath: "payload.places",
   fields: {
     id: "location_uuid",
@@ -22,6 +27,33 @@ const mapping = parseSourceMapping({
     contactName: "production.contact.name",
     contactPhone: "production.contact.phone",
     note: "production.note",
+  },
+  provenance: {
+    location: {
+      source: "links.publisher",
+      referenceDate: "metadata.referenceDate",
+    },
+    permit: {
+      source: "production.source.name",
+      sourceUrl: "production.source.url",
+      lastVerifiedAt: "production.source.lastVerifiedAt",
+    },
+  },
+  parking: {
+    path: "nearbyParking",
+    id: "id",
+    name: "name",
+    latitude: "point.lat",
+    longitude: "point.lon",
+    capacity: "capacity",
+    openingHours: "openingHours",
+    priceInfo: "priceInfo",
+    provenance: {
+      source: "source.name",
+      sourceUrl: "source.url",
+      referenceDate: "source.referenceDate",
+      lastVerifiedAt: "source.lastVerifiedAt",
+    },
   },
   images: { path: "media.images", url: "url", alt: "caption", localPath: "local_path" },
   categoryMap: { warehouse: "industrial" },
@@ -45,18 +77,38 @@ describe("normalizeDataset", () => {
             permit: "Contact first",
             contact: { name: "Location office", phone: "02-0000-0000" },
             note: "Weekdays only",
+            source: {
+              name: "Location office notice",
+              url: "https://example.com/places/1/permit",
+              lastVerifiedAt: "2026-09-21T09:30:00+09:00",
+            },
           },
+          metadata: { referenceDate: "2026-09-01" },
+          nearbyParking: [{
+            id: "parking-1",
+            name: "Example public parking",
+            point: { lat: 37.551, lon: 126.971 },
+            capacity: "24",
+            openingHours: "09:00-22:00",
+            priceInfo: "Paid",
+            source: {
+              name: "City parking API",
+              url: "https://example.com/parking/1",
+              referenceDate: "2026-09-02",
+              lastVerifiedAt: "2026-09-22T10:00:00Z",
+            },
+          }],
           media: { images: [
             { url: "https://example.com/one.jpg", caption: "Exterior", local_path: "images/one.jpg" },
             { url: "https://example.com/two.jpg", caption: "", local_path: "images/two.jpg" },
           ] },
-          links: { source: "https://example.com/places/1" },
+          links: { source: "https://example.com/places/1", publisher: "Provider place catalog" },
         }],
       },
     }, mapping);
 
     expect(output).toEqual({
-      schemaVersion: 1,
+      schemaVersion: 2,
       source: { name: "licensed-source" },
       locations: [{
         id: "00000000-0000-4000-8000-000000000101",
@@ -72,12 +124,39 @@ describe("normalizeDataset", () => {
           contactName: "Location office",
           contactPhone: "02-0000-0000",
           note: "Weekdays only",
+          provenance: {
+            source: "Location office notice",
+            sourceUrl: "https://example.com/places/1/permit",
+            referenceDate: "2026-09-01",
+            lastVerifiedAt: "2026-09-21T09:30:00+09:00",
+          },
         },
+        parking: [{
+          id: "parking-1",
+          name: "Example public parking",
+          latitude: 37.551,
+          longitude: 126.971,
+          capacity: 24,
+          openingHours: "09:00-22:00",
+          priceInfo: "Paid",
+          provenance: {
+            source: "City parking API",
+            sourceUrl: "https://example.com/parking/1",
+            referenceDate: "2026-09-02",
+            lastVerifiedAt: "2026-09-22T10:00:00Z",
+          },
+        }],
         images: [
           { imagePath: "images/one.jpg", imageUrl: "https://example.com/one.jpg", alt: "Exterior" },
           { imagePath: "images/two.jpg", imageUrl: "https://example.com/two.jpg", alt: "Sample Warehouse" },
         ],
         sourceUrl: "https://example.com/places/1",
+        provenance: {
+          source: "Provider place catalog",
+          sourceUrl: "https://example.com/places/1",
+          referenceDate: "2026-09-01",
+          lastVerifiedAt: "2026-09-20T00:00:00Z",
+        },
       }],
       reviewQueue: [],
     });
@@ -111,8 +190,15 @@ describe("normalizeDataset", () => {
     }], minimalMapping).locations[0]).toMatchObject({
       description: "",
       permit: { type: "문의 필요", contactName: null, contactPhone: null, note: null },
+      parking: [],
       images: [{ imageUrl: "https://example.com/riverside.jpg", alt: "Riverside" }],
       sourceUrl: "https://example.com/license",
+      provenance: {
+        source: "minimal",
+        sourceUrl: "https://example.com/license",
+        referenceDate: null,
+        lastVerifiedAt: null,
+      },
     });
   });
 
@@ -133,7 +219,7 @@ describe("normalizeDataset", () => {
       title: "Invalid",
       kind: "unknown",
     }] } }, mapping)).toEqual({
-      schemaVersion: 1,
+      schemaVersion: 2,
       source: { name: "licensed-source" },
       locations: [],
       reviewQueue: [{

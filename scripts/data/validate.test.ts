@@ -12,7 +12,7 @@ afterEach(async () => {
 
 function input(imagePath: string) {
   return {
-    schemaVersion: 1,
+    schemaVersion: 2,
     source: { name: "authorized-source" },
     locations: [{
       id: "00000000-0000-4000-8000-000000000101",
@@ -23,9 +23,27 @@ function input(imagePath: string) {
       address: "Address",
       latitude: 35.1,
       longitude: 129.03,
-      permit: { type: "문의 필요", contactName: null, contactPhone: null, note: null },
+      permit: {
+        type: "문의 필요",
+        contactName: null,
+        contactPhone: null,
+        note: null,
+        provenance: {
+          source: "source",
+          sourceUrl: "https://example.com/source",
+          referenceDate: null,
+          lastVerifiedAt: null,
+        },
+      },
+      parking: [],
       images: [{ imagePath, imageUrl: "https://example.com/image.jpg", alt: "Location" }],
       sourceUrl: "https://example.com/source",
+      provenance: {
+        source: "source",
+        sourceUrl: "https://example.com/source",
+        referenceDate: null,
+        lastVerifiedAt: null,
+      },
     }],
   };
 }

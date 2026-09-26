@@ -1,8 +1,11 @@
 import {
   canonicalLocationRecordSchema,
+  dataProvenanceSchema,
   normalizedLocationOutputSchema,
+  type CanonicalParkingRecord,
   type CategoryReviewItem,
   type CanonicalLocationRecord,
+  type DataProvenance,
   type NormalizedLocationOutput,
   type SourceMapping,
 } from "./contracts.ts";
@@ -48,6 +51,17 @@ function coordinate(record: JsonObject, path: string, label: string): number {
   const value = typeof raw === "string" && raw.trim().length > 0 ? Number(raw) : raw;
   if (typeof value !== "number" || !Number.isFinite(value)) {
     throw new Error(`${label} must resolve to a finite number at "${path}"`);
+  }
+  return value;
+}
+
+function optionalNonNegativeInteger(record: JsonObject, path: string | undefined, label: string): number | null {
+  if (!path) return null;
+  const raw = readPath(record, path);
+  if (raw === undefined || raw === null || raw === "") return null;
+  const value = typeof raw === "string" && raw.trim().length > 0 ? Number(raw) : raw;
+  if (typeof value !== "number" || !Number.isInteger(value) || value < 0) {
+    throw new Error(`${label} must resolve to a non-negative integer at "${path}"`);
   }
   return value;
 }
@@ -116,6 +130,44 @@ function imageRecords(record: JsonObject, mapping: SourceMapping["images"], name
   });
 }
 
+function provenanceRecord(
+  record: JsonObject,
+  mapping: SourceMapping["provenance"]["location"],
+  fallback: DataProvenance,
+): DataProvenance {
+  return dataProvenanceSchema.parse({
+    source: optionalText(record, mapping.source) ?? fallback.source,
+    sourceUrl: optionalText(record, mapping.sourceUrl) ?? fallback.sourceUrl,
+    referenceDate: optionalText(record, mapping.referenceDate) ?? fallback.referenceDate,
+    lastVerifiedAt: optionalText(record, mapping.lastVerifiedAt) ?? fallback.lastVerifiedAt,
+  });
+}
+
+function parkingRecords(
+  record: JsonObject,
+  mapping: SourceMapping["parking"],
+  fallbackProvenance: DataProvenance,
+): CanonicalParkingRecord[] {
+  if (!mapping) return [];
+  const raw = readPath(record, mapping.path);
+  if (raw === undefined || raw === null) return [];
+  const items = Array.isArray(raw) ? raw : [raw];
+  return items.map((item, index) => {
+    if (!isObject(item)) throw new Error(`parking[${index}] must be an object`);
+    const id = optionalText(item, mapping.id);
+    return {
+      ...(id ? { id } : {}),
+      name: requiredText(item, mapping.name, `parking[${index}].name`),
+      latitude: coordinate(item, mapping.latitude, `parking[${index}].latitude`),
+      longitude: coordinate(item, mapping.longitude, `parking[${index}].longitude`),
+      capacity: optionalNonNegativeInteger(item, mapping.capacity, `parking[${index}].capacity`),
+      openingHours: optionalText(item, mapping.openingHours),
+      priceInfo: optionalText(item, mapping.priceInfo),
+      provenance: provenanceRecord(item, mapping.provenance, fallbackProvenance),
+    };
+  });
+}
+
 function rawRecords(raw: unknown, recordsPath: string | undefined): unknown[] {
   const value = recordsPath ? readPath(raw, recordsPath) : raw;
   if (!Array.isArray(value)) {
@@ -134,10 +186,21 @@ function normalizeRecordWithCategory(
   const name = requiredText(record, mapping.fields.name, "name");
   const id = optionalText(record, mapping.fields.id);
   const description = optionalText(record, mapping.fields.description) ?? mapping.defaults.description;
-  const sourceUrl = optionalText(record, mapping.fields.sourceUrl) ?? mapping.source.defaultSourceUrl;
+  const sourceUrl = optionalText(record, mapping.provenance.location.sourceUrl)
+    ?? optionalText(record, mapping.fields.sourceUrl)
+    ?? mapping.source.defaultSourceUrl;
   if (!sourceUrl) {
-    throw new Error("sourceUrl is required; map a record field or configure source.defaultSourceUrl");
+    throw new Error(
+      "sourceUrl is required; map provenance.location.sourceUrl or fields.sourceUrl, or configure source.defaultSourceUrl",
+    );
   }
+  const defaultProvenance = dataProvenanceSchema.parse({
+    source: mapping.source.name,
+    sourceUrl,
+    referenceDate: mapping.source.referenceDate ?? null,
+    lastVerifiedAt: mapping.source.lastVerifiedAt ?? null,
+  });
+  const locationProvenance = provenanceRecord(record, mapping.provenance.location, defaultProvenance);
 
   const normalized: CanonicalLocationRecord = {
     ...(id ? { id } : {}),
@@ -163,9 +226,12 @@ function normalizeRecordWithCategory(
       contactName: optionalText(record, mapping.permit.contactName),
       contactPhone: optionalText(record, mapping.permit.contactPhone),
       note: optionalText(record, mapping.permit.note),
+      provenance: provenanceRecord(record, mapping.provenance.permit, locationProvenance),
     },
+    parking: parkingRecords(record, mapping.parking, locationProvenance),
     images: imageRecords(record, mapping.images, name),
-    sourceUrl,
+    sourceUrl: locationProvenance.sourceUrl,
+    provenance: locationProvenance,
   };
 
   return canonicalLocationRecordSchema.parse(normalized);
@@ -207,7 +273,7 @@ export function normalizeDataset(raw: unknown, mapping: SourceMapping): Normaliz
   });
 
   return normalizedLocationOutputSchema.parse({
-    schemaVersion: 1,
+    schemaVersion: 2,
     source: { name: mapping.source.name },
     locations,
     reviewQueue,

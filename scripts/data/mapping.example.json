@@ -2,7 +2,9 @@
   "schemaVersion": 1,
   "source": {
     "name": "authorized-location-dataset",
-    "defaultSourceUrl": "https://example.com/dataset-license"
+    "defaultSourceUrl": "https://example.com/dataset-license",
+    "referenceDate": "2026-09-01",
+    "lastVerifiedAt": "2026-09-20T00:00:00Z"
   },
   "recordsPath": "records",
   "fields": {
@@ -21,6 +23,36 @@
     "contactName": "filming.contact_name",
     "contactPhone": "filming.contact_phone",
     "note": "filming.note"
+  },
+  "provenance": {
+    "location": {
+      "source": "links.publisher",
+      "sourceUrl": "links.source",
+      "referenceDate": "metadata.reference_date",
+      "lastVerifiedAt": "metadata.last_verified_at"
+    },
+    "permit": {
+      "source": "filming.source_name",
+      "sourceUrl": "filming.source_url",
+      "referenceDate": "filming.reference_date",
+      "lastVerifiedAt": "filming.last_verified_at"
+    }
+  },
+  "parking": {
+    "path": "nearby_parking",
+    "id": "parking_id",
+    "name": "name",
+    "latitude": "coordinates.lat",
+    "longitude": "coordinates.lng",
+    "capacity": "capacity",
+    "openingHours": "opening_hours",
+    "priceInfo": "price_info",
+    "provenance": {
+      "source": "source_name",
+      "sourceUrl": "source_url",
+      "referenceDate": "reference_date",
+      "lastVerifiedAt": "last_verified_at"
+    }
   },
   "images": {
     "path": "photos",

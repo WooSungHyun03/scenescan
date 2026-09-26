@@ -4,6 +4,8 @@ import { isPermitGuidance } from "./permit-information.ts";
 const categories = new Set(["urban", "nature", "industrial", "interior"]);
 const regions = new Set(["서울", "부산", "인천", "경기"]);
 const uuidSchema = z.string().uuid();
+const isoDateSchema = z.iso.date();
+const isoDateTimeSchema = z.iso.datetime({ offset: true });
 
 type JsonObject = Record<string, unknown>;
 
@@ -27,6 +29,8 @@ export type DataValidationErrorCode =
   | "PERMIT_INVALID"
   | "PERMIT_GUIDANCE_UNSAFE"
   | "PERMIT_CONTACT_INVALID"
+  | "PROVENANCE_INVALID"
+  | "PARKING_INVALID"
   | "SOURCE_URL_INVALID"
   | "IMAGES_REQUIRED"
   | "IMAGE_INVALID"
@@ -101,6 +105,104 @@ function coordinateError(
 ): DataValidationError | null {
   if (typeof value === "number" && Number.isFinite(value) && value >= minimum && value <= maximum) return null;
   return error(code, locationIndex, locationId, field, `${field} must be a finite number between ${minimum} and ${maximum}`);
+}
+
+function validateProvenance(
+  value: unknown,
+  field: string,
+  locationIndex: number,
+  locationId: string | null,
+): DataValidationError[] {
+  if (!isObject(value)) {
+    return [error(
+      "PROVENANCE_INVALID",
+      locationIndex,
+      locationId,
+      field,
+      "Provenance must include source, sourceUrl, referenceDate, and lastVerifiedAt",
+    )];
+  }
+  const errors: DataValidationError[] = [];
+  if (!nonEmptyText(value.source)) {
+    errors.push(error("PROVENANCE_INVALID", locationIndex, locationId, `${field}.source`, "Provenance source is required"));
+  }
+  if (!isHttpUrl(value.sourceUrl)) {
+    errors.push(error(
+      "PROVENANCE_INVALID",
+      locationIndex,
+      locationId,
+      `${field}.sourceUrl`,
+      "Provenance source URL must use HTTP or HTTPS",
+    ));
+  }
+  if (value.referenceDate !== null && !isoDateSchema.safeParse(value.referenceDate).success) {
+    errors.push(error(
+      "PROVENANCE_INVALID",
+      locationIndex,
+      locationId,
+      `${field}.referenceDate`,
+      "Provenance reference date must be YYYY-MM-DD or null",
+    ));
+  }
+  if (value.lastVerifiedAt !== null && !isoDateTimeSchema.safeParse(value.lastVerifiedAt).success) {
+    errors.push(error(
+      "PROVENANCE_INVALID",
+      locationIndex,
+      locationId,
+      `${field}.lastVerifiedAt`,
+      "Provenance last verified value must be an ISO 8601 timestamp with timezone or null",
+    ));
+  }
+  return errors;
+}
+
+function validateParking(
+  value: unknown,
+  parkingIndex: number,
+  locationIndex: number,
+  locationId: string | null,
+): DataValidationError[] {
+  const field = `parking[${parkingIndex}]`;
+  if (!isObject(value)) {
+    return [error("PARKING_INVALID", locationIndex, locationId, field, "Parking entry must be an object")];
+  }
+  const errors: DataValidationError[] = [];
+  if (!nonEmptyText(value.name)) {
+    errors.push(error("PARKING_INVALID", locationIndex, locationId, `${field}.name`, "Parking name is required"));
+  }
+  const latitudeError = coordinateError(
+    value.latitude,
+    -90,
+    90,
+    "LATITUDE_INVALID",
+    locationIndex,
+    locationId,
+    "latitude",
+  );
+  if (latitudeError) errors.push({ ...latitudeError, field: `${field}.latitude` });
+  const longitudeError = coordinateError(
+    value.longitude,
+    -180,
+    180,
+    "LONGITUDE_INVALID",
+    locationIndex,
+    locationId,
+    "longitude",
+  );
+  if (longitudeError) errors.push({ ...longitudeError, field: `${field}.longitude` });
+  if (value.capacity !== null && (
+    typeof value.capacity !== "number" || !Number.isInteger(value.capacity) || value.capacity < 0
+  )) {
+    errors.push(error(
+      "PARKING_INVALID",
+      locationIndex,
+      locationId,
+      `${field}.capacity`,
+      "Parking capacity must be a non-negative integer or null",
+    ));
+  }
+  errors.push(...validateProvenance(value.provenance, `${field}.provenance`, locationIndex, locationId));
+  return errors;
 }
 
 async function validateImage(
@@ -205,10 +307,17 @@ async function validateLocation(
         "Permit contact phone must be a source string or null; do not generate a fallback contact",
       ));
     }
+    errors.push(...validateProvenance(value.permit.provenance, "permit.provenance", locationIndex, id));
+  }
+  if (!Array.isArray(value.parking)) {
+    errors.push(error("PARKING_INVALID", locationIndex, id, "parking", "Parking data must be an array"));
+  } else {
+    errors.push(...value.parking.flatMap((parking, index) => validateParking(parking, index, locationIndex, id)));
   }
   if (!isHttpUrl(value.sourceUrl)) {
     errors.push(error("SOURCE_URL_INVALID", locationIndex, id, "sourceUrl", "Source URL must use HTTP or HTTPS"));
   }
+  errors.push(...validateProvenance(value.provenance, "provenance", locationIndex, id));
 
   if (!Array.isArray(value.images) || value.images.length === 0) {
     errors.push(error("IMAGES_REQUIRED", locationIndex, id, "images", "At least one image is required before import"));
@@ -253,8 +362,8 @@ export async function validateLocationDataset(
   }
 
   const rootErrors: DataValidationError[] = [];
-  if (value.schemaVersion !== 1) {
-    rootErrors.push(error("SCHEMA_VERSION_INVALID", null, null, "schemaVersion", "Schema version must be 1"));
+  if (value.schemaVersion !== 2) {
+    rootErrors.push(error("SCHEMA_VERSION_INVALID", null, null, "schemaVersion", "Normalized schema version must be 2"));
   }
   if (!isObject(value.source) || !nonEmptyText(value.source.name)) {
     rootErrors.push(error("SOURCE_INVALID", null, null, "source.name", "Source name is required"));
