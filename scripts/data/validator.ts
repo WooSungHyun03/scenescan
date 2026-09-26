@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { isPermitGuidance } from "./permit-information.ts";
 
 const categories = new Set(["urban", "nature", "industrial", "interior"]);
 const regions = new Set(["서울", "부산", "인천", "경기"]);
@@ -24,6 +25,8 @@ export type DataValidationErrorCode =
   | "LATITUDE_INVALID"
   | "LONGITUDE_INVALID"
   | "PERMIT_INVALID"
+  | "PERMIT_GUIDANCE_UNSAFE"
+  | "PERMIT_CONTACT_INVALID"
   | "SOURCE_URL_INVALID"
   | "IMAGES_REQUIRED"
   | "IMAGE_INVALID"
@@ -174,6 +177,34 @@ async function validateLocation(
   if (longitudeError) errors.push(longitudeError);
   if (!isObject(value.permit) || !nonEmptyText(value.permit.type)) {
     errors.push(error("PERMIT_INVALID", locationIndex, id, "permit", "Permit metadata must include a non-empty type"));
+  } else {
+    if (!isPermitGuidance(value.permit.type)) {
+      errors.push(error(
+        "PERMIT_GUIDANCE_UNSAFE",
+        locationIndex,
+        id,
+        "permit.type",
+        "Permit guidance must be 문의 필요, 정보 확인 필요, 영상위원회 문의, or 기관 직접 문의",
+      ));
+    }
+    if (value.permit.contactName !== null && !nonEmptyText(value.permit.contactName)) {
+      errors.push(error(
+        "PERMIT_CONTACT_INVALID",
+        locationIndex,
+        id,
+        "permit.contactName",
+        "Permit contact name must be a source string or null; do not generate a fallback contact",
+      ));
+    }
+    if (value.permit.contactPhone !== null && !nonEmptyText(value.permit.contactPhone)) {
+      errors.push(error(
+        "PERMIT_CONTACT_INVALID",
+        locationIndex,
+        id,
+        "permit.contactPhone",
+        "Permit contact phone must be a source string or null; do not generate a fallback contact",
+      ));
+    }
   }
   if (!isHttpUrl(value.sourceUrl)) {
     errors.push(error("SOURCE_URL_INVALID", locationIndex, id, "sourceUrl", "Source URL must use HTTP or HTTPS"));

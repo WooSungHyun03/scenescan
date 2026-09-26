@@ -59,7 +59,32 @@ Unknown, missing, and invalid category values are not assigned a category. Their
 
 Review the provider documentation, add an explicit entry to that source's `categoryMap`, and run normalization again. Normalization still writes this reviewable output when the queue is non-empty, but exits with status 1. Validation also reports `CATEGORY_REVIEW_REQUIRED`, preventing the dataset from passing an import gate until the queue is empty.
 
-Validation rejects unknown mapping fields, unsafe object paths, missing required text, unmapped region values, non-finite or out-of-range coordinates, non-HTTP(S) image/source URLs, and missing provenance. Unmapped categories enter the review queue described above. Numeric coordinate strings and numeric category/region codes are accepted because they are common in JSON converted from CSV. Missing descriptions use the configured default. Missing permit details receive explicit nulls and the configurable `정보 확인 필요` type; no permission decision is inferred.
+### Permit information safety
+
+SceneScan stores inquiry guidance, not a legal or administrative permission decision. Canonical `permit.type` values are limited to:
+
+- `문의 필요`
+- `정보 확인 필요`
+- `영상위원회 문의`
+- `기관 직접 문의`
+
+Do not store provider booleans such as `can_film: true`, or decision text such as `허가 가능` and `허가 불가능`, as permit guidance. If a provider supplies its own status code or phrase, review the provider documentation and add an explicit `permitTypeMap` entry:
+
+```json
+{
+  "permitTypeMap": {
+    "contact_first": "문의 필요",
+    "film_commission": "영상위원회 문의",
+    "agency_contact": "기관 직접 문의"
+  }
+}
+```
+
+Missing or blank source status uses the safe `defaults.permitType`, which defaults to `문의 필요`. A present but unknown status fails normalization instead of being guessed.
+
+`contactName` and `contactPhone` are read only from the paths explicitly configured under `permit`. When a source does not provide those paths or values, normalization stores `null`. It does not derive contacts from the location name, permit guidance, address, or similarly named unmapped fields. The location `sourceUrl` remains the provenance reference for the stored guidance.
+
+Validation rejects unknown mapping fields, unsafe object paths, missing required text, unmapped region values, unsafe permit guidance, non-finite or out-of-range coordinates, non-HTTP(S) image/source URLs, and missing provenance. Unmapped categories enter the review queue described above. Numeric coordinate strings and numeric category/region codes are accepted because they are common in JSON converted from CSV. Missing descriptions use the configured default. Missing permit contacts receive explicit nulls and missing permit guidance uses the configurable `문의 필요` default; no permission decision is inferred.
 
 This command only reads local JSON and writes reviewed JSON. It does not download images, call a provider API, or write to Supabase. A source URL records provenance but does not establish redistribution rights; document the license and attribution in `DATA_LICENSES.md` before committing real records or images.
 
@@ -80,7 +105,7 @@ The command writes a deterministic report with `valid`, aggregate counts, and ev
 - non-blank names and addresses;
 - canonical category and region values;
 - finite latitude `[-90, 90]` and longitude `[-180, 180]`;
-- permit type and HTTP(S) source/image URLs;
+- safe permit guidance, explicit nullable contact fields, and HTTP(S) source/image URLs;
 - at least one image, non-blank alt text, a local image path, and whether that path is a regular file.
 
 Validation reads file metadata only. It does not upload, modify, or decode images, and it does not connect to Supabase. A passing report means the checked structure is safe to hand to the next import review; it does not prove data accuracy, licensing, or authorization.

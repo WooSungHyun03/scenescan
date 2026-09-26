@@ -26,7 +26,8 @@ const mapping = parseSourceMapping({
   images: { path: "media.images", url: "url", alt: "caption", localPath: "local_path" },
   categoryMap: { warehouse: "industrial" },
   regionMap: { Seoul: "서울" },
-  defaults: { description: "", permitType: "정보 확인 필요" },
+  permitTypeMap: { "Contact first": "문의 필요" },
+  defaults: { description: "", permitType: "문의 필요" },
 });
 
 describe("normalizeDataset", () => {
@@ -67,7 +68,7 @@ describe("normalizeDataset", () => {
         latitude: 37.55,
         longitude: 126.97,
         permit: {
-          type: "Contact first",
+          type: "문의 필요",
           contactName: "Location office",
           contactPhone: "02-0000-0000",
           note: "Weekdays only",
@@ -104,13 +105,26 @@ describe("normalizeDataset", () => {
       address: "Example address",
       latitude: 35.1,
       longitude: 129.03,
+      contactName: "Do not infer this field",
+      contactPhone: "02-1111-2222",
       images: "https://example.com/riverside.jpg",
     }], minimalMapping).locations[0]).toMatchObject({
       description: "",
-      permit: { type: "정보 확인 필요", contactName: null, contactPhone: null, note: null },
+      permit: { type: "문의 필요", contactName: null, contactPhone: null, note: null },
       images: [{ imageUrl: "https://example.com/riverside.jpg", alt: "Riverside" }],
       sourceUrl: "https://example.com/license",
     });
+  });
+
+  it("rejects boolean permit decisions from a source", () => {
+    expect(() => normalizeDataset({ payload: { places: [{
+      title: "Unsafe permit value",
+      kind: "warehouse",
+      area: "Seoul",
+      location: { address: "Address", lat: 37.5, lon: 127 },
+      production: { permit: true },
+      links: { source: "https://example.com/unsafe-permit" },
+    }] } }, mapping)).toThrow("must not use an allowed/not-allowed boolean");
   });
 
   it("keeps unknown categories in a review queue without validating them as locations", () => {
@@ -160,5 +174,16 @@ describe("normalizeDataset", () => {
       },
       images: { path: "images", alt: "caption" },
     })).toThrow("images.alt requires images.url");
+  });
+
+  it("rejects unsafe canonical permit defaults and mapping targets", () => {
+    expect(() => parseSourceMapping({
+      ...mapping,
+      defaults: { ...mapping.defaults, permitType: "허가 가능" },
+    })).toThrow();
+    expect(() => parseSourceMapping({
+      ...mapping,
+      permitTypeMap: { allowed: "허가 가능" },
+    })).toThrow();
   });
 });

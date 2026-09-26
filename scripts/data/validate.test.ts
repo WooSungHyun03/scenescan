@@ -23,7 +23,7 @@ function input(imagePath: string) {
       address: "Address",
       latitude: 35.1,
       longitude: 129.03,
-      permit: { type: "Contact first", contactName: null, contactPhone: null, note: null },
+      permit: { type: "문의 필요", contactName: null, contactPhone: null, note: null },
       images: [{ imagePath, imageUrl: "https://example.com/image.jpg", alt: "Location" }],
       sourceUrl: "https://example.com/source",
     }],

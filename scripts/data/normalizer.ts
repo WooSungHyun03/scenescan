@@ -7,6 +7,7 @@ import {
   type SourceMapping,
 } from "./contracts.ts";
 import { mapLocationCategory } from "./category-mapping.ts";
+import { mapPermitGuidance } from "./permit-information.ts";
 import type { LocationCategory } from "../../src/types/domain.ts";
 
 type JsonObject = Record<string, unknown>;
@@ -154,7 +155,11 @@ function normalizeRecordWithCategory(
     latitude: coordinate(record, mapping.fields.latitude, "latitude"),
     longitude: coordinate(record, mapping.fields.longitude, "longitude"),
     permit: {
-      type: optionalText(record, mapping.permit.type) ?? mapping.defaults.permitType,
+      type: mapPermitGuidance(
+        mapping.permit.type ? readPath(record, mapping.permit.type) : undefined,
+        mapping.permitTypeMap,
+        mapping.defaults.permitType,
+      ),
       contactName: optionalText(record, mapping.permit.contactName),
       contactPhone: optionalText(record, mapping.permit.contactPhone),
       note: optionalText(record, mapping.permit.note),

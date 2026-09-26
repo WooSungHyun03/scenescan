@@ -1,6 +1,7 @@
 import { z } from "zod";
 import type { Location, LocationImage } from "../../src/types/domain.ts";
 import type { CategoryReviewReason } from "./category-mapping.ts";
+import { PERMIT_GUIDANCE_VALUES } from "./permit-information.ts";
 
 const locationCategories = ["urban", "nature", "industrial", "interior"] as const;
 const regions = ["서울", "부산", "인천", "경기"] as const;
@@ -54,7 +55,7 @@ export const canonicalLocationRecordSchema: z.ZodType<CanonicalLocationRecord> =
   latitude: z.number().finite().min(-90).max(90),
   longitude: z.number().finite().min(-180).max(180),
   permit: z.object({
-    type: nonEmptyString,
+    type: z.enum(PERMIT_GUIDANCE_VALUES),
     contactName: nonEmptyString.nullable(),
     contactPhone: nonEmptyString.nullable(),
     note: nonEmptyString.nullable(),
@@ -102,10 +103,11 @@ export const sourceMappingSchema = z.object({
   ).optional(),
   categoryMap: z.record(z.string(), z.enum(locationCategories)).default({}),
   regionMap: z.record(z.string(), z.enum(regions)).default({}),
+  permitTypeMap: z.record(z.string(), z.enum(PERMIT_GUIDANCE_VALUES)).default({}),
   defaults: z.object({
     description: z.string().trim().default(""),
-    permitType: nonEmptyString.default("정보 확인 필요"),
-  }).strict().default({ description: "", permitType: "정보 확인 필요" }),
+    permitType: z.enum(PERMIT_GUIDANCE_VALUES).default("문의 필요"),
+  }).strict().default({ description: "", permitType: "문의 필요" }),
 }).strict();
 
 export type SourceMapping = z.infer<typeof sourceMappingSchema>;

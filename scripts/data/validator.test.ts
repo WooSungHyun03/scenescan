@@ -13,7 +13,7 @@ function validLocation() {
     address: "1 Example-ro",
     latitude: 37.55,
     longitude: 126.97,
-    permit: { type: "Contact first", contactName: null, contactPhone: null, note: null },
+    permit: { type: "문의 필요", contactName: null, contactPhone: null, note: null },
     images: [{
       imagePath: "images/location.jpg",
       imageUrl: "https://example.com/location.jpg",
@@ -114,5 +114,24 @@ describe("validateLocationDataset", () => {
       field: "reviewQueue",
       message: "1 source record(s) require category review before import",
     });
+  });
+
+  it("rejects decisive permit text and generated contact fallbacks", async () => {
+    const location = {
+      ...validLocation(),
+      permit: {
+        type: "허가 가능",
+        contactName: "   ",
+        contactPhone: undefined,
+        note: null,
+      },
+    };
+    const report = await validateLocationDataset(dataset([location]), { inspectImagePath: async () => "ok" });
+
+    expect(report.errors.map((item) => item.code)).toEqual([
+      "PERMIT_CONTACT_INVALID",
+      "PERMIT_CONTACT_INVALID",
+      "PERMIT_GUIDANCE_UNSAFE",
+    ]);
   });
 });
