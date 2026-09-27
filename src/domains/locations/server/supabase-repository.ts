@@ -3,6 +3,7 @@ import { getSupabaseClient } from "@/infrastructure/supabase/server-client";
 import { dataAccessError } from "@/shared/errors/application-error";
 import type { Location, LocationFilter, LocationSearchResult, ParkingInfo } from "@/types/domain";
 import { groupImageMatches, type ImageMatch } from "@/domains/locations/services/group-image-matches";
+import { rankSimilarLocations } from "@/domains/locations/services/similar-locations";
 
 type Row = {
   id: string; name: string; description: string; category: Location["category"];
@@ -56,4 +57,21 @@ export async function searchSupabaseLocations(embedding: number[], filters: Loca
   }));
   const locations = await getSupabaseLocations(filters);
   return groupImageMatches(matches, locations, 8);
+}
+
+export async function getSupabaseSimilarLocations(id: string): Promise<LocationSearchResult[]> {
+  const locations = await getSupabaseLocations();
+  if (!locations.some((location) => location.id === id)) return [];
+  const { data, error } = await getSupabaseClient().rpc("match_similar_location_images", {
+    source_location_id: id,
+    match_threshold: 0,
+    match_count: 200,
+  });
+  if (error) throw dataAccessError(`Failed to find locations similar to ${id}`, error);
+  const matches: ImageMatch[] = (data ?? []).map((row: { location_image_id: string; location_id: string; similarity: number }) => ({
+    locationImageId: row.location_image_id,
+    locationId: row.location_id,
+    similarity: row.similarity,
+  }));
+  return rankSimilarLocations(id, matches, locations, 8);
 }

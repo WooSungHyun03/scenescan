@@ -1,6 +1,7 @@
 import { mockLocations } from "@/domains/locations/fixtures/locations";
 import type { LocationFilter, LocationSearchResult } from "@/types/domain";
 import { groupImageMatches, type ImageMatch } from "@/domains/locations/services/group-image-matches";
+import { rankSimilarLocations } from "@/domains/locations/services/similar-locations";
 
 export function getMockLocations(filters: LocationFilter = {}) {
   return mockLocations.filter((location) =>
@@ -27,8 +28,10 @@ export function searchMockLocations(embedding: number[], filters: LocationFilter
 export function getMockSimilarLocations(id: string): LocationSearchResult[] {
   const current = getMockLocation(id);
   if (!current) return [];
-  return getMockLocations({ category: current.category })
-    .filter((location) => location.id !== id)
-    .slice(0, 8)
-    .map((location, index) => ({ location, similarity: 0.8 - index * 0.04, matchedImageId: location.images[0].id }));
+  const matches = getMockLocations({ category: current.category }).map((location, index) => ({
+    locationId: location.id,
+    locationImageId: location.images[0].id,
+    similarity: location.id === id ? 1 : 0.8 - index * 0.04,
+  }));
+  return rankSimilarLocations(id, matches, mockLocations, 8);
 }

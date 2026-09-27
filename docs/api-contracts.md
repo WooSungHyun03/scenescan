@@ -8,7 +8,7 @@ The source of truth for TypeScript shapes is `src/types/domain.ts` and `src/type
 | `searchByImage` / `POST /api/search` | `{ embedding: number[512], filters: LocationFilter }` | `{ results: LocationSearchResult[] }`, maximum 8 | Member 3 with 1 |
 | `getLocations` | `LocationFilter` | `Location[]` | Member 3 |
 | `getLocation` | string ID | `LocationDetail \| null` | Member 3 |
-| `getSimilarLocations` | string ID | `LocationSearchResult[]` | Member 1 with 3 |
+| `getSimilarLocations` | selected location ID | `LocationSearchResult[]`, selected location excluded, maximum 8 | Member 1 with 3 |
 | `getSolarPosition` | `GeoPoint`, JavaScript `Date` | `SolarPosition` (degrees) | Member 4 |
 
 `LocationFilter`: optional `region` (`서울`, `부산`, `인천`, `경기`) and `category` (`urban`, `nature`, `industrial`, `interior`). Search request validation uses Zod and rejects non-finite values, arrays with a length other than 512, and all-zero vectors for which cosine similarity is undefined. `POST /api/search` returns 400 for invalid JSON/body and 503 for unavailable data access. `similarity` is cosine similarity in real mode and a synthetic UI value in mock mode. Images are grouped by location using the highest image score, then sorted by descending similarity and ascending location ID for deterministic ties. Duplicate images, malformed scores, and locations missing from the filtered metadata set are excluded. A pure top-k mean strategy exists for evaluation, but max remains the service default.
@@ -27,3 +27,5 @@ match_location_images(
 ```
 
 API pages currently call repositories directly on the server for read-only listing/detail. Add a route only when a client needs an HTTP contract.
+
+Similar-location search uses the mean of all non-null CLIP image embeddings for the selected location as its representative query. The database excludes the selected `location_id`; application ranking then removes duplicate images/locations, drops orphan or malformed rows, uses max image similarity, and applies deterministic location/image ID tie-breaking. Unknown locations and locations without embeddings return an empty list. Reference-image blending remains disabled until retrieval evaluation demonstrates an improvement.

@@ -74,7 +74,7 @@ Verification:
 
 ## DAY 4 — Supabase pgvector Integration
 
-Status: local implementation complete (2026-09-22); remote integration blocked until project credentials and authorized rows are available
+Status: local implementation complete (2026-09-22); remote integration rechecked 2026-09-28 and remains blocked until a server-only credential and authorized rows are available
 
 - [x] Verify pgvector extension and `vector(512)` schema.
 - [x] Review foreign keys, indexes, and RLS against the committed backend migration.
@@ -91,6 +91,7 @@ Verification:
 - Search request validation rejects non-finite, wrong-dimension, and all-zero query vectors before RPC execution.
 - Automated suite after local DAY 4 implementation: 62 tests passed.
 - Remote dry-run/apply remains intentionally unverified because no Supabase service-role credential or authorized production rows were available on this host.
+- Production read-only recheck (2026-09-28): `locations` and `match_location_images` both returned HTTP 200 with empty arrays. No authorized row exists for a non-destructive dry-run/apply verification.
 
 ## DAY 5 — Search Ranking
 
@@ -116,14 +117,23 @@ Verification:
 
 ## DAY 6 — Similar Locations
 
-Status: not started
+Status: complete locally (2026-09-28); production activation waits on the DAY 4 data/migration blocker
 
-- [ ] Implement `getSimilarLocations` with the backend owner.
-- [ ] Exclude the selected location and remove duplicates.
-- [ ] Define representative embedding and Top-K behavior.
-- [ ] Handle missing embeddings and unknown IDs.
-- [ ] Evaluate reference blending only if evidence justifies it.
-- [ ] Add tests and confirm API contract consistency.
+- [x] Implement `getSimilarLocations` through the existing repository contract.
+- [x] Exclude the selected location and remove duplicates.
+- [x] Define representative embedding and Top-K behavior.
+- [x] Handle missing embeddings and unknown IDs.
+- [x] Evaluate reference blending only if evidence justifies it.
+- [x] Add tests and confirm API contract consistency.
+
+Verification:
+
+- Representative query: mean of every non-null CLIP image embedding for the selected location; cosine distance is used for candidates.
+- SQL and application layers both exclude the selected location. Max-per-location aggregation, Top 8, malformed/orphan removal, and deterministic ties reuse the production ranker.
+- Mock and Supabase adapters cover unknown IDs, no embeddings, duplicate candidates, RPC failures, and source exclusion.
+- Migration audit covers representative `vector(512)`, invoker rights, public execute grant, bounded threshold/count, source exclusion, and deterministic order; 20 schema checks pass across all migrations.
+- Production read-only probe confirms the new RPC is not deployed yet (`PGRST202`) and the database has no authorized rows. Code remains safe because production location data stays in mock mode.
+- Reference + selected-location blending remains disabled until DAY 7 supplies retrieval evidence.
 
 ## DAY 7 — Retrieval Evaluation
 

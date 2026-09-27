@@ -1,6 +1,6 @@
 # Location search ranking
 
-SceneScan retrieves image-level cosine matches from pgvector and converts them into unique location results in application code. The pure implementation lives in `src/lib/ai/location-ranking.ts`; the server service only joins ranked IDs to `Location` metadata.
+SceneScan retrieves image-level cosine matches from pgvector and converts them into unique location results in application code. The pure implementation lives in `src/domains/locations/services/location-ranking.ts`; the server service only joins ranked IDs to `Location` metadata.
 
 ## Production policy
 
@@ -10,6 +10,8 @@ SceneScan retrieves image-level cosine matches from pgvector and converts them i
 - Matched image: the strongest image for that location.
 - Location tie-break: ascending `location_id`.
 - Image tie-break within a location: ascending `location_image_id`.
+
+Similar-location queries use the mean of every available image embedding for the selected location. Averaging avoids arbitrarily choosing one source image, while cosine distance makes the magnitude of the mean irrelevant. The selected location is excluded in both SQL and application ranking. Reference + selected-location blending is not enabled because no authorized evaluation set currently demonstrates that it improves retrieval.
 
 Before aggregation, the ranker discards blank IDs, non-finite scores, scores outside cosine range `[-1, 1]`, and locations absent from the filtered metadata set. Repeated hits for the same image are collapsed to their strongest score. Locations are therefore unique even if pgvector returns several matching images for one location. Empty candidates or filters that remove every candidate return an empty list.
 

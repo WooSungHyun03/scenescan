@@ -16,6 +16,9 @@ Runtime: image → browser ImageEmbeddingService → Web Worker CLIP (or mock)
 Offline: licensed location image → scripts/embeddings/prepare.ts
        → validated manifest → batched/resumable 512D CLIP vector JSON
        → reviewed import into Supabase location_images
+
+Similar: selected location → mean of its non-null image embeddings
+       → pgvector cosine search excluding selected location → deterministic Top 8 locations
 ```
 
 The runtime worker is loaded only if `NEXT_PUBLIC_USE_MOCK_AI=false`. The UI remains responsive while the model loads. Initial model download and browser memory usage need device testing. Offline and runtime embeddings must use the same model and preprocessing. The [Transformers.js image-feature-extraction documentation](https://huggingface.co/docs/transformers.js/api/pipelines) shows `Xenova/clip-vit-base-patch32` yielding `[1, 512]`.
@@ -41,6 +44,6 @@ The Docker build uses Next.js standalone output, installs dependencies in a dedi
 - Mock search ranking is synthetic and only proves the end-to-end contract. The percentage badge is not a measured visual match in mock mode.
 - Max-per-location is the production aggregation default. A pure top-k mean alternative exists for DAY 7 evaluation but is not enabled without retrieval evidence. See `docs/search-ranking.md`.
 - The real RPC retrieves at most 200 top images before app-side region/category filtering. A larger dataset may need SQL-side filters to avoid excluding eligible lower-ranked images.
-- Real-mode similar-location ranking is reserved for Member 1 and 3; the UI currently shows an empty state.
+- Real-mode similar-location ranking requires the `20260928000000_similar_locations.sql` migration and authorized embedded location rows. Unknown locations or sources without embeddings intentionally return an empty state.
 - The offline preparation script emits deterministic JSON for review. A separate importer defaults to offline validation, performs remote foreign-key/RPC preflight in dry-run mode, and requires an explicit apply mode plus a server-only service role for controlled upsert. No external records or images are bundled.
 - This public read-only MVP has no authentication or authoring UI. Production data insertion uses controlled Supabase tooling.
