@@ -15,13 +15,13 @@ Similar-location queries use the mean of every available image embedding for the
 
 Before aggregation, the ranker discards blank IDs, non-finite scores, scores outside cosine range `[-1, 1]`, and locations absent from the filtered metadata set. Repeated hits for the same image are collapsed to their strongest score. Locations are therefore unique even if pgvector returns several matching images for one location. Empty candidates or filters that remove every candidate return an empty list.
 
-Max aggregation remains the default because a reference frame may strongly correspond to one defining view, while locations can have unequal image counts. It also preserves the existing API behavior. This is a product assumption rather than a retrieval-quality conclusion; DAY 7 evaluation must test it against an authorized dataset.
+Max aggregation remains the default because a reference frame may strongly correspond to one defining view, while locations can have unequal image counts. It also preserves the existing API behavior. DAY 7 synthetic policy evaluation showed the expected tradeoff—top-2 mean won some consistent-view cases and lost some defining-view cases—but its small curated scenarios are not evidence that a production change improves photographic retrieval. See `docs/ai-retrieval-evaluation.md`.
 
 ## Top-k mean alternative
 
 The pure ranker also supports `top-k-mean`. It sorts and deduplicates a location's image hits, averages up to its strongest `k`, and keeps the strongest image ID for display. For example, synthetic scores `A=[1.0, 0.1]` and `B=[0.8, 0.7]` rank A first with max, but B first with top-2 mean (`0.75` versus `0.55`). This demonstrates the strategies' behavior; it is not evidence that either strategy retrieves real filming locations better.
 
-Top-k mean is deliberately not wired as the service default until retrieval evaluation measures Top-1/3/5 or Recall@K and documents dataset balance. Changing the default requires updating this document, the API contract, and regression expectations together.
+Top-k mean remains evaluation-only. On 12 balanced synthetic policy scenarios, top-2 mean at threshold 0 reached 50.0% Top-1 versus max at 41.7%, while both reached 100% Top-3/5 and Recall@3/5. The set was deliberately authored to exercise tradeoffs and did not come from production CLIP/photo pairs, so the eight-point difference cannot justify changing production. Changing the default requires an authorized photographic dataset plus updates to this document, the API contract, and regression expectations together.
 
 ## Candidate cap
 

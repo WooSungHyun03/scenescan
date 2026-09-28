@@ -137,18 +137,28 @@ Verification:
 
 ## DAY 7 — Retrieval Evaluation
 
-Status: not started
+Status: complete for the authorized synthetic baseline (2026-09-29); production photographic relevance remains a documented data limitation
 
-- [ ] Create an authorized or synthetic multi-category evaluation set.
-- [ ] Record expected matches and failure cases.
-- [ ] Implement Top-1, Top-3, and Top-5/Recall@K evaluation.
-- [ ] Compare max similarity, top-k mean, and thresholds.
-- [ ] Record qualitative examples without unsupported tuning.
-- [ ] Create `docs/ai-retrieval-evaluation.md` and select final settings.
+- [x] Create an authorized or synthetic multi-category evaluation set.
+- [x] Record expected matches and failure cases.
+- [x] Implement Top-1, Top-3, and Top-5/Recall@K evaluation.
+- [x] Compare max similarity, top-k mean, and thresholds.
+- [x] Record qualitative examples without unsupported tuning.
+- [x] Create `docs/ai-retrieval-evaluation.md` and select final settings.
+
+Verification:
+
+- Real `Xenova/clip-vit-base-patch32` run: 20/20 finite 512-D embeddings for ten MIT-licensed candidate/query pairs; 100% Top-1/3/5 and Recall@1/3/5 on the synthetic transform regression set.
+- Correct-pair cosine range: 0.966855–0.977649; Top-1 margins: 0.000624–0.012440. These narrow margins confirm the same-template set is regression evidence, not production relevance evidence.
+- Twelve balanced ranking scenarios compare max and top-2 mean at thresholds 0, 0.5, and 0.75. Top-2 mean/0 reached 50.0% Top-1 versus max/0 at 41.7%, but both reached 100% Top-3/5; the curated set does not justify changing production.
+- Threshold 0.75 reduced macro Recall@3/5 to 70.8% and produced 8.3% empty results. Production stays at max, threshold 0, Top 8; blending stays disabled.
+- Focused evaluation and ranking suites validate malformed data, duplicate IDs, missing images/embeddings, multi-answer recall, empty threshold results, deterministic output, and model provenance.
 
 ## DAY 8 — AI Performance
 
-Status: not started
+Status: in progress (preliminary offline baseline recorded 2026-09-29; browser worker/device benchmark is next)
+
+Preliminary baseline (not a browser result): with the model already present in the local Hugging Face cache, a fresh Node 22 process loaded the production CLIP pipeline and embedded the 20-image evaluation set in five batches of four in 1.75 seconds wall time. Peak RSS was 830,912 KB. The generated score file SHA-256 was `a0aa27ae6de76e99307e5fbfece7143412129a8c0d0dc467c310753ec36239ec`. DAY 8 remains open until cold browser loading, repeated worker inference, preprocessing overhead, memory behavior, WebGPU capability, and fallback paths are measured separately.
 
 - [ ] Benchmark initial load and repeated inference.
 - [ ] Measure worker and preprocessing overhead.

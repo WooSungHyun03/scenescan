@@ -17,7 +17,9 @@
     "data:validate": "node --experimental-strip-types scripts/data/validate.ts",
     "embeddings:prepare": "node --experimental-strip-types scripts/embeddings/prepare.ts",
     "embeddings:import": "node --experimental-strip-types scripts/embeddings/import.ts",
-    "embeddings:audit-schema": "node --experimental-strip-types scripts/embeddings/audit-schema.ts"
+    "embeddings:audit-schema": "node --experimental-strip-types scripts/embeddings/audit-schema.ts",
+    "embeddings:evaluate": "node --experimental-strip-types scripts/embeddings/evaluation.ts",
+    "embeddings:evaluate-clip": "node --experimental-strip-types scripts/embeddings/clip-evaluate.ts"
   },
   "dependencies": {
     "@huggingface/transformers": "^4.3.0",

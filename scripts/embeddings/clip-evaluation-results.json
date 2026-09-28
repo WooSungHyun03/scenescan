@@ -1,0 +1,628 @@
+{
+  "schema_version": 1,
+  "name": "SceneScan CLIP synthetic image regression v1",
+  "provenance": {
+    "kind": "synthetic",
+    "license": "MIT (project-created fixtures and derived crops)",
+    "source_url": "https://github.com/WooSungHyun03/scenescan/blob/main/DATA_LICENSES.md",
+    "score_origin": "clip-cosine",
+    "model": {
+      "id": "Xenova/clip-vit-base-patch32",
+      "revision": "main",
+      "embedding_dimension": 512,
+      "transformers_js_version": "4.3.0"
+    }
+  },
+  "queries": [
+    {
+      "query_id": "clip-demo-01",
+      "category": "industrial",
+      "reference_image_path": "scripts/embeddings/evaluation-images/queries/demo-01-query.png",
+      "expected_location_ids": [
+        "demo-01"
+      ],
+      "qualitative_note": "Cropped and horizontally flipped derivative should retrieve its matching source illustration.",
+      "hits": [
+        {
+          "location_image_id": "demo-01-candidate",
+          "location_id": "demo-01",
+          "similarity": 0.9709235703553255
+        },
+        {
+          "location_image_id": "demo-02-candidate",
+          "location_id": "demo-02",
+          "similarity": 0.9327817423828706
+        },
+        {
+          "location_image_id": "demo-03-candidate",
+          "location_id": "demo-03",
+          "similarity": 0.9677986648685752
+        },
+        {
+          "location_image_id": "demo-04-candidate",
+          "location_id": "demo-04",
+          "similarity": 0.9519029705628358
+        },
+        {
+          "location_image_id": "demo-05-candidate",
+          "location_id": "demo-05",
+          "similarity": 0.9298344067590308
+        },
+        {
+          "location_image_id": "demo-06-candidate",
+          "location_id": "demo-06",
+          "similarity": 0.9577162195473968
+        },
+        {
+          "location_image_id": "demo-07-candidate",
+          "location_id": "demo-07",
+          "similarity": 0.9557879809448617
+        },
+        {
+          "location_image_id": "demo-08-candidate",
+          "location_id": "demo-08",
+          "similarity": 0.9384023410978157
+        },
+        {
+          "location_image_id": "demo-09-candidate",
+          "location_id": "demo-09",
+          "similarity": 0.9459277158568845
+        },
+        {
+          "location_image_id": "demo-10-candidate",
+          "location_id": "demo-10",
+          "similarity": 0.9543631223175403
+        }
+      ]
+    },
+    {
+      "query_id": "clip-demo-02",
+      "category": "urban",
+      "reference_image_path": "scripts/embeddings/evaluation-images/queries/demo-02-query.png",
+      "expected_location_ids": [
+        "demo-02"
+      ],
+      "qualitative_note": "Cropped and horizontally flipped derivative should retrieve its matching source illustration.",
+      "hits": [
+        {
+          "location_image_id": "demo-01-candidate",
+          "location_id": "demo-01",
+          "similarity": 0.9482513430798145
+        },
+        {
+          "location_image_id": "demo-02-candidate",
+          "location_id": "demo-02",
+          "similarity": 0.9743992104790756
+        },
+        {
+          "location_image_id": "demo-03-candidate",
+          "location_id": "demo-03",
+          "similarity": 0.9524138789654393
+        },
+        {
+          "location_image_id": "demo-04-candidate",
+          "location_id": "demo-04",
+          "similarity": 0.9428629715056109
+        },
+        {
+          "location_image_id": "demo-05-candidate",
+          "location_id": "demo-05",
+          "similarity": 0.9712008793347968
+        },
+        {
+          "location_image_id": "demo-06-candidate",
+          "location_id": "demo-06",
+          "similarity": 0.9431869334630476
+        },
+        {
+          "location_image_id": "demo-07-candidate",
+          "location_id": "demo-07",
+          "similarity": 0.9453807533278655
+        },
+        {
+          "location_image_id": "demo-08-candidate",
+          "location_id": "demo-08",
+          "similarity": 0.9732594859879817
+        },
+        {
+          "location_image_id": "demo-09-candidate",
+          "location_id": "demo-09",
+          "similarity": 0.9376521270601457
+        },
+        {
+          "location_image_id": "demo-10-candidate",
+          "location_id": "demo-10",
+          "similarity": 0.9544104825508669
+        }
+      ]
+    },
+    {
+      "query_id": "clip-demo-03",
+      "category": "nature",
+      "reference_image_path": "scripts/embeddings/evaluation-images/queries/demo-03-query.png",
+      "expected_location_ids": [
+        "demo-03"
+      ],
+      "qualitative_note": "Cropped and horizontally flipped derivative should retrieve its matching source illustration.",
+      "hits": [
+        {
+          "location_image_id": "demo-01-candidate",
+          "location_id": "demo-01",
+          "similarity": 0.9658982500270749
+        },
+        {
+          "location_image_id": "demo-02-candidate",
+          "location_id": "demo-02",
+          "similarity": 0.9362211936344021
+        },
+        {
+          "location_image_id": "demo-03-candidate",
+          "location_id": "demo-03",
+          "similarity": 0.9776494453583874
+        },
+        {
+          "location_image_id": "demo-04-candidate",
+          "location_id": "demo-04",
+          "similarity": 0.9598816233500193
+        },
+        {
+          "location_image_id": "demo-05-candidate",
+          "location_id": "demo-05",
+          "similarity": 0.9329789795511753
+        },
+        {
+          "location_image_id": "demo-06-candidate",
+          "location_id": "demo-06",
+          "similarity": 0.9510479229629402
+        },
+        {
+          "location_image_id": "demo-07-candidate",
+          "location_id": "demo-07",
+          "similarity": 0.9698108823633063
+        },
+        {
+          "location_image_id": "demo-08-candidate",
+          "location_id": "demo-08",
+          "similarity": 0.9425536988986444
+        },
+        {
+          "location_image_id": "demo-09-candidate",
+          "location_id": "demo-09",
+          "similarity": 0.9461760816187915
+        },
+        {
+          "location_image_id": "demo-10-candidate",
+          "location_id": "demo-10",
+          "similarity": 0.9533538230800782
+        }
+      ]
+    },
+    {
+      "query_id": "clip-demo-04",
+      "category": "interior",
+      "reference_image_path": "scripts/embeddings/evaluation-images/queries/demo-04-query.png",
+      "expected_location_ids": [
+        "demo-04"
+      ],
+      "qualitative_note": "Cropped and horizontally flipped derivative should retrieve its matching source illustration.",
+      "hits": [
+        {
+          "location_image_id": "demo-01-candidate",
+          "location_id": "demo-01",
+          "similarity": 0.9503184920303416
+        },
+        {
+          "location_image_id": "demo-02-candidate",
+          "location_id": "demo-02",
+          "similarity": 0.9334830280494562
+        },
+        {
+          "location_image_id": "demo-03-candidate",
+          "location_id": "demo-03",
+          "similarity": 0.9620147801765955
+        },
+        {
+          "location_image_id": "demo-04-candidate",
+          "location_id": "demo-04",
+          "similarity": 0.9699426693681933
+        },
+        {
+          "location_image_id": "demo-05-candidate",
+          "location_id": "demo-05",
+          "similarity": 0.9316611649821127
+        },
+        {
+          "location_image_id": "demo-06-candidate",
+          "location_id": "demo-06",
+          "similarity": 0.9356962326574393
+        },
+        {
+          "location_image_id": "demo-07-candidate",
+          "location_id": "demo-07",
+          "similarity": 0.9632022176110118
+        },
+        {
+          "location_image_id": "demo-08-candidate",
+          "location_id": "demo-08",
+          "similarity": 0.9375693523472476
+        },
+        {
+          "location_image_id": "demo-09-candidate",
+          "location_id": "demo-09",
+          "similarity": 0.9562796280582042
+        },
+        {
+          "location_image_id": "demo-10-candidate",
+          "location_id": "demo-10",
+          "similarity": 0.9396276762211436
+        }
+      ]
+    },
+    {
+      "query_id": "clip-demo-05",
+      "category": "urban",
+      "reference_image_path": "scripts/embeddings/evaluation-images/queries/demo-05-query.png",
+      "expected_location_ids": [
+        "demo-05"
+      ],
+      "qualitative_note": "Cropped and horizontally flipped derivative should retrieve its matching source illustration.",
+      "hits": [
+        {
+          "location_image_id": "demo-01-candidate",
+          "location_id": "demo-01",
+          "similarity": 0.9438293245161932
+        },
+        {
+          "location_image_id": "demo-02-candidate",
+          "location_id": "demo-02",
+          "similarity": 0.9716479385281114
+        },
+        {
+          "location_image_id": "demo-03-candidate",
+          "location_id": "demo-03",
+          "similarity": 0.9460727043292362
+        },
+        {
+          "location_image_id": "demo-04-candidate",
+          "location_id": "demo-04",
+          "similarity": 0.9379877185677682
+        },
+        {
+          "location_image_id": "demo-05-candidate",
+          "location_id": "demo-05",
+          "similarity": 0.972272034906094
+        },
+        {
+          "location_image_id": "demo-06-candidate",
+          "location_id": "demo-06",
+          "similarity": 0.9365691716320903
+        },
+        {
+          "location_image_id": "demo-07-candidate",
+          "location_id": "demo-07",
+          "similarity": 0.9358655259561985
+        },
+        {
+          "location_image_id": "demo-08-candidate",
+          "location_id": "demo-08",
+          "similarity": 0.9668295946414417
+        },
+        {
+          "location_image_id": "demo-09-candidate",
+          "location_id": "demo-09",
+          "similarity": 0.9361083363988636
+        },
+        {
+          "location_image_id": "demo-10-candidate",
+          "location_id": "demo-10",
+          "similarity": 0.9477497093092936
+        }
+      ]
+    },
+    {
+      "query_id": "clip-demo-06",
+      "category": "nature",
+      "reference_image_path": "scripts/embeddings/evaluation-images/queries/demo-06-query.png",
+      "expected_location_ids": [
+        "demo-06"
+      ],
+      "qualitative_note": "Cropped and horizontally flipped derivative should retrieve its matching source illustration.",
+      "hits": [
+        {
+          "location_image_id": "demo-01-candidate",
+          "location_id": "demo-01",
+          "similarity": 0.9708539713965232
+        },
+        {
+          "location_image_id": "demo-02-candidate",
+          "location_id": "demo-02",
+          "similarity": 0.9450180764817846
+        },
+        {
+          "location_image_id": "demo-03-candidate",
+          "location_id": "demo-03",
+          "similarity": 0.9651778698313307
+        },
+        {
+          "location_image_id": "demo-04-candidate",
+          "location_id": "demo-04",
+          "similarity": 0.9524908737257313
+        },
+        {
+          "location_image_id": "demo-05-candidate",
+          "location_id": "demo-05",
+          "similarity": 0.9408564027271332
+        },
+        {
+          "location_image_id": "demo-06-candidate",
+          "location_id": "demo-06",
+          "similarity": 0.9741235543688862
+        },
+        {
+          "location_image_id": "demo-07-candidate",
+          "location_id": "demo-07",
+          "similarity": 0.9590459233879259
+        },
+        {
+          "location_image_id": "demo-08-candidate",
+          "location_id": "demo-08",
+          "similarity": 0.9512189820510619
+        },
+        {
+          "location_image_id": "demo-09-candidate",
+          "location_id": "demo-09",
+          "similarity": 0.9472598939293615
+        },
+        {
+          "location_image_id": "demo-10-candidate",
+          "location_id": "demo-10",
+          "similarity": 0.9727334859268999
+        }
+      ]
+    },
+    {
+      "query_id": "clip-demo-07",
+      "category": "industrial",
+      "reference_image_path": "scripts/embeddings/evaluation-images/queries/demo-07-query.png",
+      "expected_location_ids": [
+        "demo-07"
+      ],
+      "qualitative_note": "Cropped and horizontally flipped derivative should retrieve its matching source illustration.",
+      "hits": [
+        {
+          "location_image_id": "demo-01-candidate",
+          "location_id": "demo-01",
+          "similarity": 0.9546346964138606
+        },
+        {
+          "location_image_id": "demo-02-candidate",
+          "location_id": "demo-02",
+          "similarity": 0.9352164226621896
+        },
+        {
+          "location_image_id": "demo-03-candidate",
+          "location_id": "demo-03",
+          "similarity": 0.972218040516812
+        },
+        {
+          "location_image_id": "demo-04-candidate",
+          "location_id": "demo-04",
+          "similarity": 0.9597084978285582
+        },
+        {
+          "location_image_id": "demo-05-candidate",
+          "location_id": "demo-05",
+          "similarity": 0.930421295976897
+        },
+        {
+          "location_image_id": "demo-06-candidate",
+          "location_id": "demo-06",
+          "similarity": 0.947067367706305
+        },
+        {
+          "location_image_id": "demo-07-candidate",
+          "location_id": "demo-07",
+          "similarity": 0.977006450676018
+        },
+        {
+          "location_image_id": "demo-08-candidate",
+          "location_id": "demo-08",
+          "similarity": 0.9426602568404233
+        },
+        {
+          "location_image_id": "demo-09-candidate",
+          "location_id": "demo-09",
+          "similarity": 0.9398014581354048
+        },
+        {
+          "location_image_id": "demo-10-candidate",
+          "location_id": "demo-10",
+          "similarity": 0.9510088039336073
+        }
+      ]
+    },
+    {
+      "query_id": "clip-demo-08",
+      "category": "interior",
+      "reference_image_path": "scripts/embeddings/evaluation-images/queries/demo-08-query.png",
+      "expected_location_ids": [
+        "demo-08"
+      ],
+      "qualitative_note": "Cropped and horizontally flipped derivative should retrieve its matching source illustration.",
+      "hits": [
+        {
+          "location_image_id": "demo-01-candidate",
+          "location_id": "demo-01",
+          "similarity": 0.9504804916181213
+        },
+        {
+          "location_image_id": "demo-02-candidate",
+          "location_id": "demo-02",
+          "similarity": 0.9694489251433052
+        },
+        {
+          "location_image_id": "demo-03-candidate",
+          "location_id": "demo-03",
+          "similarity": 0.9556136284086704
+        },
+        {
+          "location_image_id": "demo-04-candidate",
+          "location_id": "demo-04",
+          "similarity": 0.9434995736854381
+        },
+        {
+          "location_image_id": "demo-05-candidate",
+          "location_id": "demo-05",
+          "similarity": 0.9626761546422172
+        },
+        {
+          "location_image_id": "demo-06-candidate",
+          "location_id": "demo-06",
+          "similarity": 0.944601068337892
+        },
+        {
+          "location_image_id": "demo-07-candidate",
+          "location_id": "demo-07",
+          "similarity": 0.9496885592109764
+        },
+        {
+          "location_image_id": "demo-08-candidate",
+          "location_id": "demo-08",
+          "similarity": 0.976111925758757
+        },
+        {
+          "location_image_id": "demo-09-candidate",
+          "location_id": "demo-09",
+          "similarity": 0.9376939452726858
+        },
+        {
+          "location_image_id": "demo-10-candidate",
+          "location_id": "demo-10",
+          "similarity": 0.9570887706110148
+        }
+      ]
+    },
+    {
+      "query_id": "clip-demo-09",
+      "category": "urban",
+      "reference_image_path": "scripts/embeddings/evaluation-images/queries/demo-09-query.png",
+      "expected_location_ids": [
+        "demo-09"
+      ],
+      "qualitative_note": "Cropped and horizontally flipped derivative should retrieve its matching source illustration.",
+      "hits": [
+        {
+          "location_image_id": "demo-01-candidate",
+          "location_id": "demo-01",
+          "similarity": 0.9416398260469292
+        },
+        {
+          "location_image_id": "demo-02-candidate",
+          "location_id": "demo-02",
+          "similarity": 0.9305537029113262
+        },
+        {
+          "location_image_id": "demo-03-candidate",
+          "location_id": "demo-03",
+          "similarity": 0.9463559983533769
+        },
+        {
+          "location_image_id": "demo-04-candidate",
+          "location_id": "demo-04",
+          "similarity": 0.9544149437248681
+        },
+        {
+          "location_image_id": "demo-05-candidate",
+          "location_id": "demo-05",
+          "similarity": 0.9295366686938822
+        },
+        {
+          "location_image_id": "demo-06-candidate",
+          "location_id": "demo-06",
+          "similarity": 0.9292141657582369
+        },
+        {
+          "location_image_id": "demo-07-candidate",
+          "location_id": "demo-07",
+          "similarity": 0.9415873039073318
+        },
+        {
+          "location_image_id": "demo-08-candidate",
+          "location_id": "demo-08",
+          "similarity": 0.93328142351964
+        },
+        {
+          "location_image_id": "demo-09-candidate",
+          "location_id": "demo-09",
+          "similarity": 0.9668552778044385
+        },
+        {
+          "location_image_id": "demo-10-candidate",
+          "location_id": "demo-10",
+          "similarity": 0.9319541680445517
+        }
+      ]
+    },
+    {
+      "query_id": "clip-demo-10",
+      "category": "nature",
+      "reference_image_path": "scripts/embeddings/evaluation-images/queries/demo-10-query.png",
+      "expected_location_ids": [
+        "demo-10"
+      ],
+      "qualitative_note": "Cropped and horizontally flipped derivative should retrieve its matching source illustration.",
+      "hits": [
+        {
+          "location_image_id": "demo-01-candidate",
+          "location_id": "demo-01",
+          "similarity": 0.9583691069642999
+        },
+        {
+          "location_image_id": "demo-02-candidate",
+          "location_id": "demo-02",
+          "similarity": 0.9447359848903849
+        },
+        {
+          "location_image_id": "demo-03-candidate",
+          "location_id": "demo-03",
+          "similarity": 0.9581236926636161
+        },
+        {
+          "location_image_id": "demo-04-candidate",
+          "location_id": "demo-04",
+          "similarity": 0.9436671860607374
+        },
+        {
+          "location_image_id": "demo-05-candidate",
+          "location_id": "demo-05",
+          "similarity": 0.9386411463485945
+        },
+        {
+          "location_image_id": "demo-06-candidate",
+          "location_id": "demo-06",
+          "similarity": 0.9627802237307044
+        },
+        {
+          "location_image_id": "demo-07-candidate",
+          "location_id": "demo-07",
+          "similarity": 0.9535694175911245
+        },
+        {
+          "location_image_id": "demo-08-candidate",
+          "location_id": "demo-08",
+          "similarity": 0.9524274360206356
+        },
+        {
+          "location_image_id": "demo-09-candidate",
+          "location_id": "demo-09",
+          "similarity": 0.9356414752881396
+        },
+        {
+          "location_image_id": "demo-10-candidate",
+          "location_id": "demo-10",
+          "similarity": 0.9710070513162374
+        }
+      ]
+    }
+  ]
+}

@@ -48,9 +48,13 @@ pnpm docker:up
 pnpm embeddings:prepare scripts/embeddings/manifest.example.json output.json --batch-size 8 --retries 1
 pnpm embeddings:import output.json --validate-only
 pnpm embeddings:audit-schema
+pnpm embeddings:evaluate
+pnpm embeddings:evaluate-clip
 ```
 
 The preparation command is for licensed local images after replacing the example manifest paths, UUIDs, and provenance fields. It validates image bytes and metadata, processes configurable batches, writes an atomic resumable JSON checkpoint after every batch, and retries prior failures on the next run. Import defaults to credential-free validation; database dry-run and apply modes are documented in [offline embeddings](docs/offline-embeddings.md).
+
+The evaluation command compares max and top-k mean ranking at several thresholds on the committed synthetic policy scenarios. `embeddings:evaluate-clip` regenerates measured cosine scores from the MIT-licensed synthetic image regression set with the production CLIP model; see [retrieval evaluation](docs/ai-retrieval-evaluation.md).
 
 ## Team and deployment
 
