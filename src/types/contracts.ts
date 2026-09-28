@@ -23,3 +23,7 @@ export interface LocationListResponse {
   locations: Location[];
   filters: LocationFilter;
 }
+
+export interface SimilarLocationsResponse {
+  results: LocationSearchResult[];
+}

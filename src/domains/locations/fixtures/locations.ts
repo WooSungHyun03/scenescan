@@ -28,17 +28,32 @@ const seeds: Seed[] = [
   { id: "demo-10", name: "갈대 둔치", category: "nature", region: "서울", address: "서울 가상 촬영구역 J", latitude: 37.512, longitude: 126.923, description: "갈대와 수면이 함께 보이는 가상 둔치입니다.", permit: "문의 필요", parking: "소형 차량 2대", hue: 76 },
 ];
 
-export const mockLocations: Location[] = seeds.map((seed) => ({
-  id: seed.id,
-  name: seed.name,
-  description: seed.description,
-  category: seed.category,
-  region: seed.region,
-  address: seed.address,
-  point: { latitude: seed.latitude, longitude: seed.longitude },
-  images: [{ id: `${seed.id}-image`, locationId: seed.id, imageUrl: `/images/${seed.id}.svg`, alt: `${seed.name} 개발용 추상 이미지` }],
-  permit: { type: seed.permit, contactName: null, contactPhone: null, note: "개발용 가상 정보" },
-  parking: [{ id: `${seed.id}-parking`, locationId: seed.id, name: seed.parking, point: { latitude: seed.latitude + 0.001, longitude: seed.longitude + 0.001 }, capacity: null, openingHours: null, priceInfo: null, source: "synthetic fixture" }],
-  noiseSources: [],
-  sourceUrl: null,
-}));
+export const mockLocations: Location[] = seeds.map((seed) => {
+  const hasNearbyParking = seed.parking.startsWith("인근");
+
+  return {
+    id: seed.id,
+    name: seed.name,
+    description: seed.description,
+    category: seed.category,
+    region: seed.region,
+    address: seed.address,
+    point: { latitude: seed.latitude, longitude: seed.longitude },
+    images: [{ id: `${seed.id}-image`, locationId: seed.id, imageUrl: `/images/${seed.id}.svg`, alt: `${seed.name} 개발용 추상 이미지` }],
+    permit: { type: seed.permit, contactName: null, contactPhone: null, note: "개발용 가상 정보" },
+    parking: [{
+      id: `${seed.id}-parking`,
+      locationId: hasNearbyParking ? null : seed.id,
+      name: seed.parking,
+      point: hasNearbyParking
+        ? { latitude: seed.latitude + 0.001, longitude: seed.longitude + 0.001 }
+        : { latitude: seed.latitude, longitude: seed.longitude },
+      capacity: null,
+      openingHours: null,
+      priceInfo: null,
+      source: "synthetic fixture",
+    }],
+    noiseSources: [],
+    sourceUrl: null,
+  };
+});

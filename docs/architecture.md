@@ -37,6 +37,10 @@ The offline pipeline imports the same model ID, revision, dimension, image envel
 
 Pages compose domains and call application APIs or repository-backed server components. API routes validate shared contracts before calling domain repositories. The location map service switches between a Kakao adapter and a no-key preview, while solar calculation remains a pure domain service except for SunCalc. Exceptions cross the API boundary through one structured mapper, and server/client error surfaces use the shared logger.
 
+The shortlist remains a browser-only workflow: it stores only location IDs under a versioned `localStorage` key, synchronizes changes across cards and browser tabs, and resolves those IDs against the existing read-only location repository. It does not add authentication, server writes, or a new database contract.
+
+The browser map adapter loads the official Kakao Maps JavaScript SDK only when `NEXT_PUBLIC_KAKAO_MAP_KEY` is configured. The Kakao Developers application must register every local and production JavaScript SDK domain. Missing keys and SDK load failures preserve the no-key map preview; neither case blocks location detail or search results. The adapter receives WGS84 coordinates and display labels from the location domain and does not geocode inside the UI.
+
 The Docker build uses Next.js standalone output, installs dependencies in a dedicated stage, and runs the final image as an unprivileged user. `/api/health` is the container and deployment liveness endpoint. GitHub Actions runs lint, type checking, tests, the Next.js build, image build, and container smoke checks inside Docker. Vercel's existing Git integration remains the only production deploy trigger, avoiding a duplicate CI deployment.
 
 ## Known scaffold limits

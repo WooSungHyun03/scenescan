@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ShortlistNavLink } from "@/domains/locations/components/shortlist-nav-link";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -12,7 +13,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <header className="border-b border-stone-200 bg-white">
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4" aria-label="주 메뉴">
         <Link href="/" className="text-xl font-bold tracking-tight text-emerald-900">SceneScan<span className="text-amber-600">.</span></Link>
-        <Link href="/search" className="text-sm font-semibold text-stone-700 hover:text-emerald-800">장소 검색</Link>
+        <div className="flex items-center gap-4">
+          <Link href="/search" className="text-sm font-semibold text-stone-700 hover:text-emerald-800">장소 검색</Link>
+          <ShortlistNavLink />
+        </div>
       </nav>
     </header>
     {children}

@@ -24,6 +24,11 @@ export interface ParkingInfo {
   source: string | null;
 }
 
+export interface ParkingDistanceResult {
+  parking: ParkingInfo;
+  distanceMeters: number | null;
+}
+
 export interface NoiseSource {
   kind: string;
   note: string;
@@ -68,3 +73,8 @@ export interface SolarPosition {
   altitudeDegrees: number;
   isAboveHorizon: boolean;
 }
+
+export type LightingClassification =
+  | "front-light"
+  | "side-light"
+  | "back-light";

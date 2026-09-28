@@ -15,4 +15,14 @@ describe("mock location repository", () => {
     expect(results.every((result) => result.location.id !== "demo-01")).toBe(true);
     expect(getMockSimilarLocations("missing")).toEqual([]);
   });
+
+  it("distinguishes on-site parking from nearby parking fixtures", () => {
+    const onSite = getMockLocation("demo-01");
+    const nearby = getMockLocation("demo-02");
+
+    expect(onSite?.parking[0].locationId).toBe(onSite?.id);
+    expect(onSite?.parking[0].point).toEqual(onSite?.point);
+    expect(nearby?.parking[0].locationId).toBeNull();
+    expect(nearby?.parking[0].point).not.toEqual(nearby?.point);
+  });
 });
