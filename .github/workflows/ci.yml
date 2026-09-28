@@ -91,7 +91,11 @@ jobs:
           fi
           curl --fail --silent --output /dev/null http://127.0.0.1:3000/
           curl --fail --silent --output /dev/null http://127.0.0.1:3000/search
-          curl --fail --silent --output /dev/null http://127.0.0.1:3000/locations/demo-01
+          # Fixture id, not a literal "demo-01" string -- see
+          # src/domains/locations/fixtures/locations.ts (fixed UUIDs so mock
+          # data also exercises uuid-shaped code paths; "demo-01" survives
+          # only as that fixture's `slug`, for its SVG filename).
+          curl --fail --silent --output /dev/null http://127.0.0.1:3000/locations/00000000-0000-4000-8000-000000000001
 
       - name: Clean up smoke container
         if: always()

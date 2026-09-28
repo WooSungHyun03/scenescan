@@ -1,0 +1,25 @@
+-- Backend-owned follow-up to 20260928000000_location_data_integrity.sql.
+-- Removes the temporary column defaults on location_images.embedding_model
+-- and locations.source, keeping both columns not null.
+--
+-- Those defaults existed only so the earlier migration could introduce
+-- not-null columns without a backfill. As of this migration this project
+-- has zero real locations/location_images rows (verified manually against
+-- the target project before applying this migration -- see the report for
+-- this change; there is nothing to backfill). DROP DEFAULT only changes
+-- future inserts that omit the column -- it does not touch existing row
+-- values. If real rows exist by the time this runs, STOP: confirm every
+-- existing row already has the correct embedding_model / source value
+-- (backfilling with an explicit UPDATE first if not) before applying this
+-- migration, since dropping the default will not retroactively fix rows
+-- that already have a wrong value.
+--
+-- Dropping the default is deliberate, not cosmetic:
+-- scripts/embeddings/importer.ts does not currently set embedding_model (or
+-- source) when it upserts location_images (see report). With a default in
+-- place, that gap fails silently -- every imported row would just get
+-- today's placeholder value. Without a default, the same insert fails
+-- loudly with a not_null violation until the importer is updated to pass
+-- these columns explicitly, surfacing the gap instead of masking it.
+alter table public.location_images alter column embedding_model drop default;
+alter table public.locations alter column source drop default;

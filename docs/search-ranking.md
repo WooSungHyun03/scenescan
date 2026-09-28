@@ -23,4 +23,108 @@ Top-k mean is deliberately not wired as the service default until retrieval eval
 
 ## Candidate cap
 
-The RPC returns at most 200 image hits before application-side region/category filtering and location grouping. The ranker is deterministic for the candidates it receives, but a larger production dataset may require SQL-side filters or a measured candidate-limit change so eligible locations are not hidden beyond that boundary.
+The RPC returns at most 200 image hits. Historically these were unfiltered by region/category, and eligibility was decided entirely in application code (see "SQL-side region/category filtering" below for why that was a bug). The ranker is deterministic for the candidates it receives, but a larger production dataset may still require a measured candidate-limit change so eligible locations are not hidden beyond that boundary, now scoped to a matching region/category rather than the whole table.
+
+`src/domains/locations/server/supabase-repository.ts` fixes `match_count` at `SEARCH_MATCH_COUNT_DEFAULT` (200, the RPC's own ceiling, not a smaller "typical" number) for both search and similar-locations -- specifically because images-per-location is not yet measured for a real dataset. A location with few images could be crowded out of a smaller candidate window by one location with many near-duplicate images; at this dataset's size, a vector scan over 200 rows versus 40 has no meaningful cost (see `docs/database.md`), so there's no offsetting reason to default lower. `match_count` is **not** client-configurable via `POST /api/search` (an earlier revision of this endpoint exposed a `count` field; it was removed from the public request schema because there was no product need for a client to widen/narrow the server's own candidate-retrieval window, only to narrow via `threshold`). `POST /api/search` still lets a caller pass `threshold` (validated `[0,1]`) to narrow the pre-aggregation candidate window; it does not change the fixed 8-location result limit above.
+
+## `match_location_images` RPC contract
+
+Defined in `supabase/migrations/20260920000000_initial_schema.sql` and replaced in place (same function name, extended signature each time) by `supabase/migrations/20260928010000_match_location_images_filters.sql` and then `supabase/migrations/20260928030000_match_location_images_exclude_location.sql`.
+
+```sql
+match_location_images(
+  query_embedding extensions.vector(512),
+  match_threshold double precision default 0,
+  match_count integer default 40,
+  filter_region text default null,
+  filter_category text default null,
+  expected_embedding_model text default null,
+  exclude_location_id uuid default null
+) returns table (
+  image_id uuid,
+  location_id uuid,
+  image_url text,
+  similarity double precision
+)
+```
+
+- **similarity** is defined as `1 - (embedding <=> query_embedding)`, i.e. cosine similarity derived from pgvector's cosine distance operator. `match_threshold` is compared against this same similarity value (clamped to `[0, 1]` via `greatest(0, least(match_threshold, 1))`), never against the raw distance.
+- **Ordering**: ascending `embedding <=> query_embedding`, i.e. descending similarity, highest match first.
+- **`match_count`**: clamped inside the function to `[1, 200]` via `limit least(greatest(match_count, 1), 200)`. Results are image-level, not deduplicated by location, so callers must request enough rows for a full 8-location result after grouping (see "Aggregation" above).
+- **`filter_region` / `filter_category`**: applied in the query via a join to `locations` (`(filter_region is null or l.region = filter_region)`, and likewise for category). A `null` filter applies no restriction. This is SQL-side filtering, not a post-hoc application-side check.
+- **`expected_embedding_model`**: must equal `location_images.embedding_model` exactly for a row to be a candidate. Passing `null` matches zero rows (fail closed) rather than skipping the check -- every caller must supply this explicitly. `location_images.embedding` is always excluded when `null` regardless of this parameter.
+- **`exclude_location_id`**: when non-null, drops every candidate image belonging to that location before `match_count` is applied. Used by similar-locations search (see below); `null` (the default) excludes nothing, so `searchSupabaseLocations` (plain image search) never sets it.
+- **RLS/grants**: `security invoker` (the caller's own row-level security and table grants apply; there is no elevated access inside the function), `set search_path = public, extensions`, `execute` granted to `anon` and `authenticated`.
+
+### Why `expected_embedding_model` exists and fails closed
+
+`location_images.embedding_model` (added in `20260928000000_location_data_integrity.sql`) records the exact model/revision that produced each stored vector. Comparing a query embedding against a vector from a different model (or a different quantization of the same model) produces a numerically valid but meaningless cosine similarity -- it degrades ranking quality without raising any error. Requiring the caller to pass the expected value, and treating a missing value as "match nothing" rather than "match everything," makes that failure mode loud instead of silent. `src/domains/locations/server/supabase-repository.ts` passes `` `${CLIP_MODEL_ID}@${CLIP_MODEL_REVISION}` `` (from `src/lib/ai/embedding-service.ts`, reused as-is) as this value.
+
+### SQL-side region/category filtering: the bug this fixes
+
+Before this migration, `match_location_images` had no `filter_region`/`filter_category` parameters. `src/domains/locations/server/supabase-repository.ts` ran an unfiltered top-200 nearest-neighbor search, then called `getSupabaseLocations(filters)` to get the region/category-filtered location list, and used that list purely as an *eligibility set* inside `groupImageMatches`/`rankLocationImageHits`. Any image hit whose location wasn't in that filtered list was silently discarded. If every image in the raw top-200 belonged to locations outside the requested region/category, the API returned zero results even when matching locations existed further down the similarity ranking. Moving the filter into the RPC means the 200-row cap applies *after* filtering, not before.
+
+`searchSupabaseLocations` now passes `filter_region`/`filter_category` (alongside `expected_embedding_model`) on every call, and loads `Location` metadata for search results by the exact IDs the RPC returned (`getSupabaseLocationsByIds`) rather than by re-running a region/category filter query. There is no separate app-side eligibility computation left for region/category -- `groupImageMatches`'s `eligibleLocationIds` set is now always exactly "the locations the RPC already told us match," not an independently-derived filter result that could disagree with it.
+
+### Regression test: a filtered-out region must not be dropped
+
+Verified directly against a disposable `pgvector/pgvector:pg16` Postgres container (no Supabase project needed) with all four migrations applied in order. Seed data: one 서울 location with 5 images essentially identical to the query vector, and one 부산 location with 1 image that is a weaker but legitimate match (cosine similarity `0.6`).
+
+```sql
+-- Unfiltered top-3: 서울's cluster wins every slot; 부산 never appears.
+select image_id, location_id, similarity
+from match_location_images(query_embedding, 0, 3, null, null, expected_embedding_model);
+-- => 3 rows, all location_id = 서울 location
+
+-- With filter_region = '부산': the 부산 image is returned even though it
+-- ranks well outside the unfiltered top-3.
+select image_id, location_id, similarity
+from match_location_images(query_embedding, 0, 3, '부산', null, expected_embedding_model);
+-- => 1 row, location_id = 부산 location, similarity = 0.6
+```
+
+Actual output from the verification run:
+
+```
+--- unfiltered top-3: A dominates, B is not in it ---
+ (3 rows, all location_id = A / 서울, similarity ≈ 1.0000)
+
+--- filter_region = 부산 (B): must still return B image despite ranking below A cluster ---
+               image_id               |             location_id              | similarity
+--------------------------------------+--------------------------------------+------------
+ f2eb78e3-4fbf-42f2-b6c6-0ab5de71e715 | 37b15242-84de-40cb-9af2-ab0cef878ea0 |     0.6000
+(1 row)
+```
+
+Also verified in the same run: a `location_images` row with a different `embedding_model` value is excluded when the correct `expected_embedding_model` is passed (0 rows), and omitting `expected_embedding_model` entirely returns 0 rows across the whole table (fail closed), even though otherwise-matching rows exist.
+
+## Similar locations (`GET /api/locations/[id]/similar`)
+
+Uses `match_location_images` with `query_embedding` set to one of the target location's own stored image embeddings and `exclude_location_id` set to the target location's own ID. No client-supplied vector is involved -- see `docs/api-contracts.md` for the endpoint contract.
+
+### Which embedding represents a location
+
+No existing utility (Member 1's or otherwise) defines how to pick or combine a location's embedding(s) for this purpose -- `src/domains/locations/services/location-ranking.ts` and `group-image-matches.ts` both operate on an already-produced list of image hits; neither has an opinion on selecting a location's own representative embedding. Implemented with the simplest reasonable rule pending Member 1 input: the target location's oldest `location_images` row (`order by created_at, id limit 1`) whose `embedding_model` matches the server's expected model/revision and whose `embedding` is not null. `TODO(similar-locations-embedding)` in `src/domains/locations/server/supabase-repository.ts` marks this; an averaged/pooled embedding across a location's images is a plausible alternative Member 1 may prefer, which would require a small additional SQL aggregate (not a ranking-utility change, so still backend-owned, but the *choice* of pooling strategy is a Member 1 call).
+
+If the location has no `location_images` row at all, or none with a non-null embedding matching the expected model, the endpoint returns an empty result (`{ results: [] }`), not an error -- indistinguishable at the response level from "found candidates but none passed threshold." Same rule as plain search.
+
+### Regression test: excluding a location's own images must not starve the result
+
+Verified against the same disposable Postgres container, migration `20260928030000` applied. Seed: location A with 5 images essentially identical to A's own query vector (i.e. what happens when A's own embedding is used to search), location B with 1 image, a weaker but legitimate match (similarity `0.6`).
+
+```sql
+-- Without exclude_location_id: A's own other images dominate every slot.
+select image_id, location_id, similarity
+from match_location_images(a_query_embedding, 0, 3, null, null, expected_embedding_model, null);
+-- => 3 rows, all location_id = A
+
+-- With exclude_location_id = A: B is returned even though, unfiltered, it
+-- never appears in the top 3.
+select image_id, location_id, similarity
+from match_location_images(a_query_embedding, 0, 3, null, null, expected_embedding_model, a_id);
+-- => 1 row, location_id = B, similarity = 0.6
+```
+
+Both outcomes were confirmed exactly as shown. Also verified: a pre-existing named-parameter call omitting `exclude_location_id` entirely (`match_threshold => 0, match_count => 10, expected_embedding_model => ...`) still returns all matching rows (6, both locations) -- unaffected by the new parameter, and `anon` can execute the new 7-parameter signature.
+
+The equivalent mock-mode regression (self exclusion holding even when same-category "candidates" would otherwise crowd it out) is covered by a Vitest test in `src/domains/locations/server/mock-repository.test.ts`.
