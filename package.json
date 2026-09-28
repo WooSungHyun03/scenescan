@@ -13,6 +13,8 @@
     "test": "vitest run",
     "docker:build": "docker build -t scenescan:local .",
     "docker:up": "docker compose up --build",
+    "data:collect-commons": "node --experimental-strip-types scripts/data/collect-commons.ts",
+    "data:import-production": "node --experimental-strip-types scripts/data/import-production.ts",
     "data:normalize": "node --experimental-strip-types scripts/data/normalize.ts",
     "data:validate": "node --experimental-strip-types scripts/data/validate.ts",
     "embeddings:prepare": "node --experimental-strip-types scripts/embeddings/prepare.ts",

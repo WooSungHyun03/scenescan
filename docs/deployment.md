@@ -6,7 +6,7 @@ The current production topology is Vercel Hobby for the Next.js application, Sup
 2. Enable pgvector (the migration also runs `create extension if not exists vector with schema extensions`).
 3. Run `supabase/migrations/20260920000000_initial_schema.sql` with Supabase SQL Editor or CLI.
 4. Create a public Storage bucket named `location-images`; upload only licensed images. Record rights in `DATA_LICENSES.md`.
-5. Run `pnpm embeddings:audit-schema`, validate the reviewed embedding output, then use the server-only importer dry-run before applying it. `SUPABASE_SERVICE_ROLE_KEY` is needed only in the trusted local import process and must not be added to Vercel.
+5. Run `pnpm embeddings:audit-schema`, then import `data/production/locations.json` with `pnpm data:import-production ... --dry-run` and `--apply`. Validate and import `data/production/embeddings.json` afterward. The exact commands are in `scripts/data/README.md`. `SUPABASE_SERVICE_ROLE_KEY` is needed only in the trusted local import process and must not be added to Vercel.
 6. Set `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`. Set both mock flags to `false` only after real data, embeddings, and keys are ready. Configure a Kakao JavaScript app key and allowed web domains for the real map.
 7. Create a Vercel Hobby project and connect the GitHub repository. The root is the Next.js app; no custom `vercel.json` is needed.
 8. Copy the same public environment variables into Vercel project settings and deploy.

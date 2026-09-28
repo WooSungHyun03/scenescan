@@ -110,6 +110,38 @@ Validation rejects unknown mapping fields, unsafe object paths, missing required
 
 This command only reads local JSON and writes reviewed JSON. It does not download images, call a provider API, or write to Supabase. A source URL records provenance but does not establish redistribution rights; document the license and attribution in `DATA_LICENSES.md` before committing real records or images.
 
+## Curated production seed
+
+`data/production/commons-manifest.json` is the reviewed source manifest for the initial real dataset. It contains 10 Korean filming-location candidates and 20 explicitly licensed Wikimedia Commons images. Rebuild the checked-in assets and derived manifests with:
+
+```bash
+pnpm data:collect-commons
+pnpm data:validate data/production/locations.json data/production/validation-report.json --image-root .
+pnpm embeddings:prepare data/production/embeddings-manifest.json data/production/embeddings.json --batch-size 4
+pnpm data:import-production data/production/locations.json data/production/embeddings-manifest.json --validate-only
+pnpm embeddings:import data/production/embeddings.json --validate-only
+```
+
+The collector re-fetches Commons metadata and fails closed when a file is missing, is not JPEG, has an unapproved license, declares extra restrictions, exceeds 15 MB, or does not have a complete JPEG signature. Downloads run four at a time with bounded retry. It writes files atomically and produces:
+
+- `public/locations/*.jpg`: local, stable, 1280-pixel application images;
+- `data/production/locations.json`: canonical location records;
+- `data/production/image-licenses.json`: source and local checksums plus exact attribution;
+- `data/production/embeddings-manifest.json`: offline CLIP input.
+
+Running the collector is deterministic for a fixed Commons source revision except for a provider-side regenerated thumbnail. Review any checksum change before committing it. The source manifest is human-reviewed; do not populate it from an unreviewed scrape. The collector and both `--validate-only` commands do not write to Supabase.
+
+After the schema migrations are installed, use the explicit production import sequence below from a trusted local shell. The service-role key must never be placed in a `NEXT_PUBLIC_*` variable or Vercel. The first importer writes location and image metadata; the second adds the validated vectors to those image rows. Both operations are idempotent by stable UUID. Always run `--dry-run` immediately before `--apply`.
+
+```bash
+export SUPABASE_URL="https://<project-ref>.supabase.co"
+export SUPABASE_SERVICE_ROLE_KEY="<server-only secret>"
+pnpm data:import-production data/production/locations.json data/production/embeddings-manifest.json --dry-run
+pnpm data:import-production data/production/locations.json data/production/embeddings-manifest.json --apply
+pnpm embeddings:import data/production/embeddings.json --dry-run
+pnpm embeddings:import data/production/embeddings.json --apply
+```
+
 ## Validation gate
 
 Run validation after normalization and before any database import. Relative image paths are resolved from the normalized file's directory unless `--image-root` is provided.

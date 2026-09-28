@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "valid": true,
+  "summary": {
+    "totalLocations": 10,
+    "validLocations": 10,
+    "invalidLocations": 0,
+    "errorCount": 0
+  },
+  "errors": []
+}

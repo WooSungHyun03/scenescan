@@ -13,7 +13,7 @@ Two complementary synthetic sets are committed:
 1. `scripts/embeddings/clip-evaluation-index.json` contains ten queries and ten candidates spanning urban, nature, industrial, and interior fixture labels. The PNGs under `scripts/embeddings/evaluation-images/` are cropped/flipped derivatives of project-created SVGs and are MIT-licensed. `pnpm embeddings:evaluate-clip` runs the production `Xenova/clip-vit-base-patch32` image-feature-extraction pipeline, validates finite 512-D vectors, calculates cosine similarities, and writes `clip-evaluation-results.json` with exact model provenance.
 2. `scripts/embeddings/evaluation-dataset.json` contains 12 balanced, curated multi-image ranking scenarios. It deliberately includes one-defining-view, consistent-multiple-view, false-positive, multiple-acceptable-location, low-margin, and strict-threshold failure cases. Its scores are synthetic policy probes, not CLIP quality claims.
 
-`DATA_LICENSES.md` records both sources. No scraped or third-party photo is present.
+`DATA_LICENSES.md` records both evaluation sources. No scraped or third-party photo is present in either evaluation set; the separately collected production seed is not used as evaluation evidence.
 
 ## Metrics
 

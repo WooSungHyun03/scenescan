@@ -1,0 +1,178 @@
+{
+  "schema_version": 1,
+  "verified_at": "2026-09-29T00:00:00+09:00",
+  "public_base_url": "https://beceleb.org/locations",
+  "attribution_url": "https://github.com/WooSungHyun03/scenescan/blob/main/DATA_LICENSES.md#production-location-images",
+  "locations": [
+    {
+      "id": "16be41dd-dd84-5728-8f73-6786b85fe366",
+      "slug": "ddp",
+      "name": "동대문디자인플라자",
+      "description": "곡면 금속 외장과 넓은 보행 공간이 이어지는 서울의 복합문화공간입니다.",
+      "category": "urban",
+      "region": "서울",
+      "address": "서울특별시 중구 을지로 281",
+      "latitude": 37.5669,
+      "longitude": 127.0094,
+      "source": "서울문화포털",
+      "source_url": "https://culture.seoul.go.kr/culture/culture/cultureSpace/view.do?facCode=101016&menuNo=200119",
+      "images": [
+        { "id": "457bb8df-5cf0-517b-b3bf-e86313c9ea37", "file_title": "File:Dongdaemun Design Plaza at night, Seoul, Korea.jpg", "filename": "ddp-01.jpg", "alt": "야간의 동대문디자인플라자 곡면 외관" },
+        { "id": "ed265285-3e27-5fa6-829c-9a6567114214", "file_title": "File:20240601 144028 Dongdaemun Design Plaza, Seoul 08.jpg", "filename": "ddp-02.jpg", "alt": "주간의 동대문디자인플라자 외부 공간" }
+      ]
+    },
+    {
+      "id": "4ebcf4f1-e9ac-5775-940d-11854c71271a",
+      "slug": "oil-tank-culture-park",
+      "name": "문화비축기지",
+      "description": "옛 석유 비축 시설을 탱크와 콘크리트 질감이 살아 있는 문화공간으로 재생한 장소입니다.",
+      "category": "industrial",
+      "region": "서울",
+      "address": "서울특별시 마포구 증산로 87",
+      "latitude": 37.57083333333334,
+      "longitude": 126.89416666666668,
+      "source": "서울특별시 공원 안내",
+      "source_url": "https://parks.seoul.go.kr/template/sub/culturetank.do",
+      "images": [
+        { "id": "52cdf352-5783-5aa2-9886-f52a35201791", "file_title": "File:Oil-tank-culture-park.jpg", "filename": "oil-tank-culture-park-01.jpg", "alt": "문화비축기지의 원형 탱크 건축" },
+        { "id": "c4454613-9800-5d33-aedf-afc31045963b", "file_title": "File:문화비축기지 T6.jpg", "filename": "oil-tank-culture-park-02.jpg", "alt": "문화비축기지 T6 공간" }
+      ]
+    },
+    {
+      "id": "86edb735-45b7-54cf-9aba-e3c6b772fcd7",
+      "slug": "seonyudo-park",
+      "name": "선유도공원",
+      "description": "한강 섬의 수목과 수경 공간, 옛 정수장 구조물이 함께 남아 있는 생태공원입니다.",
+      "category": "nature",
+      "region": "서울",
+      "address": "서울특별시 영등포구 선유로 343",
+      "latitude": 37.543694444444,
+      "longitude": 126.89980555556,
+      "source": "서울특별시 공원 안내",
+      "source_url": "https://parks.seoul.go.kr/template/sub/seonyudo.do",
+      "images": [
+        { "id": "a89e333c-e8b0-58d0-8355-c035a616e921", "file_title": "File:Seoul Seonyudo Park.jpg", "filename": "seonyudo-park-01.jpg", "alt": "선유도공원의 녹지와 산책 공간" },
+        { "id": "b783fe42-906f-52aa-9e5e-1d7bfb89c3f6", "file_title": "File:Seonyudo Park - historical - 2005 June 6 various - 03.jpg", "filename": "seonyudo-park-02.jpg", "alt": "선유도공원의 수경 시설과 식생" }
+      ]
+    },
+    {
+      "id": "dcbe4d63-7b74-5b6c-95eb-58ca90beb3e0",
+      "slug": "incheon-chinatown",
+      "name": "인천 차이나타운",
+      "description": "붉은 간판과 장식문, 경사진 골목이 밀집한 인천 개항장 일대의 거리 공간입니다.",
+      "category": "urban",
+      "region": "인천",
+      "address": "인천광역시 중구 차이나타운로59번길 20 일대",
+      "latitude": 37.476361111111,
+      "longitude": 126.61819444444,
+      "source": "Wikidata",
+      "source_url": "https://www.wikidata.org/wiki/Q6014440",
+      "images": [
+        { "id": "5217f2b0-e7e6-5585-bb3b-85ea1d9d9bad", "file_title": "File:Chinatown, incheon 20230430 002.jpg", "filename": "incheon-chinatown-01.jpg", "alt": "인천 차이나타운의 장식문과 거리" },
+        { "id": "0aac5877-126f-567f-bc8e-59ce16c2fa05", "file_title": "File:Chinatown, incheon 20230430 003.jpg", "filename": "incheon-chinatown-02.jpg", "alt": "인천 차이나타운의 붉은 골목 풍경" }
+      ]
+    },
+    {
+      "id": "c26c56a1-df95-52c7-83d7-15eb50fab1dd",
+      "slug": "songdo-central-park",
+      "name": "송도 센트럴파크",
+      "description": "수로와 산책로 사이로 송도의 고층 건축물이 펼쳐지는 도심 공원입니다.",
+      "category": "nature",
+      "region": "인천",
+      "address": "인천광역시 연수구 컨벤시아대로 160",
+      "latitude": 37.3925,
+      "longitude": 126.63944444444445,
+      "source": "Wikidata",
+      "source_url": "https://www.wikidata.org/wiki/Q7561251",
+      "images": [
+        { "id": "3b08dc59-1996-5a5a-877d-5255a23bd873", "file_title": "File:Songdo Convensia and Central Park View.jpg", "filename": "songdo-central-park-01.jpg", "alt": "송도 센트럴파크 수로와 도심 전경" },
+        { "id": "b60ce650-e72a-5f00-93bc-bbbe8510c525", "file_title": "File:Songdo Central Park at night.jpg", "filename": "songdo-central-park-02.jpg", "alt": "야간의 송도 센트럴파크와 고층 건물" }
+      ]
+    },
+    {
+      "id": "5fec204b-6a5a-50f9-8bc7-8cbacf5a94ff",
+      "slug": "gamcheon-culture-village",
+      "name": "감천문화마을",
+      "description": "산비탈을 따라 다채로운 주택과 좁은 골목이 층층이 이어지는 부산의 마을 경관입니다.",
+      "category": "urban",
+      "region": "부산",
+      "address": "부산광역시 사하구 감내2로 203",
+      "latitude": 35.0975,
+      "longitude": 129.00916667,
+      "source": "한국관광공사 VISITKOREA",
+      "source_url": "https://english.visitkorea.or.kr/svc/contents/contentsView.do?menuSn=351&vcontsId=72894",
+      "images": [
+        { "id": "c4982d4c-0927-5339-8e14-5ed14695c168", "file_title": "File:Colorful houses in Gamcheon Culture Village at sunset in Busan South Korea.jpg", "filename": "gamcheon-culture-village-01.jpg", "alt": "노을 아래 감천문화마을의 다채로운 주택" },
+        { "id": "6b36dca1-7747-5f8f-8dad-8f784b762db1", "file_title": "File:Gamcheon Culture Village.jpg", "filename": "gamcheon-culture-village-02.jpg", "alt": "언덕에서 내려다본 감천문화마을" }
+      ]
+    },
+    {
+      "id": "71900375-6632-52d7-a01b-0a2ebff62c39",
+      "slug": "busan-cinema-center",
+      "name": "영화의전당",
+      "description": "대형 지붕과 열린 광장, 공연·상영 공간이 결합된 부산의 영화문화 복합공간입니다.",
+      "category": "interior",
+      "region": "부산",
+      "address": "부산광역시 해운대구 수영강변대로 120",
+      "latitude": 35.171163888889,
+      "longitude": 129.12718888889,
+      "source": "영화의전당",
+      "source_url": "https://www.dureraum.org/",
+      "images": [
+        { "id": "b17ed098-4f46-5ac9-9d68-8bc44a5937ef", "file_title": "File:Busan Cinema Center.jpg", "filename": "busan-cinema-center-01.jpg", "alt": "영화의전당의 대형 지붕과 야외 광장" },
+        { "id": "f0a3fbe8-e80d-5997-a3f3-b18fafcc6524", "file_title": "File:Busan Cinema Center at BIFF 2020 - 09.jpg", "filename": "busan-cinema-center-02.jpg", "alt": "부산국제영화제 기간의 영화의전당 공간" }
+      ]
+    },
+    {
+      "id": "13d8a195-24a1-5fb5-9469-3100043deccf",
+      "slug": "suwon-hwaseong",
+      "name": "수원화성",
+      "description": "성곽과 문루, 언덕 지형이 도심과 이어지는 수원의 유네스코 세계유산입니다.",
+      "category": "nature",
+      "region": "경기",
+      "address": "경기도 수원시 팔달구 정조로 825 일대",
+      "latitude": 37.280733333333,
+      "longitude": 127.01020277778,
+      "source": "수원문화재단",
+      "source_url": "https://www.swcf.or.kr/?p=58",
+      "images": [
+        { "id": "5fbb961f-7684-5b87-bd7d-141a47074ec6", "file_title": "File:Hwaseong Fortress 01.jpg", "filename": "suwon-hwaseong-01.jpg", "alt": "수원화성 성곽과 주변 녹지" },
+        { "id": "b35d5ef8-534d-5caf-8730-0533749af58b", "file_title": "File:Hwaseong Fortress 03.jpg", "filename": "suwon-hwaseong-02.jpg", "alt": "수원화성의 성벽과 문루" }
+      ]
+    },
+    {
+      "id": "88642f64-da5a-550b-b294-a4c7260c3f1e",
+      "slug": "gwangmyeong-cave",
+      "name": "광명동굴",
+      "description": "폐광의 암반과 갱도 구조를 문화관광 공간으로 재생한 산업유산 장소입니다.",
+      "category": "industrial",
+      "region": "경기",
+      "address": "경기도 광명시 가학로85번길 142",
+      "latitude": 37.425622,
+      "longitude": 126.864386,
+      "source": "광명시 문화관광",
+      "source_url": "https://www.gm.go.kr/tour/gmNine/nine01.jsp",
+      "images": [
+        { "id": "16a872d5-4aad-505e-8f6a-284a6ef96f97", "file_title": "File:20230902 Gwangmyeong Cave 003.jpg", "filename": "gwangmyeong-cave-01.jpg", "alt": "광명동굴 내부의 암반과 조명" },
+        { "id": "63d9a5c9-7442-574c-8c02-5649677df889", "file_title": "File:20230902 Gwangmyeong Cave 004.jpg", "filename": "gwangmyeong-cave-02.jpg", "alt": "광명동굴 내부 갱도 공간" }
+      ]
+    },
+    {
+      "id": "979a6ddc-2f93-586f-a515-6c86f1c521bc",
+      "slug": "starfield-library",
+      "name": "별마당도서관",
+      "description": "높은 서가와 개방형 열람·행사 공간이 중심을 이루는 코엑스몰 내부 문화공간입니다.",
+      "category": "interior",
+      "region": "서울",
+      "address": "서울특별시 강남구 영동대로 513 스타필드 코엑스몰 B1·1층",
+      "latitude": 37.510011,
+      "longitude": 127.060378,
+      "source": "스타필드 코엑스몰",
+      "source_url": "https://starfield.co.kr/m/coexmall/starfieldLibrary/library.do",
+      "images": [
+        { "id": "6afae4a4-6973-5bcf-aea8-c0c78ca82126", "file_title": "File:Starfield library 1.jpg", "filename": "starfield-library-01.jpg", "alt": "별마당도서관의 높은 서가와 내부 공간" },
+        { "id": "aa102734-c7ff-51b0-91bb-5acd20b93951", "file_title": "File:Starfield library 2.jpg", "filename": "starfield-library-02.jpg", "alt": "다른 시점에서 본 별마당도서관 내부" }
+      ]
+    }
+  ]
+}
