@@ -21,6 +21,7 @@ describe("MockEmbeddingService", () => {
     service.subscribe(listener);
 
     expect(service.getStatus()).toEqual({ state: "ready" });
+    expect(service.getPerformanceSnapshot()).toEqual([]);
     expect(listener).toHaveBeenCalledWith({ state: "ready" });
   });
 

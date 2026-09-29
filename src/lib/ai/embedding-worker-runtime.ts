@@ -12,6 +12,7 @@ type EmbeddingWorkerDependencies<Input> = {
   decodeImage: (image: Blob) => Promise<Input>;
   getDimensions: (image: Input) => { width: number; height: number };
   postMessage: (message: EmbeddingWorkerReply) => void;
+  now?: () => number;
 };
 
 function errorMessage(error: unknown): string {
@@ -23,6 +24,7 @@ export function createEmbeddingWorkerHandler<Input>({
   decodeImage,
   getDimensions,
   postMessage,
+  now = () => performance.now(),
 }: EmbeddingWorkerDependencies<Input>) {
   let extractorPromise: Promise<FeatureExtractor<Input>> | null = null;
 
@@ -52,16 +54,31 @@ export function createEmbeddingWorkerHandler<Input>({
 
   return async (request: EmbeddingWorkerRequest): Promise<void> => {
     const { id, image } = request;
+    const startedAt = now();
     try {
+      const decodeStartedAt = now();
       const decodedImage = await decodeImage(image);
+      const decodeMs = now() - decodeStartedAt;
       const { width, height } = getDimensions(decodedImage);
       validateImageDimensions(width, height);
+      const modelWasCached = extractorPromise !== null;
+      const modelWaitStartedAt = now();
       const extractor = await getExtractor();
+      const modelWaitMs = now() - modelWaitStartedAt;
+      const inferenceStartedAt = now();
       const features = await extractor(decodedImage);
+      const inferenceMs = now() - inferenceStartedAt;
       postMessage({
         type: "result",
         id,
         embedding: toValidatedEmbedding(features.data),
+        timing: {
+          totalMs: now() - startedAt,
+          decodeMs,
+          modelWaitMs,
+          inferenceMs,
+          modelWasCached,
+        },
       });
     } catch (error) {
       postMessage({ type: "error", id, error: errorMessage(error) });

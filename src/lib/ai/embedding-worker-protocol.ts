@@ -6,7 +6,15 @@ export type EmbeddingWorkerRequest = {
   image: Blob;
 };
 
+export type EmbeddingWorkerTiming = {
+  totalMs: number;
+  decodeMs: number;
+  modelWaitMs: number;
+  inferenceMs: number;
+  modelWasCached: boolean;
+};
+
 export type EmbeddingWorkerReply =
   | { type: "status"; status: EmbeddingServiceState; error?: string; progress?: number }
-  | { type: "result"; id: number; embedding: number[] }
+  | { type: "result"; id: number; embedding: number[]; timing?: EmbeddingWorkerTiming }
   | { type: "error"; id: number; error: string };

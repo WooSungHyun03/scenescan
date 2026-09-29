@@ -5,6 +5,10 @@ import type {
   ImageEmbeddingService,
 } from "./embedding-service";
 import { DEFAULT_EMBEDDING_TIMEOUT_MS } from "./embedding-service";
+import {
+  EMBEDDING_PERFORMANCE_SAMPLE_LIMIT,
+  type EmbeddingPerformanceSample,
+} from "./embedding-service";
 import { toValidatedEmbedding } from "./embedding-validation";
 import type {
   EmbeddingWorkerReply,
@@ -30,11 +34,16 @@ type PendingTask = {
   timeout: ReturnType<typeof setTimeout>;
   signal?: AbortSignal;
   abortListener?: () => void;
+  startedAt: number;
 };
 
 function createWorker(): WorkerLike {
   if (typeof Worker === "undefined") throw new Error("Browser Web Worker required");
   return new Worker(new URL("./embedding.worker.ts", import.meta.url), { type: "module" });
+}
+
+function nonNegativeDuration(value: number): number {
+  return Number.isFinite(value) && value >= 0 ? value : 0;
 }
 
 export class TransformersJsEmbeddingService implements ImageEmbeddingService {
@@ -43,11 +52,17 @@ export class TransformersJsEmbeddingService implements ImageEmbeddingService {
   private pending = new Map<number, PendingTask>();
   private status: EmbeddingServiceStatus = { state: "idle" };
   private listeners = new Set<EmbeddingStatusListener>();
+  private performanceSamples: EmbeddingPerformanceSample[] = [];
 
   constructor(
     private readonly workerFactory: WorkerFactory = createWorker,
     private readonly maxWorkerRetries = 1,
+    private readonly now = () => performance.now(),
   ) {}
+
+  getPerformanceSnapshot(): readonly EmbeddingPerformanceSample[] {
+    return this.performanceSamples.map((sample) => ({ ...sample }));
+  }
 
   getStatus(): EmbeddingServiceStatus {
     return this.status;
@@ -87,7 +102,25 @@ export class TransformersJsEmbeddingService implements ImageEmbeddingService {
           return;
         }
         try {
-          task.resolve(toValidatedEmbedding(reply.embedding));
+          const embedding = toValidatedEmbedding(reply.embedding);
+          if (reply.timing) {
+            const totalMs = nonNegativeDuration(this.now() - task.startedAt);
+            const workerMs = nonNegativeDuration(reply.timing.totalMs);
+            this.performanceSamples.push({
+              requestId: id,
+              totalMs,
+              workerMs,
+              transferAndQueueMs: nonNegativeDuration(totalMs - workerMs),
+              decodeMs: nonNegativeDuration(reply.timing.decodeMs),
+              modelWaitMs: nonNegativeDuration(reply.timing.modelWaitMs),
+              inferenceMs: nonNegativeDuration(reply.timing.inferenceMs),
+              modelWasCached: reply.timing.modelWasCached,
+            });
+            if (this.performanceSamples.length > EMBEDDING_PERFORMANCE_SAMPLE_LIMIT) {
+              this.performanceSamples.splice(0, this.performanceSamples.length - EMBEDDING_PERFORMANCE_SAMPLE_LIMIT);
+            }
+          }
+          task.resolve(embedding);
         } catch (error) {
           task.reject(error instanceof Error ? error : new Error("Invalid CLIP embedding"));
         }
@@ -175,6 +208,7 @@ export class TransformersJsEmbeddingService implements ImageEmbeddingService {
           }
         }, timeoutMs),
         signal: options.signal,
+        startedAt: this.now(),
       };
       task.abortListener = () => {
         this.pending.delete(task.id);

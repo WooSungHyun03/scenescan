@@ -157,27 +157,31 @@ Verification:
 
 ## DAY 8 — AI Performance
 
-Status: in progress (preliminary offline baseline recorded 2026-09-29; browser worker/device benchmark is next)
+Status: in progress (offline and cache-warm production browser baselines recorded; cold-download and heap device matrix remain)
 
 Preliminary baseline (not a browser result): with the model already present in the local Hugging Face cache, a fresh Node 22 process loaded the production CLIP pipeline and embedded the 20-image evaluation set in five batches of four in 1.75 seconds wall time. Peak RSS was 830,912 KB. The generated score file SHA-256 was `a0aa27ae6de76e99307e5fbfece7143412129a8c0d0dc467c310753ec36239ec`. DAY 8 remains open until cold browser loading, repeated worker inference, preprocessing overhead, memory behavior, WebGPU capability, and fallback paths are measured separately.
 
-- [ ] Benchmark initial load and repeated inference.
-- [ ] Measure worker and preprocessing overhead.
-- [ ] Confirm lazy loading, caching, and duplicate-init prevention.
+- [ ] Benchmark first-visit network/model load; cache-warm Worker initialization and repeated inference are recorded.
+- [x] Add bounded worker decode/model-wait/inference and main-thread overhead measurements.
+- [x] Confirm lazy loading, caching, and duplicate-init prevention.
 - [ ] Check repeated-use memory behavior.
 - [ ] Evaluate WebGPU capability without making it mandatory.
-- [ ] Preserve WASM/CPU fallback, cancellation, and timeout behavior.
-- [ ] Add regression tests and benchmark documentation.
+- [x] Preserve explicit WASM fallback, cancellation, and timeout behavior.
+- [x] Add regression tests and benchmark documentation.
+
+Production browser verification (2026-09-30): a new Worker with model files already cached completed the full image-to-Top-8 flow in 3,334 ms. Five same-Worker searches took 2,168/1,947/1,952/2,266/1,955 ms (2,058 ms mean; 1,955 ms median), returned 선유도공원 first at 88%, and emitted no console warning/error. See `docs/ai-performance.md`. Cold network load and browser heap remain explicitly unverified.
 
 ## DAY 9 — CI
 
-Status: not started
+Status: complete (2026-09-29)
 
-- [ ] Add GitHub Actions checkout, Node 22, and pnpm setup.
-- [ ] Use frozen lockfile install and dependency caching.
-- [ ] Run lint, typecheck, test, and build with clear failures.
-- [ ] Apply minimum permissions, concurrency cancellation, and timeout.
-- [ ] Validate workflow syntax and document CI in README.
+- [x] Add GitHub Actions checkout, Node 22, and pnpm setup.
+- [x] Use frozen lockfile install and dependency caching.
+- [x] Run lint, typecheck, test, and build with clear failures.
+- [x] Apply minimum permissions, concurrency cancellation, and timeout.
+- [x] Validate workflow syntax and document CI in README.
+
+Verification: GitHub Actions run `36521957799` passed the Docker-based lint, typecheck, 160-test suite, standalone build, production image build, and container smoke checks in 3m44s with read-only permissions, a 25-minute timeout, dependency/build caching, and concurrency cancellation.
 
 ## DAY 10 — Environment / Secret Security
 
@@ -192,13 +196,15 @@ Status: not started
 
 ## DAY 11 — Production Deployment
 
-Status: not started
+Status: complete (2026-09-29)
 
-- [ ] Verify Vercel Hobby build, Node, pnpm, and environment settings.
-- [ ] Verify Supabase migrations, pgvector, RLS, RPC, and licensed sample data.
-- [ ] Run a production build and deploy when credentials are available.
-- [ ] Smoke-test home, search, detail, API, and real AI search paths.
-- [ ] Record external credential blockers without blocking local work.
+- [x] Verify Vercel Hobby build, Node, pnpm, and environment settings.
+- [x] Verify Supabase migrations, pgvector, RLS, RPC, and licensed sample data.
+- [x] Run a production build and deploy when credentials are available.
+- [x] Smoke-test home, search, detail, API, and real AI search paths.
+- [x] Record external credential blockers without blocking local work.
+
+Verification: Vercel deployed commit `edc063a` in 38 seconds and assigned `beceleb.org`. Production returned 200 for health/home/search/detail, loaded Kakao Maps and Supabase Storage images, returned eight finite RPC results, and completed a real browser CLIP search with the matching location ranked first. No credential blocker remains; Resend/Auth are intentionally absent because the MVP has no email/auth flow.
 
 ## DAY 12 — Production Reliability
 

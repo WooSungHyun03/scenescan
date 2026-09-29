@@ -190,4 +190,44 @@ describe("TransformersJsEmbeddingService", () => {
     expect(results).toHaveLength(25);
     expect(results.every((embedding) => embedding.length === CLIP_EMBEDDING_DIMENSION)).toBe(true);
   });
+
+  it("keeps a bounded copy-safe performance snapshot", async () => {
+    const worker = new FakeWorker();
+    let now = 100;
+    const service = new TransformersJsEmbeddingService(() => worker, 1, () => now);
+    const requests = Array.from({ length: 25 }, (_, index) => {
+      now = 100 + index;
+      return service.embed(pngBlob(`${index}`));
+    });
+
+    worker.messages.forEach(({ id }, index) => {
+      now = 200 + index;
+      worker.reply({
+        type: "result",
+        id,
+        embedding: validEmbedding(),
+        timing: {
+          totalMs: 80,
+          decodeMs: 4,
+          modelWaitMs: index === 0 ? 50 : 0,
+          inferenceMs: 20,
+          modelWasCached: index !== 0,
+        },
+      });
+    });
+    await Promise.all(requests);
+
+    const snapshot = service.getPerformanceSnapshot();
+    expect(snapshot).toHaveLength(20);
+    expect(snapshot[0]?.requestId).toBe(6);
+    expect(snapshot.at(-1)).toEqual(expect.objectContaining({
+      requestId: 25,
+      workerMs: 80,
+      decodeMs: 4,
+      inferenceMs: 20,
+      modelWasCached: true,
+    }));
+    snapshot[0]!.requestId = 999;
+    expect(service.getPerformanceSnapshot()[0]?.requestId).toBe(6);
+  });
 });

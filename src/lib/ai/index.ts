@@ -7,13 +7,16 @@ export type {
   EmbeddingServiceStatus,
   EmbeddingStatusListener,
   EmbeddingRequestOptions,
+  EmbeddingPerformanceSample,
   ImageEmbeddingService,
 } from "./embedding-service";
 export {
   CLIP_EMBEDDING_DIMENSION,
+  CLIP_BROWSER_DEVICE,
   CLIP_MODEL_ID,
   CLIP_MODEL_REVISION,
   DEFAULT_EMBEDDING_TIMEOUT_MS,
+  EMBEDDING_PERFORMANCE_SAMPLE_LIMIT,
   MAX_IMAGE_BYTES,
   MAX_IMAGE_DIMENSION,
   MAX_IMAGE_PIXELS,

@@ -149,4 +149,42 @@ describe("embedding worker runtime", () => {
 
     expect(replies).toContainEqual({ type: "status", status: "loading", progress: 100 });
   });
+
+  it("reports decode, model wait, inference, and cache timing without changing the embedding", async () => {
+    const replies: EmbeddingWorkerReply[] = [];
+    let clock = 0;
+    const handle = createEmbeddingWorkerHandler({
+      loadExtractor: async () => async () => ({
+        data: new Float32Array(CLIP_EMBEDDING_DIMENSION).fill(0.25),
+      }),
+      decodeImage: async (blob) => blob,
+      getDimensions: () => ({ width: 800, height: 600 }),
+      postMessage: (reply) => replies.push(reply),
+      now: () => {
+        const current = clock;
+        clock += 2;
+        return current;
+      },
+    });
+
+    await handle({ type: "embed", id: 20, image });
+    await handle({ type: "embed", id: 21, image });
+
+    const results = replies.filter((reply) => reply.type === "result");
+    expect(results).toHaveLength(2);
+    expect(results[0]).toEqual(expect.objectContaining({
+      id: 20,
+      timing: {
+        totalMs: 14,
+        decodeMs: 2,
+        modelWaitMs: 2,
+        inferenceMs: 2,
+        modelWasCached: false,
+      },
+    }));
+    expect(results[1]).toEqual(expect.objectContaining({
+      id: 21,
+      timing: expect.objectContaining({ modelWasCached: true }),
+    }));
+  });
 });

@@ -21,9 +21,11 @@ Similar: selected location → mean of its non-null image embeddings
        → pgvector cosine search excluding selected location → deterministic Top 8 locations
 ```
 
-The runtime worker is loaded only if `NEXT_PUBLIC_USE_MOCK_AI=false`. The UI remains responsive while the model loads. Initial model download and browser memory usage need device testing. Offline and runtime embeddings must use the same model and preprocessing. The [Transformers.js image-feature-extraction documentation](https://huggingface.co/docs/transformers.js/api/pipelines) shows `Xenova/clip-vit-base-patch32` yielding `[1, 512]`.
+The runtime worker is loaded only if `NEXT_PUBLIC_USE_MOCK_AI=false`. The UI remains responsive while the model loads. Runtime explicitly uses the Transformers.js WASM device so browsers without WebGPU remain supported; WebGPU stays an opt-in experiment until measured quality and stability justify changing the default. Offline and runtime embeddings use the same model and preprocessing. The [Transformers.js image-feature-extraction documentation](https://huggingface.co/docs/transformers.js/api/pipelines) shows `Xenova/clip-vit-base-patch32` yielding `[1, 512]`.
 
 Runtime AI accepts JPEG, PNG, and WebP files up to 15 MB, 8192 px on either axis, and 20 megapixels. The main thread validates the file envelope; the worker validates decoded dimensions and rejects malformed or non-finite model output. One service instance owns one worker, and the worker owns one lazily initialized model promise. Requests are correlated by ID, default to a 120-second timeout, may be cancelled with an `AbortSignal`, and are retried once on a worker crash. Model state is observable as `idle`, `loading` (with optional aggregate download percentage), `ready`, or `error`.
+
+Each successful real inference records timing for decode, model wait, inference, total worker time, and transfer/queue overhead. The service retains only the latest 20 small numeric samples so diagnostics cannot grow without bound or retain user image data. See `docs/ai-performance.md`.
 
 The offline pipeline imports the same model ID, revision, dimension, image envelope, and decoded-dimension validators as runtime AI. Its versioned manifest records image/location UUIDs plus source provenance. Output has deterministic manifest order and no timestamps; it records the installed Transformers.js version and writes an atomic checkpoint after each batch. A normal rerun resumes matching completed records and retries failures. See `docs/offline-embeddings.md`.
 
