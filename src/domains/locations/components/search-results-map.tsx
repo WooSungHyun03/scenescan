@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { MapPinned } from "lucide-react";
+import { Check, MapPin, MapPinned } from "lucide-react";
 import {
   createKakaoMapAdapter,
   mockMapAdapter,
@@ -121,7 +121,7 @@ export function SearchResultsMap({
             검색 결과 지도
           </h3>
           <p className="mt-1 text-xs text-stone-500">
-            마커를 선택하거나 결과 카드에 커서를 올려 위치를 비교하세요.
+            마커 버튼을 선택하거나 결과 카드에 포커스해 위치를 비교하세요.
           </p>
         </div>
         <span className="shrink-0 text-xs font-semibold text-stone-500">
@@ -142,6 +142,35 @@ export function SearchResultsMap({
         >
           표시할 수 있는 위치 좌표가 없습니다.
         </div>
+      )}
+      {markers.length > 0 && (
+        <ul
+          aria-label="지도 마커 키보드 선택"
+          className="mt-3 flex gap-2 overflow-x-auto pb-1"
+        >
+          {markers.map((marker) => {
+            const isActive = marker.id === activeLocationId;
+            return (
+              <li key={marker.id} className="shrink-0">
+                <button
+                  type="button"
+                  aria-pressed={isActive}
+                  onClick={() => onMarkerActivate(marker.id)}
+                  onFocus={() => onMarkerActivate(marker.id)}
+                  className={`inline-flex min-h-11 items-center gap-1.5 rounded-full border px-3 py-2 text-xs font-bold ${
+                    isActive
+                      ? "border-emerald-800 bg-emerald-800 text-white"
+                      : "border-stone-300 bg-white text-stone-700 hover:border-emerald-700"
+                  }`}
+                >
+                  {isActive ? <Check size={14} aria-hidden="true" /> : <MapPin size={14} aria-hidden="true" />}
+                  {marker.rank}. {marker.label}
+                  {isActive && <span className="sr-only"> 선택됨</span>}
+                </button>
+              </li>
+            );
+          })}
+        </ul>
       )}
       <p aria-live="polite" className="mt-3 min-h-5 text-sm text-stone-600">
         {activeResult

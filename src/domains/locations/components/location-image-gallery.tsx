@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { ExternalLink, ImageOff, Images } from "lucide-react";
+import { ImageOff, Images } from "lucide-react";
 import type { LocationImage } from "@/types/domain";
+import { SourceAttribution } from "./source-attribution";
 
 type LocationImageGalleryProps = {
   images: LocationImage[];
@@ -30,25 +31,6 @@ function getSafeUrl(value: string | null | undefined, allowLocalPath = false) {
   } catch {
     return null;
   }
-}
-
-function SourceAttribution({ sourceUrl }: { sourceUrl: string | null }) {
-  if (!sourceUrl) return null;
-
-  return (
-    <p className="mt-3 text-xs text-stone-500">
-      원본 데이터·이미지 출처:{" "}
-      <a
-        href={sourceUrl}
-        target="_blank"
-        rel="noreferrer"
-        className="inline-flex items-center gap-1 font-semibold text-emerald-800 underline decoration-emerald-300 underline-offset-2 hover:text-emerald-950"
-      >
-        출처 및 저작자 정보 보기
-        <ExternalLink size={12} aria-hidden="true" />
-      </a>
-    </p>
-  );
 }
 
 export function LocationImageGallery({
@@ -95,7 +77,13 @@ export function LocationImageGallery({
           <p className="mt-3 text-sm font-semibold">등록된 이미지가 없습니다</p>
           <p className="mt-1 text-xs">정보 없음</p>
         </div>
-        <SourceAttribution sourceUrl={safeSourceUrl} />
+        <div className="mt-3">
+          <SourceAttribution
+            sourceUrl={safeSourceUrl}
+            label="원본 데이터·이미지 출처"
+            compact
+          />
+        </div>
       </section>
     );
   }
@@ -180,7 +168,13 @@ export function LocationImageGallery({
         </div>
       )}
 
-      <SourceAttribution sourceUrl={safeSourceUrl} />
+      <div className="mt-3">
+        <SourceAttribution
+          sourceUrl={safeSourceUrl}
+          label="원본 데이터·이미지 출처"
+          compact
+        />
+      </div>
     </section>
   );
 }

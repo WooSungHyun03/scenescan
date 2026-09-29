@@ -176,6 +176,7 @@ export function SimilarLocationsSection({
                 location={location}
                 similarity={similarity}
                 rank={index + 1}
+                eager={index < 4}
               />
             ))}
           </div>

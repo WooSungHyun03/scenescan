@@ -29,7 +29,7 @@ export function ShortlistButton({
         onClick={() => toggle(locationId)}
         className={
           compact
-            ? `inline-flex size-10 items-center justify-center rounded-full border shadow-sm transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-800 disabled:cursor-wait ${
+            ? `inline-flex size-11 items-center justify-center rounded-full border shadow-sm transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-800 disabled:cursor-wait ${
                 isSaved
                   ? "border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100"
                   : "border-white/80 bg-white/95 text-stone-600 hover:text-rose-700"

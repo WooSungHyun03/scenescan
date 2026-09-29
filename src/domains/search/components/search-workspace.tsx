@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState, type DragEvent, type KeyboardEvent } from "react";
 import Image from "next/image";
-import { FileImage, ImagePlus, LoaderCircle, Search, Trash2, Upload } from "lucide-react";
+import { Check, FileImage, ImagePlus, LoaderCircle, Search, Trash2, Upload } from "lucide-react";
 import { LocationCard } from "@/domains/locations/components/location-card";
 import { SearchResultsMap } from "@/domains/locations/components/search-results-map";
 import { createImageEmbeddingService, type EmbeddingServiceStatus } from "@/lib/ai";
@@ -244,6 +244,7 @@ export function SearchWorkspace({ examples }: { examples: Location[] }) {
         ref={fileInputRef}
         type="file"
         accept="image/jpeg,image/png,image/webp"
+        aria-label="레퍼런스 이미지 파일 선택"
         className="sr-only"
         disabled={busy}
         onChange={(event) => {
@@ -265,22 +266,23 @@ export function SearchWorkspace({ examples }: { examples: Location[] }) {
         role="button"
         tabIndex={busy ? -1 : 0}
         aria-label="레퍼런스 이미지 업로드"
+        aria-disabled={busy}
         onClick={() => !busy && fileInputRef.current?.click()}
         onKeyDown={handleDropZoneKeyDown}
         onDragEnter={(event) => { event.preventDefault(); if (!busy) setIsDragging(true); }}
         onDragOver={(event) => event.preventDefault()}
         onDragLeave={() => setIsDragging(false)}
         onDrop={handleDrop}
-        className={`mt-4 flex min-h-44 cursor-pointer flex-col items-center justify-center rounded-lg border border-dashed p-5 text-center text-sm transition-colors ${isDragging ? "border-emerald-700 bg-emerald-50 text-emerald-900" : "border-stone-300 bg-stone-50 text-stone-600"} ${busy ? "cursor-not-allowed opacity-60" : "hover:border-emerald-700 hover:bg-emerald-50"}`}
+        className={`mt-4 flex min-h-44 cursor-pointer flex-col items-center justify-center rounded-lg border border-dashed p-5 text-center text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-800 ${isDragging ? "border-emerald-700 bg-emerald-50 text-emerald-900" : "border-stone-300 bg-stone-50 text-stone-600"} ${busy ? "cursor-not-allowed opacity-60" : "hover:border-emerald-700 hover:bg-emerald-50"}`}
       >
         <Upload size={24} aria-hidden="true" />
         <p className="mt-3 font-semibold text-stone-800">이미지를 끌어놓거나 클릭해 선택</p>
         <p className="mt-1 text-xs">JPEG, PNG, WebP · 최대 15MB</p>
       </div>}
       <div className="mt-6 space-y-5 border-t border-stone-200 pt-5">
-        <div className="flex items-center justify-between gap-3"><h3 className="text-sm font-semibold">검색 필터</h3><button type="button" disabled={busy || !hasActiveFilters} onClick={resetFilters} className="text-xs font-semibold text-emerald-800 underline underline-offset-2 disabled:cursor-not-allowed disabled:text-stone-400">초기화</button></div>
-        <fieldset disabled={busy}><legend className="text-sm font-medium text-stone-700">지역</legend><div className="mt-2 flex flex-wrap gap-2">{regionOptions.map((option) => <button key={option} type="button" aria-pressed={region === option} onClick={() => selectRegion(option)} className={`rounded-full border px-3 py-1.5 text-sm transition-colors ${region === option ? "border-emerald-800 bg-emerald-800 text-white" : "border-stone-300 bg-white text-stone-700 hover:border-emerald-700"} disabled:cursor-not-allowed disabled:opacity-60`}>{option}</button>)}</div></fieldset>
-        <fieldset disabled={busy}><legend className="text-sm font-medium text-stone-700">공간 종류</legend><div className="mt-2 flex flex-wrap gap-2">{categoryOptions.map((option) => <button key={option.value} type="button" aria-pressed={category === option.value} onClick={() => selectCategory(option.value)} className={`rounded-full border px-3 py-1.5 text-sm transition-colors ${category === option.value ? "border-emerald-800 bg-emerald-800 text-white" : "border-stone-300 bg-white text-stone-700 hover:border-emerald-700"} disabled:cursor-not-allowed disabled:opacity-60`}>{option.label}</button>)}</div></fieldset>
+        <div className="flex items-center justify-between gap-3"><h3 className="text-sm font-semibold">검색 필터</h3><button type="button" disabled={busy || !hasActiveFilters} onClick={resetFilters} className="min-h-11 rounded-md px-2 text-xs font-semibold text-emerald-800 underline underline-offset-2 disabled:cursor-not-allowed disabled:text-stone-400">초기화</button></div>
+        <fieldset disabled={busy}><legend className="text-sm font-medium text-stone-700">지역</legend><div className="mt-2 flex flex-wrap gap-2">{regionOptions.map((option) => { const selected = region === option; return <button key={option} type="button" aria-pressed={selected} onClick={() => selectRegion(option)} className={`inline-flex min-h-11 items-center gap-1.5 rounded-full border px-3 py-2 text-sm transition-colors ${selected ? "border-emerald-800 bg-emerald-800 text-white" : "border-stone-300 bg-white text-stone-700 hover:border-emerald-700"} disabled:cursor-not-allowed disabled:opacity-60`}>{selected && <Check size={14} aria-hidden="true" />}{option}</button>; })}</div></fieldset>
+        <fieldset disabled={busy}><legend className="text-sm font-medium text-stone-700">공간 종류</legend><div className="mt-2 flex flex-wrap gap-2">{categoryOptions.map((option) => { const selected = category === option.value; return <button key={option.value} type="button" aria-pressed={selected} onClick={() => selectCategory(option.value)} className={`inline-flex min-h-11 items-center gap-1.5 rounded-full border px-3 py-2 text-sm transition-colors ${selected ? "border-emerald-800 bg-emerald-800 text-white" : "border-stone-300 bg-white text-stone-700 hover:border-emerald-700"} disabled:cursor-not-allowed disabled:opacity-60`}>{selected && <Check size={14} aria-hidden="true" />}{option.label}</button>; })}</div></fieldset>
       </div>
       <Button onClick={search} disabled={busy} aria-busy={busy} className="mt-6 w-full">
         {busy ? <LoaderCircle size={16} className="animate-spin" aria-hidden="true" /> : <Search size={16} aria-hidden="true" />}
@@ -321,7 +323,7 @@ export function SearchWorkspace({ examples }: { examples: Location[] }) {
             <button
               type="button"
               onClick={resetFilters}
-              className="mt-4 text-sm font-semibold text-emerald-800 underline underline-offset-2"
+              className="mt-4 min-h-11 rounded-md px-3 text-sm font-semibold text-emerald-800 underline underline-offset-2"
             >
               필터 초기화
             </button>
@@ -341,6 +343,7 @@ export function SearchWorkspace({ examples }: { examples: Location[] }) {
                 location={location}
                 similarity={similarity}
                 rank={index + 1}
+                eager={index < 3}
                 highlighted={activeLocationId === location.id}
                 onHighlightChange={(highlighted) =>
                   setActiveLocationId((current) =>
@@ -357,8 +360,8 @@ export function SearchWorkspace({ examples }: { examples: Location[] }) {
         </div>
       ) : (
         <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-          {examples.map((location) => (
-            <LocationCard key={location.id} location={location} />
+          {examples.map((location, index) => (
+            <LocationCard key={location.id} location={location} eager={index < 3} />
           ))}
         </div>
       )}

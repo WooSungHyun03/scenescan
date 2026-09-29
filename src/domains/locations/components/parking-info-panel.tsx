@@ -10,21 +10,10 @@ import {
 import type { ReactNode } from "react";
 import { sortParkingByDistance } from "@/domains/locations/services/parking-distance";
 import type { GeoPoint, ParkingInfo } from "@/types/domain";
+import { SourceAttribution } from "./source-attribution";
 
 function getValue(value: string | null | undefined) {
   return value?.trim() || null;
-}
-
-function getSafeUrl(value: string | null) {
-  if (!value) return null;
-  try {
-    const url = new URL(value);
-    return url.protocol === "http:" || url.protocol === "https:"
-      ? url.toString()
-      : null;
-  } catch {
-    return null;
-  }
 }
 
 function formatDistance(distanceMeters: number | null) {
@@ -99,7 +88,6 @@ export function ParkingInfoPanel({
             const openingHours = getValue(item.openingHours);
             const priceInfo = getValue(item.priceInfo);
             const source = getValue(item.source);
-            const sourceUrl = getSafeUrl(source);
 
             return (
               <article
@@ -175,25 +163,12 @@ export function ParkingInfoPanel({
                     </ParkingField>
 
                     <ParkingField icon={<ExternalLink size={16} />} label="출처">
-                      {sourceUrl ? (
-                        <a
-                          href={sourceUrl}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="inline-flex items-start gap-1 break-all font-semibold text-emerald-800 underline decoration-emerald-300 underline-offset-2 hover:text-emerald-950"
-                        >
-                          <span>{source}</span>
-                          <ExternalLink
-                            size={13}
-                            className="mt-1 shrink-0"
-                            aria-hidden="true"
-                          />
-                        </a>
-                      ) : (
-                        <span className={source ? "text-stone-900" : "text-stone-500"}>
-                          {source ?? "정보 없음"}
-                        </span>
-                      )}
+                      <SourceAttribution
+                        source={source}
+                        label="주차 정보 출처"
+                        compact
+                        showLabel={false}
+                      />
                     </ParkingField>
                   </dl>
                 </div>

@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import type { ReactNode } from "react";
 import type { PermitInfo } from "@/types/domain";
+import { SourceAttribution } from "./source-attribution";
 
 function getValue(value: string | null | undefined) {
   return value?.trim() || null;
@@ -16,18 +17,6 @@ function getPhoneHref(phone: string | null) {
   if (!phone) return null;
   const callable = phone.replace(/[^\d+]/g, "");
   return /\d/.test(callable) ? `tel:${callable}` : null;
-}
-
-function getSafeSourceUrl(value: string | null) {
-  if (!value) return null;
-  try {
-    const url = new URL(value);
-    return url.protocol === "http:" || url.protocol === "https:"
-      ? url.toString()
-      : null;
-  } catch {
-    return null;
-  }
 }
 
 function PermitField({
@@ -64,7 +53,6 @@ export function PermitInfoPanel({
   const contactPhone = getValue(permit.contactPhone);
   const note = getValue(permit.note);
   const phoneHref = getPhoneHref(contactPhone);
-  const safeSourceUrl = getSafeSourceUrl(sourceUrl);
 
   return (
     <section aria-labelledby="permit-title" className="scene-panel p-5">
@@ -124,23 +112,12 @@ export function PermitInfoPanel({
         </PermitField>
 
         <PermitField icon={<ExternalLink size={17} />} label="정보 출처">
-          {safeSourceUrl ? (
-            <a
-              href={safeSourceUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-start gap-1 break-all font-semibold text-emerald-800 underline decoration-emerald-300 underline-offset-2 hover:text-emerald-950"
-            >
-              <span>{safeSourceUrl}</span>
-              <ExternalLink
-                size={13}
-                className="mt-1 shrink-0"
-                aria-hidden="true"
-              />
-            </a>
-          ) : (
-            <span className="text-stone-500">정보 없음</span>
-          )}
+          <SourceAttribution
+            sourceUrl={sourceUrl}
+            label="장소·허가 정보 출처"
+            compact
+            showLabel={false}
+          />
         </PermitField>
       </dl>
 

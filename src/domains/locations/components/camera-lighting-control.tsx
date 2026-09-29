@@ -1,7 +1,7 @@
 "use client";
 
 import { useId } from "react";
-import { Camera } from "lucide-react";
+import { Camera, Check } from "lucide-react";
 import { classifyLighting } from "@/domains/locations/services/lighting-classification";
 import type {
   LightingClassification,
@@ -115,12 +115,13 @@ export function CameraLightingControl({
             type="button"
             aria-pressed={cameraHeadingDegrees === heading.value}
             onClick={() => onCameraHeadingChange(heading.value)}
-            className={`rounded-md border px-2 py-1.5 text-xs font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-800 ${
+            className={`inline-flex min-h-11 items-center justify-center gap-1 rounded-md border px-2 py-1.5 text-xs font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-800 ${
               cameraHeadingDegrees === heading.value
                 ? "border-emerald-800 bg-emerald-800 text-white"
                 : "border-stone-300 bg-white text-stone-700 hover:border-emerald-700"
             }`}
           >
+            {cameraHeadingDegrees === heading.value && <Check size={13} aria-hidden="true" />}
             {heading.label}
           </button>
         ))}

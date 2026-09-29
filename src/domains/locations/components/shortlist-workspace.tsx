@@ -1,21 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Heart, ImagePlus, MapPin } from "lucide-react";
+import { useState } from "react";
+import { ArrowRight, Heart, ImagePlus, MapPin, Scale } from "lucide-react";
 import { LocationCard } from "@/domains/locations/components/location-card";
+import { ShortlistComparison } from "@/domains/locations/components/shortlist-comparison";
 import { useShortlist } from "@/domains/locations/components/use-shortlist";
 import type { Location } from "@/types/domain";
-
-const categoryLabels: Record<Location["category"], string> = {
-  urban: "도시",
-  nature: "자연",
-  industrial: "산업",
-  interior: "실내",
-};
-
-function displayValue(value: string | null | undefined) {
-  return value?.trim() || "정보 없음";
-}
 
 function ShortlistSkeleton() {
   return (
@@ -36,98 +27,93 @@ function ShortlistSkeleton() {
   );
 }
 
-function ComparisonTable({ locations }: { locations: Location[] }) {
-  const rows = [
-    {
-      label: "지역",
-      value: (location: Location) => displayValue(location.region),
-    },
-    {
-      label: "공간 유형",
-      value: (location: Location) => categoryLabels[location.category],
-    },
-    {
-      label: "주소",
-      value: (location: Location) => displayValue(location.address),
-    },
-    {
-      label: "허가 문의 유형",
-      value: (location: Location) => displayValue(location.permit.type),
-    },
-    {
-      label: "등록 주차 정보",
-      value: (location: Location) =>
-        location.parking.length ? `${location.parking.length}곳` : "정보 없음",
-    },
-    {
-      label: "예상 소음원",
-      value: (location: Location) =>
-        location.noiseSources.length
-          ? `${location.noiseSources.length}개`
-          : "정보 없음",
-    },
-  ];
+function ShortlistReadyContent({
+  savedLocations,
+  unavailableCount,
+}: {
+  savedLocations: Location[];
+  unavailableCount: number;
+}) {
+  const [selectedIds, setSelectedIds] = useState(() =>
+    savedLocations.slice(0, 4).map((location) => location.id),
+  );
+  const availableIds = new Set(savedLocations.map((location) => location.id));
+  const normalizedSelectedIds = selectedIds.filter((id) => availableIds.has(id));
+  const selectedIdSet = new Set(normalizedSelectedIds);
+  const selectedLocations = savedLocations.filter((location) =>
+    selectedIdSet.has(location.id),
+  );
+
+  function toggleComparison(locationId: string) {
+    setSelectedIds((current) => {
+      const availableCurrent = current.filter((id) => availableIds.has(id));
+      if (availableCurrent.includes(locationId)) {
+        return availableCurrent.filter((id) => id !== locationId);
+      }
+      if (availableCurrent.length >= 4) return availableCurrent;
+      return [...availableCurrent, locationId];
+    });
+  }
 
   return (
-    <section className="mt-10" aria-labelledby="comparison-title">
-      <div className="mb-4">
-        <p className="scene-label">COMPARE</p>
-        <h2 id="comparison-title" className="mt-1 text-2xl font-bold">
-          후보 비교
-        </h2>
-        <p className="mt-2 text-sm text-stone-600">
-          저장한 장소의 기본 촬영 조건을 나란히 확인하세요.
+    <>
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+        <p className="text-sm text-stone-600">
+          이 브라우저에 촬영 후보 <strong className="text-stone-900">{savedLocations.length}곳</strong>이 저장되어 있습니다.
+        </p>
+        <Link
+          href="/search"
+          className="inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-800 hover:text-emerald-950"
+        >
+          후보 더 찾기 <ArrowRight size={15} aria-hidden="true" />
+        </Link>
+      </div>
+
+      {unavailableCount > 0 && (
+        <p className="mb-5 rounded-lg bg-amber-50 p-3 text-sm text-amber-900">
+          저장된 ID 중 현재 데이터에서 찾을 수 없는 장소가 {unavailableCount}곳 있습니다.
+        </p>
+      )}
+
+      <div className="mb-4 flex items-start gap-2 rounded-lg border border-emerald-100 bg-emerald-50 p-3 text-sm text-emerald-950">
+        <Scale size={18} className="mt-0.5 shrink-0" aria-hidden="true" />
+        <p>
+          아래 후보 중 비교할 장소를 2~4곳 선택하세요. 현재 <strong>{selectedLocations.length}곳</strong>이 선택되어 있습니다.
         </p>
       </div>
 
-      <div className="scene-panel overflow-x-auto">
-        <table className="w-full min-w-max border-collapse text-left text-sm">
-          <caption className="sr-only">저장된 촬영 후보 비교표</caption>
-          <thead>
-            <tr className="border-b border-stone-200 bg-stone-50">
-              <th scope="col" className="sticky left-0 z-10 w-40 bg-stone-50 p-4 font-semibold text-stone-600">
-                비교 항목
-              </th>
-              {locations.map((location) => (
-                <th key={location.id} scope="col" className="min-w-56 p-4">
-                  <Link
-                    href={`/locations/${location.id}`}
-                    className="font-bold text-emerald-900 underline decoration-emerald-300 underline-offset-4 hover:text-emerald-700"
-                  >
-                    {displayValue(location.name)}
-                  </Link>
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((row) => (
-              <tr key={row.label} className="border-b border-stone-100 last:border-0">
-                <th
-                  scope="row"
-                  className="sticky left-0 z-10 bg-white p-4 font-semibold text-stone-600"
-                >
-                  {row.label}
-                </th>
-                {locations.map((location) => {
-                  const value = row.value(location);
-                  return (
-                    <td
-                      key={location.id}
-                      className={`max-w-72 p-4 align-top leading-relaxed ${
-                        value === "정보 없음" ? "text-stone-500" : "text-stone-800"
-                      }`}
-                    >
-                      {value}
-                    </td>
-                  );
-                })}
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        {savedLocations.map((location, index) => {
+          const isSelected = selectedIdSet.has(location.id);
+          const isDisabled = !isSelected && selectedLocations.length >= 4;
+          return (
+            <div key={location.id} className="space-y-2">
+              <LocationCard location={location} eager={index < 4} />
+              <label
+                className={`flex min-h-11 items-center justify-center gap-2 rounded-xl border px-3 py-2 text-sm font-bold transition-colors ${
+                  isSelected
+                    ? "border-emerald-700 bg-emerald-50 text-emerald-900"
+                    : isDisabled
+                      ? "cursor-not-allowed border-stone-200 bg-stone-100 text-stone-400"
+                      : "cursor-pointer border-stone-300 bg-white text-stone-700 hover:border-emerald-500"
+                }`}
+              >
+                <input
+                  type="checkbox"
+                  checked={isSelected}
+                  disabled={isDisabled}
+                  onChange={() => toggleComparison(location.id)}
+                  className="size-4 accent-emerald-700"
+                />
+                {isSelected ? "비교 선택됨" : isDisabled ? "최대 4곳 선택 가능" : "비교에 추가"}
+              </label>
+            </div>
+          );
+        })}
       </div>
-    </section>
+
+      <ShortlistComparison locations={selectedLocations} />
+    </>
   );
 }
 
@@ -154,33 +140,10 @@ export function ShortlistWorkspace({ locations }: { locations: Location[] }) {
       )}
 
       {savedLocations.length ? (
-        <>
-          <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-            <p className="text-sm text-stone-600">
-              이 브라우저에 촬영 후보 <strong className="text-stone-900">{savedLocations.length}곳</strong>이 저장되어 있습니다.
-            </p>
-            <Link
-              href="/search"
-              className="inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-800 hover:text-emerald-950"
-            >
-              후보 더 찾기 <ArrowRight size={15} aria-hidden="true" />
-            </Link>
-          </div>
-
-          {unavailableCount > 0 && (
-            <p className="mb-5 rounded-lg bg-amber-50 p-3 text-sm text-amber-900">
-              저장된 ID 중 현재 데이터에서 찾을 수 없는 장소가 {unavailableCount}곳 있습니다.
-            </p>
-          )}
-
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {savedLocations.map((location) => (
-              <LocationCard key={location.id} location={location} />
-            ))}
-          </div>
-
-          <ComparisonTable locations={savedLocations} />
-        </>
+        <ShortlistReadyContent
+          savedLocations={savedLocations}
+          unavailableCount={unavailableCount}
+        />
       ) : (
         <div className="scene-panel px-6 py-14 text-center">
           <span className="mx-auto flex size-14 items-center justify-center rounded-full bg-rose-50 text-rose-700">

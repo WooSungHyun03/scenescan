@@ -10,7 +10,7 @@ export function ShortlistNavLink() {
   return (
     <Link
       href="/shortlist"
-      className="inline-flex items-center gap-1.5 text-sm font-semibold text-stone-700 hover:text-emerald-800"
+      className="inline-flex min-h-11 items-center gap-1.5 rounded-md px-1.5 text-sm font-semibold text-stone-700 hover:text-emerald-800"
     >
       <Heart size={16} aria-hidden="true" />
       관심 장소
