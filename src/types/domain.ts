@@ -1,5 +1,7 @@
-export type LocationCategory = "urban" | "nature" | "industrial" | "interior";
-export type Region = "서울" | "부산" | "인천" | "경기";
+import type { LOCATION_CATEGORY_VALUES, REGION_VALUES } from "./location-options";
+
+export type LocationCategory = (typeof LOCATION_CATEGORY_VALUES)[number];
+export type Region = (typeof REGION_VALUES)[number];
 
 export interface GeoPoint {
   latitude: number;

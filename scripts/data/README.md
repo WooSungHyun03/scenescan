@@ -112,30 +112,44 @@ This command only reads local JSON and writes reviewed JSON. It does not downloa
 
 ## Curated production seed
 
-`data/production/commons-manifest.json` is the reviewed source manifest for the initial real dataset. It contains 10 Korean filming-location candidates and 20 explicitly licensed Wikimedia Commons images. Rebuild the checked-in assets and derived manifests with:
+`data/production/commons-manifest.json` is the reviewed source manifest for the production dataset. It currently contains 159 Korean filming-location candidates and 209 explicitly licensed Wikimedia Commons images across all 17 first-level regions. Ten hand-reviewed seed locations retain six views each; automatically discovered Wikidata locations use one representative Commons image to maximize geographic coverage within free-tier bandwidth.
+
+Discover additional candidates from Wikidata's CC0 location metadata before collection. Discovery requires an address, coordinate, representative image, supported place type, matching first-level region, and an image accepted by the Commons license gate. It excludes schools, hospitals, non-place artifacts, malformed addresses, near-duplicate coordinates, and duplicate source images.
+
+```bash
+pnpm data:discover-wikidata \
+  data-work/wikidata/commons-manifest.json \
+  --base data/production/commons-manifest.json \
+  --max 400
+```
+
+Review the generated manifest and report, then promote it to `data/production/commons-manifest.json`. Rebuild local working images and derived manifests with:
 
 ```bash
 pnpm data:collect-commons
 pnpm data:validate data/production/locations.json data/production/validation-report.json --image-root .
-pnpm embeddings:prepare data/production/embeddings-manifest.json data/production/embeddings.json --batch-size 4
+pnpm data:upload-storage data/production/locations.json data/production/embeddings-manifest.json data/production --dry-run
+pnpm data:upload-storage data/production/locations.json data/production/embeddings-manifest.json data/production --apply
+pnpm embeddings:prepare data/production/embeddings-manifest.json data/production/embeddings.json --batch-size 8 --retries 2
 pnpm data:import-production data/production/locations.json data/production/embeddings-manifest.json --validate-only
 pnpm embeddings:import data/production/embeddings.json --validate-only
 ```
 
-The collector re-fetches Commons metadata and fails closed when a file is missing, is not JPEG, has an unapproved license, declares extra restrictions, exceeds 15 MB, or does not have a complete JPEG signature. Downloads run four at a time with bounded retry. It writes files atomically and produces:
+The collector re-fetches Commons metadata and fails closed when a file is missing, is not JPEG, has neither an approved Creative Commons license nor a verified public-domain declaration, declares extra restrictions, exceeds 15 MB, or does not have a complete JPEG signature. Downloads run four at a time with bounded retry. It writes files atomically and produces:
 
-- `public/locations/*.jpg`: local, stable, 1280-pixel application images;
+- `public/locations/*.jpg`: local 1024-pixel working images used for review and embedding generation;
 - `data/production/locations.json`: canonical location records;
 - `data/production/image-licenses.json`: source and local checksums plus exact attribution;
+- `data/production/IMAGE_LICENSES.md`: complete human-readable attribution table;
 - `data/production/embeddings-manifest.json`: offline CLIP input.
 
-Running the collector is deterministic for a fixed Commons source revision except for a provider-side regenerated thumbnail. Review any checksum change before committing it. The source manifest is human-reviewed; do not populate it from an unreviewed scrape. The collector and both `--validate-only` commands do not write to Supabase.
+Running the collector is deterministic for a fixed Commons source revision except for a provider-side regenerated thumbnail. Review any checksum change before committing it. The discovery step produces candidates, not an authority to bypass the license and validation gates. `public/locations/wikidata-*.jpg` is ignored because these working files are reproducibly downloaded and production serves their uploaded Storage copies. The collector and both `--validate-only` commands do not write to Supabase.
 
 After the schema migrations are installed, use the explicit production import sequence below from a trusted local shell. The service-role key must never be placed in a `NEXT_PUBLIC_*` variable or Vercel. The first importer writes location and image metadata; the second adds the validated vectors to those image rows. Both operations are idempotent by stable UUID. Always run `--dry-run` immediately before `--apply`.
 
 ```bash
 export SUPABASE_URL="https://<project-ref>.supabase.co"
-export SUPABASE_SERVICE_ROLE_KEY="<server-only secret>"
+export SUPABASE_SECRET_KEY="<server-only secret>"
 pnpm data:import-production data/production/locations.json data/production/embeddings-manifest.json --dry-run
 pnpm data:import-production data/production/locations.json data/production/embeddings-manifest.json --apply
 pnpm embeddings:import data/production/embeddings.json --dry-run

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "verified_at": "2026-09-29T00:00:00+09:00",
+  "verified_at": "2026-09-29T13:00:00+09:00",
   "public_base_url": "https://beceleb.org/locations",
   "attribution_url": "https://github.com/WooSungHyun03/scenescan/blob/main/DATA_LICENSES.md#production-location-images",
   "locations": [
@@ -17,8 +17,42 @@
       "source": "서울문화포털",
       "source_url": "https://culture.seoul.go.kr/culture/culture/cultureSpace/view.do?facCode=101016&menuNo=200119",
       "images": [
-        { "id": "457bb8df-5cf0-517b-b3bf-e86313c9ea37", "file_title": "File:Dongdaemun Design Plaza at night, Seoul, Korea.jpg", "filename": "ddp-01.jpg", "alt": "야간의 동대문디자인플라자 곡면 외관" },
-        { "id": "ed265285-3e27-5fa6-829c-9a6567114214", "file_title": "File:20240601 144028 Dongdaemun Design Plaza, Seoul 08.jpg", "filename": "ddp-02.jpg", "alt": "주간의 동대문디자인플라자 외부 공간" }
+        {
+          "id": "457bb8df-5cf0-517b-b3bf-e86313c9ea37",
+          "file_title": "File:Dongdaemun Design Plaza at night, Seoul, Korea.jpg",
+          "filename": "ddp-01.jpg",
+          "alt": "야간의 동대문디자인플라자 곡면 외관"
+        },
+        {
+          "id": "ed265285-3e27-5fa6-829c-9a6567114214",
+          "file_title": "File:20240601 144028 Dongdaemun Design Plaza, Seoul 08.jpg",
+          "filename": "ddp-02.jpg",
+          "alt": "주간의 동대문디자인플라자 외부 공간"
+        },
+        {
+          "id": "7f3786e2-b7a0-552d-93d1-d5d7bddb586d",
+          "file_title": "File:Dongdaemun Design Plaza & Park.jpg",
+          "filename": "ddp-03.jpg",
+          "alt": "동대문디자인플라자와 공원의 전경"
+        },
+        {
+          "id": "0ec2dda6-c058-5217-a954-c358e236df92",
+          "file_title": "File:Dongdaemun Design Plaza - DDP2369.jpg",
+          "filename": "ddp-04.jpg",
+          "alt": "동대문디자인플라자의 곡면 건축 디테일"
+        },
+        {
+          "id": "ad8642d8-e81f-5fea-abc3-ac7775bb77cb",
+          "file_title": "File:Dongdaemun Design Plaza - DDP2376.jpg",
+          "filename": "ddp-05.jpg",
+          "alt": "동대문디자인플라자의 외부 보행 공간"
+        },
+        {
+          "id": "37f7027f-e083-5bb0-9016-28d2c5784517",
+          "file_title": "File:Dongdaemun Design Plaza (58619444).jpg",
+          "filename": "ddp-06.jpg",
+          "alt": "도심에서 바라본 동대문디자인플라자"
+        }
       ]
     },
     {
@@ -34,8 +68,42 @@
       "source": "서울특별시 공원 안내",
       "source_url": "https://parks.seoul.go.kr/template/sub/culturetank.do",
       "images": [
-        { "id": "52cdf352-5783-5aa2-9886-f52a35201791", "file_title": "File:Oil-tank-culture-park.jpg", "filename": "oil-tank-culture-park-01.jpg", "alt": "문화비축기지의 원형 탱크 건축" },
-        { "id": "c4454613-9800-5d33-aedf-afc31045963b", "file_title": "File:문화비축기지 T6.jpg", "filename": "oil-tank-culture-park-02.jpg", "alt": "문화비축기지 T6 공간" }
+        {
+          "id": "52cdf352-5783-5aa2-9886-f52a35201791",
+          "file_title": "File:Oil-tank-culture-park.jpg",
+          "filename": "oil-tank-culture-park-01.jpg",
+          "alt": "문화비축기지의 원형 탱크 건축"
+        },
+        {
+          "id": "c4454613-9800-5d33-aedf-afc31045963b",
+          "file_title": "File:문화비축기지 T6.jpg",
+          "filename": "oil-tank-culture-park-02.jpg",
+          "alt": "문화비축기지 T6 공간"
+        },
+        {
+          "id": "079f6ad1-af33-5dac-a265-5c4285867bb0",
+          "file_title": "File:문화비축기지 T1.jpg",
+          "filename": "oil-tank-culture-park-03.jpg",
+          "alt": "문화비축기지 T1의 산업 시설 외관"
+        },
+        {
+          "id": "5282d9c2-7d63-5bae-b9be-63579aa032d7",
+          "file_title": "File:문화비축기지 T2.jpg",
+          "filename": "oil-tank-culture-park-04.jpg",
+          "alt": "문화비축기지 T2의 원형 공간"
+        },
+        {
+          "id": "574bdb7b-b352-5a1f-841d-e02ec6938db4",
+          "file_title": "File:문화비축기지 T3.jpg",
+          "filename": "oil-tank-culture-park-05.jpg",
+          "alt": "문화비축기지 T3의 콘크리트 구조"
+        },
+        {
+          "id": "12a4e81c-d518-5998-bdf1-a692ecaa5397",
+          "file_title": "File:문화비축기지 T4.jpg",
+          "filename": "oil-tank-culture-park-06.jpg",
+          "alt": "문화비축기지 T4의 내외부 공간"
+        }
       ]
     },
     {
@@ -51,8 +119,42 @@
       "source": "서울특별시 공원 안내",
       "source_url": "https://parks.seoul.go.kr/template/sub/seonyudo.do",
       "images": [
-        { "id": "a89e333c-e8b0-58d0-8355-c035a616e921", "file_title": "File:Seoul Seonyudo Park.jpg", "filename": "seonyudo-park-01.jpg", "alt": "선유도공원의 녹지와 산책 공간" },
-        { "id": "b783fe42-906f-52aa-9e5e-1d7bfb89c3f6", "file_title": "File:Seonyudo Park - historical - 2005 June 6 various - 03.jpg", "filename": "seonyudo-park-02.jpg", "alt": "선유도공원의 수경 시설과 식생" }
+        {
+          "id": "a89e333c-e8b0-58d0-8355-c035a616e921",
+          "file_title": "File:Korea Seonyudo Summer 20140805 07 (14839914154).jpg",
+          "filename": "seonyudo-park-01.jpg",
+          "alt": "선유도공원의 녹지와 산책 공간"
+        },
+        {
+          "id": "b783fe42-906f-52aa-9e5e-1d7bfb89c3f6",
+          "file_title": "File:Seonyudo Park - historical - 2005 June 6 various - 03.jpg",
+          "filename": "seonyudo-park-02.jpg",
+          "alt": "선유도공원의 수경 시설과 식생"
+        },
+        {
+          "id": "b5493a61-380b-594c-95ce-3c91fd47fcf2",
+          "file_title": "File:Korea Seonyudo Summer 20140805 05 (14655573120).jpg",
+          "filename": "seonyudo-park-03.jpg",
+          "alt": "여름 선유도공원의 녹지 풍경"
+        },
+        {
+          "id": "c1f0e7f2-553b-53ca-8e1a-2e4bc8e38588",
+          "file_title": "File:Korea Seonyudo Summer 20140805 08 (14841920672).jpg",
+          "filename": "seonyudo-park-04.jpg",
+          "alt": "선유도공원의 여름 산책 공간"
+        },
+        {
+          "id": "30ea1955-bada-5a76-955b-ed8ae310b323",
+          "file_title": "File:Korea Seonyudo Summer 20140805 13 (14839916134).jpg",
+          "filename": "seonyudo-park-05.jpg",
+          "alt": "식생이 어우러진 선유도공원 구조물"
+        },
+        {
+          "id": "a6f0b261-965c-5b36-9356-2f75fab1a532",
+          "file_title": "File:Korea Seonyudo Summer 20140805 16 (14655632329).jpg",
+          "filename": "seonyudo-park-06.jpg",
+          "alt": "선유도공원의 수목과 수경 공간"
+        }
       ]
     },
     {
@@ -68,8 +170,42 @@
       "source": "Wikidata",
       "source_url": "https://www.wikidata.org/wiki/Q6014440",
       "images": [
-        { "id": "5217f2b0-e7e6-5585-bb3b-85ea1d9d9bad", "file_title": "File:Chinatown, incheon 20230430 002.jpg", "filename": "incheon-chinatown-01.jpg", "alt": "인천 차이나타운의 장식문과 거리" },
-        { "id": "0aac5877-126f-567f-bc8e-59ce16c2fa05", "file_title": "File:Chinatown, incheon 20230430 003.jpg", "filename": "incheon-chinatown-02.jpg", "alt": "인천 차이나타운의 붉은 골목 풍경" }
+        {
+          "id": "5217f2b0-e7e6-5585-bb3b-85ea1d9d9bad",
+          "file_title": "File:Chinatown, incheon 20230430 002.jpg",
+          "filename": "incheon-chinatown-01.jpg",
+          "alt": "인천 차이나타운의 장식문과 거리"
+        },
+        {
+          "id": "0aac5877-126f-567f-bc8e-59ce16c2fa05",
+          "file_title": "File:Chinatown, incheon 20230430 003.jpg",
+          "filename": "incheon-chinatown-02.jpg",
+          "alt": "인천 차이나타운의 붉은 골목 풍경"
+        },
+        {
+          "id": "0bf1b111-7f44-5723-b524-1db4d60800c7",
+          "file_title": "File:An alley of Chinatown in Incheon.jpg",
+          "filename": "incheon-chinatown-03.jpg",
+          "alt": "인천 차이나타운의 좁은 골목"
+        },
+        {
+          "id": "90aff854-ba6d-542d-ac48-f839fb73bc66",
+          "file_title": "File:Buildings in Chinatown, Incheon.jpg",
+          "filename": "incheon-chinatown-04.jpg",
+          "alt": "인천 차이나타운 거리의 건물과 간판"
+        },
+        {
+          "id": "b0c10264-e149-58f7-a46d-aceacc004580",
+          "file_title": "File:Chinatown Gate, Incheon.jpg",
+          "filename": "incheon-chinatown-05.jpg",
+          "alt": "인천 차이나타운의 장식문"
+        },
+        {
+          "id": "795208ab-4ae5-5d28-a1d8-5c1021426cc7",
+          "file_title": "File:Chinatown, Incheon 02.jpg",
+          "filename": "incheon-chinatown-06.jpg",
+          "alt": "인천 차이나타운의 거리 전경"
+        }
       ]
     },
     {
@@ -85,8 +221,42 @@
       "source": "Wikidata",
       "source_url": "https://www.wikidata.org/wiki/Q7561251",
       "images": [
-        { "id": "3b08dc59-1996-5a5a-877d-5255a23bd873", "file_title": "File:Songdo Convensia and Central Park View.jpg", "filename": "songdo-central-park-01.jpg", "alt": "송도 센트럴파크 수로와 도심 전경" },
-        { "id": "b60ce650-e72a-5f00-93bc-bbbe8510c525", "file_title": "File:Songdo Central Park at night.jpg", "filename": "songdo-central-park-02.jpg", "alt": "야간의 송도 센트럴파크와 고층 건물" }
+        {
+          "id": "3b08dc59-1996-5a5a-877d-5255a23bd873",
+          "file_title": "File:Songdo Convensia and Central Park View.jpg",
+          "filename": "songdo-central-park-01.jpg",
+          "alt": "송도 센트럴파크 수로와 도심 전경"
+        },
+        {
+          "id": "b60ce650-e72a-5f00-93bc-bbbe8510c525",
+          "file_title": "File:Songdo Central Park at night.jpg",
+          "filename": "songdo-central-park-02.jpg",
+          "alt": "야간의 송도 센트럴파크와 고층 건물"
+        },
+        {
+          "id": "068b73d0-0389-5f8d-9480-f71e0ef015e3",
+          "file_title": "File:Central Park Lake, Songdo IBD.jpg",
+          "filename": "songdo-central-park-03.jpg",
+          "alt": "송도 센트럴파크의 호수와 건축물"
+        },
+        {
+          "id": "3ba75e77-16a0-5fff-a7c1-9430a146dde6",
+          "file_title": "File:Central Park Lawn, Songdo IBD.jpg",
+          "filename": "songdo-central-park-04.jpg",
+          "alt": "송도 센트럴파크의 잔디 광장"
+        },
+        {
+          "id": "1ad7909c-59f7-5c85-bc92-a861a444d411",
+          "file_title": "File:Central Park Patio View of Lake, Songdo IBD.jpg",
+          "filename": "songdo-central-park-05.jpg",
+          "alt": "송도 센트럴파크 테라스에서 본 수로"
+        },
+        {
+          "id": "092614e5-20c4-5c68-96ff-0bb5ee1daa62",
+          "file_title": "File:20141231 143657 HDR.jpg",
+          "filename": "songdo-central-park-06.jpg",
+          "alt": "겨울의 송도 센트럴파크 도심 풍경"
+        }
       ]
     },
     {
@@ -102,8 +272,42 @@
       "source": "한국관광공사 VISITKOREA",
       "source_url": "https://english.visitkorea.or.kr/svc/contents/contentsView.do?menuSn=351&vcontsId=72894",
       "images": [
-        { "id": "c4982d4c-0927-5339-8e14-5ed14695c168", "file_title": "File:Colorful houses in Gamcheon Culture Village at sunset in Busan South Korea.jpg", "filename": "gamcheon-culture-village-01.jpg", "alt": "노을 아래 감천문화마을의 다채로운 주택" },
-        { "id": "6b36dca1-7747-5f8f-8dad-8f784b762db1", "file_title": "File:Gamcheon Culture Village.jpg", "filename": "gamcheon-culture-village-02.jpg", "alt": "언덕에서 내려다본 감천문화마을" }
+        {
+          "id": "c4982d4c-0927-5339-8e14-5ed14695c168",
+          "file_title": "File:Colorful houses in Gamcheon Culture Village at sunset in Busan South Korea.jpg",
+          "filename": "gamcheon-culture-village-01.jpg",
+          "alt": "노을 아래 감천문화마을의 다채로운 주택"
+        },
+        {
+          "id": "6b36dca1-7747-5f8f-8dad-8f784b762db1",
+          "file_title": "File:Gamcheon Culture Village.jpg",
+          "filename": "gamcheon-culture-village-02.jpg",
+          "alt": "언덕에서 내려다본 감천문화마을"
+        },
+        {
+          "id": "c9e375e5-c9b8-5d13-8659-ad5b6d5f521c",
+          "file_title": "File:Backstreet in Gamcheon, Busan, Korea.jpg",
+          "filename": "gamcheon-culture-village-03.jpg",
+          "alt": "감천문화마을의 좁은 골목"
+        },
+        {
+          "id": "96642916-3adf-5129-80f4-6d2421e84ea5",
+          "file_title": "File:Busan Gamcheon Village 2022-10-09.jpg",
+          "filename": "gamcheon-culture-village-04.jpg",
+          "alt": "가을의 감천문화마을 전경"
+        },
+        {
+          "id": "2835b8eb-79d0-5a72-874e-63ed6d220127",
+          "file_title": "File:Busan, KR, October 2019 04.jpg",
+          "filename": "gamcheon-culture-village-05.jpg",
+          "alt": "감천문화마을의 다채로운 주택과 계단"
+        },
+        {
+          "id": "7b06eb31-9fdf-5cbb-bab5-bce29cf619f4",
+          "file_title": "File:Busan, KR, October 2019 10.jpg",
+          "filename": "gamcheon-culture-village-06.jpg",
+          "alt": "부산 감천문화마을의 거리 풍경"
+        }
       ]
     },
     {
@@ -119,8 +323,42 @@
       "source": "영화의전당",
       "source_url": "https://www.dureraum.org/",
       "images": [
-        { "id": "b17ed098-4f46-5ac9-9d68-8bc44a5937ef", "file_title": "File:Busan Cinema Center.jpg", "filename": "busan-cinema-center-01.jpg", "alt": "영화의전당의 대형 지붕과 야외 광장" },
-        { "id": "f0a3fbe8-e80d-5997-a3f3-b18fafcc6524", "file_title": "File:Busan Cinema Center at BIFF 2020 - 09.jpg", "filename": "busan-cinema-center-02.jpg", "alt": "부산국제영화제 기간의 영화의전당 공간" }
+        {
+          "id": "b17ed098-4f46-5ac9-9d68-8bc44a5937ef",
+          "file_title": "File:Busan Cinema Center.jpg",
+          "filename": "busan-cinema-center-01.jpg",
+          "alt": "영화의전당의 대형 지붕과 야외 광장"
+        },
+        {
+          "id": "f0a3fbe8-e80d-5997-a3f3-b18fafcc6524",
+          "file_title": "File:Busan Cinema Center at BIFF 2020 - 09.jpg",
+          "filename": "busan-cinema-center-02.jpg",
+          "alt": "부산국제영화제 기간의 영화의전당 공간"
+        },
+        {
+          "id": "a3856daa-8412-554c-9932-b13e727476ed",
+          "file_title": "File:Busan Cinema Center at BIFF 2020 - 03.jpg",
+          "filename": "busan-cinema-center-03.jpg",
+          "alt": "영화의전당 야외 광장과 대형 지붕"
+        },
+        {
+          "id": "f9e25763-ab71-562a-9288-baf2e5d62bfe",
+          "file_title": "File:Busan Cinema Center at BIFF 2020 - 05.jpg",
+          "filename": "busan-cinema-center-04.jpg",
+          "alt": "부산국제영화제 행사 공간"
+        },
+        {
+          "id": "f10a56e8-288a-5458-92db-d96701284636",
+          "file_title": "File:Busan Cinema Center at BIFF 2020 - 13.jpg",
+          "filename": "busan-cinema-center-05.jpg",
+          "alt": "영화의전당의 열린 광장과 시설"
+        },
+        {
+          "id": "33c4158d-cd5c-5ce0-b7ce-21995dc5cd8c",
+          "file_title": "File:Busan Cinema Center at BIFF 2020 - 15.jpg",
+          "filename": "busan-cinema-center-06.jpg",
+          "alt": "영화의전당 야외 상영 공간"
+        }
       ]
     },
     {
@@ -136,8 +374,42 @@
       "source": "수원문화재단",
       "source_url": "https://www.swcf.or.kr/?p=58",
       "images": [
-        { "id": "5fbb961f-7684-5b87-bd7d-141a47074ec6", "file_title": "File:Hwaseong Fortress 01.jpg", "filename": "suwon-hwaseong-01.jpg", "alt": "수원화성 성곽과 주변 녹지" },
-        { "id": "b35d5ef8-534d-5caf-8730-0533749af58b", "file_title": "File:Hwaseong Fortress 03.jpg", "filename": "suwon-hwaseong-02.jpg", "alt": "수원화성의 성벽과 문루" }
+        {
+          "id": "5fbb961f-7684-5b87-bd7d-141a47074ec6",
+          "file_title": "File:Hwaseong Fortress 01.jpg",
+          "filename": "suwon-hwaseong-01.jpg",
+          "alt": "수원화성 성곽과 주변 녹지"
+        },
+        {
+          "id": "b35d5ef8-534d-5caf-8730-0533749af58b",
+          "file_title": "File:Hwaseong Fortress 03.jpg",
+          "filename": "suwon-hwaseong-02.jpg",
+          "alt": "수원화성의 성벽과 문루"
+        },
+        {
+          "id": "c3c58070-383b-5761-884f-f9cbf9142256",
+          "file_title": "File:Hwaseong Fortress 05.jpg",
+          "filename": "suwon-hwaseong-03.jpg",
+          "alt": "수원화성의 성곽길과 주변 경관"
+        },
+        {
+          "id": "7e95b483-f231-5828-8285-3a20e6852c18",
+          "file_title": "File:Hwaseong Fortress 06.jpg",
+          "filename": "suwon-hwaseong-04.jpg",
+          "alt": "수원화성 성벽과 전통 건축"
+        },
+        {
+          "id": "b312babb-4247-5da1-911e-66249e588408",
+          "file_title": "File:Gate at Hwaseong Fortress.jpg",
+          "filename": "suwon-hwaseong-05.jpg",
+          "alt": "수원화성의 성문과 성곽"
+        },
+        {
+          "id": "a3fefce0-3f82-5977-9e37-f91decfa3cd9",
+          "file_title": "File:Suwon Hwaseong AirView.jpg",
+          "filename": "suwon-hwaseong-06.jpg",
+          "alt": "상공에서 본 수원화성과 도심"
+        }
       ]
     },
     {
@@ -153,8 +425,42 @@
       "source": "광명시 문화관광",
       "source_url": "https://www.gm.go.kr/tour/gmNine/nine01.jsp",
       "images": [
-        { "id": "16a872d5-4aad-505e-8f6a-284a6ef96f97", "file_title": "File:20230902 Gwangmyeong Cave 003.jpg", "filename": "gwangmyeong-cave-01.jpg", "alt": "광명동굴 내부의 암반과 조명" },
-        { "id": "63d9a5c9-7442-574c-8c02-5649677df889", "file_title": "File:20230902 Gwangmyeong Cave 004.jpg", "filename": "gwangmyeong-cave-02.jpg", "alt": "광명동굴 내부 갱도 공간" }
+        {
+          "id": "16a872d5-4aad-505e-8f6a-284a6ef96f97",
+          "file_title": "File:20230902 Gwangmyeong Cave 003.jpg",
+          "filename": "gwangmyeong-cave-01.jpg",
+          "alt": "광명동굴 내부의 암반과 조명"
+        },
+        {
+          "id": "63d9a5c9-7442-574c-8c02-5649677df889",
+          "file_title": "File:20230902 Gwangmyeong Cave 004.jpg",
+          "filename": "gwangmyeong-cave-02.jpg",
+          "alt": "광명동굴 내부 갱도 공간"
+        },
+        {
+          "id": "a056ce15-7a90-5beb-8b98-ddd7d54c3bd2",
+          "file_title": "File:20230902 Gwangmyeong Cave 001.jpg",
+          "filename": "gwangmyeong-cave-03.jpg",
+          "alt": "광명동굴의 암반 통로"
+        },
+        {
+          "id": "39ecb910-0882-5939-9f43-9f78c32444f0",
+          "file_title": "File:20230902 Gwangmyeong Cave 002.jpg",
+          "filename": "gwangmyeong-cave-04.jpg",
+          "alt": "조명이 비치는 광명동굴 내부"
+        },
+        {
+          "id": "f06c9b86-564f-56fc-a5fd-8e3069c31a7c",
+          "file_title": "File:20230902 Gwangmyeong Cave 006.jpg",
+          "filename": "gwangmyeong-cave-05.jpg",
+          "alt": "광명동굴의 산업 유산 공간"
+        },
+        {
+          "id": "54f0000a-48b6-59da-ad35-a98e8fc33595",
+          "file_title": "File:230902 Gwangmyeong Cave 01.jpg",
+          "filename": "gwangmyeong-cave-06.jpg",
+          "alt": "광명동굴 입구와 내부 진입 공간"
+        }
       ]
     },
     {
@@ -170,8 +476,3171 @@
       "source": "스타필드 코엑스몰",
       "source_url": "https://starfield.co.kr/m/coexmall/starfieldLibrary/library.do",
       "images": [
-        { "id": "6afae4a4-6973-5bcf-aea8-c0c78ca82126", "file_title": "File:Starfield library 1.jpg", "filename": "starfield-library-01.jpg", "alt": "별마당도서관의 높은 서가와 내부 공간" },
-        { "id": "aa102734-c7ff-51b0-91bb-5acd20b93951", "file_title": "File:Starfield library 2.jpg", "filename": "starfield-library-02.jpg", "alt": "다른 시점에서 본 별마당도서관 내부" }
+        {
+          "id": "6afae4a4-6973-5bcf-aea8-c0c78ca82126",
+          "file_title": "File:Starfield library 1.jpg",
+          "filename": "starfield-library-01.jpg",
+          "alt": "별마당도서관의 높은 서가와 내부 공간"
+        },
+        {
+          "id": "aa102734-c7ff-51b0-91bb-5acd20b93951",
+          "file_title": "File:Starfield library 2.jpg",
+          "filename": "starfield-library-02.jpg",
+          "alt": "다른 시점에서 본 별마당도서관 내부"
+        },
+        {
+          "id": "8d986aec-f97c-599e-b835-d1f2718eb703",
+          "file_title": "File:Starfield library 3.jpg",
+          "filename": "starfield-library-03.jpg",
+          "alt": "별마당도서관의 서가와 열람 공간"
+        },
+        {
+          "id": "8d1500a2-f964-5efc-bfac-092644eca04a",
+          "file_title": "File:Starfield library 4.jpg",
+          "filename": "starfield-library-04.jpg",
+          "alt": "별마당도서관 중앙 공간의 전경"
+        },
+        {
+          "id": "d4d9ea54-848e-5d18-9280-cff2ee147270",
+          "file_title": "File:Starfield library 5.jpg",
+          "filename": "starfield-library-05.jpg",
+          "alt": "높은 서가가 보이는 별마당도서관 내부"
+        },
+        {
+          "id": "708d7993-7d44-5d31-9371-32553bc12f03",
+          "file_title": "File:20250705 별마당도서관.jpg",
+          "filename": "starfield-library-06.jpg",
+          "alt": "행사 공간에서 본 별마당도서관"
+        }
+      ]
+    },
+    {
+      "id": "c30d73b0-f138-52fe-af83-324ea92126e0",
+      "slug": "wikidata-q17184",
+      "name": "왕십리역",
+      "description": "서울특별시 성동구의 철도역",
+      "category": "urban",
+      "region": "서울",
+      "address": "서울특별시 성동구 왕십리광장로 17",
+      "latitude": 37.56131,
+      "longitude": 127.038632,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q17184",
+      "images": [
+        {
+          "id": "6fb12856-aca7-59df-914a-7ebd6590c77c",
+          "file_title": "File:Q17184 Wangsimni A06.JPG",
+          "filename": "wikidata-q17184-01.jpg",
+          "alt": "왕십리역 전경"
+        }
+      ]
+    },
+    {
+      "id": "e648c796-1b53-5070-ac4a-8146fbada158",
+      "slug": "wikidata-q17469",
+      "name": "강남역",
+      "description": "서울지하철 2호선과 네오트랜스 신분당선의 전철역 중 하나",
+      "category": "urban",
+      "region": "서울",
+      "address": "서울특별시 강남구 강남대로 지하396",
+      "latitude": 37.497927777,
+      "longitude": 127.027583333,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q17469",
+      "images": [
+        {
+          "id": "2fa22385-778d-5784-bd20-e5b092cc5a60",
+          "file_title": "File:D07 Gangnam Station Terminal Platform.JPG",
+          "filename": "wikidata-q17469-01.jpg",
+          "alt": "강남역 전경"
+        }
+      ]
+    },
+    {
+      "id": "277abbfd-7131-5804-93d6-f387f3a3520f",
+      "slug": "wikidata-q59969",
+      "name": "서울고속버스터미널",
+      "description": "대한민국 서울특별시 서초구에 있는 고속버스 터미널",
+      "category": "urban",
+      "region": "서울",
+      "address": "서울특별시 서초구 신반포로 194",
+      "latitude": 37.506008,
+      "longitude": 127.006987,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q59969",
+      "images": [
+        {
+          "id": "73aab6e4-01ee-558e-878c-543a9fe7ca81",
+          "file_title": "File:Seoul Express Bus Terminal.jpg",
+          "filename": "wikidata-q59969-01.jpg",
+          "alt": "서울고속버스터미널 전경"
+        }
+      ]
+    },
+    {
+      "id": "a06ca99c-6c90-5d9c-93a7-2e9d982dea52",
+      "slug": "wikidata-q75330",
+      "name": "잠실역",
+      "description": "서울지하철 2, 8호선의 전철역 중 하나",
+      "category": "urban",
+      "region": "서울",
+      "address": "서울특별시 송파구 올림픽로 305",
+      "latitude": 37.513333333,
+      "longitude": 127.100277777,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q75330",
+      "images": [
+        {
+          "id": "882cfe7f-5df1-54e1-bec3-ab2d6e18b08f",
+          "file_title": "File:20250708 8호선 잠실역 승강장.jpg",
+          "filename": "wikidata-q75330-01.jpg",
+          "alt": "잠실역 전경"
+        }
+      ]
+    },
+    {
+      "id": "cabfdd24-af5c-56d2-ac35-cc82b048967b",
+      "slug": "wikidata-q100852",
+      "name": "양재역",
+      "description": "서울지하철 3호선, 네오트랜스 신분당선의 전철역 중 하나",
+      "category": "urban",
+      "region": "서울",
+      "address": "서울특별시 서초구 남부순환로 지하2585",
+      "latitude": 37.484444444,
+      "longitude": 127.033888888,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q100852",
+      "images": [
+        {
+          "id": "3edf2b36-fac6-51f0-884f-69a3ff8b4547",
+          "file_title": "File:Q100852 Yangjae A02.JPG",
+          "filename": "wikidata-q100852-01.jpg",
+          "alt": "양재역 전경"
+        }
+      ]
+    },
+    {
+      "id": "a9c0b744-137c-5d2f-94f8-225511ee40d4",
+      "slug": "wikidata-q135709",
+      "name": "봉은사",
+      "description": "서울특별시 강남구 삼성동에 있는 사찰",
+      "category": "urban",
+      "region": "서울",
+      "address": "서울특별시 강남구 봉은사로 531",
+      "latitude": 37.51565753,
+      "longitude": 127.0572871,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q135709",
+      "images": [
+        {
+          "id": "bb950856-b99c-5110-bd09-1b3023df492a",
+          "file_title": "File:Bongeunsa Seoul 8.jpg",
+          "filename": "wikidata-q135709-01.jpg",
+          "alt": "봉은사 전경"
+        }
+      ]
+    },
+    {
+      "id": "88b8c9e2-51f7-5a90-b6c5-eced3854e9b7",
+      "slug": "wikidata-q212297",
+      "name": "광운대학교",
+      "description": "대한민국 서울특별시의 사립 종합대학",
+      "category": "urban",
+      "region": "서울",
+      "address": "20 Gwangun-ro, Nowon-gu, Seoul 01897",
+      "latitude": 37.619527777,
+      "longitude": 127.059,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q212297",
+      "images": [
+        {
+          "id": "52c14eea-b5e1-5cc9-8bca-e4b23ac2083e",
+          "file_title": "File:Kwangwoon+university6.jpg",
+          "filename": "wikidata-q212297-01.jpg",
+          "alt": "광운대학교 전경"
+        }
+      ]
+    },
+    {
+      "id": "606017c3-8137-57cf-bc72-1bda14564453",
+      "slug": "wikidata-q246645",
+      "name": "종각역",
+      "description": "서울지하철 1호선의 전철역 중 하나",
+      "category": "urban",
+      "region": "서울",
+      "address": "서울특별시 종로구 종로 지하55",
+      "latitude": 37.570277777,
+      "longitude": 126.983055555,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q246645",
+      "images": [
+        {
+          "id": "9ae4341d-8d54-5e6e-a4dd-b1c095e13077",
+          "file_title": "File:Seoul-metro-131-Jonggak-station-platform-20181125-171906.jpg",
+          "filename": "wikidata-q246645-01.jpg",
+          "alt": "종각역 전경"
+        }
+      ]
+    },
+    {
+      "id": "970b37ed-0767-593f-9d90-94ef7caa751c",
+      "slug": "wikidata-q482493",
+      "name": "김포국제공항",
+      "description": "대한민국의 국제공항",
+      "category": "industrial",
+      "region": "서울",
+      "address": "07505 서울시 강서구 하늘길 112(공항동)",
+      "latitude": 37.556944444,
+      "longitude": 126.7975,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q482493",
+      "images": [
+        {
+          "id": "dea5387c-40b3-5c31-83f4-47bd9ba79e7f",
+          "file_title": "File:Gimpo International Airport (1).jpg",
+          "filename": "wikidata-q482493-01.jpg",
+          "alt": "김포국제공항 전경"
+        }
+      ]
+    },
+    {
+      "id": "fd0e39c8-03c7-52d2-ba74-7fb82a71b679",
+      "slug": "wikidata-q482852",
+      "name": "창경궁",
+      "description": "대한민국 서울특별시에 있는 조선의 궁궐",
+      "category": "urban",
+      "region": "서울",
+      "address": "서울특별시 종로구 창경궁로 185",
+      "latitude": 37.578430555,
+      "longitude": 126.995980555,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q482852",
+      "images": [
+        {
+          "id": "1957b7b1-7048-5902-b7df-2f983401969a",
+          "file_title": "File:Korea-Seoul-Changgyeonggung-Myeongjeongjeon-01.jpg",
+          "filename": "wikidata-q482852-01.jpg",
+          "alt": "창경궁 전경"
+        }
+      ]
+    },
+    {
+      "id": "1706101c-6641-5202-92b2-c1ff8bb76130",
+      "slug": "wikidata-q487804",
+      "name": "동국대학교",
+      "description": "대한민국의 불교 사립 종합대학",
+      "category": "urban",
+      "region": "서울",
+      "address": "30 Pildong-ro 1-gil, Jung-gu, Seoul 04620",
+      "latitude": 37.55825,
+      "longitude": 127.000194,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q487804",
+      "images": [
+        {
+          "id": "dc15ff17-369c-5662-9eb1-b0bbe0eee2e5",
+          "file_title": "File:DONGGUK UNIVERSITY 동국관.jpg",
+          "filename": "wikidata-q487804-01.jpg",
+          "alt": "동국대학교 전경"
+        }
+      ]
+    },
+    {
+      "id": "d9195bda-c46c-5f3b-a3eb-d12539668d39",
+      "slug": "wikidata-q488897",
+      "name": "국립서울현충원",
+      "description": "대한민국의 국립묘지",
+      "category": "urban",
+      "region": "서울",
+      "address": "서울특별시 동작구 현충로 210",
+      "latitude": 37.499,
+      "longitude": 126.972,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q488897",
+      "images": [
+        {
+          "id": "fc2bd052-4248-58d5-8430-22b71326addb",
+          "file_title": "File:Korean War Veterans 20160726 08 (27941236813).jpg",
+          "filename": "wikidata-q488897-01.jpg",
+          "alt": "국립서울현충원 전경"
+        }
+      ]
+    },
+    {
+      "id": "97fdf851-ad12-5cf9-87b9-73623d1a7329",
+      "slug": "wikidata-q492402",
+      "name": "양재시민의숲역",
+      "description": "대한민국 서울특별시 서초구의 신분당선 역",
+      "category": "urban",
+      "region": "서울",
+      "address": "서울특별시 서초구 매헌로 지하116",
+      "latitude": 37.4699,
+      "longitude": 127.038,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q492402",
+      "images": [
+        {
+          "id": "35010a5f-4d22-5227-a5af-7206d81a77a3",
+          "file_title": "File:D09YangjaeCitizen'sForest.jpg",
+          "filename": "wikidata-q492402-01.jpg",
+          "alt": "양재시민의숲역 전경"
+        }
+      ]
+    },
+    {
+      "id": "d3b314b2-8737-5083-8219-aba3385ecaf7",
+      "slug": "wikidata-q492606",
+      "name": "청계산입구역",
+      "description": "대한민국 서울특별시 서초구에 위치한 신분당선 역",
+      "category": "urban",
+      "region": "서울",
+      "address": "서울특별시 서초구 청계산로 지하179",
+      "latitude": 37.4465,
+      "longitude": 127.0565,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q492606",
+      "images": [
+        {
+          "id": "15a11b14-ba74-591b-aa33-f939bfb1da33",
+          "file_title": "File:Cheonggyesan Station 3.JPG",
+          "filename": "wikidata-q492606-01.jpg",
+          "alt": "청계산입구역 전경"
+        }
+      ]
+    },
+    {
+      "id": "8ec52037-b0bf-5cc0-b8ff-5f1221eb0f5e",
+      "slug": "wikidata-q494577",
+      "name": "청와대",
+      "description": "대한민국의 대통령 관저",
+      "category": "urban",
+      "region": "서울",
+      "address": "서울특별시 종로구 청와대로 1",
+      "latitude": 37.58669167,
+      "longitude": 126.97486389,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q494577",
+      "images": [
+        {
+          "id": "77a53f89-1344-5312-9fe8-1d1a1502a90b",
+          "file_title": "File:Blue House Seoul 3.jpg",
+          "filename": "wikidata-q494577-01.jpg",
+          "alt": "청와대 전경"
+        }
+      ]
+    },
+    {
+      "id": "759a6034-9294-5bb7-9fe1-34fb6b573bb1",
+      "slug": "wikidata-q494668",
+      "name": "롯데월드",
+      "description": "서울특별시의 테마파크",
+      "category": "urban",
+      "region": "서울",
+      "address": "Hotel LOTTE LOTTEWORLD, 240, Olympic-ro, Songpa-gu, Seoul",
+      "latitude": 37.51119444,
+      "longitude": 127.09811111,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q494668",
+      "images": [
+        {
+          "id": "196a86e9-e6a7-5962-9ed0-5a0b58560513",
+          "file_title": "File:Lotte World.jpg",
+          "filename": "wikidata-q494668-01.jpg",
+          "alt": "롯데월드 전경"
+        }
+      ]
+    },
+    {
+      "id": "1c9cfb91-0047-5e4d-871f-89a28973efed",
+      "slug": "wikidata-q495005",
+      "name": "국립중앙도서관",
+      "description": "대한민국 서울특별시 서초구에 있는 국립 도서관",
+      "category": "interior",
+      "region": "서울",
+      "address": "서울특별시 서초구 반포대로 201 (국립중앙도서관)",
+      "latitude": 37.497538888,
+      "longitude": 127.003261111,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q495005",
+      "images": [
+        {
+          "id": "b8887ef9-1cf1-58f9-927f-3a0e4ef074f3",
+          "file_title": "File:National library of Korea cafe and stairs.jpeg",
+          "filename": "wikidata-q495005-01.jpg",
+          "alt": "국립중앙도서관 전경"
+        }
+      ]
+    },
+    {
+      "id": "da022503-ee9d-5cbd-9ad5-ab89b2e23053",
+      "slug": "wikidata-q496536",
+      "name": "경희대학교",
+      "description": "대한민국 서울특별시와 경기도의 사립 종합대학",
+      "category": "urban",
+      "region": "서울",
+      "address": "02447 서울특별시 동대문구 경희대로 26 (회기동)",
+      "latitude": 37.5967,
+      "longitude": 127.052,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q496536",
+      "images": [
+        {
+          "id": "990c2159-3285-53bd-9d68-01bbccbe64d3",
+          "file_title": "File:Kyung Hee Univ. Administration Building(Seoul Campus).JPG",
+          "filename": "wikidata-q496536-01.jpg",
+          "alt": "경희대학교 전경"
+        }
+      ]
+    },
+    {
+      "id": "433f4a1b-bbec-5729-8762-41c2f34f1343",
+      "slug": "wikidata-q623908",
+      "name": "서울특별시청사",
+      "description": "서울특별시의 행정부 건물",
+      "category": "urban",
+      "region": "서울",
+      "address": "서울특별시 중구 세종대로 110",
+      "latitude": 37.56640556,
+      "longitude": 126.97782222,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q623908",
+      "images": [
+        {
+          "id": "cc8281d5-31d3-555c-9334-449b34887d10",
+          "file_title": "File:Seoul City Hall 20190608 005.jpg",
+          "filename": "wikidata-q623908-01.jpg",
+          "alt": "서울특별시청사 전경"
+        }
+      ]
+    },
+    {
+      "id": "79d764b1-990d-5bc9-b276-b92d7f35bca8",
+      "slug": "wikidata-q624865",
+      "name": "대한민국 국회도서관",
+      "description": "대한민국의 국립도서관",
+      "category": "interior",
+      "region": "서울",
+      "address": "서울특별시 영등포구 의사당대로 1 (여의도동) 국회도서관",
+      "latitude": 37.5312,
+      "longitude": 126.917,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q624865",
+      "images": [
+        {
+          "id": "a2758157-627b-5f8e-a0db-0a65dba80d98",
+          "file_title": "File:국회도서관 전경.jpg",
+          "filename": "wikidata-q624865-01.jpg",
+          "alt": "대한민국 국회도서관 전경"
+        }
+      ]
+    },
+    {
+      "id": "da7bd7fb-44f6-5931-ba4d-778cca7bc3cf",
+      "slug": "wikidata-q625542",
+      "name": "북한산 신라 진흥왕 순수비",
+      "description": "대한민국의 국보 제 3호. 신라의 진흥왕이 새로 공략한 국경지대를 순시한 다음 세운 비(碑)",
+      "category": "urban",
+      "region": "서울",
+      "address": "서울특별시 용산구 서빙고로 137, 국립중앙박물관 (용산동 6가)",
+      "latitude": 37.524166666,
+      "longitude": 126.980277777,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q625542",
+      "images": [
+        {
+          "id": "42833532-6272-5189-814f-5c97172d8f17",
+          "file_title": "File:Stele of Silla.jpg",
+          "filename": "wikidata-q625542-01.jpg",
+          "alt": "북한산 신라 진흥왕 순수비 전경"
+        }
+      ]
+    },
+    {
+      "id": "f666eaa2-30dd-573b-b93a-b10ad0e756a6",
+      "slug": "wikidata-q626736",
+      "name": "화정박물관",
+      "description": "대한민국 서울특별시 종로구에 소재한 박물관",
+      "category": "interior",
+      "region": "서울",
+      "address": "03011, 서울특별시 종로구 평창8길 3 (평창동)",
+      "latitude": 37.604789,
+      "longitude": 126.965919,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q626736",
+      "images": [
+        {
+          "id": "980f8d45-9f50-54b4-be25-bd4d00ee7d6e",
+          "file_title": "File:National Museum of Korea.jpg",
+          "filename": "wikidata-q626736-01.jpg",
+          "alt": "화정박물관 전경"
+        }
+      ]
+    },
+    {
+      "id": "b2568a56-4fad-5987-8dd9-4e6158de6290",
+      "slug": "wikidata-q6431677",
+      "name": "태릉국가대표선수촌",
+      "description": "athletic training center in Seoul, South Korea",
+      "category": "urban",
+      "region": "서울",
+      "address": "서울특별시 노원구 화랑로 727",
+      "latitude": 37.635801,
+      "longitude": 127.103896,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q6431677",
+      "images": [
+        {
+          "id": "bd1866d7-ece8-5f53-a556-3b96598f09ee",
+          "file_title": "File:Gongneung-dong, Nowon-gu, Seoul, South Korea - panoramio (1).jpg",
+          "filename": "wikidata-q6431677-01.jpg",
+          "alt": "태릉국가대표선수촌 전경"
+        }
+      ]
+    },
+    {
+      "id": "5e7ec357-8d03-5fc4-89fc-bc33085fdc64",
+      "slug": "wikidata-q6431840",
+      "name": "한국영상자료원",
+      "description": "영화 및 영상 자료를 수집, 보존, 복원하고 일반에 제공하는 문화체육관광부 산하의 공공 기록관",
+      "category": "interior",
+      "region": "서울",
+      "address": "서울시 마포구 월드컵북로 400 (03925)",
+      "latitude": 37.72,
+      "longitude": 126.692222222,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q6431840",
+      "images": [
+        {
+          "id": "f64ba82d-b8c8-5427-845a-54457bec4e66",
+          "file_title": "File:한국영상자료원.jpg",
+          "filename": "wikidata-q6431840-01.jpg",
+          "alt": "한국영상자료원 전경"
+        }
+      ]
+    },
+    {
+      "id": "ebd513f7-e7fc-59c2-a63a-d92592ab29b9",
+      "slug": "wikidata-q7990635",
+      "name": "환기미술관",
+      "description": "서울 종로구 부암동에 있는 미술관",
+      "category": "interior",
+      "region": "서울",
+      "address": "서울특별시 종로구 자하문로 40길 63",
+      "latitude": 37.5944,
+      "longitude": 126.966,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q7990635",
+      "images": [
+        {
+          "id": "4671070f-728d-5ffb-8540-c0257a342c1f",
+          "file_title": "File:Whanki Museum.jpg",
+          "filename": "wikidata-q7990635-01.jpg",
+          "alt": "환기미술관 전경"
+        }
+      ]
+    },
+    {
+      "id": "b919affd-6a29-5be7-be01-91db689271c4",
+      "slug": "wikidata-q10826354",
+      "name": "칠궁",
+      "description": "group of shrines dedicated to royal concubines in Seoul, South Korea",
+      "category": "urban",
+      "region": "서울",
+      "address": "서울특별시 종로구 창의문로 12",
+      "latitude": 37.585362,
+      "longitude": 126.9738,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q10826354",
+      "images": [
+        {
+          "id": "d2501dbb-15ae-5825-aead-726041ae390e",
+          "file_title": "File:Chilgungje 20141027 12 (15637008081).jpg",
+          "filename": "wikidata-q10826354-01.jpg",
+          "alt": "칠궁 전경"
+        }
+      ]
+    },
+    {
+      "id": "b0ab6796-7a1b-594f-bcf6-fca941ac499f",
+      "slug": "wikidata-q10855678",
+      "name": "근정전",
+      "description": "조선의 법궁인 경복궁의 정전",
+      "category": "urban",
+      "region": "서울",
+      "address": "서울 종로구 사직로 161 경복궁",
+      "latitude": 37.578333333,
+      "longitude": 126.976944444,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q10855678",
+      "images": [
+        {
+          "id": "7b4b3e50-2119-53de-9384-6009725cd6d0",
+          "file_title": "File:Front view of the Eastern side of the Imperial Throne Hall Geunjeongjeon at Gyeongbokgung Palace in Seoul.jpg",
+          "filename": "wikidata-q10855678-01.jpg",
+          "alt": "근정전 전경"
+        }
+      ]
+    },
+    {
+      "id": "5b7c4a87-631f-5313-a9a8-a8d0b5512d56",
+      "slug": "wikidata-q11269904",
+      "name": "정교회 성 니콜라스 대성당",
+      "description": "서울 소재 콘스탄티노폴리스 세계총대주교청 소속 동방 정교회 대성당",
+      "category": "urban",
+      "region": "서울",
+      "address": "서울시 마포구 마포대로 18길 43 (04205)",
+      "latitude": 37.551474,
+      "longitude": 126.957128,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q11269904",
+      "images": [
+        {
+          "id": "41d6eae4-331f-5e02-9f4b-be10e5514def",
+          "file_title": "File:Seoul St.Nicholas Cathedral.jpg",
+          "filename": "wikidata-q11269904-01.jpg",
+          "alt": "정교회 성 니콜라스 대성당 전경"
+        }
+      ]
+    },
+    {
+      "id": "87ad6a54-1b8a-5b8e-a2fb-914744bf5c65",
+      "slug": "wikidata-q12586829",
+      "name": "길상사 (서울)",
+      "description": "Buddhist temple in Seoul, South Korea",
+      "category": "urban",
+      "region": "서울",
+      "address": "323 Seongbuk- dong, Seongbuk-gu , Seoul",
+      "latitude": 37.59913,
+      "longitude": 126.99427,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q12586829",
+      "images": [
+        {
+          "id": "9286ef4a-80c8-5206-af1b-3fffee800b81",
+          "file_title": "File:Monk Beopjeong Jinyeong-gak.jpg",
+          "filename": "wikidata-q12586829-01.jpg",
+          "alt": "길상사 (서울) 전경"
+        }
+      ]
+    },
+    {
+      "id": "f91632a0-e708-519b-8e77-38305358ce78",
+      "slug": "wikidata-q12593476",
+      "name": "동아일보 사옥",
+      "description": "Korean cultural heritage item",
+      "category": "urban",
+      "region": "서울",
+      "address": "139-8 Sejong-ro, Jongno-gu, Seoul",
+      "latitude": 37.5698517,
+      "longitude": 126.977606,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q12593476",
+      "images": [
+        {
+          "id": "cd1da221-7afa-546a-bbcb-e46283441e75",
+          "file_title": "File:Ilmin Museum of Art.jpg",
+          "filename": "wikidata-q12593476-01.jpg",
+          "alt": "동아일보 사옥 전경"
+        }
+      ]
+    },
+    {
+      "id": "967ec878-061b-5b1a-96e8-8326f0cc6d9c",
+      "slug": "wikidata-q12600354",
+      "name": "삼청동 오위장 김춘영 가옥",
+      "description": "서울특별시 민속문화재",
+      "category": "urban",
+      "region": "서울",
+      "address": "28 Toegye-ro 34-gil, Jung-gu, Seoul (Pildong 2-ga)",
+      "latitude": 37.5583775,
+      "longitude": 126.9914082,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q12600354",
+      "images": [
+        {
+          "id": "4fe86c3a-0fa2-56a9-9cd9-29bb83d20eb4",
+          "file_title": "File:남산골 한옥마을 삼청동오위장김춘영가옥 사진1.jpg",
+          "filename": "wikidata-q12600354-01.jpg",
+          "alt": "삼청동 오위장 김춘영 가옥 전경"
+        }
+      ]
+    },
+    {
+      "id": "b31e3dfa-f4d4-5237-9fb1-27f3424a1d15",
+      "slug": "wikidata-q12615554",
+      "name": "정릉",
+      "description": "신덕왕후의 능",
+      "category": "urban",
+      "region": "서울",
+      "address": "서울특별시 성북구 아리랑로19길 116",
+      "latitude": 37.6022,
+      "longitude": 127.0056,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q12615554",
+      "images": [
+        {
+          "id": "649b01df-b493-5652-9823-e46dc2b9aedc",
+          "file_title": "File:Jeongneung Jeongjagak.jpg",
+          "filename": "wikidata-q12615554-01.jpg",
+          "alt": "정릉 전경"
+        }
+      ]
+    },
+    {
+      "id": "cce08e39-af3c-5503-9a18-e5ccd9ba0bae",
+      "slug": "wikidata-q12618846",
+      "name": "천도교 중앙대교당",
+      "description": "building in Jongno District, South Korea",
+      "category": "urban",
+      "region": "서울",
+      "address": "88 Gyeongun -dong, Jongno-gu , Seoul",
+      "latitude": 37.5752149,
+      "longitude": 126.9833985,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q12618846",
+      "images": [
+        {
+          "id": "f4031580-a30a-58bc-b55a-d647f990dd58",
+          "file_title": "File:Cheondogyo Jungang Daegyodang.jpg",
+          "filename": "wikidata-q12618846-01.jpg",
+          "alt": "천도교 중앙대교당 전경"
+        }
+      ]
+    },
+    {
+      "id": "c8b4c190-4f56-5d43-8c59-ee826bab82ba",
+      "slug": "wikidata-q16092829",
+      "name": "돈화문",
+      "description": "창덕궁의 정문",
+      "category": "urban",
+      "region": "서울",
+      "address": "서울특별시 종로구 율곡로 99",
+      "latitude": 37.577822049,
+      "longitude": 126.989934114,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q16092829",
+      "images": [
+        {
+          "id": "ebdad211-8fd7-5812-ae9c-01b4828705db",
+          "file_title": "File:Donhwamun Gate Changdeokgung 2.jpg",
+          "filename": "wikidata-q16092829-01.jpg",
+          "alt": "돈화문 전경"
+        }
+      ]
+    },
+    {
+      "id": "61af5ba4-794d-541d-86aa-689a75b315a0",
+      "slug": "wikidata-q16093071",
+      "name": "LG트윈타워",
+      "description": "LG그룹의 본사로 사용되는 건물",
+      "category": "urban",
+      "region": "서울",
+      "address": "128 Yeouidae-ro, Yeongdeungpo-gu, Seoul",
+      "latitude": 37.5279215,
+      "longitude": 126.9292653,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q16093071",
+      "images": [
+        {
+          "id": "9a7c5dc9-15fd-52ea-affd-ff2dfc4aca77",
+          "file_title": "File:IFC Seoul.jpg",
+          "filename": "wikidata-q16093071-01.jpg",
+          "alt": "LG트윈타워 전경"
+        }
+      ]
+    },
+    {
+      "id": "9891f608-b39f-5287-bde3-8ee4e4716c3f",
+      "slug": "wikidata-q16094228",
+      "name": "용산신학교와 원효로성당",
+      "description": "Wikidata에 등재된 서울의 장소입니다.",
+      "category": "urban",
+      "region": "서울",
+      "address": "49 Wonhyo-ro 19-gil, Yongsan-gu, Seoul",
+      "latitude": 37.534809,
+      "longitude": 126.954076,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q16094228",
+      "images": [
+        {
+          "id": "1c78f8b2-6388-5606-9834-2b7b99bd98ad",
+          "file_title": "File:Former Yongsan Roman Catholic Theological Seminary and Wonhyo-ro Church.jpg",
+          "filename": "wikidata-q16094228-01.jpg",
+          "alt": "용산신학교와 원효로성당 전경"
+        }
+      ]
+    },
+    {
+      "id": "a362ad1e-5a3e-50c7-92b1-42db3c8a8f7e",
+      "slug": "wikidata-q16094363",
+      "name": "의릉",
+      "description": "조선 경종의 능",
+      "category": "urban",
+      "region": "서울",
+      "address": "서울특별시 성북구 화랑로32길 146-37",
+      "latitude": 37.6033,
+      "longitude": 127.0567,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q16094363",
+      "images": [
+        {
+          "id": "004557b6-0d24-5473-867f-34ef9d83216b",
+          "file_title": "File:Stone statue of Uireung 01.JPG",
+          "filename": "wikidata-q16094363-01.jpg",
+          "alt": "의릉 전경"
+        }
+      ]
+    },
+    {
+      "id": "864741d8-d758-5dbf-b528-f8793dbf4ce4",
+      "slug": "wikidata-q16094699",
+      "name": "국립어린이청소년도서관",
+      "description": "대한민국의 국립도서관",
+      "category": "interior",
+      "region": "서울",
+      "address": "서울특별시 강남구 역삼동 테헤란로 7길 21",
+      "latitude": 37.500851,
+      "longitude": 127.029688,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q16094699",
+      "images": [
+        {
+          "id": "dd222e7f-0dd2-50a3-a697-7d4d210a9f9a",
+          "file_title": "File:2-min-12.jpg",
+          "filename": "wikidata-q16094699-01.jpg",
+          "alt": "국립어린이청소년도서관 전경"
+        }
+      ]
+    },
+    {
+      "id": "d15f6d1e-6251-5ee9-b51c-01609bad2997",
+      "slug": "wikidata-q16630774",
+      "name": "국립한글박물관",
+      "description": "한글에 관한 전시, 연구 사무를 위하여 대한민국 문화체육관광부가 설치한 박물관",
+      "category": "interior",
+      "region": "서울",
+      "address": "서울특별시 용산구 서빙고로 139",
+      "latitude": 37.521173,
+      "longitude": 126.980937,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q16630774",
+      "images": [
+        {
+          "id": "1a9fc17f-f508-56d9-88f5-5e73621a7abc",
+          "file_title": "File:National Hangeul Museum Exhibition 20160317 02 (25824207776).jpg",
+          "filename": "wikidata-q16630774-01.jpg",
+          "alt": "국립한글박물관 전경"
+        }
+      ]
+    },
+    {
+      "id": "66fa410a-3575-5b4e-8209-b748c49876dd",
+      "slug": "wikidata-q16799669",
+      "name": "혜화동성당",
+      "description": "서울특별시 혜화동에 있는 천주교 성당",
+      "category": "urban",
+      "region": "서울",
+      "address": "서울특별시 종로구 창경궁로 288",
+      "latitude": 37.586125,
+      "longitude": 127.0025,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q16799669",
+      "images": [
+        {
+          "id": "f44c4626-771e-5cf5-b60b-b9fa4891267a",
+          "file_title": "File:Thumb 등록문화재제230호 서울혜화동성당 계단.jpg",
+          "filename": "wikidata-q16799669-01.jpg",
+          "alt": "혜화동성당 전경"
+        }
+      ]
+    },
+    {
+      "id": "304133f7-69d2-556f-b1c5-709f519edbf4",
+      "slug": "wikidata-q24856619",
+      "name": "대한극장",
+      "description": "Multiplex movie theater in Seoul, South Korea",
+      "category": "urban",
+      "region": "서울",
+      "address": "125-18, Chungmu-ro 4-ga, Jung District, Seoul, South Korea",
+      "latitude": 37.561090155,
+      "longitude": 126.995318416,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q24856619",
+      "images": [
+        {
+          "id": "18663dbf-7739-5985-aaf7-26b13e4ad2b3",
+          "file_title": "File:Entrance of Daehan Cinema in Chungmuro.jpg",
+          "filename": "wikidata-q24856619-01.jpg",
+          "alt": "대한극장 전경"
+        }
+      ]
+    },
+    {
+      "id": "d412983a-bb71-5172-b931-30d6b62e838b",
+      "slug": "wikidata-q73134743",
+      "name": "LOL 파크",
+      "description": "대한민국의 e스포츠 경기장",
+      "category": "urban",
+      "region": "서울",
+      "address": "33 Jong-ro, Jongno District, Seoul",
+      "latitude": 37.571111111,
+      "longitude": 126.981388888,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q73134743",
+      "images": [
+        {
+          "id": "4e99a612-86a6-5842-9530-df862f2e3f8f",
+          "file_title": "File:LOL Park Entrance (cropped).jpg",
+          "filename": "wikidata-q73134743-01.jpg",
+          "alt": "LOL 파크 전경"
+        }
+      ]
+    },
+    {
+      "id": "68532134-d8d8-5432-b41d-cc99a7153c51",
+      "slug": "wikidata-q123676073",
+      "name": "갤러리 조선",
+      "description": "서울에 현대미술관 개관",
+      "category": "urban",
+      "region": "서울",
+      "address": "125 Sogyeok-dong, Jongno District, Seoul",
+      "latitude": 37.580056109,
+      "longitude": 126.981483357,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q123676073",
+      "images": [
+        {
+          "id": "49c5aadb-0094-53b5-a0bb-858c16d98139",
+          "file_title": "File:Gallery Chosun.jpg",
+          "filename": "wikidata-q123676073-01.jpg",
+          "alt": "갤러리 조선 전경"
+        }
+      ]
+    },
+    {
+      "id": "f3fd4fa4-efa2-5b60-a17c-9cf350accdac",
+      "slug": "wikidata-q482589",
+      "name": "부산아시아드주경기장",
+      "description": "대한민국 부산광역시에 있는 스포츠 시설",
+      "category": "urban",
+      "region": "부산",
+      "address": "대한민국 부산광역시 연제구 월드컵대로 344",
+      "latitude": 35.190103,
+      "longitude": 129.058361,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q482589",
+      "images": [
+        {
+          "id": "a2a9ba2a-2831-51f3-893e-b8bd370eb773",
+          "file_title": "File:BusanAsiadStadium.jpg",
+          "filename": "wikidata-q482589-01.jpg",
+          "alt": "부산아시아드주경기장 전경"
+        }
+      ]
+    },
+    {
+      "id": "10b5407e-b46c-5465-a6ed-46141f3b1d08",
+      "slug": "wikidata-q482737",
+      "name": "고신대학교",
+      "description": "대한민국 부산광역시와 충청남도의 사립 대학",
+      "category": "urban",
+      "region": "부산",
+      "address": "194 Wachi-ro, Yeongdo-gu, Busan 49104",
+      "latitude": 35.07961111,
+      "longitude": 129.063,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q482737",
+      "images": [
+        {
+          "id": "d533d950-5754-5696-b513-b93512074242",
+          "file_title": "File:Kosin University.jpg",
+          "filename": "wikidata-q482737-01.jpg",
+          "alt": "고신대학교 전경"
+        }
+      ]
+    },
+    {
+      "id": "c54aa143-9969-5e82-b885-944ae756be9e",
+      "slug": "wikidata-q487170",
+      "name": "부산외국어대학교",
+      "description": "대한민국 부산광역시의 사립 종합대학",
+      "category": "urban",
+      "region": "부산",
+      "address": "65 Geumsaem-ro 485beon-gil, Geumjeong-gu, Busan 46234",
+      "latitude": 35.267621265,
+      "longitude": 129.079267424,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q487170",
+      "images": [
+        {
+          "id": "21cbf6ec-a5d9-5dbd-bf7e-fe89f90e039a",
+          "file_title": "File:BUFS.jpg",
+          "filename": "wikidata-q487170-01.jpg",
+          "alt": "부산외국어대학교 전경"
+        }
+      ]
+    },
+    {
+      "id": "85465ca6-367b-5a22-9adc-ec784232cf7d",
+      "slug": "wikidata-q623798",
+      "name": "동의대학교",
+      "description": "대한민국 부산광역시의 사립 종합대학",
+      "category": "urban",
+      "region": "부산",
+      "address": "176 Eomgwang-ro, Busanjin-gu, Busan 47340",
+      "latitude": 35.13944444,
+      "longitude": 129.03336111,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q623798",
+      "images": [
+        {
+          "id": "15d8c6d9-6b1a-5077-96ee-e2fe7915e9ed",
+          "file_title": "File:동의대학교 건학이념비.jpg",
+          "filename": "wikidata-q623798-01.jpg",
+          "alt": "동의대학교 전경"
+        }
+      ]
+    },
+    {
+      "id": "57487170-5484-5f0f-99d1-b9d5acc87c3c",
+      "slug": "wikidata-q626783",
+      "name": "동아대학교",
+      "description": "대한민국 부산광역시의 사립 종합대학",
+      "category": "urban",
+      "region": "부산",
+      "address": "37 Nakdong-daero 550beon-gil, Saha-gu, Busan 49315",
+      "latitude": 35.11586111,
+      "longitude": 128.96725,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q626783",
+      "images": [
+        {
+          "id": "a70924b0-de86-5877-bbad-1656028e3980",
+          "file_title": "File:Dong-A Univ Bumin Campus.JPG",
+          "filename": "wikidata-q626783-01.jpg",
+          "alt": "동아대학교 전경"
+        }
+      ]
+    },
+    {
+      "id": "3eb1c31b-3c8c-5bc1-820e-29b97a97a2ef",
+      "slug": "wikidata-q113493764",
+      "name": "석불사",
+      "description": "Buddhist temple in Busan, South Korea",
+      "category": "urban",
+      "region": "부산",
+      "address": "부산 북구 만덕고개길143-96",
+      "latitude": 35.221545,
+      "longitude": 129.0488107,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q113493764",
+      "images": [
+        {
+          "id": "d8dc340c-f579-5879-9918-cf93f48f7d65",
+          "file_title": "File:Seokbulsa in Busan 21.jpg",
+          "filename": "wikidata-q113493764-01.jpg",
+          "alt": "석불사 전경"
+        }
+      ]
+    },
+    {
+      "id": "d0176718-c442-5f3f-bf82-85ef55381ade",
+      "slug": "wikidata-q483402",
+      "name": "계명대학교",
+      "description": "대한민국 대구광역시의 사립 종합대학",
+      "category": "urban",
+      "region": "대구",
+      "address": "42601 대구광역시 달서구 달구벌대로 1095 (신당동)",
+      "latitude": 35.8574,
+      "longitude": 128.4834,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q483402",
+      "images": [
+        {
+          "id": "cd08d8ab-ddf2-54be-a52a-175833fe490e",
+          "file_title": "File:Eng college.jpg",
+          "filename": "wikidata-q483402-01.jpg",
+          "alt": "계명대학교 전경"
+        }
+      ]
+    },
+    {
+      "id": "5fa36bc9-e0ba-5190-9047-77106f3b3024",
+      "slug": "wikidata-q31177147",
+      "name": "대구부수성비",
+      "description": "Wikidata에 등재된 대구의 장소입니다.",
+      "category": "urban",
+      "region": "대구",
+      "address": "248 Palhyeon-gil, Suseong-gu, Daegu (Manchon-dong, Yeongnam Jeilgwan)",
+      "latitude": 35.875277777,
+      "longitude": 128.658333333,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q31177147",
+      "images": [
+        {
+          "id": "4ebc86bc-36a2-5b94-a675-b03838fae9c8",
+          "file_title": "File:20191009 114618 HDR.jpg",
+          "filename": "wikidata-q31177147-01.jpg",
+          "alt": "대구부수성비 전경"
+        }
+      ]
+    },
+    {
+      "id": "e0d7bc5c-1c32-5c85-898e-88b8a3f2d33a",
+      "slug": "wikidata-q59556849",
+      "name": "대구iM뱅크파크",
+      "description": "대한민국 대구광역시에 있는 스포츠 시설",
+      "category": "urban",
+      "region": "대구",
+      "address": "191 Goseong-ro, Buk-gu, Daegu, Republic of Korea",
+      "latitude": 35.881253,
+      "longitude": 128.588231,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q59556849",
+      "images": [
+        {
+          "id": "a134391b-fdad-5f09-89b3-a7e0ff3b803a",
+          "file_title": "File:Daegu DGB Bank Park 2019.jpg",
+          "filename": "wikidata-q59556849-01.jpg",
+          "alt": "대구iM뱅크파크 전경"
+        }
+      ]
+    },
+    {
+      "id": "e44408df-894a-534f-b867-af769264934e",
+      "slug": "wikidata-q20932",
+      "name": "인천국제공항",
+      "description": "인천광역시 영종구 운서동에 위치한 국제공항",
+      "category": "industrial",
+      "region": "인천",
+      "address": "22382 인천시 중구 공항로 424번길 47",
+      "latitude": 37.4625,
+      "longitude": 126.439166666,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q20932",
+      "images": [
+        {
+          "id": "0ba122d1-a8e3-5394-b3d2-40b330e362fc",
+          "file_title": "File:202403 Aerial View of Incheon International Airport.jpg",
+          "filename": "wikidata-q20932-01.jpg",
+          "alt": "인천국제공항 전경"
+        }
+      ]
+    },
+    {
+      "id": "e1eb2717-25ff-5297-8e70-b61356d5a50e",
+      "slug": "wikidata-q12601867",
+      "name": "성공회 온수리성당",
+      "description": "Wikidata에 등재된 인천의 장소입니다.",
+      "category": "urban",
+      "region": "인천",
+      "address": "14 Onsu-gil 38beon-gil, Ganghwa-gun, Incheon (Gilsang-myeon)",
+      "latitude": 37.640555555,
+      "longitude": 126.490277777,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q12601867",
+      "images": [
+        {
+          "id": "076b1b4e-a41d-5a1c-b4ec-2f1f2e6d0618",
+          "file_title": "File:강화 온수리 성공회성당.jpg",
+          "filename": "wikidata-q12601867-01.jpg",
+          "alt": "성공회 온수리성당 전경"
+        }
+      ]
+    },
+    {
+      "id": "d8589a81-02ec-5f38-8759-18226da234e9",
+      "slug": "wikidata-q22973965",
+      "name": "강화 부근리 지석묘",
+      "description": "dolmen in South Korea",
+      "category": "urban",
+      "region": "인천",
+      "address": "317 Bujeong-ri, Hajem-myeon, Ganghwa-gun, Incheon",
+      "latitude": 37.773055555,
+      "longitude": 126.4375,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q22973965",
+      "images": [
+        {
+          "id": "b8a34591-e6ca-5f4f-b63d-475869280dd0",
+          "file_title": "File:Ganghwa Bugeun-ri dolmen.jpg",
+          "filename": "wikidata-q22973965-01.jpg",
+          "alt": "강화 부근리 지석묘 전경"
+        }
+      ]
+    },
+    {
+      "id": "1ab4e361-add0-5dca-95c2-d0d574a3d361",
+      "slug": "wikidata-q65288006",
+      "name": "장도포대지",
+      "description": "artillery battery in Incheon, South Korea",
+      "category": "urban",
+      "region": "인천",
+      "address": "111-3 Nonhyeon-dong , Namdong -gu, Incheon Metropolitan City",
+      "latitude": 37.4033161,
+      "longitude": 126.7338109,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q65288006",
+      "images": [
+        {
+          "id": "61fd5196-4147-5066-862c-c1ba36ed37f6",
+          "file_title": "File:장도포대진.jpg",
+          "filename": "wikidata-q65288006-01.jpg",
+          "alt": "장도포대지 전경"
+        }
+      ]
+    },
+    {
+      "id": "3ab16bff-fd53-5af4-b371-3661468020fe",
+      "slug": "wikidata-q623623",
+      "name": "환벽당",
+      "description": "광주광역시의 정자",
+      "category": "urban",
+      "region": "광주",
+      "address": "387 Chunghyo-dong, Buk-gu, Gwangju",
+      "latitude": 35.185555555,
+      "longitude": 127.002777777,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q623623",
+      "images": [
+        {
+          "id": "a378fe64-3b94-589f-a63d-c9d2f55d08af",
+          "file_title": "File:환벽당.JPG",
+          "filename": "wikidata-q623623-01.jpg",
+          "alt": "환벽당 전경"
+        }
+      ]
+    },
+    {
+      "id": "aa091a5d-852a-5419-a35e-3547f40416e9",
+      "slug": "wikidata-q12585329",
+      "name": "구 산업은행 대전지점",
+      "description": "Korean cultural heritage item",
+      "category": "urban",
+      "region": "대전",
+      "address": "198 Jungang-ro, Dong -gu, Daejeon",
+      "latitude": 36.3303719,
+      "longitude": 127.4286635,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q12585329",
+      "images": [
+        {
+          "id": "1bd429c6-09a0-5cd1-81a0-9cffd2d0e865",
+          "file_title": "File:Former Korea Development Bank Daejeon Branch.JPG",
+          "filename": "wikidata-q12585329-01.jpg",
+          "alt": "구 산업은행 대전지점 전경"
+        }
+      ]
+    },
+    {
+      "id": "60d8e576-d713-5997-a0a3-1cd3e7468884",
+      "slug": "wikidata-q12609075",
+      "name": "울기항로표지관리소",
+      "description": "대한민국 울산광역시 동구에 위치한 항로표지관리소",
+      "category": "urban",
+      "region": "울산",
+      "address": "울산광역시 동구 등대로 155",
+      "latitude": 35.492777777,
+      "longitude": 129.442916666,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q12609075",
+      "images": [
+        {
+          "id": "2a86c522-50d2-5693-854a-64d8c7faf3b6",
+          "file_title": "File:UlgiLightHousNew.JPG",
+          "filename": "wikidata-q12609075-01.jpg",
+          "alt": "울기항로표지관리소 전경"
+        }
+      ]
+    },
+    {
+      "id": "b64398cb-5a35-56c0-ba58-6a6f276221fd",
+      "slug": "wikidata-q12585765",
+      "name": "국립세종수목원",
+      "description": "세종특별자치시에 위치한 국립 수목원",
+      "category": "urban",
+      "region": "세종",
+      "address": "30106 세종특별자치시 연기면 수목원로 212-24 국립세종수목원",
+      "latitude": 36.494757,
+      "longitude": 127.282967,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q12585765",
+      "images": [
+        {
+          "id": "4ffb8841-200f-5d73-ad0b-6c60f1eef041",
+          "file_title": "File:국립세종수목원1.jpg",
+          "filename": "wikidata-q12585765-01.jpg",
+          "alt": "국립세종수목원 전경"
+        }
+      ]
+    },
+    {
+      "id": "6f7bfb6e-da2b-5663-bb17-e6645d509192",
+      "slug": "wikidata-q17226",
+      "name": "죽전역",
+      "description": "경기도 용인시 수지구에 위치한 전철역및 급행열차 정차역이다",
+      "category": "urban",
+      "region": "경기",
+      "address": "경기도 용인시 수지구 포은대로 536",
+      "latitude": 37.3245669,
+      "longitude": 127.1074072,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q17226",
+      "images": [
+        {
+          "id": "21df61b4-9bbc-50b8-8667-c7bb4a5f4970",
+          "file_title": "File:Jukjeonstation06.jpg",
+          "filename": "wikidata-q17226-01.jpg",
+          "alt": "죽전역 전경"
+        }
+      ]
+    },
+    {
+      "id": "2c2f414f-20af-5d41-9340-aaf4d328283c",
+      "slug": "wikidata-q31038",
+      "name": "정자역",
+      "description": "대한민국 경기도 성남시 분당구에 있는 분당선과 신분당선의 역",
+      "category": "urban",
+      "region": "경기",
+      "address": "B 333, Seongnam-daero, Bundang-gu, Seongnam-si, Gyeonggi-do",
+      "latitude": 37.366277777,
+      "longitude": 127.108122222,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q31038",
+      "images": [
+        {
+          "id": "dd60b628-6b88-5ba5-96a7-2ce2e785bfa0",
+          "file_title": "File:Q31038 Jeongja B02.jpg",
+          "filename": "wikidata-q31038-01.jpg",
+          "alt": "정자역 전경"
+        }
+      ]
+    },
+    {
+      "id": "b944c031-2329-53cc-8076-13cc2b51e6aa",
+      "slug": "wikidata-q46193",
+      "name": "미금역",
+      "description": "대한민국 경기도 성남시 분당구에 있는 역및 분당선과 신분당선의 전철역중 하나",
+      "category": "urban",
+      "region": "경기",
+      "address": "경기도 성남시 분당구 성남대로 지하156",
+      "latitude": 37.349977777,
+      "longitude": 127.10895,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q46193",
+      "images": [
+        {
+          "id": "55d6d9c5-9e01-5668-a79c-5dc09fd198bd",
+          "file_title": "File:K231 Migeum 02.jpg",
+          "filename": "wikidata-q46193-01.jpg",
+          "alt": "미금역 전경"
+        }
+      ]
+    },
+    {
+      "id": "9f30437d-8d58-57fb-8df6-8ae5fdf39ce2",
+      "slug": "wikidata-q46203",
+      "name": "보정역",
+      "description": "대한민국 경기도 용인시 기흥구에 있는 전철역및 분당선 역중 하나",
+      "category": "urban",
+      "region": "경기",
+      "address": "경기도 용인시 기흥구 용구대로 2560",
+      "latitude": 37.3126,
+      "longitude": 127.10835,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q46203",
+      "images": [
+        {
+          "id": "29c5d4f5-d39b-5aa0-a2e5-b8b7b431db13",
+          "file_title": "File:Q46203 Bojeong A02.jpg",
+          "filename": "wikidata-q46203-01.jpg",
+          "alt": "보정역 전경"
+        }
+      ]
+    },
+    {
+      "id": "7eb1e844-1907-5ea1-b988-573cb2bcd089",
+      "slug": "wikidata-q56147",
+      "name": "가천대학교",
+      "description": "대한민국 경기도 성남시와 인천광역시에 있는 사립 종합 대학",
+      "category": "urban",
+      "region": "경기",
+      "address": "13120 경기도 성남시 수정구 성남대로 1342 (복정동)",
+      "latitude": 37.45125,
+      "longitude": 127.129278,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q56147",
+      "images": [
+        {
+          "id": "68692489-c7bb-5fdf-9e81-f522e227085a",
+          "file_title": "File:가천대학교(1).jpg",
+          "filename": "wikidata-q56147-01.jpg",
+          "alt": "가천대학교 전경"
+        }
+      ]
+    },
+    {
+      "id": "515eee48-964d-552c-a0e4-7c60a5e54a53",
+      "slug": "wikidata-q60007",
+      "name": "안산종합버스터미널",
+      "description": "대한민국 경기도 안산시 상록구 성포동에 위치한 고속버스 터미널 중 하나이다.",
+      "category": "urban",
+      "region": "경기",
+      "address": "경기도 안산시 상록구 항가울로 410",
+      "latitude": 37.316861111,
+      "longitude": 126.846361111,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q60007",
+      "images": [
+        {
+          "id": "8c76e7d6-1c72-5a64-85f3-02d430175c08",
+          "file_title": "File:Ansan Bus Terminal.jpg",
+          "filename": "wikidata-q60007-01.jpg",
+          "alt": "안산종합버스터미널 전경"
+        }
+      ]
+    },
+    {
+      "id": "e8cee0c6-9667-5868-ae77-af3652759c3d",
+      "slug": "wikidata-q483295",
+      "name": "동구릉",
+      "description": "구리시에 위치한 조선 시대의 왕릉군",
+      "category": "urban",
+      "region": "경기",
+      "address": "경기도 구리시 동구릉로 197",
+      "latitude": 37.622608,
+      "longitude": 127.132075,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q483295",
+      "images": [
+        {
+          "id": "92addc81-eb64-5484-a6b4-9605227c4e06",
+          "file_title": "File:동구릉1.jpg",
+          "filename": "wikidata-q483295-01.jpg",
+          "alt": "동구릉 전경"
+        }
+      ]
+    },
+    {
+      "id": "9d0fcee2-d9ce-5660-ad92-bd3ff50db1ec",
+      "slug": "wikidata-q486846",
+      "name": "판교역",
+      "description": "한국철도공사 경강선, 네오트랜스 신분당선의 전철역 중 하나",
+      "category": "urban",
+      "region": "경기",
+      "address": "경기도 성남시 분당구 판교역로 지하160",
+      "latitude": 37.394762,
+      "longitude": 127.111137,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q486846",
+      "images": [
+        {
+          "id": "63df2ef5-d0fc-5eb7-bde1-eb9e28fa8d4b",
+          "file_title": "File:K410 Pangyo Station - Place name sign (20160916).jpg",
+          "filename": "wikidata-q486846-01.jpg",
+          "alt": "판교역 전경"
+        }
+      ]
+    },
+    {
+      "id": "85a48401-b57a-5447-80e7-94f3cb9db64d",
+      "slug": "wikidata-q490258",
+      "name": "오리역",
+      "description": "대한민국 경기도 성남시 분당구에 위치한 역",
+      "category": "urban",
+      "region": "경기",
+      "address": "경기도 성남시 분당구 성남대로 지하55",
+      "latitude": 37.339775,
+      "longitude": 127.108941666,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q490258",
+      "images": [
+        {
+          "id": "3ba3a55c-5ae5-598c-8629-540c3fed7d6b",
+          "file_title": "File:Ori Station 005.jpg",
+          "filename": "wikidata-q490258-01.jpg",
+          "alt": "오리역 전경"
+        }
+      ]
+    },
+    {
+      "id": "edff0afd-3cdd-5998-85a6-5baf116697cd",
+      "slug": "wikidata-q494673",
+      "name": "에버랜드",
+      "description": "대한민국 경기도 용인시에 위치한 놀이공원",
+      "category": "urban",
+      "region": "경기",
+      "address": "199, Everland-ro, Pogok-eup, Cheoin-gu, Yongin-si, Gyeonggi-do",
+      "latitude": 37.29517778,
+      "longitude": 127.20445278,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q494673",
+      "images": [
+        {
+          "id": "2ee123d2-d89c-5dd6-9fe4-bdc3eed6c09d",
+          "file_title": "File:Korea-Yongin-Everland-04.jpg",
+          "filename": "wikidata-q494673-01.jpg",
+          "alt": "에버랜드 전경"
+        }
+      ]
+    },
+    {
+      "id": "37c557a5-d957-5fe3-ab18-4cb682de0d69",
+      "slug": "wikidata-q5208233",
+      "name": "대진대학교",
+      "description": "대한민국 경기도의 사립 대학",
+      "category": "urban",
+      "region": "경기",
+      "address": "1007 Hoguk-ro, Pocheon-si, Gyeonggi-do 11159",
+      "latitude": 37.870683757,
+      "longitude": 127.156123954,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q5208233",
+      "images": [
+        {
+          "id": "b1dc0b75-e33e-5a7d-b0fc-194c2a9488ca",
+          "file_title": "File:250207 대진대학교 대문 (內).jpg",
+          "filename": "wikidata-q5208233-01.jpg",
+          "alt": "대진대학교 전경"
+        }
+      ]
+    },
+    {
+      "id": "d34417c4-f0df-51f4-a085-98652b4ddd6e",
+      "slug": "wikidata-q6656875",
+      "name": "서삼릉",
+      "description": "고양시에 위치한 조선 시대의 왕릉군",
+      "category": "urban",
+      "region": "경기",
+      "address": "경기도 고양시 덕양구 서삼릉길 233-126",
+      "latitude": 37.6633,
+      "longitude": 126.87,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q6656875",
+      "images": [
+        {
+          "id": "399da32c-a2fa-5df3-9fd3-0dcd87c32d78",
+          "file_title": "File:Korea-Goyang-Seosamneung Tomb-01.jpg",
+          "filename": "wikidata-q6656875-01.jpg",
+          "alt": "서삼릉 전경"
+        }
+      ]
+    },
+    {
+      "id": "3ad7aaaa-3b75-523e-af33-daa4e3a7c9a2",
+      "slug": "wikidata-q12608241",
+      "name": "온릉",
+      "description": "단경왕후의 능",
+      "category": "urban",
+      "region": "경기",
+      "address": "경기도 양주시 장흥면 호국로 255-41",
+      "latitude": 37.72,
+      "longitude": 126.9508,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q12608241",
+      "images": [
+        {
+          "id": "a7fc7fdc-be1c-5a2f-8e1e-154c58ef0306",
+          "file_title": "File:양주 온릉 01.jpg",
+          "filename": "wikidata-q12608241-01.jpg",
+          "alt": "온릉 전경"
+        }
+      ]
+    },
+    {
+      "id": "c9402c29-f027-54bd-8a51-ae39defc2740",
+      "slug": "wikidata-q12608267",
+      "name": "온온사",
+      "description": "경기도 과천시의 조선시대 객사",
+      "category": "interior",
+      "region": "경기",
+      "address": "58 Gwanaksan-gil, Gwacheon-si, Gyeonggi-do",
+      "latitude": 37.4360725,
+      "longitude": 126.9886352,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q12608267",
+      "images": [
+        {
+          "id": "072946c5-ce02-5554-968b-3984ca40738b",
+          "file_title": "File:Ononsa 0a.jpg",
+          "filename": "wikidata-q12608267-01.jpg",
+          "alt": "온온사 전경"
+        }
+      ]
+    },
+    {
+      "id": "1eef7dcb-46a3-58b6-b3e4-a7a92b78e36b",
+      "slug": "wikidata-q12614438",
+      "name": "장릉",
+      "description": "조선 원종의 능",
+      "category": "urban",
+      "region": "경기",
+      "address": "경기도 김포시 장릉로 79",
+      "latitude": 37.6131,
+      "longitude": 126.7108,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q12614438",
+      "images": [
+        {
+          "id": "e60b0b8b-9796-5d3a-a746-27da6aab33a4",
+          "file_title": "File:JangNeung in Gimpo City.jpg",
+          "filename": "wikidata-q12614438-01.jpg",
+          "alt": "장릉 전경"
+        }
+      ]
+    },
+    {
+      "id": "aed7845e-3520-5c7c-bf76-55ea998b8dec",
+      "slug": "wikidata-q12621501",
+      "name": "파주 삼릉",
+      "description": "파주시에 위치한 조선 시대의 왕릉군",
+      "category": "urban",
+      "region": "경기",
+      "address": "경기도 파주시 조리읍 삼릉로 89",
+      "latitude": 37.7453,
+      "longitude": 126.8303,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q12621501",
+      "images": [
+        {
+          "id": "6d908a21-977c-57e5-9bf0-da6a2653648c",
+          "file_title": "File:조선 진종 영릉 2.jpg",
+          "filename": "wikidata-q12621501-01.jpg",
+          "alt": "파주 삼릉 전경"
+        }
+      ]
+    },
+    {
+      "id": "3c7ca1de-dcdf-505f-929e-d69658aaa13a",
+      "slug": "wikidata-q14947137",
+      "name": "별망성지",
+      "description": "14th century Korean defensive structure",
+      "category": "urban",
+      "region": "경기",
+      "address": "656 Choji-dong, Danwon-gu, Ansan-si, Gyeonggi-do",
+      "latitude": 37.299722222,
+      "longitude": 126.797777777,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q14947137",
+      "images": [
+        {
+          "id": "abdeed04-e936-53b5-ac7c-14264ebd938b",
+          "file_title": "File:Byeolmangseong Fortress 08.JPG",
+          "filename": "wikidata-q14947137-01.jpg",
+          "alt": "별망성지 전경"
+        }
+      ]
+    },
+    {
+      "id": "8204f9b9-a2ab-5614-a82e-2fc76fab89bf",
+      "slug": "wikidata-q16095974",
+      "name": "포천 한탄강 현무암 협곡과 비둘기낭 폭포",
+      "description": "포천시에 있는 폭포와 협곡",
+      "category": "nature",
+      "region": "경기",
+      "address": "San 42-1, Daehoesan-ri, Yeongbuk-myeon, Pocheon-si, Gyeonggi-do",
+      "latitude": 38.079722222,
+      "longitude": 127.216944444,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q16095974",
+      "images": [
+        {
+          "id": "01904913-95db-54be-ab39-31cfbbc6c498",
+          "file_title": "File:Columnar jointed basalt in Bidulginang(Dove's pocket) Fall at Pocheon, Gyeonggi-do, South Korea, image 1.jpg",
+          "filename": "wikidata-q16095974-01.jpg",
+          "alt": "포천 한탄강 현무암 협곡과 비둘기낭 폭포 전경"
+        }
+      ]
+    },
+    {
+      "id": "c425de6f-91cc-5a36-8058-f72d0e033a53",
+      "slug": "wikidata-q18328963",
+      "name": "창룡도서관",
+      "description": "수원시 팔달구 우만동의 공립 도서관",
+      "category": "interior",
+      "region": "경기",
+      "address": "16232, 경기도 수원시 팔달구 월드컵로381번길 36 (우만동, 창룡도서관)",
+      "latitude": 37.290846,
+      "longitude": 127.027574,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q18328963",
+      "images": [
+        {
+          "id": "7cb33ba2-e182-5e55-a859-dc3d37a7a72a",
+          "file_title": "File:Changryonglib1.JPG",
+          "filename": "wikidata-q18328963-01.jpg",
+          "alt": "창룡도서관 전경"
+        }
+      ]
+    },
+    {
+      "id": "0966b62c-cc15-506f-bc7b-2fb61655bcd5",
+      "slug": "wikidata-q19940341",
+      "name": "안산갈대습지공원",
+      "description": "대한민국 경기도 안산시 상록구에 위치한 공원",
+      "category": "urban",
+      "region": "경기",
+      "address": "경기도 안산시 상록구 해안로 820-116",
+      "latitude": 37.27,
+      "longitude": 126.843055555,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q19940341",
+      "images": [
+        {
+          "id": "9099d03f-f5c1-570d-ae84-a83ae2985d0e",
+          "file_title": "File:Ansan Swamp Reed Park 41.JPG",
+          "filename": "wikidata-q19940341-01.jpg",
+          "alt": "안산갈대습지공원 전경"
+        }
+      ]
+    },
+    {
+      "id": "e172b592-102e-588e-a934-cdf220c3c3f7",
+      "slug": "wikidata-q21025128",
+      "name": "동천역",
+      "description": "대한민국 경기도 용인시의 신분당선 역",
+      "category": "urban",
+      "region": "경기",
+      "address": "경기도 용인시 수지구 신수로 지하760",
+      "latitude": 37.337874,
+      "longitude": 127.102882,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q21025128",
+      "images": [
+        {
+          "id": "9d8e3f8b-04c4-5b35-8549-2e2aa0bdd39b",
+          "file_title": "File:Q21025128 Dongcheon A02.jpg",
+          "filename": "wikidata-q21025128-01.jpg",
+          "alt": "동천역 전경"
+        }
+      ]
+    },
+    {
+      "id": "d0eb6dd5-abe3-5c09-a73f-5e07a121e1d0",
+      "slug": "wikidata-q21025129",
+      "name": "수지구청역",
+      "description": "대한민국 경기도 용인시 수지구에 위치한 역",
+      "category": "urban",
+      "region": "경기",
+      "address": "경기도 용인시 수지구 풍덕천로 지하120",
+      "latitude": 37.322829,
+      "longitude": 127.095273,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q21025129",
+      "images": [
+        {
+          "id": "68ea3b6d-9b20-5d32-a7ee-a74bd4c30fd2",
+          "file_title": "File:Q21025129 Suji-gu Office Station A02.jpg",
+          "filename": "wikidata-q21025129-01.jpg",
+          "alt": "수지구청역 전경"
+        }
+      ]
+    },
+    {
+      "id": "b4a476ec-4288-5937-9877-8e07a1bbe428",
+      "slug": "wikidata-q21025130",
+      "name": "성복역",
+      "description": "대한민국 경기도 용인시 수지구에 위치한 역",
+      "category": "urban",
+      "region": "경기",
+      "address": "경기도 용인시 수지구 수지로 지하134",
+      "latitude": 37.313199,
+      "longitude": 127.080195,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q21025130",
+      "images": [
+        {
+          "id": "e54af33b-c589-5a2c-aa85-93d5130824b7",
+          "file_title": "File:Q21025130 Seongbok A02.jpg",
+          "filename": "wikidata-q21025130-01.jpg",
+          "alt": "성복역 전경"
+        }
+      ]
+    },
+    {
+      "id": "00ef25a3-5c02-5423-a7b8-5a4c4c8b4425",
+      "slug": "wikidata-q21025131",
+      "name": "상현역",
+      "description": "대한민국 경기도 용인시 수지구의 역",
+      "category": "urban",
+      "region": "경기",
+      "address": "경기도 용인시 수지구 광교중앙로 지하312",
+      "latitude": 37.29703,
+      "longitude": 127.069147,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q21025131",
+      "images": [
+        {
+          "id": "ca610369-17d6-5b9d-ae03-3dc068b0f14e",
+          "file_title": "File:Q21025131 Sanghyeon A02.jpg",
+          "filename": "wikidata-q21025131-01.jpg",
+          "alt": "상현역 전경"
+        }
+      ]
+    },
+    {
+      "id": "2ce23b86-8397-5735-abed-f3a7737b83db",
+      "slug": "wikidata-q21025132",
+      "name": "광교중앙역",
+      "description": "대한민국 경기도 수원시 영통구에 있는 역",
+      "category": "urban",
+      "region": "경기",
+      "address": "경기도 수원시 영통구 도청로 지하45",
+      "latitude": 37.288483,
+      "longitude": 127.051646,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q21025132",
+      "images": [
+        {
+          "id": "26be01dd-c0ad-5380-9eba-235d17f349fe",
+          "file_title": "File:Gwanggyo Jungang Station Exit 1.jpg",
+          "filename": "wikidata-q21025132-01.jpg",
+          "alt": "광교중앙역 전경"
+        }
+      ]
+    },
+    {
+      "id": "f8149b70-dcdd-5bde-b28c-433a8e774079",
+      "slug": "wikidata-q24700199",
+      "name": "파주 윤관장군묘",
+      "description": "경기도 파주시 광탄면 분수리에 있는 고려 중기의 문신인 윤관(?∼1111)의 무덤",
+      "category": "urban",
+      "region": "경기",
+      "address": "경기도 파주시 광탄면 혜음로 930 (분수리)",
+      "latitude": 37.768055555,
+      "longitude": 126.855,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q24700199",
+      "images": [
+        {
+          "id": "fbffd48c-0f39-5afd-88fd-781179a47569",
+          "file_title": "File:윤관장군묘.jpg",
+          "filename": "wikidata-q24700199-01.jpg",
+          "alt": "파주 윤관장군묘 전경"
+        }
+      ]
+    },
+    {
+      "id": "8beb8a11-06a1-5aad-a016-f9235aa30889",
+      "slug": "wikidata-q25842401",
+      "name": "한양대학교 ERICA캠퍼스",
+      "description": "대한민국 경기도의 한양대학교 분교",
+      "category": "urban",
+      "region": "경기",
+      "address": "경기도 안산시 상록구 한양대학로 55",
+      "latitude": 37.296923,
+      "longitude": 126.834216,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q25842401",
+      "images": [
+        {
+          "id": "a2fe8f27-0c34-5fa8-8e0c-8694b10330cd",
+          "file_title": "File:Erica campus main gate.jpg",
+          "filename": "wikidata-q25842401-01.jpg",
+          "alt": "한양대학교 ERICA캠퍼스 전경"
+        }
+      ]
+    },
+    {
+      "id": "5ada32a5-3c1e-50f0-9459-7431c2dc3e3c",
+      "slug": "wikidata-q626458",
+      "name": "가톨릭관동대학교",
+      "description": "대한민국 강원특별자치도의 사립 대학",
+      "category": "urban",
+      "region": "강원",
+      "address": "강원특별자치도 강릉시 범일로579번길 24",
+      "latitude": 37.7364444,
+      "longitude": 128.871567,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q626458",
+      "images": [
+        {
+          "id": "96dd175c-5ac3-5923-bcf9-f2f602472848",
+          "file_title": "File:Korea Special Olympics 27 (8382984068).jpg",
+          "filename": "wikidata-q626458-01.jpg",
+          "alt": "가톨릭관동대학교 전경"
+        }
+      ]
+    },
+    {
+      "id": "5e228d4c-047e-5b54-8e1d-4ecb5400b4de",
+      "slug": "wikidata-q4734818",
+      "name": "알펜시아 슬라이딩 센터",
+      "description": "sports venue in Daegwallyeong, South Korea",
+      "category": "urban",
+      "region": "강원",
+      "address": "강원도 평창군 대관령면 솔봉로 470",
+      "latitude": 37.6537139,
+      "longitude": 128.681389,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q4734818",
+      "images": [
+        {
+          "id": "7ccd5849-f85c-5f45-ba3f-539626ff89ae",
+          "file_title": "File:Alpensia 20170202 05 (32619189236).jpg",
+          "filename": "wikidata-q4734818-01.jpg",
+          "alt": "알펜시아 슬라이딩 센터 전경"
+        }
+      ]
+    },
+    {
+      "id": "88019667-fc10-5395-b667-5e89efe9484c",
+      "slug": "wikidata-q5521164",
+      "name": "강릉종합운동장",
+      "description": "대한민국 강원특별자치도 강릉시에 있는 스포츠 시설",
+      "category": "urban",
+      "region": "강원",
+      "address": "69 Jonghabundongjang-gil, Gangneung-si, Gangwon-do, Republic of Korea",
+      "latitude": 37.773561,
+      "longitude": 128.897503,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q5521164",
+      "images": [
+        {
+          "id": "90dc9ffc-b506-5e3b-8e3e-3f5a518bae88",
+          "file_title": "File:Gangneung Stadium2.jpg",
+          "filename": "wikidata-q5521164-01.jpg",
+          "alt": "강릉종합운동장 전경"
+        }
+      ]
+    },
+    {
+      "id": "d278100e-270b-54a4-b740-47c30db01da7",
+      "slug": "wikidata-q483675",
+      "name": "청주국제공항",
+      "description": "충청권 유일의 국제공항 및 군사 전용 공항",
+      "category": "industrial",
+      "region": "충북",
+      "address": "28142 충북 청원구 내수읍 오창대로 980",
+      "latitude": 36.716388888,
+      "longitude": 127.499166666,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q483675",
+      "images": [
+        {
+          "id": "68d1cf5e-bbbe-5770-96c4-35ff2be042b7",
+          "file_title": "File:Cheongju airport 20090404.jpg",
+          "filename": "wikidata-q483675-01.jpg",
+          "alt": "청주국제공항 전경"
+        }
+      ]
+    },
+    {
+      "id": "8a8bbd97-8474-5426-80cd-ed79f770557c",
+      "slug": "wikidata-q484090",
+      "name": "한국교원대학교",
+      "description": "대한민국 충청북도의 국립 종합대학",
+      "category": "urban",
+      "region": "충북",
+      "address": "충청북도 청주시 흥덕구 강내면 태성탑연로 250",
+      "latitude": 36.608983,
+      "longitude": 127.36064,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q484090",
+      "images": [
+        {
+          "id": "76a075c1-1cf9-5de0-b4b4-2c26523455dd",
+          "file_title": "File:KNUE campus.JPG",
+          "filename": "wikidata-q484090-01.jpg",
+          "alt": "한국교원대학교 전경"
+        }
+      ]
+    },
+    {
+      "id": "2390b194-2afd-567d-84b0-212e74404228",
+      "slug": "wikidata-q16095714",
+      "name": "청풍 망월산성",
+      "description": "fortress/castle in Korea",
+      "category": "urban",
+      "region": "충북",
+      "address": "San 6-2, Multae- ri , Cheongpung-myeon , Jecheon-si, Chungcheongbuk-do",
+      "latitude": 37.0017509,
+      "longitude": 128.1653801,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q16095714",
+      "images": [
+        {
+          "id": "c606be36-36cc-556e-a259-ffe92b081e28",
+          "file_title": "File:청풍 성열성 남문지.jpg",
+          "filename": "wikidata-q16095714-01.jpg",
+          "alt": "청풍 망월산성 전경"
+        }
+      ]
+    },
+    {
+      "id": "60d50be6-8f63-5ed1-8e18-3eb783443b21",
+      "slug": "wikidata-q19940563",
+      "name": "옥천 석탄리 고인돌",
+      "description": "Korean cultural heritage item",
+      "category": "urban",
+      "region": "충북",
+      "address": "685-2, Tattan-ri , Dong-myeon, Okcheon-gun , Chungcheongbuk -do",
+      "latitude": 36.319444444,
+      "longitude": 127.617777777,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q19940563",
+      "images": [
+        {
+          "id": "19ee9fae-722b-57b4-9c5d-feb0ddc56935",
+          "file_title": "File:Dolmen in Seoktan-ri, Okcheon.jpg",
+          "filename": "wikidata-q19940563-01.jpg",
+          "alt": "옥천 석탄리 고인돌 전경"
+        }
+      ]
+    },
+    {
+      "id": "f6633d3d-220b-5742-92f6-1135833a6271",
+      "slug": "wikidata-q22975133",
+      "name": "충주 조동리 고인돌",
+      "description": "Korean cultural heritage item",
+      "category": "urban",
+      "region": "충북",
+      "address": "1756 Jodong-ri , Dongnyang- myeon, Chungju-si , Chungcheongbuk-do",
+      "latitude": 37.030333333,
+      "longitude": 127.974194444,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q22975133",
+      "images": [
+        {
+          "id": "6681b5d7-e1c1-5ae9-b8f3-819656d5d068",
+          "file_title": "File:Jodongri Goindol 02.jpg",
+          "filename": "wikidata-q22975133-01.jpg",
+          "alt": "충주 조동리 고인돌 전경"
+        }
+      ]
+    },
+    {
+      "id": "513cddce-38fb-5d3b-8621-5ab3df824c41",
+      "slug": "wikidata-q28698707",
+      "name": "진천 농다리",
+      "description": "bridge in South Korea",
+      "category": "urban",
+      "region": "충북",
+      "address": "601-32 Gusandong-ri, Munbaek-myeon, Jincheon-gun, Chungcheongbuk-do",
+      "latitude": 36.825833333,
+      "longitude": 127.493333333,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q28698707",
+      "images": [
+        {
+          "id": "ab42afef-4741-5f9f-8321-fa9a3a9dc945",
+          "file_title": "File:Jincheon Nongdari Bridge 20200716 160025.jpg",
+          "filename": "wikidata-q28698707-01.jpg",
+          "alt": "진천 농다리 전경"
+        }
+      ]
+    },
+    {
+      "id": "ee5ea9c6-12ef-5160-9f08-7d45706b1252",
+      "slug": "wikidata-q61093095",
+      "name": "충주 신청리 고인돌",
+      "description": "cultural heritage",
+      "category": "urban",
+      "region": "충북",
+      "address": "502, Cheongwon-ri , Shinni - myeon, Chungju-si, Chungcheongbuk-do",
+      "latitude": 37.009722222,
+      "longitude": 127.734166666,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q61093095",
+      "images": [
+        {
+          "id": "89a77523-770c-56e2-b3f4-da9afe87fd38",
+          "file_title": "File:충주 신청리 고인돌 1.jpg",
+          "filename": "wikidata-q61093095-01.jpg",
+          "alt": "충주 신청리 고인돌 전경"
+        }
+      ]
+    },
+    {
+      "id": "c09f03c4-791a-55d5-af5a-788a2dbed8c2",
+      "slug": "wikidata-q623817",
+      "name": "한국전통문화대학교",
+      "description": "대한민국 충청남도의 국립 대학",
+      "category": "urban",
+      "region": "충남",
+      "address": "충청남도 부여군 규암면 백제문로 367",
+      "latitude": 36.308,
+      "longitude": 126.897,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q623817",
+      "images": [
+        {
+          "id": "58ff9c31-eb06-5b29-8764-ff34e26cb08d",
+          "file_title": "File:전통문화학교20211003 122203.jpg",
+          "filename": "wikidata-q623817-01.jpg",
+          "alt": "한국전통문화대학교 전경"
+        }
+      ]
+    },
+    {
+      "id": "f74211a8-8850-5bdf-a6f1-33034ee4bc99",
+      "slug": "wikidata-q12582562",
+      "name": "간월암",
+      "description": "충청남도 서산시 부석면에 있는 암자",
+      "category": "urban",
+      "region": "충남",
+      "address": "119-29, Ganwoldo 1-gil, Buseok-myeon, Seosan-si, Chungcheongnam-do, 32023, Rep. of KOREA",
+      "latitude": 36.603702,
+      "longitude": 126.411141,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q12582562",
+      "images": [
+        {
+          "id": "fadf379a-2f42-512f-8a8f-bb2da3f566c8",
+          "file_title": "File:Ganworam Hermitage.jpg",
+          "filename": "wikidata-q12582562-01.jpg",
+          "alt": "간월암 전경"
+        }
+      ]
+    },
+    {
+      "id": "55bfdd8e-b57b-5b14-a54e-e61e668340ac",
+      "slug": "wikidata-q16094598",
+      "name": "정충사",
+      "description": "Buddhist temple",
+      "category": "urban",
+      "region": "충남",
+      "address": "40-1 Pangyo 1-gil, Hongseong -gun, Chungcheongnam- do ( Western -myeon, Jeongchungsa)",
+      "latitude": 36.551388888,
+      "longitude": 126.526944444,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q16094598",
+      "images": [
+        {
+          "id": "4f7cf66b-27f6-501b-9a6b-e7398aca4d20",
+          "file_title": "File:홍성 정충사.jpg",
+          "filename": "wikidata-q16094598-01.jpg",
+          "alt": "정충사 전경"
+        }
+      ]
+    },
+    {
+      "id": "75e5d508-5b4a-59fe-9f37-f4286ab0e278",
+      "slug": "wikidata-q16095200",
+      "name": "창렬사",
+      "description": "Confucian temple",
+      "category": "urban",
+      "region": "충남",
+      "address": "78 Geumsanam-ro, Guryong-myeon, Buyeo-gun, Chungcheongnam-do (Geumsa-ri)",
+      "latitude": 36.245194444,
+      "longitude": 126.796638888,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q16095200",
+      "images": [
+        {
+          "id": "e6278416-5fe0-5af0-8945-7e707b2c141c",
+          "file_title": "File:부여 창렬사 (정문 밖에서).jpg",
+          "filename": "wikidata-q16095200-01.jpg",
+          "alt": "창렬사 전경"
+        }
+      ]
+    },
+    {
+      "id": "e86fa1d5-519b-58f1-9cc2-4f07ab45a108",
+      "slug": "wikidata-q16979132",
+      "name": "홍산객사",
+      "description": "Wikidata에 등재된 충남의 장소입니다.",
+      "category": "interior",
+      "region": "충남",
+      "address": "47 Bukchon- ro, Hongsan- myeon, Buyeo-gun, Chungcheongnam -do (Bukchon-ri)",
+      "latitude": 36.215833333,
+      "longitude": 126.756666666,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q16979132",
+      "images": [
+        {
+          "id": "4a7fe656-bde6-5c1a-923f-2572db02e36a",
+          "file_title": "File:홍산객사-20200628 141756.jpg",
+          "filename": "wikidata-q16979132-01.jpg",
+          "alt": "홍산객사 전경"
+        }
+      ]
+    },
+    {
+      "id": "d1036509-b1a6-529c-8e59-b707c796b0bd",
+      "slug": "wikidata-q17095114",
+      "name": "홍산 형방청",
+      "description": "Korean cultural heritage item",
+      "category": "urban",
+      "region": "충남",
+      "address": "38 Dongheon- ro, Hongsan-myeon, Buyeo-gun , Chungcheongnam -do",
+      "latitude": 36.2149512,
+      "longitude": 126.7520608,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q17095114",
+      "images": [
+        {
+          "id": "7206cca7-8ba4-5169-b8f5-6e3c38c9d0e0",
+          "file_title": "File:홍산현-형방청20200628 140835.jpg",
+          "filename": "wikidata-q17095114-01.jpg",
+          "alt": "홍산 형방청 전경"
+        }
+      ]
+    },
+    {
+      "id": "9eb4895d-28db-51c7-a6ec-57ab0ddc2021",
+      "slug": "wikidata-q29939356",
+      "name": "서광사",
+      "description": "충청남도 서산시 읍내동의 사찰",
+      "category": "urban",
+      "region": "충남",
+      "address": "31970,충청남도 서산시 부춘산1로 44 (읍내동)",
+      "latitude": 36.791742,
+      "longitude": 126.445396,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q29939356",
+      "images": [
+        {
+          "id": "10b1301c-4933-5759-b017-7ce9be3e5ae9",
+          "file_title": "File:서광사2.jpg",
+          "filename": "wikidata-q29939356-01.jpg",
+          "alt": "서광사 전경"
+        }
+      ]
+    },
+    {
+      "id": "d784633f-a80c-5a51-96e9-662f44c079e3",
+      "slug": "wikidata-q109458459",
+      "name": "천안홍대용과학관",
+      "description": "Wikidata에 등재된 충남의 장소입니다.",
+      "category": "interior",
+      "region": "충남",
+      "address": "충청남도 천안시 동남구 수신면 장산서길 113",
+      "latitude": 36.740555555,
+      "longitude": 127.295555555,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q109458459",
+      "images": [
+        {
+          "id": "92914ab7-3479-51a3-ba44-678990fcc65a",
+          "file_title": "File:천안홍대용과학관 보조관측실.jpg",
+          "filename": "wikidata-q109458459-01.jpg",
+          "alt": "천안홍대용과학관 전경"
+        }
+      ]
+    },
+    {
+      "id": "cf7faa0f-d2f7-5378-a605-e73bf43e734b",
+      "slug": "wikidata-q12584431",
+      "name": "고창 선운사 육층석탑",
+      "description": "Korean cultural heritage item",
+      "category": "urban",
+      "region": "전북",
+      "address": "250 Seonunsa-ro, Asan -myeon , Gochang -gun, Jeollabuk- do (Samin-ri)",
+      "latitude": 35.497166666,
+      "longitude": 126.578277777,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q12584431",
+      "images": [
+        {
+          "id": "68019b08-34ab-5b69-9c89-29f4c8364c91",
+          "file_title": "File:고창 선운사 육층석탑.jpg",
+          "filename": "wikidata-q12584431-01.jpg",
+          "alt": "고창 선운사 육층석탑 전경"
+        }
+      ]
+    },
+    {
+      "id": "f2a63166-4562-5741-b428-0abb3cf07bf9",
+      "slug": "wikidata-q12584448",
+      "name": "고창읍성",
+      "description": "fortress in South Korea",
+      "category": "urban",
+      "region": "전북",
+      "address": "126 Eupnae-ri, Gochang-eup, Gochang-gun, Jeollabuk-do",
+      "latitude": 35.431111111,
+      "longitude": 126.703611111,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q12584448",
+      "images": [
+        {
+          "id": "ca093c90-1a4f-573a-b56b-7bc02adb2b32",
+          "file_title": "File:Gochangeupseong10.jpg",
+          "filename": "wikidata-q12584448-01.jpg",
+          "alt": "고창읍성 전경"
+        }
+      ]
+    },
+    {
+      "id": "4b0bb303-0820-5331-9934-58ec5900c5e9",
+      "slug": "wikidata-q12588611",
+      "name": "김제 금산사 노주",
+      "description": "pillar in Geumsansa Temple, Gimje, South Korea (national treasure)",
+      "category": "urban",
+      "region": "전북",
+      "address": "38 Geumsan-ri, Geumsan-myeon, Gimje-si, Jeollabuk-do, South Korea",
+      "latitude": 35.723727,
+      "longitude": 127.0502237,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q12588611",
+      "images": [
+        {
+          "id": "94b24b7d-25db-5bb4-8511-6222edd35f8c",
+          "file_title": "File:Korea-Gimje-Geumsansa Geumsansanoju 4120-07.JPG",
+          "filename": "wikidata-q12588611-01.jpg",
+          "alt": "김제 금산사 노주 전경"
+        }
+      ]
+    },
+    {
+      "id": "c5c02eda-7904-5313-b37f-b9c00478674c",
+      "slug": "wikidata-q12595609",
+      "name": "무장읍성",
+      "description": "eupseong in Gochang",
+      "category": "urban",
+      "region": "전북",
+      "address": "149-1 Seongnae-ri, Mujang-myeon, Gochang-gun, Jeollabuk-do",
+      "latitude": 35.4188564,
+      "longitude": 126.5533044,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q12595609",
+      "images": [
+        {
+          "id": "e657b7ff-781d-5787-8195-336c20c78085",
+          "file_title": "File:.무장읍성의 아름다움.jpg",
+          "filename": "wikidata-q12595609-01.jpg",
+          "alt": "무장읍성 전경"
+        }
+      ]
+    },
+    {
+      "id": "0068f584-57b8-50a4-a258-b1e7cb0d19e9",
+      "slug": "wikidata-q12611766",
+      "name": "이성당",
+      "description": "oldest bakery in South Korea",
+      "category": "urban",
+      "region": "전북",
+      "address": "전북특별자치도 군산시 중앙로 177",
+      "latitude": 35.9871,
+      "longitude": 126.7112,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q12611766",
+      "images": [
+        {
+          "id": "c3b3f121-feb2-54df-bd21-469c03ba97c5",
+          "file_title": "File:Isungdang.jpg",
+          "filename": "wikidata-q12611766-01.jpg",
+          "alt": "이성당 전경"
+        }
+      ]
+    },
+    {
+      "id": "2d64d699-28e0-57e5-9393-5bdb6fcaf3b1",
+      "slug": "wikidata-q12615292",
+      "name": "전주 객사",
+      "description": "gaeksa in South Korea",
+      "category": "interior",
+      "region": "전북",
+      "address": "1 Jungang-dong 3-ga, Wansan-gu, Jeonju-si, Jeollabuk-do",
+      "latitude": 35.8186646,
+      "longitude": 127.1426821,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q12615292",
+      "images": [
+        {
+          "id": "460d15e4-f7e5-5dbc-add7-37220da9a0f0",
+          "file_title": "File:Jeonju Gaeksa.jpg",
+          "filename": "wikidata-q12615292-01.jpg",
+          "alt": "전주 객사 전경"
+        }
+      ]
+    },
+    {
+      "id": "66bc9393-ec58-5322-a44d-cc70673fd6e5",
+      "slug": "wikidata-q17095057",
+      "name": "창주서원",
+      "description": "seowon (private confucian academy)",
+      "category": "urban",
+      "region": "전북",
+      "address": "315 Dotong-dong, Namwon-si , Jeollabuk- do",
+      "latitude": 35.420555555,
+      "longitude": 127.395277777,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q17095057",
+      "images": [
+        {
+          "id": "0d9ca470-d310-54e7-9c70-e32e866ba9e9",
+          "file_title": "File:남원 창주서원.jpg",
+          "filename": "wikidata-q17095057-01.jpg",
+          "alt": "창주서원 전경"
+        }
+      ]
+    },
+    {
+      "id": "09912b2a-13a7-56bf-b38e-42c60743f672",
+      "slug": "wikidata-q491213",
+      "name": "목포공항",
+      "description": "전남광주통합특별시 영암군에 있는 대한민국 해군의 항공작전기지",
+      "category": "urban",
+      "region": "전남",
+      "address": "1374-20, Yongdang-ri, Samho-myeon, Youngam guon, Jeollanamdo",
+      "latitude": 34.758611111,
+      "longitude": 126.38,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q491213",
+      "images": [
+        {
+          "id": "203b4673-88d4-5cc5-b38f-c6c03da6da5f",
+          "file_title": "File:Mokpo airport South Korea 20071008.jpg",
+          "filename": "wikidata-q491213-01.jpg",
+          "alt": "목포공항 전경"
+        }
+      ]
+    },
+    {
+      "id": "253e2baf-b270-5705-8419-f0dae8380265",
+      "slug": "wikidata-q12585325",
+      "name": "구 나주경찰서",
+      "description": "Korean cultural heritage item",
+      "category": "urban",
+      "region": "전남",
+      "address": "65 Namgomun- ro, Naju-si, Jeollanam-do (Geumseong-dong)",
+      "latitude": 35.028944444,
+      "longitude": 126.717975,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q12585325",
+      "images": [
+        {
+          "id": "5077a4df-2237-5c44-abb4-303e6aa248da",
+          "file_title": "File:Former Naju Police Office.JPG",
+          "filename": "wikidata-q12585325-01.jpg",
+          "alt": "구 나주경찰서 전경"
+        }
+      ]
+    },
+    {
+      "id": "9f3db805-4e37-52b3-a7bc-d4aa2993e0e8",
+      "slug": "wikidata-q12589628",
+      "name": "나주 동점문 밖 석당간",
+      "description": "Korean cultural heritage item",
+      "category": "urban",
+      "region": "전남",
+      "address": "229-9 Seongbuk-dong, Naju-si, Jeollanam-do",
+      "latitude": 35.0366575,
+      "longitude": 126.7203034,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q12589628",
+      "images": [
+        {
+          "id": "ac5abdab-c12d-5247-9234-3a1610b4a7bb",
+          "file_title": "File:나주 동점문 밖 석당간 05.jpg",
+          "filename": "wikidata-q12589628-01.jpg",
+          "alt": "나주 동점문 밖 석당간 전경"
+        }
+      ]
+    },
+    {
+      "id": "d3db348e-3464-5790-a828-d3ff40ead7ba",
+      "slug": "wikidata-q12589630",
+      "name": "나주 북망문 밖 삼층석탑",
+      "description": "Korean cultural heritage item",
+      "category": "urban",
+      "region": "전남",
+      "address": "41-1 Geonjae-ro, Naju-si, Jeollanam-do (Daeho-dong) / (No.) 824 Daeho-dong, Naju-si, Jeollanam-do",
+      "latitude": 35.0395224,
+      "longitude": 126.7092835,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q12589630",
+      "images": [
+        {
+          "id": "1db774b9-9059-5cb3-8589-65d39648213b",
+          "file_title": "File:나주 북망문 밖 삼층석탑 01.jpg",
+          "filename": "wikidata-q12589630-01.jpg",
+          "alt": "나주 북망문 밖 삼층석탑 전경"
+        }
+      ]
+    },
+    {
+      "id": "71bafae4-3cf7-5da4-985b-41ea15d9488c",
+      "slug": "wikidata-q12589647",
+      "name": "나주향교 대성전",
+      "description": "Korean cultural heritage item",
+      "category": "urban",
+      "region": "전남",
+      "address": "36-11 Hyanggyo-gil , Naju-si, Jeollanam-do (Gyo-dong)",
+      "latitude": 35.034027777,
+      "longitude": 126.711111111,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q12589647",
+      "images": [
+        {
+          "id": "5fd6fc70-5294-5c68-bcd7-333567e1ca61",
+          "file_title": "File:나주향교 대성전 04.jpg",
+          "filename": "wikidata-q12589647-01.jpg",
+          "alt": "나주향교 대성전 전경"
+        }
+      ]
+    },
+    {
+      "id": "cd6e98d6-6ec4-53e4-ba83-c8a9dfc8775e",
+      "slug": "wikidata-q12591051",
+      "name": "담양 객사리 석당간",
+      "description": "Wikidata에 등재된 전남의 장소입니다.",
+      "category": "urban",
+      "region": "전남",
+      "address": "45 Gaeksa-ri , Damyang-eup , Damyang-gun, Jeollanam- do",
+      "latitude": 35.3206154,
+      "longitude": 126.9898007,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q12591051",
+      "images": [
+        {
+          "id": "c900bc50-80cc-5866-ab1c-b9bb6444cda2",
+          "file_title": "File:담양 객사리 석당간 01.jpg",
+          "filename": "wikidata-q12591051-01.jpg",
+          "alt": "담양 객사리 석당간 전경"
+        }
+      ]
+    },
+    {
+      "id": "9c099291-2812-5785-9302-83f6fde36d3c",
+      "slug": "wikidata-q12598376",
+      "name": "보성 벌교 홍교",
+      "description": "Korean cultural heritage item, Joseon stone bridge",
+      "category": "urban",
+      "region": "전남",
+      "address": "154-1 Beolgyo-ri, Beolgyo-eup, Boseong-gun, Jeollanam-do",
+      "latitude": 34.849904,
+      "longitude": 127.338399,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q12598376",
+      "images": [
+        {
+          "id": "883b9a21-b1df-59d4-9df2-837b027776b6",
+          "file_title": "File:Beolgyo Arch Bridge 13-09911.JPG",
+          "filename": "wikidata-q12598376-01.jpg",
+          "alt": "보성 벌교 홍교 전경"
+        }
+      ]
+    },
+    {
+      "id": "9eaf68d5-20ed-58ef-a993-4f76dacab66f",
+      "slug": "wikidata-q12614512",
+      "name": "장성 백양사 비자나무 숲",
+      "description": "Korean cultural heritage item",
+      "category": "nature",
+      "region": "전남",
+      "address": "115-1 San, Yaksu- ri , Buk- myeon, Jangseong-gun, Jeollanam-do",
+      "latitude": 35.446944444,
+      "longitude": 126.874444444,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q12614512",
+      "images": [
+        {
+          "id": "025bef01-54da-572a-8409-db457e9d95f7",
+          "file_title": "File:Torreya nucifera 5.JPG",
+          "filename": "wikidata-q12614512-01.jpg",
+          "alt": "장성 백양사 비자나무 숲 전경"
+        }
+      ]
+    },
+    {
+      "id": "3b1cd87b-3ae5-5143-b69b-49b672483620",
+      "slug": "wikidata-q16092277",
+      "name": "고흥 능가사 대웅전",
+      "description": "Korean cultural heritage item",
+      "category": "urban",
+      "region": "전남",
+      "address": "21 Palbong-gil, Jeom-am-myeon, Goheung-gun, Jeollanam-do (Seonggi-ri) / (Address) 369 Seonggi-ri, Jeom-am-myeon, Goheung-gun, Jeollanam-do",
+      "latitude": 34.6388804,
+      "longitude": 127.3958187,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q16092277",
+      "images": [
+        {
+          "id": "d45a3af3-a805-5193-9ec1-5bc60bb48b09",
+          "file_title": "File:South Korea-Goheunggun-Neunggasa 5840-07 Daeungjeon.JPG",
+          "filename": "wikidata-q16092277-01.jpg",
+          "alt": "고흥 능가사 대웅전 전경"
+        }
+      ]
+    },
+    {
+      "id": "c9ed5c1d-27d2-543e-acf8-4bd0138fc501",
+      "slug": "wikidata-q19941496",
+      "name": "나주 홍기응 가옥",
+      "description": "Korean cultural heritage item",
+      "category": "urban",
+      "region": "전남",
+      "address": "18-1, Dongwon -gil, Dado-myeon , Naju -si , Jeollanam-do (Pungsan-ri)",
+      "latitude": 34.998333333,
+      "longitude": 126.823055555,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q19941496",
+      "images": [
+        {
+          "id": "d41d8bb0-27f6-511c-83e8-cb86507a23a0",
+          "file_title": "File:나주 계은 고택 안채.jpg",
+          "filename": "wikidata-q19941496-01.jpg",
+          "alt": "나주 홍기응 가옥 전경"
+        }
+      ]
+    },
+    {
+      "id": "e24b0171-3e3f-578c-a0b4-2b3744ad224b",
+      "slug": "wikidata-q21057473",
+      "name": "영보정",
+      "description": "South Korean cultural heritage item",
+      "category": "urban",
+      "region": "전남",
+      "address": "전라남도 영암군 영보정길 10-8",
+      "latitude": 34.829444444,
+      "longitude": 126.7325,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q21057473",
+      "images": [
+        {
+          "id": "c682f06b-0edd-5338-970a-0e1fd15dfb16",
+          "file_title": "File:영암 영보정.jpg",
+          "filename": "wikidata-q21057473-01.jpg",
+          "alt": "영보정 전경"
+        }
+      ]
+    },
+    {
+      "id": "57602f58-0bc3-599a-aef7-72e26b925232",
+      "slug": "wikidata-q390124",
+      "name": "국립경주박물관",
+      "description": "경상북도 경주시에 있는 대한민국의 국립박물관",
+      "category": "interior",
+      "region": "경북",
+      "address": "경상북도 경주시 일정로 186",
+      "latitude": 35.82898333,
+      "longitude": 129.22836111,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q390124",
+      "images": [
+        {
+          "id": "e1ef9b30-882b-5eff-9018-6d0d626348d8",
+          "file_title": "File:Korea-Gyeongju.National.Museum-04.jpg",
+          "filename": "wikidata-q390124-01.jpg",
+          "alt": "국립경주박물관 전경"
+        }
+      ]
+    },
+    {
+      "id": "87c3457c-6233-5c63-b43e-f73fcd1b954f",
+      "slug": "wikidata-q489708",
+      "name": "대구대학교",
+      "description": "대한민국 경상북도와 대구광역시의 사립 종합대학",
+      "category": "urban",
+      "region": "경북",
+      "address": "201 Daegudae-ro, Jillyang-eup, Gyeongsan-si, Gyeongsangbuk-do 38453",
+      "latitude": 35.902222222,
+      "longitude": 128.848333333,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q489708",
+      "images": [
+        {
+          "id": "12af0a17-0717-5c18-8a44-43aa5f7eaa48",
+          "file_title": "File:Daegu University Seongsan hall.jpg",
+          "filename": "wikidata-q489708-01.jpg",
+          "alt": "대구대학교 전경"
+        }
+      ]
+    },
+    {
+      "id": "15e3cd89-dcf2-515a-baac-43e59f264dd4",
+      "slug": "wikidata-q623604",
+      "name": "한동대학교",
+      "description": "대한민국 경상북도의 사립 대학",
+      "category": "urban",
+      "region": "경북",
+      "address": "경상북도 포항시 북구 흥해읍 한동로 558",
+      "latitude": 36.103055555,
+      "longitude": 129.388444444,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q623604",
+      "images": [
+        {
+          "id": "34e96a6f-6688-5669-a4c9-21de43d0c35d",
+          "file_title": "File:CAMPUS-HGU.jpg",
+          "filename": "wikidata-q623604-01.jpg",
+          "alt": "한동대학교 전경"
+        }
+      ]
+    },
+    {
+      "id": "a0dd1d35-76c2-5ecf-a8e4-bd00ef238250",
+      "slug": "wikidata-q624306",
+      "name": "포석정",
+      "description": "former ancient villa in South Korea",
+      "category": "urban",
+      "region": "경북",
+      "address": "경북 경주시 배동 454-3",
+      "latitude": 35.809182,
+      "longitude": 129.212265,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q624306",
+      "images": [
+        {
+          "id": "01e22f5f-6a82-5476-960b-efeb207eaa58",
+          "file_title": "File:Korea south silla poseokjeong.jpg",
+          "filename": "wikidata-q624306-01.jpg",
+          "alt": "포석정 전경"
+        }
+      ]
+    },
+    {
+      "id": "d37907a9-96b6-5989-9aeb-c6962a950226",
+      "slug": "wikidata-q6680259",
+      "name": "김유신묘",
+      "description": "tomb in Gyeongju, South Korea",
+      "category": "urban",
+      "region": "경북",
+      "address": "Lim 7-1 San, Chunghyo-dong, Gyeongju-si, Gyeongsangbuk-do",
+      "latitude": 35.845555555,
+      "longitude": 129.188611111,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q6680259",
+      "images": [
+        {
+          "id": "8f44054b-ceb6-5359-8e8a-455619147ffc",
+          "file_title": "File:Korea-Gyeongju-Tomb of General Kim Yusin-02A.jpg",
+          "filename": "wikidata-q6680259-01.jpg",
+          "alt": "김유신묘 전경"
+        }
+      ]
+    },
+    {
+      "id": "455438c3-fedf-53dd-971e-9d63691efd05",
+      "slug": "wikidata-q12583868",
+      "name": "경주 불국사 청운교 및 백운교",
+      "description": "Wikidata에 등재된 경북의 장소입니다.",
+      "category": "urban",
+      "region": "경북",
+      "address": "385 Bulguk-ro, Gyeongju-si , Gyeongsangbuk -do",
+      "latitude": 35.789761111,
+      "longitude": 129.331622222,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q12583868",
+      "images": [
+        {
+          "id": "8c80b75b-3dfd-5a1c-ba63-2afa74799bd7",
+          "file_title": "File:Bulguksa 01.jpg",
+          "filename": "wikidata-q12583868-01.jpg",
+          "alt": "경주 불국사 청운교 및 백운교 전경"
+        }
+      ]
+    },
+    {
+      "id": "335130a1-6679-5d4a-ac66-04b1a6a81625",
+      "slug": "wikidata-q12605595",
+      "name": "안동 구리 측백나무 숲",
+      "description": "Korean cultural heritage item",
+      "category": "nature",
+      "region": "경북",
+      "address": "1-1 San, Gwangeum-ri, Namhu-myeon, Andong-si, Gyeongsangbuk-do",
+      "latitude": 36.508611111,
+      "longitude": 128.683611111,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q12605595",
+      "images": [
+        {
+          "id": "61f9238d-13e9-5b25-88fa-376d646312c4",
+          "file_title": "File:안동 구리 측백나무 숲.jpg",
+          "filename": "wikidata-q12605595-01.jpg",
+          "alt": "안동 구리 측백나무 숲 전경"
+        }
+      ]
+    },
+    {
+      "id": "4ea36f34-ace5-5684-8136-9a9dd827e102",
+      "slug": "wikidata-q12609080",
+      "name": "울릉 성인봉 원시림",
+      "description": "대한민국 경상북도 울릉군 성인봉 정상 근처에 있는 숲. 대한민국의 천연기념물 제189호",
+      "category": "nature",
+      "region": "경북",
+      "address": "44-1 Narisan, Buk-myeon , Ulleung-gun, Gyeongsangbuk-do",
+      "latitude": 37.5061329,
+      "longitude": 130.8565735,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q12609080",
+      "images": [
+        {
+          "id": "52606729-d412-58a4-b0a0-837b1723267a",
+          "file_title": "File:울릉 성인봉 원시림 1.jpg",
+          "filename": "wikidata-q12609080-01.jpg",
+          "alt": "울릉 성인봉 원시림 전경"
+        }
+      ]
+    },
+    {
+      "id": "c7b397d5-df66-58b6-918d-5225e6dc76c3",
+      "slug": "wikidata-q12621212",
+      "name": "통구미항",
+      "description": "Wikidata에 등재된 경북의 장소입니다.",
+      "category": "industrial",
+      "region": "경북",
+      "address": "Namyang-ri, Seomyeon, Ulleung-gun, Gyeongsangbuk-do",
+      "latitude": 37.460555555,
+      "longitude": 130.857222222,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q12621212",
+      "images": [
+        {
+          "id": "176420fc-cbd9-5d02-b09f-abfc01dd51ce",
+          "file_title": "File:Geobuk Bawi of Tonggumi Fishing Port OCT2020.jpg",
+          "filename": "wikidata-q12621212-01.jpg",
+          "alt": "통구미항 전경"
+        }
+      ]
+    },
+    {
+      "id": "09037aa1-7bb2-5a38-8230-2bd67ae8fc25",
+      "slug": "wikidata-q16094464",
+      "name": "장기읍성",
+      "description": "walled town",
+      "category": "urban",
+      "region": "경북",
+      "address": "127-2 Eupnae-ri, Janggi-myeon, Nam-gu, Pohang-si, Gyeongsangbuk-do",
+      "latitude": 35.9071966,
+      "longitude": 129.456531,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q16094464",
+      "images": [
+        {
+          "id": "f0e29072-da49-5d95-89cb-546fc9a62a08",
+          "file_title": "File:장기읍성 북문.jpg",
+          "filename": "wikidata-q16094464-01.jpg",
+          "alt": "장기읍성 전경"
+        }
+      ]
+    },
+    {
+      "id": "ac5147aa-0864-5bb5-9fa0-ffbf9ecc7847",
+      "slug": "wikidata-q16095406",
+      "name": "청도 석빙고",
+      "description": "Korean cultural heritage item",
+      "category": "urban",
+      "region": "경북",
+      "address": "7 Donggyo-gil , Hwayang -eup, Cheongdo-gun, Gyeongsangbuk -do (Dongcheon-ri)",
+      "latitude": 35.649414,
+      "longitude": 128.708363,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q16095406",
+      "images": [
+        {
+          "id": "3b7cbf40-4243-51e4-a586-003431d4210e",
+          "file_title": "File:석빙고Sukbingo.jpg",
+          "filename": "wikidata-q16095406-01.jpg",
+          "alt": "청도 석빙고 전경"
+        }
+      ]
+    },
+    {
+      "id": "c2ba271c-07e4-54b8-9887-52a8392fc54f",
+      "slug": "wikidata-q16096110",
+      "name": "헌덕왕릉",
+      "description": "tomb in Gyeongju, South Korea",
+      "category": "urban",
+      "region": "경북",
+      "address": "80 Dongcheon-dong, Gyeongju-si, Gyeongsangbuk-do",
+      "latitude": 35.843611111,
+      "longitude": 129.244722222,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q16096110",
+      "images": [
+        {
+          "id": "1e72f915-8b36-5adf-8250-0bf4c2500573",
+          "file_title": "File:헌덕왕릉 경주 29.jpg",
+          "filename": "wikidata-q16096110-01.jpg",
+          "alt": "헌덕왕릉 전경"
+        }
+      ]
+    },
+    {
+      "id": "4930d5eb-bcb6-56ca-8e60-c02330d551ed",
+      "slug": "wikidata-q31179255",
+      "name": "서석지",
+      "description": "Wikidata에 등재된 경북의 장소입니다.",
+      "category": "urban",
+      "region": "경북",
+      "address": "394-2 Yeondang-ri, Ipam-myeon, Yeongyang-gun, Gyeongsangbuk-do",
+      "latitude": 36.611666666,
+      "longitude": 129.069722222,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q31179255",
+      "images": [
+        {
+          "id": "da22edbe-b514-514c-8dfc-df73eab2a7ba",
+          "file_title": "File:서석지.jpg",
+          "filename": "wikidata-q31179255-01.jpg",
+          "alt": "서석지 전경"
+        }
+      ]
+    },
+    {
+      "id": "31b43eef-957e-5658-90ff-4d3d6fe02292",
+      "slug": "wikidata-q109455925",
+      "name": "불굴사",
+      "description": "대한민국의 절",
+      "category": "urban",
+      "region": "경북",
+      "address": "205 Bulgulsa-gil, Palgongsan Mountain, Wachon-myeon, Gyeongsan-si, Gyeongsangbuk-do",
+      "latitude": 35.945277777,
+      "longitude": 128.778611111,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q109455925",
+      "images": [
+        {
+          "id": "eea0e0b8-b215-5a1e-8e46-ba2aa77a8cda",
+          "file_title": "File:경산 불굴사 삼층석탑.jpg",
+          "filename": "wikidata-q109455925-01.jpg",
+          "alt": "불굴사 전경"
+        }
+      ]
+    },
+    {
+      "id": "7fe68348-556e-5d3e-b26b-d7a4e51316fb",
+      "slug": "wikidata-q6202570",
+      "name": "국립진주박물관",
+      "description": "경상남도 진주시의 국립박물관",
+      "category": "interior",
+      "region": "경남",
+      "address": "626-35 Namgang-ro, Jinju-si , Gyeongsangnam- do",
+      "latitude": 35.188922222,
+      "longitude": 128.076955555,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q6202570",
+      "images": [
+        {
+          "id": "11222007-db64-560a-b610-e78dafa6d7dc",
+          "file_title": "File:The Jinju National Museum.jpg",
+          "filename": "wikidata-q6202570-01.jpg",
+          "alt": "국립진주박물관 전경"
+        }
+      ]
+    },
+    {
+      "id": "ab2c6a05-5546-51c1-8ffa-63bed196ec2e",
+      "slug": "wikidata-q12618340",
+      "name": "진주고속버스터미널",
+      "description": "경상남도 진주시의 고속버스터미널",
+      "category": "urban",
+      "region": "경남",
+      "address": "16, Dongjin-ro, Jinju-si, Gyeongsangnam-do, 52726, Rep. of KOREA",
+      "latitude": 35.17863,
+      "longitude": 128.093005,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q12618340",
+      "images": [
+        {
+          "id": "7e0eb6d4-90fd-5386-b6b2-aa04a0a71107",
+          "file_title": "File:Juju Bus Terminal Front shot.jpg",
+          "filename": "wikidata-q12618340-01.jpg",
+          "alt": "진주고속버스터미널 전경"
+        }
+      ]
+    },
+    {
+      "id": "b37b45ef-030a-55b0-bcaf-32635dc93402",
+      "slug": "wikidata-q12624438",
+      "name": "함양 상림",
+      "description": "Wikidata에 등재된 경남의 장소입니다.",
+      "category": "nature",
+      "region": "경남",
+      "address": "246 Daedeok-ri, Hamyang-eup, Hamyang-gun, Gyeongsangnam-do",
+      "latitude": 35.524166666,
+      "longitude": 127.719444444,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q12624438",
+      "images": [
+        {
+          "id": "18944169-c35d-5975-bdd0-4374cf6aedc6",
+          "file_title": "File:함양 상림 ( 5 ).jpg",
+          "filename": "wikidata-q12624438-01.jpg",
+          "alt": "함양 상림 전경"
+        }
+      ]
+    },
+    {
+      "id": "d6dfb0a6-e27b-534b-8525-4b787a7c77d4",
+      "slug": "wikidata-q16096002",
+      "name": "하동 송림",
+      "description": "Korean cultural heritage item",
+      "category": "nature",
+      "region": "경남",
+      "address": "443-10 Gwangpyeong-ri, Hadong-eup, Hadong-gun, Gyeongsangnam-do",
+      "latitude": 35.0625,
+      "longitude": 127.743611111,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q16096002",
+      "images": [
+        {
+          "id": "3f938c61-4f21-53d7-af09-66a22ace6d53",
+          "file_title": "File:Korean red pine forest in Hadong.JPG",
+          "filename": "wikidata-q16096002-01.jpg",
+          "alt": "하동 송림 전경"
+        }
+      ]
+    },
+    {
+      "id": "ee589d28-4339-5e02-a7ef-ca45701e88d4",
+      "slug": "wikidata-q16100741",
+      "name": "호국사",
+      "description": "Buddhist temple in South Korea",
+      "category": "urban",
+      "region": "경남",
+      "address": "214-5 Namseong-dong , Jinju-si, Gyeongsangnam-do",
+      "latitude": 35.1875992,
+      "longitude": 128.0732654,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q16100741",
+      "images": [
+        {
+          "id": "2c88822a-9d26-5200-9731-0514607349ac",
+          "file_title": "File:Hokuksa Tepmple-Jinju Castle.jpg",
+          "filename": "wikidata-q16100741-01.jpg",
+          "alt": "호국사 전경"
+        }
+      ]
+    },
+    {
+      "id": "59cb6c77-a333-53fb-86cd-18ee58f1ae83",
+      "slug": "wikidata-q18492946",
+      "name": "마산일본성",
+      "description": "창원시 마산합포구 산호동에 있는 일본식 성곽",
+      "category": "urban",
+      "region": "경남",
+      "address": "142 Yongmasan- gil , Masanhappo-gu, Changwon-si, Gyeongsangnam-do ( Sanho-dong )",
+      "latitude": 35.2138299,
+      "longitude": 128.5831596,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q18492946",
+      "images": [
+        {
+          "id": "b9aea29f-6c9f-5098-b182-cb2923c4b844",
+          "file_title": "File:마산일본성.jpg",
+          "filename": "wikidata-q18492946-01.jpg",
+          "alt": "마산일본성 전경"
+        }
+      ]
+    },
+    {
+      "id": "064e0f7b-31e8-508a-a316-d27d8a5d2d00",
+      "slug": "wikidata-q18605797",
+      "name": "창녕 객사",
+      "description": "gaeksa in South Korea",
+      "category": "interior",
+      "region": "경남",
+      "address": "28-22 Gyosang-ri, Changnyeong-eup, Changnyeong-gun, Gyeongsangnam-do",
+      "latitude": 35.54075,
+      "longitude": 128.501583333,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q18605797",
+      "images": [
+        {
+          "id": "0dc59ac6-d9e8-5c90-8b5d-05a810ae03f9",
+          "file_title": "File:Changnyeong Gaeksa.JPG",
+          "filename": "wikidata-q18605797-01.jpg",
+          "alt": "창녕 객사 전경"
+        }
+      ]
+    },
+    {
+      "id": "f78f832e-bf46-5d8d-abcb-bab5237b643e",
+      "slug": "wikidata-q19794650",
+      "name": "마산 성요셉 성당",
+      "description": "Korean cultural heritage item",
+      "category": "urban",
+      "region": "경남",
+      "address": "20 Wanwolnam-ro, Masanhappo-gu, Changwon-si, Gyeongsangnam - do ( Wanwol-dong )",
+      "latitude": 35.197916666,
+      "longitude": 128.559666666,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q19794650",
+      "images": [
+        {
+          "id": "ef7d2f06-3b6d-5792-889d-d0c43806ef01",
+          "file_title": "File:마산 성요셉 성당.jpg",
+          "filename": "wikidata-q19794650-01.jpg",
+          "alt": "마산 성요셉 성당 전경"
+        }
+      ]
+    },
+    {
+      "id": "7529c671-3da1-5d1c-bdb2-3aa799dfb008",
+      "slug": "wikidata-q24856539",
+      "name": "산청 단계리 용담정사",
+      "description": "temple",
+      "category": "urban",
+      "region": "경남",
+      "address": "545 Sincharo, Sancheong-gun, Gyeongsangnam- do ( Sindeung-myeon )",
+      "latitude": 35.380277777,
+      "longitude": 128.007777777,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q24856539",
+      "images": [
+        {
+          "id": "66286ac7-8c95-5fbc-8ba6-33de9ca835f4",
+          "file_title": "File:20221118 용담정사.jpg",
+          "filename": "wikidata-q24856539-01.jpg",
+          "alt": "산청 단계리 용담정사 전경"
+        }
+      ]
+    },
+    {
+      "id": "2049aa5c-f109-5693-8a4b-cb7771432b69",
+      "slug": "wikidata-q65234888",
+      "name": "거창 오례사",
+      "description": "temple",
+      "category": "urban",
+      "region": "경남",
+      "address": "1062 Deoksan-ri , Sinwon -myeon, Geochang -gun , Gyeongsangnam-do",
+      "latitude": 35.5702026,
+      "longitude": 127.8725564,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q65234888",
+      "images": [
+        {
+          "id": "6fc94093-fc71-59e2-9d6f-aea530ee14c7",
+          "file_title": "File:ORESA-Geuchang southKorea.jpg",
+          "filename": "wikidata-q65234888-01.jpg",
+          "alt": "거창 오례사 전경"
+        }
+      ]
+    },
+    {
+      "id": "b3ef848e-2758-5d97-93b5-e4dae2de2a4f",
+      "slug": "wikidata-q65236011",
+      "name": "고성 장산숲",
+      "description": "경상남도 고성군 마암면에 있는 숲",
+      "category": "nature",
+      "region": "경남",
+      "address": "231-2, Jangsan-ri, Maam-myeon, Goseong-gun, Gyeongsangnam-do",
+      "latitude": 35.058972222,
+      "longitude": 128.326694444,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q65236011",
+      "images": [
+        {
+          "id": "c100e567-a5b7-5bef-ac7b-6c70f156fc73",
+          "file_title": "File:고성 장산숲.jpg",
+          "filename": "wikidata-q65236011-01.jpg",
+          "alt": "고성 장산숲 전경"
+        }
+      ]
+    },
+    {
+      "id": "9ba387f5-29be-54d3-9f3c-8ab0404172e8",
+      "slug": "wikidata-q7410332",
+      "name": "삼성혈",
+      "description": "제주도에 있는 3개의 구멍",
+      "category": "urban",
+      "region": "제주",
+      "address": "제주특별자치도 제주시 삼성로 22",
+      "latitude": 33.504256,
+      "longitude": 126.528874,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q7410332",
+      "images": [
+        {
+          "id": "76dc8527-6010-5a65-82b0-ca59cdb100c6",
+          "file_title": "File:Three sacred holes in Jeju.JPG",
+          "filename": "wikidata-q7410332-01.jpg",
+          "alt": "삼성혈 전경"
+        }
       ]
     }
   ]

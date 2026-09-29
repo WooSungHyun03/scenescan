@@ -15,7 +15,7 @@ Runtime: image → browser ImageEmbeddingService → Web Worker CLIP (or mock)
 
 Offline: licensed location image → scripts/embeddings/prepare.ts
        → validated manifest → batched/resumable 512D CLIP vector JSON
-       → reviewed import into Supabase location_images
+       → reviewed upload to Supabase Storage → import into Supabase location_images
 
 Similar: selected location → mean of its non-null image embeddings
        → pgvector cosine search excluding selected location → deterministic Top 8 locations
@@ -48,6 +48,7 @@ The Docker build uses Next.js standalone output, installs dependencies in a dedi
 - Mock search ranking is synthetic and only proves the end-to-end contract. The percentage badge is not a measured visual match in mock mode.
 - Max-per-location is the production aggregation default. A pure top-k mean alternative exists for DAY 7 evaluation but is not enabled without retrieval evidence. See `docs/search-ranking.md`.
 - The real RPC retrieves at most 200 top images before app-side region/category filtering. A larger dataset may need SQL-side filters to avoid excluding eligible lower-ranked images.
+- Production image search uses a partial HNSW cosine index. The current 159-location/209-image catalog is well below Supabase Free database and Storage limits; monthly image egress is the first capacity metric to watch.
 - Real-mode similar-location ranking requires the `20260928000000_similar_locations.sql` migration and authorized embedded location rows. Unknown locations or sources without embeddings intentionally return an empty state.
 - The offline preparation script emits deterministic JSON for review. A separate importer defaults to offline validation, performs remote foreign-key/RPC preflight in dry-run mode, and requires an explicit apply mode plus a server-only service role for controlled upsert. No external records or images are bundled.
 - This public read-only MVP has no authentication or authoring UI. Production data insertion uses controlled Supabase tooling.

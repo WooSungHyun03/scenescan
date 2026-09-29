@@ -8,13 +8,14 @@ import { SearchResultsMap } from "@/domains/locations/components/search-results-
 import { createImageEmbeddingService, type EmbeddingServiceStatus } from "@/lib/ai";
 import { Button } from "@/shared/ui/button";
 import type { Location, LocationCategory, LocationSearchResult, Region } from "@/types/domain";
+import { REGION_VALUES } from "@/types/location-options";
 import type { SearchResponse } from "@/types/contracts";
 
 const searchModeDescription = process.env.NEXT_PUBLIC_USE_MOCK_AI === "false"
   ? "브라우저에서 실제 CLIP 임베딩을 생성합니다. 장소 데이터는 배포 환경 설정에 따라 검색됩니다."
   : "기본 설정에서는 가상 데이터와 mock 임베딩으로 검색 흐름을 체험합니다.";
 
-const regionOptions: Region[] = ["서울", "부산", "인천", "경기"];
+const regionOptions: Region[] = [...REGION_VALUES];
 const categoryOptions: { value: LocationCategory; label: string }[] = [
   { value: "urban", label: "도시" },
   { value: "nature", label: "자연" },

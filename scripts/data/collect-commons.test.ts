@@ -57,10 +57,12 @@ describe("Commons production data collection", () => {
     const result = parseCommonsImageInfo("File:Test.jpg", imageInfo());
     expect(result.artist).toBe("Test & Author");
     expect(result.license).toBe("CC BY-SA 4.0");
+    expect(parseCommonsImageInfo("File:Test.jpg", imageInfo("CC BY-SA 2.0")).license).toBe("CC BY-SA 2.0");
+    expect(parseCommonsImageInfo("File:Test.jpg", imageInfo("Public domain")).license).toBe("Public domain");
   });
 
   it("rejects unapproved licenses and additional restrictions", () => {
-    expect(() => parseCommonsImageInfo("File:Test.jpg", imageInfo("Public domain"))).toThrow("unapproved license");
+    expect(() => parseCommonsImageInfo("File:Test.jpg", imageInfo("GPL 3.0"))).toThrow("unapproved license");
     expect(() => parseCommonsImageInfo("File:Test.jpg", imageInfo("CC BY 4.0", "personality rights"))).toThrow("additional restrictions");
   });
 

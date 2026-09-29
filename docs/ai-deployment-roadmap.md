@@ -74,14 +74,14 @@ Verification:
 
 ## DAY 4 — Supabase pgvector Integration
 
-Status: local implementation complete (2026-09-22); remote integration rechecked 2026-09-28 and remains blocked until a server-only credential and authorized rows are available
+Status: complete (remote integration verified 2026-09-29)
 
 - [x] Verify pgvector extension and `vector(512)` schema.
 - [x] Review foreign keys, indexes, and RLS against the committed backend migration.
 - [x] Add a controlled validate/dry-run/apply upsert workflow with duplicate prevention.
 - [x] Reject invalid and zero-norm vectors and keep service-role credentials server-only.
 - [x] Verify cosine normalization utilities, RPC bounds in SQL, empty result handling, and malformed query rejection locally.
-- [ ] Run real integration checks when credentials and authorized location rows are available.
+- [x] Run real integration checks with server-only credentials and authorized location rows.
 - [x] Document migration and import operations.
 
 Verification:
@@ -90,8 +90,9 @@ Verification:
 - Import preflight tests cover missing locations, cross-location UUID replacement, duplicate URL, unresolved failure, zero norm, invalid RPC similarity, dry-run no-write behavior, and apply batching.
 - Search request validation rejects non-finite, wrong-dimension, and all-zero query vectors before RPC execution.
 - Automated suite after local DAY 4 implementation: 62 tests passed.
-- Remote dry-run/apply remains intentionally unverified because no Supabase service-role credential or authorized production rows were available on this host.
-- Production read-only recheck (2026-09-28): `locations` and `match_location_images` both returned HTTP 200 with empty arrays. No authorized row exists for a non-destructive dry-run/apply verification.
+- Production (2026-09-29): 159 licensed locations and 209 image rows imported; all 209 rows contain finite 512-D CLIP embeddings.
+- Real `match_location_images` and `match_similar_location_images` probes each returned eight finite results. Runtime image URLs resolve through the public `location-images` Supabase Storage bucket.
+- The nationwide region constraint and partial cosine HNSW index were applied through `20260929000000_scale_location_catalog.sql`.
 
 ## DAY 5 — Search Ranking
 
@@ -117,7 +118,7 @@ Verification:
 
 ## DAY 6 — Similar Locations
 
-Status: complete locally (2026-09-28); production activation waits on the DAY 4 data/migration blocker
+Status: complete, including production activation (2026-09-29)
 
 - [x] Implement `getSimilarLocations` through the existing repository contract.
 - [x] Exclude the selected location and remove duplicates.
@@ -132,7 +133,7 @@ Verification:
 - SQL and application layers both exclude the selected location. Max-per-location aggregation, Top 8, malformed/orphan removal, and deterministic ties reuse the production ranker.
 - Mock and Supabase adapters cover unknown IDs, no embeddings, duplicate candidates, RPC failures, and source exclusion.
 - Migration audit covers representative `vector(512)`, invoker rights, public execute grant, bounded threshold/count, source exclusion, and deterministic order; 20 schema checks pass across all migrations.
-- Production read-only probe confirms the new RPC is not deployed yet (`PGRST202`) and the database has no authorized rows. Code remains safe because production location data stays in mock mode.
+- Production RPC is deployed and returns eight results while excluding the source location; the 159-location catalog has embeddings for all 209 image rows.
 - Reference + selected-location blending remains disabled until DAY 7 supplies retrieval evidence.
 
 ## DAY 7 — Retrieval Evaluation

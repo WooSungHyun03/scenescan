@@ -1,6 +1,6 @@
 # Offline location embeddings
 
-The offline pipeline prepares licensed location images for later review and import into `location_images`. It never uploads files or writes to Supabase.
+The offline embedding pipeline prepares licensed location images for later review and import into `location_images`. It never uploads files or writes to Supabase; the separate `data:upload-storage` command owns reviewed image publication and URL rewriting.
 
 ## Manifest contract
 
@@ -60,11 +60,11 @@ It rejects unresolved failures, empty output, duplicate IDs or public URLs, wron
 
 ```bash
 SUPABASE_URL=https://PROJECT.supabase.co \
-SUPABASE_SERVICE_ROLE_KEY=... \
+SUPABASE_SECRET_KEY=... \
 pnpm embeddings:import path/to/output.json --dry-run
 
 SUPABASE_URL=https://PROJECT.supabase.co \
-SUPABASE_SERVICE_ROLE_KEY=... \
+SUPABASE_SECRET_KEY=... \
 pnpm embeddings:import path/to/output.json --apply --batch-size 100
 ```
 
@@ -89,3 +89,11 @@ Before DAY 4 database import, review:
 3. `source`, `source_url`, `image_url`, and `DATA_LICENSES.md` agree.
 4. Root and item model metadata match the importer configuration and every vector has a non-zero norm.
 5. No local path, credential, or unlicensed asset is being published accidentally.
+
+For the production catalog, upload and rewrite URLs before generating the final embedding output:
+
+```bash
+pnpm data:upload-storage data/production/locations.json data/production/embeddings-manifest.json data/production --dry-run
+pnpm data:upload-storage data/production/locations.json data/production/embeddings-manifest.json data/production --apply
+pnpm embeddings:prepare data/production/embeddings-manifest.json data/production/embeddings.json --batch-size 8 --retries 2
+```

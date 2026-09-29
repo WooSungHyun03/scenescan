@@ -6,11 +6,12 @@ import { z } from "zod";
 import type { NormalizedLocationOutput } from "./contracts.ts";
 import { parseNormalizedLocationOutput } from "./contracts.ts";
 import { parseManifest as parseEmbeddingManifest } from "../embeddings/contracts.ts";
+import { LOCATION_CATEGORY_VALUES, REGION_VALUES } from "../../src/types/location-options.ts";
 
 const COMMONS_API = "https://commons.wikimedia.org/w/api.php";
 const USER_AGENT = "SceneScan/0.1 (open-source location dataset; https://github.com/WooSungHyun03/scenescan)";
 const MAX_IMAGE_BYTES = 15 * 1024 * 1024;
-const ALLOWED_LICENSES = new Set(["CC0", "CC BY 2.0", "CC BY 4.0", "CC BY-SA 4.0"]);
+const ALLOWED_LICENSES = /^(?:CC0|Public domain|CC BY(?:-SA)? (?:2\.0|3\.0|4\.0))$/;
 
 const httpUrl = z.string().url().refine((value) => value.startsWith("https://"), "URL must use HTTPS");
 const imageSchema = z.object({
@@ -24,8 +25,8 @@ const locationSchema = z.object({
   slug: z.string().regex(/^[a-z0-9-]+$/),
   name: z.string().trim().min(1),
   description: z.string().trim().min(1),
-  category: z.enum(["urban", "nature", "industrial", "interior"]),
-  region: z.enum(["서울", "부산", "인천", "경기"]),
+  category: z.enum(LOCATION_CATEGORY_VALUES),
+  region: z.enum(REGION_VALUES),
   address: z.string().trim().min(1),
   latitude: z.number().finite().min(-90).max(90),
   longitude: z.number().finite().min(-180).max(180),
@@ -42,7 +43,7 @@ const collectionManifestSchema = z.object({
 }).strict();
 
 type CollectionManifest = z.infer<typeof collectionManifestSchema>;
-type CommonsMetadata = {
+export type CommonsMetadata = {
   title: string;
   pageUrl: string;
   originalUrl: string;
@@ -95,7 +96,7 @@ export function parseCommonsImageInfo(title: string, info: CommonsApiImageInfo):
   const metadata = info.extmetadata ?? {};
   const license = stripMarkup(text(metadata.LicenseShortName?.value, "LicenseShortName"));
   const restrictions = stripMarkup(typeof metadata.Restrictions?.value === "string" ? metadata.Restrictions.value : "");
-  if (!ALLOWED_LICENSES.has(license)) throw new Error(`${title} uses an unapproved license: ${license}`);
+  if (!ALLOWED_LICENSES.test(license)) throw new Error(`${title} uses an unapproved license: ${license}`);
   if (restrictions.length > 0) throw new Error(`${title} has additional restrictions: ${restrictions}`);
 
   const mime = text(info.mime, "mime");
@@ -155,7 +156,7 @@ async function fetchWithRetry(url: string, attempts = 3): Promise<Response> {
   throw lastError instanceof Error ? lastError : new Error(`Request failed: ${url}`);
 }
 
-export async function fetchCommonsMetadata(titles: string[]): Promise<Map<string, CommonsMetadata>> {
+async function fetchCommonsImageInfoBatch(titles: string[]): Promise<Map<string, CommonsApiImageInfo>> {
   const url = new URL(COMMONS_API);
   url.search = new URLSearchParams({
     action: "query",
@@ -165,7 +166,7 @@ export async function fetchCommonsMetadata(titles: string[]): Promise<Map<string
     prop: "imageinfo",
     titles: titles.join("|"),
     iiprop: "url|mime|size|sha1|extmetadata",
-    iiurlwidth: "1280",
+    iiurlwidth: "1024",
   }).toString();
   const response = await fetchWithRetry(url.toString());
   const body = await response.json() as {
@@ -174,14 +175,50 @@ export async function fetchCommonsMetadata(titles: string[]): Promise<Map<string
   const pages = body.query?.pages;
   if (!Array.isArray(pages)) throw new Error("Commons API response is missing query.pages");
 
-  const result = new Map<string, CommonsMetadata>();
+  const result = new Map<string, CommonsApiImageInfo>();
   for (const page of pages) {
     const title = text(page.title, "page title");
     if (page.missing !== undefined || !page.imageinfo?.[0]) throw new Error(`Commons file is missing: ${title}`);
-    result.set(title, parseCommonsImageInfo(title, page.imageinfo[0]));
+    result.set(title, page.imageinfo[0]);
   }
   for (const title of titles) if (!result.has(title)) throw new Error(`Commons API omitted requested file: ${title}`);
   return result;
+}
+
+export async function fetchCommonsMetadata(titles: string[]): Promise<Map<string, CommonsMetadata>> {
+  const result = new Map<string, CommonsMetadata>();
+  for (let index = 0; index < titles.length; index += 20) {
+    const batch = await fetchCommonsImageInfoBatch(titles.slice(index, index + 20));
+    for (const [title, info] of batch) result.set(title, parseCommonsImageInfo(title, info));
+  }
+  return result;
+}
+
+export async function fetchCommonsMetadataSettled(titles: string[]): Promise<{
+  accepted: Map<string, CommonsMetadata>;
+  rejected: Array<{ title: string; reason: string }>;
+}> {
+  const accepted = new Map<string, CommonsMetadata>();
+  const rejected: Array<{ title: string; reason: string }> = [];
+  for (let index = 0; index < titles.length; index += 20) {
+    const requested = titles.slice(index, index + 20);
+    let batch: Map<string, CommonsApiImageInfo>;
+    try {
+      batch = await fetchCommonsImageInfoBatch(requested);
+    } catch (error) {
+      const reason = error instanceof Error ? error.message : String(error);
+      rejected.push(...requested.map((title) => ({ title, reason })));
+      continue;
+    }
+    for (const [title, info] of batch) {
+      try {
+        accepted.set(title, parseCommonsImageInfo(title, info));
+      } catch (error) {
+        rejected.push({ title, reason: error instanceof Error ? error.message : String(error) });
+      }
+    }
+  }
+  return { accepted, rejected };
 }
 
 async function writeJsonAtomic(path: string, value: unknown): Promise<void> {
@@ -189,6 +226,17 @@ async function writeJsonAtomic(path: string, value: unknown): Promise<void> {
   const temporaryPath = `${path}.tmp`;
   await writeFile(temporaryPath, `${JSON.stringify(value, null, 2)}\n`, "utf8");
   await rename(temporaryPath, path);
+}
+
+async function writeTextAtomic(path: string, value: string): Promise<void> {
+  await mkdir(dirname(path), { recursive: true });
+  const temporaryPath = `${path}.tmp`;
+  await writeFile(temporaryPath, value, "utf8");
+  await rename(temporaryPath, path);
+}
+
+function markdownCell(value: string): string {
+  return value.replaceAll("|", "\\|").replaceAll("\n", " ");
 }
 
 async function downloadImage(url: string, outputPath: string): Promise<{ sha256: string; bytes: number }> {
@@ -313,15 +361,30 @@ export async function collectCommonsDataset(manifestPath: string, repositoryRoot
         source_width: details.width,
         source_height: details.height,
         local_bytes: downloaded.bytes,
-        modification: "Wikimedia Commons 1280px thumbnail; no additional modification",
+        modification: "Wikimedia Commons 1024px thumbnail; no additional modification",
       };
     }),
   };
+  const attributionMarkdown = [
+    "# Production image licenses",
+    "",
+    `Generated from verified Wikimedia Commons metadata on ${manifest.verified_at}. These files are not covered by the repository MIT license. Retain the author, source, and license when redistributing an image. CC BY-SA adaptations must use the same or a compatible license.`,
+    "",
+    "| Local file / location | Author | License | Wikimedia Commons source |",
+    "| --- | --- | --- | --- |",
+    ...licenses.items.map((item) =>
+      `| \`${item.filename}\` / ${markdownCell(item.location_name)} | ${markdownCell(item.author)} | [${markdownCell(item.license)}](<${item.license_url}>) | [source](<${item.commons_page_url}>) |`,
+    ),
+    "",
+    "Exact source dimensions, original and thumbnail URLs, source SHA-1, local SHA-256, byte size, credit text, and modification notes are recorded in `image-licenses.json`.",
+    "",
+  ].join("\n");
 
   const outputDirectory = resolve(repositoryRoot, "data/production");
   await writeJsonAtomic(resolve(outputDirectory, "locations.json"), locations);
   await writeJsonAtomic(resolve(outputDirectory, "image-licenses.json"), licenses);
   await writeJsonAtomic(resolve(outputDirectory, "embeddings-manifest.json"), embeddings);
+  await writeTextAtomic(resolve(outputDirectory, "IMAGE_LICENSES.md"), attributionMarkdown);
   console.log(`Collected ${manifest.locations.length} locations and ${imageEntries.length} licensed images.`);
 }
 

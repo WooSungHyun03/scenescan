@@ -1,8 +1,9 @@
 import { z } from "zod";
 import { isPermitGuidance } from "./permit-information.ts";
+import { LOCATION_CATEGORY_VALUES, REGION_VALUES } from "../../src/types/location-options.ts";
 
-const categories = new Set(["urban", "nature", "industrial", "interior"]);
-const regions = new Set(["서울", "부산", "인천", "경기"]);
+const categories = new Set<string>(LOCATION_CATEGORY_VALUES);
+const regions = new Set<string>(REGION_VALUES);
 const uuidSchema = z.string().uuid();
 const isoDateSchema = z.iso.date();
 const isoDateTimeSchema = z.iso.datetime({ offset: true });
@@ -268,7 +269,7 @@ async function validateLocation(
     errors.push(error("CATEGORY_UNKNOWN", locationIndex, id, "category", "Category must be urban, nature, industrial, or interior"));
   }
   if (typeof value.region !== "string" || !regions.has(value.region)) {
-    errors.push(error("REGION_UNKNOWN", locationIndex, id, "region", "Region must be 서울, 부산, 인천, or 경기"));
+    errors.push(error("REGION_UNKNOWN", locationIndex, id, "region", `Region must be one of: ${REGION_VALUES.join(", ")}`));
   }
   if (!nonEmptyText(value.address)) {
     errors.push(error("ADDRESS_REQUIRED", locationIndex, id, "address", "Location address must not be blank"));

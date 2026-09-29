@@ -1,9 +1,10 @@
 import { z } from "zod";
 import type { Location, LocationFilter, LocationSearchResult } from "./domain";
+import { LOCATION_CATEGORY_VALUES, REGION_VALUES } from "./location-options";
 
 export const locationFilterSchema = z.object({
-  region: z.enum(["서울", "부산", "인천", "경기"]).optional(),
-  category: z.enum(["urban", "nature", "industrial", "interior"]).optional(),
+  region: z.enum(REGION_VALUES).optional(),
+  category: z.enum(LOCATION_CATEGORY_VALUES).optional(),
 });
 
 export const searchRequestSchema = z.object({

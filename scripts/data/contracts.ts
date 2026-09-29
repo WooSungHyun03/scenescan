@@ -2,9 +2,8 @@ import { z } from "zod";
 import type { Location, LocationImage, ParkingInfo } from "../../src/types/domain.ts";
 import type { CategoryReviewReason } from "./category-mapping.ts";
 import { PERMIT_GUIDANCE_VALUES } from "./permit-information.ts";
+import { LOCATION_CATEGORY_VALUES, REGION_VALUES } from "../../src/types/location-options.ts";
 
-const locationCategories = ["urban", "nature", "industrial", "interior"] as const;
-const regions = ["서울", "부산", "인천", "경기"] as const;
 const unsafePathSegments = new Set(["__proto__", "prototype", "constructor"]);
 
 const nonEmptyString = z.string().trim().min(1);
@@ -82,8 +81,8 @@ export const canonicalLocationRecordSchema: z.ZodType<CanonicalLocationRecord> =
   id: nonEmptyString.optional(),
   name: nonEmptyString,
   description: z.string().trim(),
-  category: z.enum(locationCategories),
-  region: z.enum(regions),
+  category: z.enum(LOCATION_CATEGORY_VALUES),
+  region: z.enum(REGION_VALUES),
   address: nonEmptyString,
   latitude: z.number().finite().min(-90).max(90),
   longitude: z.number().finite().min(-180).max(180),
@@ -170,8 +169,8 @@ export const sourceMappingSchema = z.object({
     (value) => value.url !== undefined || value.alt === undefined,
     { message: "images.alt requires images.url", path: ["alt"] },
   ).optional(),
-  categoryMap: z.record(z.string(), z.enum(locationCategories)).default({}),
-  regionMap: z.record(z.string(), z.enum(regions)).default({}),
+  categoryMap: z.record(z.string(), z.enum(LOCATION_CATEGORY_VALUES)).default({}),
+  regionMap: z.record(z.string(), z.enum(REGION_VALUES)).default({}),
   permitTypeMap: z.record(z.string(), z.enum(PERMIT_GUIDANCE_VALUES)).default({}),
   defaults: z.object({
     description: z.string().trim().default(""),
