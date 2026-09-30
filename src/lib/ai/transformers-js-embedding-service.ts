@@ -113,8 +113,10 @@ export class TransformersJsEmbeddingService implements ImageEmbeddingService {
               transferAndQueueMs: nonNegativeDuration(totalMs - workerMs),
               decodeMs: nonNegativeDuration(reply.timing.decodeMs),
               modelWaitMs: nonNegativeDuration(reply.timing.modelWaitMs),
+              queueWaitMs: nonNegativeDuration(reply.timing.queueWaitMs),
               inferenceMs: nonNegativeDuration(reply.timing.inferenceMs),
               modelWasCached: reply.timing.modelWasCached,
+              device: reply.timing.device,
             });
             if (this.performanceSamples.length > EMBEDDING_PERFORMANCE_SAMPLE_LIMIT) {
               this.performanceSamples.splice(0, this.performanceSamples.length - EMBEDDING_PERFORMANCE_SAMPLE_LIMIT);
@@ -201,6 +203,7 @@ export class TransformersJsEmbeddingService implements ImageEmbeddingService {
         timeout: setTimeout(() => {
           this.pending.delete(task.id);
           this.cleanUpTask(task);
+          this.worker?.postMessage({ type: "cancel", id: task.id });
           reject(new Error(`Embedding timed out after ${timeoutMs} ms`));
           if (this.pending.size === 0) {
             this.stopWorker();
@@ -213,6 +216,7 @@ export class TransformersJsEmbeddingService implements ImageEmbeddingService {
       task.abortListener = () => {
         this.pending.delete(task.id);
         this.cleanUpTask(task);
+        this.worker?.postMessage({ type: "cancel", id: task.id });
         reject(new DOMException("Embedding cancelled", "AbortError"));
         if (this.pending.size === 0) {
           this.stopWorker();

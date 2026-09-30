@@ -136,6 +136,7 @@ describe("TransformersJsEmbeddingService", () => {
 
     await vi.advanceTimersByTimeAsync(25);
     await timeoutExpectation;
+    expect(firstWorker.messages.at(-1)).toEqual({ type: "cancel", id: 1 });
     expect(firstWorker.terminate).toHaveBeenCalledOnce();
     expect(service.getStatus()).toEqual({ state: "idle" });
 
@@ -156,6 +157,22 @@ describe("TransformersJsEmbeddingService", () => {
     await expect(result).rejects.toMatchObject({ name: "AbortError" });
     expect(worker.terminate).toHaveBeenCalledOnce();
     expect(service.getStatus()).toEqual({ state: "idle" });
+  });
+
+  it("cancels one queued request without terminating work that is still pending", async () => {
+    const worker = new FakeWorker();
+    const service = new TransformersJsEmbeddingService(() => worker);
+    const controller = new AbortController();
+    const cancelled = service.embed(pngBlob("cancelled"), { signal: controller.signal });
+    const retained = service.embed(pngBlob("retained"));
+
+    controller.abort();
+    await expect(cancelled).rejects.toMatchObject({ name: "AbortError" });
+    expect(worker.messages.at(-1)).toEqual({ type: "cancel", id: 1 });
+    expect(worker.terminate).not.toHaveBeenCalled();
+
+    worker.reply({ type: "result", id: 2, embedding: validEmbedding() });
+    await expect(retained).resolves.toHaveLength(CLIP_EMBEDDING_DIMENSION);
   });
 
   it("rejects unsupported input before starting a worker", async () => {
@@ -210,8 +227,10 @@ describe("TransformersJsEmbeddingService", () => {
           totalMs: 80,
           decodeMs: 4,
           modelWaitMs: index === 0 ? 50 : 0,
+          queueWaitMs: index,
           inferenceMs: 20,
           modelWasCached: index !== 0,
+          device: "wasm",
         },
       });
     });
@@ -224,8 +243,10 @@ describe("TransformersJsEmbeddingService", () => {
       requestId: 25,
       workerMs: 80,
       decodeMs: 4,
+      queueWaitMs: 24,
       inferenceMs: 20,
       modelWasCached: true,
+      device: "wasm",
     }));
     snapshot[0]!.requestId = 999;
     expect(service.getPerformanceSnapshot()[0]?.requestId).toBe(6);

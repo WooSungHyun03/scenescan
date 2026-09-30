@@ -28,6 +28,7 @@ Production uses the WASM backend for broad browser compatibility and keeps only 
 | --- | --- |
 | `NEXT_PUBLIC_USE_MOCK_DATA` | Defaults to true; `false` switches server reads/search to Supabase |
 | `NEXT_PUBLIC_USE_MOCK_AI` | Defaults to true; `false` loads browser CLIP worker |
+| `NEXT_PUBLIC_CLIP_DEVICE` | Optional `wasm` (default) or experimental `webgpu`; failed WebGPU initialization falls back to WASM |
 | `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL for real data |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Public anon key; RLS restricts writes |
 | `NEXT_PUBLIC_KAKAO_MAP_KEY` | Kakao JavaScript key and registered domain for real map |

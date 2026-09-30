@@ -1,17 +1,17 @@
-import type { EmbeddingServiceState } from "./embedding-service";
+import type { ClipBrowserDevice, EmbeddingServiceState } from "./embedding-service";
 
-export type EmbeddingWorkerRequest = {
-  type: "embed";
-  id: number;
-  image: Blob;
-};
+export type EmbeddingWorkerRequest =
+  | { type: "embed"; id: number; image: Blob }
+  | { type: "cancel"; id: number };
 
 export type EmbeddingWorkerTiming = {
   totalMs: number;
   decodeMs: number;
   modelWaitMs: number;
+  queueWaitMs: number;
   inferenceMs: number;
   modelWasCached: boolean;
+  device: ClipBrowserDevice;
 };
 
 export type EmbeddingWorkerReply =

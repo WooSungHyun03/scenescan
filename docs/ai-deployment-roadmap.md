@@ -164,12 +164,14 @@ Preliminary baseline (not a browser result): with the model already present in t
 - [ ] Benchmark first-visit network/model load; cache-warm Worker initialization and repeated inference are recorded.
 - [x] Add bounded worker decode/model-wait/inference and main-thread overhead measurements.
 - [x] Confirm lazy loading, caching, and duplicate-init prevention.
-- [ ] Check repeated-use memory behavior.
-- [ ] Evaluate WebGPU capability without making it mandatory.
+- [ ] Measure long-run browser heap; worker serialization and bounded telemetry now prevent decoded-image concurrency and unbounded diagnostic retention.
+- [ ] Run the WebGPU device benchmark; opt-in selection and automatic WASM initialization fallback are implemented and tested.
 - [x] Preserve explicit WASM fallback, cancellation, and timeout behavior.
 - [x] Add regression tests and benchmark documentation.
 
 Production browser verification (2026-09-30): a new Worker with model files already cached completed the full image-to-Top-8 flow in 3,334 ms. Five same-Worker searches took 2,168/1,947/1,952/2,266/1,955 ms (2,058 ms mean; 1,955 ms median), returned 선유도공원 first at 88%, and emitted no console warning/error. See `docs/ai-performance.md`. Cold network load and browser heap remain explicitly unverified.
+
+Reliability follow-up (2026-10-01): concurrent Worker requests now serialize decode/inference, report queue wait and actual execution device, and drop cancelled queued requests without terminating unrelated work. `NEXT_PUBLIC_CLIP_DEVICE=webgpu` is an explicit build-time experiment and retries with WASM if WebGPU setup fails; four focused fallback tests and concurrent cancellation/serialization regressions pass. A physical WebGPU comparison and trustworthy browser heap run remain open.
 
 ## DAY 9 — CI
 

@@ -8,6 +8,7 @@ export type {
   EmbeddingStatusListener,
   EmbeddingRequestOptions,
   EmbeddingPerformanceSample,
+  ClipBrowserDevice,
   ImageEmbeddingService,
 } from "./embedding-service";
 export {
@@ -21,6 +22,7 @@ export {
   MAX_IMAGE_DIMENSION,
   MAX_IMAGE_PIXELS,
   SUPPORTED_IMAGE_MIME_TYPES,
+  selectClipBrowserDevice,
 } from "./embedding-service";
 
 let service: ImageEmbeddingService | null = null;
