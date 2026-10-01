@@ -1,6 +1,7 @@
 import "server-only";
 import { getSupabaseClient } from "@/infrastructure/supabase/server-client";
 import { dataAccessError } from "@/shared/errors/application-error";
+import { logger } from "@/shared/observability/logger";
 import type { Location, LocationFilter, LocationSearchResult, ParkingInfo } from "@/types/domain";
 import { groupImageMatches, type ImageMatch } from "@/domains/locations/services/group-image-matches";
 import { rankSimilarLocations } from "@/domains/locations/services/similar-locations";
@@ -10,12 +11,12 @@ type Row = {
   region: Location["region"]; address: string; latitude: number; longitude: number;
   permit_type: string; contact_name: string | null; contact_phone: string | null;
   permit_note: string | null; noise_sources: Location["noiseSources"] | null;
-  source: string | null; source_url: string | null; author: string | null;
-  license: string | null; license_url: string | null; last_verified_at: string | null;
+  source?: string | null; source_url?: string | null; author?: string | null;
+  license?: string | null; license_url?: string | null; last_verified_at?: string | null;
   location_images: Array<{
-    id: string; image_url: string; alt: string | null; source: string | null;
-    source_url: string | null; author: string | null; license: string | null;
-    license_url: string | null; last_verified_at: string | null;
+    id: string; image_url: string; alt: string | null; source?: string | null;
+    source_url?: string | null; author?: string | null; license?: string | null;
+    license_url?: string | null; last_verified_at?: string | null;
   }>;
   parking: { id: string; name: string; latitude: number; longitude: number; capacity: number | null; opening_hours: string | null; price_info: string | null; source: string | null }[];
 };
@@ -50,22 +51,66 @@ function toLocation(row: Row): Location {
 }
 
 const LOCATION_RELATIONS = "*, location_images(id, image_url, alt, source, source_url, author, license, license_url, last_verified_at), parking(id, name, latitude, longitude, capacity, opening_hours, price_info, source)";
+const LEGACY_LOCATION_RELATIONS = "*, location_images(id, image_url, alt), parking(id, name, latitude, longitude, capacity, opening_hours, price_info, source)";
+const IMAGE_ATTRIBUTION_COLUMNS = ["source", "source_url", "author", "license", "license_url", "last_verified_at"];
 
-export async function getSupabaseLocations(filters: LocationFilter = {}): Promise<Location[]> {
-  let query = getSupabaseClient().from("locations").select(LOCATION_RELATIONS).order("name");
+type SupabaseQueryError = {
+  code?: string;
+  message?: string;
+  details?: string;
+  hint?: string;
+};
+
+function isMissingImageAttributionSchema(error: unknown): boolean {
+  if (!error || typeof error !== "object") return false;
+  const queryError = error as SupabaseQueryError;
+  if (queryError.code !== "42703" && queryError.code !== "PGRST204") return false;
+  const description = [queryError.message, queryError.details, queryError.hint]
+    .filter((value): value is string => typeof value === "string")
+    .join(" ")
+    .toLowerCase();
+  return description.includes("location_images")
+    && IMAGE_ATTRIBUTION_COLUMNS.some((column) => description.includes(column));
+}
+
+function warnAboutLegacyAttributionSchema(error: unknown): void {
+  const queryError = error as SupabaseQueryError;
+  logger.warn("Image attribution columns are unavailable; using the legacy location schema", {
+    code: queryError.code ?? "unknown",
+  });
+}
+
+async function listLocationRows(relations: string, filters: LocationFilter) {
+  let query = getSupabaseClient().from("locations").select(relations).order("name");
   if (filters.region) query = query.eq("region", filters.region);
   if (filters.category) query = query.eq("category", filters.category);
-  const { data, error } = await query;
+  return query;
+}
+
+async function loadLocationRow(id: string, relations: string) {
+  return getSupabaseClient().from("locations")
+    .select(relations)
+    .eq("id", id).maybeSingle();
+}
+
+export async function getSupabaseLocations(filters: LocationFilter = {}): Promise<Location[]> {
+  let { data, error } = await listLocationRows(LOCATION_RELATIONS, filters);
+  if (isMissingImageAttributionSchema(error)) {
+    warnAboutLegacyAttributionSchema(error);
+    ({ data, error } = await listLocationRows(LEGACY_LOCATION_RELATIONS, filters));
+  }
   if (error) throw dataAccessError("Failed to list locations", error);
-  return (data as Row[]).map(toLocation);
+  return (data as unknown as Row[]).map(toLocation);
 }
 
 export async function getSupabaseLocation(id: string): Promise<Location | null> {
-  const { data, error } = await getSupabaseClient().from("locations")
-    .select(LOCATION_RELATIONS)
-    .eq("id", id).maybeSingle();
+  let { data, error } = await loadLocationRow(id, LOCATION_RELATIONS);
+  if (isMissingImageAttributionSchema(error)) {
+    warnAboutLegacyAttributionSchema(error);
+    ({ data, error } = await loadLocationRow(id, LEGACY_LOCATION_RELATIONS));
+  }
   if (error) throw dataAccessError(`Failed to load location ${id}`, error);
-  return data ? toLocation(data as Row) : null;
+  return data ? toLocation(data as unknown as Row) : null;
 }
 
 export async function searchSupabaseLocations(embedding: number[], filters: LocationFilter = {}): Promise<LocationSearchResult[]> {

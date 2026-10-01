@@ -6,7 +6,7 @@ vi.mock("@/infrastructure/supabase/server-client", () => ({
   getSupabaseClient: getSupabaseClientMock,
 }));
 
-import { getSupabaseLocations, getSupabaseSimilarLocations } from "./supabase-repository";
+import { getSupabaseLocation, getSupabaseLocations, getSupabaseSimilarLocations } from "./supabase-repository";
 
 const row = (id: string, name: string) => ({
   id,
@@ -69,6 +69,57 @@ describe("Supabase similar location repository", () => {
         licenseUrl: "https://creativecommons.org/licenses/by/4.0",
       }],
     });
+  });
+
+  it("retries with the legacy image relation when attribution columns are not migrated yet", async () => {
+    const legacyRow = row("legacy", "Legacy");
+    const legacyImage = {
+      id: legacyRow.location_images[0].id,
+      image_url: legacyRow.location_images[0].image_url,
+      alt: legacyRow.location_images[0].alt,
+    };
+    const select = vi.fn((relations: string) => ({
+      eq: vi.fn(() => ({
+        maybeSingle: vi.fn(async () => relations.includes("last_verified_at")
+          ? {
+              data: null,
+              error: {
+                code: "42703",
+                message: "column location_images.last_verified_at does not exist",
+              },
+            }
+          : { data: { ...legacyRow, location_images: [legacyImage] }, error: null }),
+      })),
+    }));
+    getSupabaseClientMock.mockReturnValue({ from: vi.fn(() => ({ select })) });
+
+    await expect(getSupabaseLocation("legacy")).resolves.toMatchObject({
+      id: "legacy",
+      images: [{
+        source: null,
+        sourceUrl: null,
+        author: null,
+        license: null,
+        licenseUrl: null,
+        lastVerifiedAt: null,
+      }],
+    });
+    expect(select).toHaveBeenCalledTimes(2);
+  });
+
+  it("does not hide unrelated Supabase failures behind the legacy fallback", async () => {
+    const order = vi.fn(async () => ({
+      data: null,
+      error: { code: "42501", message: "permission denied for table locations" },
+    }));
+    const select = vi.fn(() => ({ order }));
+    getSupabaseClientMock.mockReturnValue({ from: vi.fn(() => ({ select })) });
+
+    await expect(getSupabaseLocations()).rejects.toMatchObject({
+      code: "DATA_ACCESS_ERROR",
+      status: 503,
+    });
+    expect(select).toHaveBeenCalledTimes(1);
   });
 
   it("calls the representative-embedding RPC and excludes the selected location", async () => {
