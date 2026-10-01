@@ -9,10 +9,7 @@ import { PermitInfoPanel } from "@/domains/locations/components/permit-info-pane
 import { SimilarLocationsSection } from "@/domains/locations/components/similar-locations-section";
 import { ShortlistButton } from "@/domains/locations/components/shortlist-button";
 import { SolarPanel } from "@/domains/locations/components/solar-panel";
-import {
-  getSafeSourceUrl,
-  SourceAttribution,
-} from "@/domains/locations/components/source-attribution";
+import { SourceAttribution } from "@/domains/locations/components/source-attribution";
 import { getLocation, getSimilarLocations } from "@/domains/locations/server/repository";
 
 const categoryLabels = {
@@ -31,7 +28,6 @@ export default async function LocationPage({ params }: { params: Promise<{ id: s
   const location = await getLocation(id);
   if (!location) notFound();
   const similar = await getSimilarLocations(id);
-  const sourceUrl = getSafeSourceUrl(location.sourceUrl);
   return <main className="mx-auto max-w-6xl px-5 py-10">
     <Link href="/search" className="inline-flex min-h-11 items-center gap-2 rounded-md px-2 text-sm font-semibold text-emerald-800"><ArrowLeft size={16} aria-hidden="true" /> 검색으로 돌아가기</Link>
     <div className="mt-7 grid gap-8 lg:grid-cols-[minmax(0,1.35fr)_minmax(280px,.65fr)]">
@@ -39,7 +35,6 @@ export default async function LocationPage({ params }: { params: Promise<{ id: s
         <LocationImageGallery
           images={location.images}
           locationName={location.name}
-          sourceUrl={sourceUrl}
         />
         <section aria-labelledby="location-overview-title" className="scene-panel p-6">
           <p className="scene-label">{displayValue(location.region)} · {categoryLabels[location.category] ?? "정보 없음"}</p>
@@ -60,9 +55,15 @@ export default async function LocationPage({ params }: { params: Promise<{ id: s
           </p>
           <div className="mt-4 rounded-lg border border-stone-200 bg-stone-50 p-4">
             <SourceAttribution
-              sourceUrl={sourceUrl}
+              source={location.source}
+              sourceUrl={location.sourceUrl}
+              author={location.author}
+              license={location.license}
+              licenseUrl={location.licenseUrl}
+              lastVerifiedAt={location.lastVerifiedAt}
               label="장소 데이터 출처"
               showLabel={false}
+              showDetails
             />
           </div>
         </section>
@@ -70,7 +71,7 @@ export default async function LocationPage({ params }: { params: Promise<{ id: s
       <div className="space-y-5">
         <section aria-labelledby="map-title" className="scene-panel p-5"><h2 id="map-title" className="mb-4 text-lg font-semibold">지도</h2><LocationMap point={location.point} label={displayValue(location.name)} /><p className="mt-3 text-xs text-stone-500">위도 {location.point.latitude.toFixed(5)} · 경도 {location.point.longitude.toFixed(5)}</p></section>
         <section aria-labelledby="solar-title" className="scene-panel p-5"><h2 id="solar-title" className="mb-4 text-lg font-semibold">태양 위치</h2><SolarPanel point={location.point} /></section>
-        <PermitInfoPanel permit={location.permit} sourceUrl={sourceUrl} />
+        <PermitInfoPanel permit={location.permit} sourceUrl={location.sourceUrl} />
         <ParkingInfoPanel
           parking={location.parking}
           origin={location.point}

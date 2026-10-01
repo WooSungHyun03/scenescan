@@ -1,15 +1,16 @@
 import { readFile } from "node:fs/promises";
 import { describe, expect, it } from "vitest";
-import { auditEmbeddingSchema, auditSimilarLocationSchema } from "./schema-audit.ts";
+import { auditAttributionSchema, auditEmbeddingSchema, auditSimilarLocationSchema } from "./schema-audit.ts";
 import { auditSchemaFile } from "./audit-schema.ts";
 
 const migration = new URL("../../supabase/migrations/20260920000000_initial_schema.sql", import.meta.url);
 const similarMigration = new URL("../../supabase/migrations/20260928000000_similar_locations.sql", import.meta.url);
 const scaleMigration = new URL("../../supabase/migrations/20260929000000_scale_location_catalog.sql", import.meta.url);
+const attributionMigration = new URL("../../supabase/migrations/20261001000000_location_attribution.sql", import.meta.url);
 
 describe("embedding database schema audit", () => {
   it("audits every committed migration by default", async () => {
-    await expect(auditSchemaFile()).resolves.toBe(21);
+    await expect(auditSchemaFile()).resolves.toBe(26);
   });
 
   it("passes the committed migration contract", async () => {
@@ -17,6 +18,8 @@ describe("embedding database schema audit", () => {
     expect(result.checks.length).toBeGreaterThanOrEqual(10);
     const similarResult = auditSimilarLocationSchema(await readFile(similarMigration, "utf8"));
     expect(similarResult.checks.length).toBeGreaterThanOrEqual(8);
+    const attributionResult = auditAttributionSchema(await readFile(attributionMigration, "utf8"));
+    expect(attributionResult.checks).toContain("image attribution columns");
   });
 
   it("reports missing contract elements", async () => {

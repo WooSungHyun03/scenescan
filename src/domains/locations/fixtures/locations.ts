@@ -39,7 +39,18 @@ export const mockLocations: Location[] = seeds.map((seed) => {
     region: seed.region,
     address: seed.address,
     point: { latitude: seed.latitude, longitude: seed.longitude },
-    images: [{ id: `${seed.id}-image`, locationId: seed.id, imageUrl: `/images/${seed.id}.svg`, alt: `${seed.name} 개발용 추상 이미지` }],
+    images: [{
+      id: `${seed.id}-image`,
+      locationId: seed.id,
+      imageUrl: `/images/${seed.id}.svg`,
+      alt: `${seed.name} 개발용 추상 이미지`,
+      source: "SceneScan synthetic fixture",
+      sourceUrl: null,
+      author: "SceneScan",
+      license: "MIT",
+      licenseUrl: "https://github.com/WooSungHyun03/scenescan/blob/main/LICENSE",
+      lastVerifiedAt: null,
+    }],
     permit: { type: seed.permit, contactName: null, contactPhone: null, note: "개발용 가상 정보" },
     parking: [{
       id: `${seed.id}-parking`,
@@ -54,6 +65,11 @@ export const mockLocations: Location[] = seeds.map((seed) => {
       source: "synthetic fixture",
     }],
     noiseSources: [],
+    source: "SceneScan synthetic fixture",
     sourceUrl: null,
+    author: "SceneScan",
+    license: "MIT",
+    licenseUrl: "https://github.com/WooSungHyun03/scenescan/blob/main/LICENSE",
+    lastVerifiedAt: null,
   };
 });

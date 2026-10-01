@@ -27,6 +27,14 @@ const SIMILAR_LOCATION_CHECKS: Array<[string, RegExp]> = [
   ["similar RPC public execute grant", /grant\s+execute\s+on\s+function\s+public\.match_similar_location_images[\s\S]*?to\s+anon\s*,\s*authenticated/i],
 ];
 
+const ATTRIBUTION_CHECKS: Array<[string, RegExp]> = [
+  ["location source metadata columns", /alter\s+table\s+public\.locations[\s\S]*?add\s+column\s+if\s+not\s+exists\s+source\s+text[\s\S]*?last_verified_at\s+timestamptz/i],
+  ["image attribution columns", /alter\s+table\s+public\.location_images[\s\S]*?source_url\s+text[\s\S]*?author\s+text[\s\S]*?license_url\s+text[\s\S]*?last_verified_at\s+timestamptz/i],
+  ["location source URL constraint", /locations_source_url_http_check[\s\S]*?source_url\s+~\*\s+'\^https\?:\/\/'/i],
+  ["image source URL constraint", /location_images_source_url_http_check[\s\S]*?source_url\s+~\*\s+'\^https\?:\/\/'/i],
+  ["image license URL constraint", /location_images_license_url_http_check[\s\S]*?license_url\s+~\*\s+'\^https\?:\/\/'/i],
+];
+
 export function auditEmbeddingSchema(sql: string): SchemaAuditResult {
   const missing = REQUIRED_CHECKS.filter(([, pattern]) => !pattern.test(sql)).map(([name]) => name);
   if (missing.length > 0) throw new Error(`Embedding schema audit failed: ${missing.join(", ")}`);
@@ -37,4 +45,10 @@ export function auditSimilarLocationSchema(sql: string): SchemaAuditResult {
   const missing = SIMILAR_LOCATION_CHECKS.filter(([, pattern]) => !pattern.test(sql)).map(([name]) => name);
   if (missing.length > 0) throw new Error(`Similar-location schema audit failed: ${missing.join(", ")}`);
   return { checks: SIMILAR_LOCATION_CHECKS.map(([name]) => name) };
+}
+
+export function auditAttributionSchema(sql: string): SchemaAuditResult {
+  const missing = ATTRIBUTION_CHECKS.filter(([, pattern]) => !pattern.test(sql)).map(([name]) => name);
+  if (missing.length > 0) throw new Error(`Attribution schema audit failed: ${missing.join(", ")}`);
+  return { checks: ATTRIBUTION_CHECKS.map(([name]) => name) };
 }

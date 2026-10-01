@@ -4,6 +4,7 @@ import { parseNormalizedLocationOutput } from "./contracts.ts";
 import {
   createProductionRows,
   importProductionData,
+  parseImageLicenseCatalog,
   type ProductionImportDatabase,
 } from "./production-importer.ts";
 
@@ -11,7 +12,7 @@ const locationId = "00000000-0000-4000-8000-000000000001";
 const imageId = "00000000-0000-4000-8000-000000000002";
 const imageUrl = "https://example.com/image.jpg";
 
-function rows() {
+function inputs() {
   const data = parseNormalizedLocationOutput({
     schemaVersion: 2,
     source: { name: "test" },
@@ -49,7 +50,24 @@ function rows() {
       source_url: "https://example.com/license",
     }],
   });
-  return createProductionRows(data, manifest);
+  const licenses = parseImageLicenseCatalog({
+    schema_version: 1,
+    verified_at: "2026-09-29T13:00:00+09:00",
+    items: [{
+      image_id: imageId,
+      location_id: locationId,
+      commons_page_url: "https://commons.wikimedia.org/wiki/File:Test.jpg",
+      author: "Test Author",
+      license: "CC BY 4.0",
+      license_url: "https://creativecommons.org/licenses/by/4.0",
+    }],
+  });
+  return { data, manifest, licenses };
+}
+
+function rows() {
+  const { data, manifest, licenses } = inputs();
+  return createProductionRows(data, manifest, licenses);
 }
 
 function database(overrides: Partial<ProductionImportDatabase> = {}): ProductionImportDatabase {
@@ -66,8 +84,54 @@ describe("production data importer", () => {
   it("joins stable image IDs without inventing unreviewed values", () => {
     expect(rows()).toEqual({
       locations: [expect.objectContaining({ id: locationId, permit_type: "문의 필요", noise_sources: [] })],
-      images: [{ id: imageId, location_id: locationId, image_url: imageUrl, alt: "대체 텍스트" }],
+      images: [{
+        id: imageId,
+        location_id: locationId,
+        image_url: imageUrl,
+        alt: "대체 텍스트",
+        source: "Wikimedia Commons",
+        source_url: "https://commons.wikimedia.org/wiki/File:Test.jpg",
+        author: "Test Author",
+        license: "CC BY 4.0",
+        license_url: "https://creativecommons.org/licenses/by/4.0",
+        last_verified_at: "2026-09-29T13:00:00+09:00",
+      }],
     });
+  });
+
+  it("rejects unsafe attribution URLs and preserves explicitly missing metadata", () => {
+    expect(() => parseImageLicenseCatalog({
+      schema_version: 1,
+      verified_at: "2026-09-29T13:00:00+09:00",
+      items: [{
+        image_id: imageId,
+        location_id: locationId,
+        commons_page_url: "javascript:alert(1)",
+      }],
+    })).toThrow();
+
+    const missing = parseImageLicenseCatalog({
+      schema_version: 1,
+      verified_at: "2026-09-29T13:00:00+09:00",
+      items: [{ image_id: imageId, location_id: locationId }],
+    });
+    expect(missing.items[0]).toMatchObject({
+      sourceUrl: null,
+      author: null,
+      license: null,
+      licenseUrl: null,
+    });
+  });
+
+  it("supports the same image URL in multiple locations with distinct image IDs", () => {
+    const secondLocationId = "00000000-0000-4000-8000-000000000003";
+    const secondImageId = "00000000-0000-4000-8000-000000000004";
+    const { data, manifest, licenses } = inputs();
+    data.locations.push({ ...data.locations[0], id: secondLocationId, name: "테스트 2" });
+    manifest.items.push({ ...manifest.items[0], image_id: secondImageId, location_id: secondLocationId });
+    licenses.items.push({ ...licenses.items[0], imageId: secondImageId, locationId: secondLocationId });
+
+    expect(createProductionRows(data, manifest, licenses).images).toHaveLength(2);
   });
 
   it("validates offline and writes locations before image metadata", async () => {
@@ -83,6 +147,23 @@ describe("production data importer", () => {
       imagesWritten: 1,
     });
     expect(db.upsertLocations).toHaveBeenCalledBefore(vi.mocked(db.upsertImages));
+  });
+
+  it("performs a read-only database preflight in dry-run mode", async () => {
+    const db = database({
+      findLocationIds: vi.fn(async () => [locationId]),
+      findExistingImages: vi.fn(async () => [{ id: imageId, location_id: locationId }]),
+    });
+
+    await expect(importProductionData(rows(), "dry-run", 100, db)).resolves.toMatchObject({
+      mode: "dry-run",
+      existingLocations: 1,
+      existingImages: 1,
+      locationsWritten: 0,
+      imagesWritten: 0,
+    });
+    expect(db.upsertLocations).not.toHaveBeenCalled();
+    expect(db.upsertImages).not.toHaveBeenCalled();
   });
 
   it("rejects mismatched existing image ownership", async () => {

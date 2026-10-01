@@ -9,17 +9,12 @@ import { SourceAttribution } from "./source-attribution";
 type LocationImageGalleryProps = {
   images: LocationImage[];
   locationName: string;
-  sourceUrl?: string | null;
 };
 
-function getSafeUrl(value: string | null | undefined, allowLocalPath = false) {
+export function getSafeImageUrl(value: string | null | undefined) {
   const trimmed = value?.trim();
   if (!trimmed) return null;
-  if (
-    allowLocalPath &&
-    trimmed.startsWith("/") &&
-    !trimmed.startsWith("//")
-  ) {
+  if (trimmed.startsWith("/") && !trimmed.startsWith("//")) {
     return trimmed;
   }
 
@@ -33,23 +28,27 @@ function getSafeUrl(value: string | null | undefined, allowLocalPath = false) {
   }
 }
 
+export function getAvailableGalleryImages(images: LocationImage[]) {
+  return images.flatMap((image) => {
+    const imageUrl = getSafeImageUrl(image.imageUrl);
+    return imageUrl ? [{ ...image, imageUrl }] : [];
+  });
+}
+
+export function getSelectedGalleryImage(images: LocationImage[], selectedId: string | null) {
+  return images.find((image) => image.id === selectedId) ?? images[0];
+}
+
 export function LocationImageGallery({
   images,
   locationName,
-  sourceUrl,
 }: LocationImageGalleryProps) {
-  const availableImages = images.flatMap((image) => {
-    const imageUrl = getSafeUrl(image.imageUrl, true);
-    return imageUrl ? [{ ...image, imageUrl }] : [];
-  });
-  const safeSourceUrl = getSafeUrl(sourceUrl);
+  const availableImages = getAvailableGalleryImages(images);
   const [selectedId, setSelectedId] = useState(availableImages[0]?.id ?? null);
   const [failedImageIds, setFailedImageIds] = useState<Set<string>>(
     () => new Set(),
   );
-  const selectedImage =
-    availableImages.find((image) => image.id === selectedId) ??
-    availableImages[0];
+  const selectedImage = getSelectedGalleryImage(availableImages, selectedId);
   const safeLocationName = locationName.trim() || "장소";
 
   function getImageAlt(image: LocationImage, index: number) {
@@ -79,9 +78,9 @@ export function LocationImageGallery({
         </div>
         <div className="mt-3">
           <SourceAttribution
-            sourceUrl={safeSourceUrl}
-            label="원본 데이터·이미지 출처"
+            label="선택 이미지 출처"
             compact
+            showDetails
           />
         </div>
       </section>
@@ -170,9 +169,15 @@ export function LocationImageGallery({
 
       <div className="mt-3">
         <SourceAttribution
-          sourceUrl={safeSourceUrl}
-          label="원본 데이터·이미지 출처"
+          source={selectedImage.source}
+          sourceUrl={selectedImage.sourceUrl}
+          author={selectedImage.author}
+          license={selectedImage.license}
+          licenseUrl={selectedImage.licenseUrl}
+          lastVerifiedAt={selectedImage.lastVerifiedAt}
+          label="선택 이미지 출처"
           compact
+          showDetails
         />
       </div>
     </section>

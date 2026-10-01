@@ -10,8 +10,13 @@ type Row = {
   region: Location["region"]; address: string; latitude: number; longitude: number;
   permit_type: string; contact_name: string | null; contact_phone: string | null;
   permit_note: string | null; noise_sources: Location["noiseSources"] | null;
-  source_url: string | null;
-  location_images: { id: string; image_url: string; alt: string | null }[];
+  source: string | null; source_url: string | null; author: string | null;
+  license: string | null; license_url: string | null; last_verified_at: string | null;
+  location_images: Array<{
+    id: string; image_url: string; alt: string | null; source: string | null;
+    source_url: string | null; author: string | null; license: string | null;
+    license_url: string | null; last_verified_at: string | null;
+  }>;
   parking: { id: string; name: string; latitude: number; longitude: number; capacity: number | null; opening_hours: string | null; price_info: string | null; source: string | null }[];
 };
 
@@ -20,15 +25,34 @@ function toLocation(row: Row): Location {
     id: row.id, name: row.name, description: row.description,
     category: row.category, region: row.region, address: row.address,
     point: { latitude: row.latitude, longitude: row.longitude },
-    images: row.location_images.map((image) => ({ id: image.id, locationId: row.id, imageUrl: image.image_url, alt: image.alt ?? row.name })),
+    images: row.location_images.map((image) => ({
+      id: image.id,
+      locationId: row.id,
+      imageUrl: image.image_url,
+      alt: image.alt ?? row.name,
+      source: image.source ?? null,
+      sourceUrl: image.source_url ?? null,
+      author: image.author ?? null,
+      license: image.license ?? null,
+      licenseUrl: image.license_url ?? null,
+      lastVerifiedAt: image.last_verified_at ?? null,
+    })),
     permit: { type: row.permit_type, contactName: row.contact_name, contactPhone: row.contact_phone, note: row.permit_note },
     parking: row.parking.map((item): ParkingInfo => ({ id: item.id, locationId: row.id, name: item.name, point: { latitude: item.latitude, longitude: item.longitude }, capacity: item.capacity, openingHours: item.opening_hours, priceInfo: item.price_info, source: item.source })),
-    noiseSources: row.noise_sources ?? [], sourceUrl: row.source_url,
+    noiseSources: row.noise_sources ?? [],
+    source: row.source ?? null,
+    sourceUrl: row.source_url ?? null,
+    author: row.author ?? null,
+    license: row.license ?? null,
+    licenseUrl: row.license_url ?? null,
+    lastVerifiedAt: row.last_verified_at ?? null,
   };
 }
 
+const LOCATION_RELATIONS = "*, location_images(id, image_url, alt, source, source_url, author, license, license_url, last_verified_at), parking(id, name, latitude, longitude, capacity, opening_hours, price_info, source)";
+
 export async function getSupabaseLocations(filters: LocationFilter = {}): Promise<Location[]> {
-  let query = getSupabaseClient().from("locations").select("*, location_images(id, image_url, alt), parking(id, name, latitude, longitude, capacity, opening_hours, price_info, source)").order("name");
+  let query = getSupabaseClient().from("locations").select(LOCATION_RELATIONS).order("name");
   if (filters.region) query = query.eq("region", filters.region);
   if (filters.category) query = query.eq("category", filters.category);
   const { data, error } = await query;
@@ -38,7 +62,7 @@ export async function getSupabaseLocations(filters: LocationFilter = {}): Promis
 
 export async function getSupabaseLocation(id: string): Promise<Location | null> {
   const { data, error } = await getSupabaseClient().from("locations")
-    .select("*, location_images(id, image_url, alt), parking(id, name, latitude, longitude, capacity, opening_hours, price_info, source)")
+    .select(LOCATION_RELATIONS)
     .eq("id", id).maybeSingle();
   if (error) throw dataAccessError(`Failed to load location ${id}`, error);
   return data ? toLocation(data as Row) : null;

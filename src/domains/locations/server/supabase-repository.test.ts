@@ -6,7 +6,7 @@ vi.mock("@/infrastructure/supabase/server-client", () => ({
   getSupabaseClient: getSupabaseClientMock,
 }));
 
-import { getSupabaseSimilarLocations } from "./supabase-repository";
+import { getSupabaseLocations, getSupabaseSimilarLocations } from "./supabase-repository";
 
 const row = (id: string, name: string) => ({
   id,
@@ -22,8 +22,23 @@ const row = (id: string, name: string) => ({
   contact_phone: null,
   permit_note: null,
   noise_sources: [],
-  source_url: null,
-  location_images: [{ id: `${id}-image`, image_url: "/test.svg", alt: null }],
+  source: "Wikidata",
+  source_url: "https://www.wikidata.org/wiki/Q1",
+  author: null,
+  license: null,
+  license_url: null,
+  last_verified_at: "2026-09-29T04:00:00Z",
+  location_images: [{
+    id: `${id}-image`,
+    image_url: "/test.svg",
+    alt: null,
+    source: "Wikimedia Commons",
+    source_url: "https://commons.wikimedia.org/wiki/File:Test.jpg",
+    author: "Example Author",
+    license: "CC BY 4.0",
+    license_url: "https://creativecommons.org/licenses/by/4.0",
+    last_verified_at: "2026-09-29T04:00:00Z",
+  }],
   parking: [],
 });
 
@@ -36,6 +51,25 @@ function clientWith(locations: ReturnType<typeof row>[], matches: unknown[] = []
 
 describe("Supabase similar location repository", () => {
   beforeEach(() => getSupabaseClientMock.mockReset());
+
+  it("maps location and image attribution metadata", async () => {
+    const { client } = clientWith([row("source", "Source")]);
+    getSupabaseClientMock.mockReturnValue(client);
+
+    const [location] = await getSupabaseLocations();
+
+    expect(location).toMatchObject({
+      source: "Wikidata",
+      sourceUrl: "https://www.wikidata.org/wiki/Q1",
+      lastVerifiedAt: "2026-09-29T04:00:00Z",
+      images: [{
+        source: "Wikimedia Commons",
+        author: "Example Author",
+        license: "CC BY 4.0",
+        licenseUrl: "https://creativecommons.org/licenses/by/4.0",
+      }],
+    });
+  });
 
   it("calls the representative-embedding RPC and excludes the selected location", async () => {
     const { client, rpc } = clientWith(

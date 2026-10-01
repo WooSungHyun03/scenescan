@@ -36,14 +36,23 @@ export interface NoiseSource {
   note: string;
 }
 
-export interface LocationImage {
+export interface SourceMetadata {
+  source: string | null;
+  sourceUrl: string | null;
+  author: string | null;
+  license: string | null;
+  licenseUrl: string | null;
+  lastVerifiedAt: string | null;
+}
+
+export interface LocationImage extends SourceMetadata {
   id: string;
   locationId: string;
   imageUrl: string;
   alt: string;
 }
 
-export interface Location {
+export interface Location extends SourceMetadata {
   id: string;
   name: string;
   description: string;
@@ -55,7 +64,6 @@ export interface Location {
   permit: PermitInfo;
   parking: ParkingInfo[];
   noiseSources: NoiseSource[];
-  sourceUrl: string | null;
 }
 
 export type LocationDetail = Location;

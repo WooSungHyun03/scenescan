@@ -282,7 +282,7 @@ export function buildLocationDataset(manifest: CollectionManifest): NormalizedLo
         imageUrl: `${manifest.public_base_url}/${image.filename}`,
         alt: image.alt,
       })),
-      sourceUrl: manifest.attribution_url,
+      sourceUrl: location.source_url,
       provenance: { source: location.source, sourceUrl: location.source_url, referenceDate: null, lastVerifiedAt: verifiedAt },
     })),
     reviewQueue: [],

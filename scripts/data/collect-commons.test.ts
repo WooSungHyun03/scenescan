@@ -80,7 +80,7 @@ describe("Commons production data collection", () => {
     const output = buildLocationDataset(parsed);
     expect(output.locations[0]).toMatchObject({
       id: locationId,
-      sourceUrl: "https://example.com/licenses",
+      sourceUrl: "https://example.com/location",
       permit: { type: "문의 필요", contactName: null, contactPhone: null },
       images: [{
         imagePath: "public/locations/test-location-01.jpg",

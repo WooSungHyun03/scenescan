@@ -145,6 +145,8 @@ The collector re-fetches Commons metadata and fails closed when a file is missin
 
 Running the collector is deterministic for a fixed Commons source revision except for a provider-side regenerated thumbnail. Review any checksum change before committing it. The discovery step produces candidates, not an authority to bypass the license and validation gates. `public/locations/wikidata-*.jpg` is ignored because these working files are reproducibly downloaded and production serves their uploaded Storage copies. The collector and both `--validate-only` commands do not write to Supabase.
 
+`data:import-production` reads `image-licenses.json` from the directory containing `locations.json` by default. Use `--image-licenses <path>` only when the reviewed catalog lives elsewhere. It joins attribution by stable `image_id`, rejects missing or duplicate license records, mismatched location ownership, and non-HTTP(S) source/license URLs. Reusing the same source image in different locations remains valid when each use has its own stable image UUID and reviewed catalog entry.
+
 After the schema migrations are installed, use the explicit production import sequence below from a trusted local shell. The service-role key must never be placed in a `NEXT_PUBLIC_*` variable or Vercel. The first importer writes location and image metadata; the second adds the validated vectors to those image rows. Both operations are idempotent by stable UUID. Always run `--dry-run` immediately before `--apply`.
 
 ```bash

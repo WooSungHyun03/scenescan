@@ -1,7 +1,7 @@
 import { readFile, readdir, stat } from "node:fs/promises";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
-import { auditEmbeddingSchema, auditSimilarLocationSchema } from "./schema-audit.ts";
+import { auditAttributionSchema, auditEmbeddingSchema, auditSimilarLocationSchema } from "./schema-audit.ts";
 
 const DEFAULT_MIGRATIONS = "supabase/migrations";
 
@@ -13,7 +13,9 @@ async function readMigrationSql(path: string): Promise<string> {
 
 export async function auditSchemaFile(path = DEFAULT_MIGRATIONS): Promise<number> {
   const sql = await readMigrationSql(path);
-  return auditEmbeddingSchema(sql).checks.length + auditSimilarLocationSchema(sql).checks.length;
+  return auditEmbeddingSchema(sql).checks.length
+    + auditSimilarLocationSchema(sql).checks.length
+    + auditAttributionSchema(sql).checks.length;
 }
 
 async function main(): Promise<void> {

@@ -1,5 +1,6 @@
 import type { EmbeddingManifest } from "../embeddings/contracts.ts";
 import type { NormalizedLocationOutput } from "./contracts.ts";
+import { z } from "zod";
 
 export type ProductionImportMode = "validate-only" | "dry-run" | "apply";
 
@@ -18,6 +19,11 @@ export type LocationRow = {
   permit_note: string | null;
   noise_sources: string[];
   source_url: string;
+  source: string;
+  author: string | null;
+  license: string | null;
+  license_url: string | null;
+  last_verified_at: string | null;
 };
 
 export type ImageMetadataRow = {
@@ -25,6 +31,24 @@ export type ImageMetadataRow = {
   location_id: string;
   image_url: string;
   alt: string;
+  source: string | null;
+  source_url: string | null;
+  author: string | null;
+  license: string | null;
+  license_url: string | null;
+  last_verified_at: string | null;
+};
+
+export type ImageLicenseCatalog = {
+  verifiedAt: string;
+  items: Array<{
+    imageId: string;
+    locationId: string;
+    sourceUrl: string | null;
+    author: string | null;
+    license: string | null;
+    licenseUrl: string | null;
+  }>;
 };
 
 export type ProductionRows = { locations: LocationRow[]; images: ImageMetadataRow[] };
@@ -52,13 +76,65 @@ function requiredId(id: string | undefined, label: string): string {
   return id;
 }
 
+const optionalText = z.string().trim().min(1).nullable().optional();
+const optionalHttpUrl = z.string().trim().url().refine(
+  (value) => value.startsWith("https://") || value.startsWith("http://"),
+  "URL must use http or https",
+).nullable().optional();
+
+const imageLicenseCatalogSchema = z.object({
+  schema_version: z.literal(1),
+  verified_at: z.iso.datetime({ offset: true }),
+  items: z.array(z.object({
+    image_id: z.string().uuid(),
+    location_id: z.string().uuid(),
+    commons_page_url: optionalHttpUrl,
+    author: optionalText,
+    license: optionalText,
+    license_url: optionalHttpUrl,
+  }).passthrough()),
+}).strict();
+
+export function parseImageLicenseCatalog(value: unknown): ImageLicenseCatalog {
+  const parsed = imageLicenseCatalogSchema.parse(value);
+  const seen = new Set<string>();
+  const items = parsed.items.map((item) => {
+    if (seen.has(item.image_id)) throw new Error(`Image license catalog contains duplicate image_id: ${item.image_id}`);
+    seen.add(item.image_id);
+    return {
+      imageId: item.image_id,
+      locationId: item.location_id,
+      sourceUrl: item.commons_page_url ?? null,
+      author: item.author ?? null,
+      license: item.license ?? null,
+      licenseUrl: item.license_url ?? null,
+    };
+  });
+  return { verifiedAt: parsed.verified_at, items };
+}
+
+function sourceName(sourceUrl: string | null, fallback: string): string {
+  if (!sourceUrl) return fallback;
+  const hostname = new URL(sourceUrl).hostname.toLowerCase();
+  return hostname === "commons.wikimedia.org" || hostname.endsWith(".commons.wikimedia.org")
+    ? "Wikimedia Commons"
+    : fallback;
+}
+
 export function createProductionRows(
   dataset: NormalizedLocationOutput,
   embeddingManifest: EmbeddingManifest,
+  imageLicenses: ImageLicenseCatalog,
 ): ProductionRows {
   if (dataset.reviewQueue.length > 0) throw new Error("Production data contains unresolved review items");
-  const embeddingsByUrl = new Map(embeddingManifest.items.map((item) => [item.image_url, item]));
-  if (embeddingsByUrl.size !== embeddingManifest.items.length) throw new Error("Embedding manifest contains duplicate image_url values");
+  const manifestKey = (locationId: string, imageUrl: string) => `${locationId}\u0000${imageUrl}`;
+  const embeddingsByLocationAndUrl = new Map(
+    embeddingManifest.items.map((item) => [manifestKey(item.location_id, item.image_url), item]),
+  );
+  if (embeddingsByLocationAndUrl.size !== embeddingManifest.items.length) {
+    throw new Error("Embedding manifest contains duplicate location_id and image_url pairs");
+  }
+  const licensesByImageId = new Map(imageLicenses.items.map((item) => [item.imageId, item]));
 
   const locations: LocationRow[] = [];
   const images: ImageMetadataRow[] = [];
@@ -81,18 +157,42 @@ export function createProductionRows(
       contact_phone: location.permit.contactPhone,
       permit_note: location.permit.note,
       noise_sources: [],
-      source_url: location.sourceUrl,
+      source: location.provenance.source,
+      source_url: location.provenance.sourceUrl,
+      author: null,
+      license: null,
+      license_url: null,
+      last_verified_at: location.provenance.lastVerifiedAt,
     });
     for (const image of location.images) {
-      const entry = embeddingsByUrl.get(image.imageUrl);
+      const key = manifestKey(locationId, image.imageUrl);
+      const entry = embeddingsByLocationAndUrl.get(key);
       if (!entry) throw new Error(`Image is missing from embedding manifest: ${image.imageUrl}`);
       if (entry.location_id !== locationId) throw new Error(`Image location_id mismatch: ${entry.image_id}`);
-      images.push({ id: entry.image_id, location_id: locationId, image_url: image.imageUrl, alt: image.alt });
-      embeddingsByUrl.delete(image.imageUrl);
+      const attribution = licensesByImageId.get(entry.image_id);
+      if (!attribution) throw new Error(`Image is missing from license catalog: ${entry.image_id}`);
+      if (attribution.locationId !== locationId) throw new Error(`Image license location_id mismatch: ${entry.image_id}`);
+      images.push({
+        id: entry.image_id,
+        location_id: locationId,
+        image_url: image.imageUrl,
+        alt: image.alt,
+        source: sourceName(attribution.sourceUrl, entry.source),
+        source_url: attribution.sourceUrl,
+        author: attribution.author,
+        license: attribution.license,
+        license_url: attribution.licenseUrl,
+        last_verified_at: imageLicenses.verifiedAt,
+      });
+      embeddingsByLocationAndUrl.delete(key);
+      licensesByImageId.delete(entry.image_id);
     }
   }
-  if (embeddingsByUrl.size > 0) {
-    throw new Error(`Embedding manifest contains ${embeddingsByUrl.size} image(s) absent from location data`);
+  if (embeddingsByLocationAndUrl.size > 0) {
+    throw new Error(`Embedding manifest contains ${embeddingsByLocationAndUrl.size} image(s) absent from location data`);
+  }
+  if (licensesByImageId.size > 0) {
+    throw new Error(`Image license catalog contains ${licensesByImageId.size} image(s) absent from location data`);
   }
   return { locations, images };
 }

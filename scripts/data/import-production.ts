@@ -1,4 +1,5 @@
 import { readFile } from "node:fs/promises";
+import { dirname, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { parseManifest } from "../embeddings/contracts.ts";
@@ -7,6 +8,7 @@ import { parseNormalizedLocationOutput } from "./contracts.ts";
 import {
   createProductionRows,
   importProductionData,
+  parseImageLicenseCatalog,
   type ExistingImageMetadata,
   type ImageMetadataRow,
   type LocationRow,
@@ -17,6 +19,7 @@ import {
 type CliOptions = {
   locationsPath: string;
   manifestPath: string;
+  imageLicensesPath: string;
   mode: ProductionImportMode;
   batchSize: number;
 };
@@ -24,11 +27,12 @@ type CliOptions = {
 export function parseProductionImportArgs(args: string[]): CliOptions {
   const [locationsPath, manifestPath, ...flags] = args;
   if (!locationsPath || !manifestPath) {
-    throw new Error("Usage: pnpm data:import-production <locations.json> <embeddings-manifest.json> [--validate-only | --dry-run | --apply] [--batch-size N]");
+    throw new Error("Usage: pnpm data:import-production <locations.json> <embeddings-manifest.json> [--image-licenses PATH] [--validate-only | --dry-run | --apply] [--batch-size N]");
   }
   let mode: ProductionImportMode = "validate-only";
   let selectedMode = false;
   let batchSize = 100;
+  let imageLicensesPath = resolve(dirname(locationsPath), "image-licenses.json");
   for (let index = 0; index < flags.length; index += 1) {
     const flag = flags[index];
     if (flag === "--validate-only" || flag === "--dry-run" || flag === "--apply") {
@@ -37,11 +41,15 @@ export function parseProductionImportArgs(args: string[]): CliOptions {
       mode = flag.slice(2) as ProductionImportMode;
     } else if (flag === "--batch-size") {
       batchSize = Number(flags[++index]);
+    } else if (flag === "--image-licenses") {
+      const path = flags[++index];
+      if (!path) throw new Error("--image-licenses requires a path");
+      imageLicensesPath = path;
     } else {
       throw new Error(`Unknown option: ${flag}`);
     }
   }
-  return { locationsPath, manifestPath, mode, batchSize };
+  return { locationsPath, manifestPath, imageLicensesPath, mode, batchSize };
 }
 
 function failOnSupabaseError(error: { message: string } | null, action: string): void {
@@ -79,7 +87,8 @@ async function main(): Promise<void> {
   const options = parseProductionImportArgs(process.argv.slice(2));
   const dataset = parseNormalizedLocationOutput(await readJson(options.locationsPath));
   const manifest = parseManifest(await readJson(options.manifestPath));
-  const rows = createProductionRows(dataset, manifest);
+  const imageLicenses = parseImageLicenseCatalog(await readJson(options.imageLicensesPath));
+  const rows = createProductionRows(dataset, manifest, imageLicenses);
   let database: ProductionImportDatabase | undefined;
   if (options.mode !== "validate-only") {
     const environment = readDatabaseEnvironment(process.env);
