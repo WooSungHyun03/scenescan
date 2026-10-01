@@ -26,4 +26,6 @@ curl --fail http://127.0.0.1:3000/api/health
 
 For a production-like local run, copy `.env.example` to an ignored `.env.local` or export the required public variables, then run `docker compose up --build`. Compose applies a non-root user, drops Linux capabilities, enables `no-new-privileges`, and checks `/api/health`. Public variables used by client code are compiled into the image, so rebuild after changing them.
 
+`NEXT_PUBLIC_*` values are fixed into the bundle during `pnpm build` inside the `builder` stage (passed as `ARG`s); setting them as `docker run -e` environment variables on the already-built image has no effect. To change a `NEXT_PUBLIC_*` value, pass it as a `--build-arg` and rebuild the image.
+
 Resend is intentionally not configured: this read-only MVP has no email flow. Supabase Auth callback URLs are likewise not required until authentication exists. Adding either integration should start with an application feature and contract, not an unused production credential.

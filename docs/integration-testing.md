@@ -42,3 +42,10 @@ Everything above was, earlier in this project's history, verified by hand once a
 
 - Full HTTP-level API tests (`POST /api/search`, `GET /api/locations/[id]/similar`) against a *running Next.js server* in real mode -- those routes were verified manually against this same kind of stack while building them (see the reports for those changes), but this suite tests at the repository layer (the boundary between this project's code and Supabase), which is the more usual integration-test scope and doesn't require booting the whole Next app inside a test run. If HTTP-level real-mode coverage becomes worth the added complexity, `supabase start`'s printed `API_URL`/keys are already exactly what a real-mode `next start` would need.
 - `scripts/embeddings/*` (Member 1's pipeline) -- out of scope for this backend-owned suite.
+
+## 마지막 확인
+
+- 날짜: 2026-10-01
+- `pnpm supabase:start`: migration 에러 없이 기동 (`supabase/migrations/**` 전체 적용 성공, 이 자체가 첫 검증).
+- `pnpm test:integration`: **4개 파일, 14개 테스트 전부 통과**, 946ms.
+- `pnpm supabase:stop`으로 정리 완료.
