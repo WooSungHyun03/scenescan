@@ -50,5 +50,10 @@ export function auditSimilarLocationSchema(sql: string): SchemaAuditResult {
 export function auditAttributionSchema(sql: string): SchemaAuditResult {
   const missing = ATTRIBUTION_CHECKS.filter(([, pattern]) => !pattern.test(sql)).map(([name]) => name);
   if (missing.length > 0) throw new Error(`Attribution schema audit failed: ${missing.join(", ")}`);
+  const imageConstraintAdd = sql.search(/add\s+constraint\s+location_images_source_url_http_check/i);
+  const imageConstraintValidate = sql.search(/validate\s+constraint\s+location_images_source_url_http_check/i);
+  if (imageConstraintAdd < 0 || imageConstraintValidate < 0 || imageConstraintAdd > imageConstraintValidate) {
+    throw new Error("Attribution schema audit failed: image URL constraints must be added before validation");
+  }
   return { checks: ATTRIBUTION_CHECKS.map(([name]) => name) };
 }

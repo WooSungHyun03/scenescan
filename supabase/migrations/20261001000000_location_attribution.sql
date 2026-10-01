@@ -24,14 +24,14 @@ alter table public.locations
   validate constraint locations_license_url_http_check;
 
 alter table public.location_images
-  validate constraint location_images_source_url_http_check,
-  validate constraint location_images_license_url_http_check;
-
-alter table public.location_images
   add constraint location_images_source_url_http_check
     check (source_url is null or source_url ~* '^https?://') not valid,
   add constraint location_images_license_url_http_check
     check (license_url is null or license_url ~* '^https?://') not valid;
+
+alter table public.location_images
+  validate constraint location_images_source_url_http_check,
+  validate constraint location_images_license_url_http_check;
 
 comment on column public.locations.source is 'Human-readable source of the location metadata';
 comment on column public.locations.source_url is 'Official or primary source URL for the location metadata';

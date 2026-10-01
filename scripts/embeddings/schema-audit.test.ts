@@ -32,4 +32,16 @@ describe("embedding database schema audit", () => {
       .replace("li.location_id <> source_location_id", "true");
     expect(() => auditSimilarLocationSchema(sql)).toThrow("selected location exclusion");
   });
+
+  it("rejects attribution migrations that validate image constraints before adding them", async () => {
+    const sql = await readFile(attributionMigration, "utf8");
+    const addBlock = sql.match(/alter table public\.location_images\s+add constraint location_images_source_url_http_check[\s\S]*?not valid;/i)?.[0];
+    const validateBlock = sql.match(/alter table public\.location_images\s+validate constraint location_images_source_url_http_check[\s\S]*?;/i)?.[0];
+    expect(addBlock).toBeTruthy();
+    expect(validateBlock).toBeTruthy();
+    const invalid = sql
+      .replace(addBlock!, "")
+      .replace(validateBlock!, `${validateBlock}\n\n${addBlock}`);
+    expect(() => auditAttributionSchema(invalid)).toThrow("must be added before validation");
+  });
 });

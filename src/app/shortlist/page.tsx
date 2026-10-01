@@ -1,6 +1,8 @@
 import { ShortlistWorkspace } from "@/domains/locations/components/shortlist-workspace";
 import { getLocations } from "@/domains/locations/server/repository";
 
+export const dynamic = "force-dynamic";
+
 export default async function ShortlistPage() {
   const locations = await getLocations();
 

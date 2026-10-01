@@ -4,6 +4,8 @@ import { LocationCard } from "@/domains/locations/components/location-card";
 import { getLocations } from "@/domains/locations/server/repository";
 import { Button } from "@/shared/ui/button";
 
+export const dynamic = "force-dynamic";
+
 export default async function HomePage() {
   const examples = (await getLocations()).slice(0, 4);
   return <main className="mx-auto max-w-6xl px-5">
