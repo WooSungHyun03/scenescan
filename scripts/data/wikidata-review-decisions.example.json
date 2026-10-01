@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "decisions": [
+    {
+      "qid": "Q123456",
+      "decision": "accept",
+      "category": "interior",
+      "region": "서울",
+      "note": "공식 원문과 사진을 확인했으며 실내 촬영 공간으로 분류",
+      "reviewed_by": "member-4",
+      "reviewed_at": "2026-10-01T09:00:00+09:00"
+    },
+    {
+      "qid": "Q654321",
+      "decision": "reject",
+      "note": "촬영 장소가 아닌 행정 개념 항목",
+      "reviewed_by": "member-4",
+      "reviewed_at": "2026-10-01T09:00:00+09:00"
+    }
+  ]
+}

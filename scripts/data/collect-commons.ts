@@ -42,7 +42,7 @@ const collectionManifestSchema = z.object({
   locations: z.array(locationSchema).min(1),
 }).strict();
 
-type CollectionManifest = z.infer<typeof collectionManifestSchema>;
+export type CollectionManifest = z.infer<typeof collectionManifestSchema>;
 export type CommonsMetadata = {
   title: string;
   pageUrl: string;
