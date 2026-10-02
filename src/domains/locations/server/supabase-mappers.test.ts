@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
   matchLocationImagesRowSchema,
+  parseLocationRow,
+  parseLocationRows,
   parseMatchLocationImagesRows,
   toImageMatch,
   toLocation,
@@ -33,10 +35,18 @@ describe("toLocation", () => {
   it("maps a normal row with no warnings", () => {
     const { location, warnings } = toLocation(baseRow());
     expect(warnings).toHaveLength(0);
-    expect(location.images).toEqual([{ id: "img-1", locationId: "loc-1", imageUrl: "https://example.com/a.jpg", alt: "설명" }]);
+    expect(location.images).toEqual([{
+      id: "img-1", locationId: "loc-1", imageUrl: "https://example.com/a.jpg", alt: "설명",
+      source: null, sourceUrl: null, author: null, license: null, licenseUrl: null, lastVerifiedAt: null,
+    }]);
     expect(location.parking).toHaveLength(1);
     expect(location.noiseSources).toEqual([]);
     expect(location.sourceUrl).toBeNull();
+    expect(location.source).toBeNull();
+    expect(location.author).toBeNull();
+    expect(location.license).toBeNull();
+    expect(location.licenseUrl).toBeNull();
+    expect(location.lastVerifiedAt).toBeNull();
   });
 
   it("returns an empty images array with no warnings when location_images is null", () => {
@@ -77,6 +87,59 @@ describe("toLocation", () => {
     }));
     expect(location.parking[0].openingHours).toBeNull();
     expect(location.parking[0].priceInfo).toBeNull();
+  });
+});
+
+describe("parseLocationRows / parseLocationRow (locations select response validation)", () => {
+  // Legacy, pre-attribution-migration shape: PostgREST/supabase-js never
+  // sends `source`/`author`/`license`/`license_url`/`last_verified_at` keys
+  // at all here (not null values -- the keys are simply absent), since
+  // LEGACY_LOCATION_SELECT (supabase-repository.ts's fallback for a
+  // 42703/PGRST204 "column does not exist" retry) never asks for them.
+  // These schemas must accept that shape too, not just the full one.
+  function legacyRow(overrides: Record<string, unknown> = {}) {
+    return {
+      id: "loc-1", name: "테스트 장소", description: "설명", category: "urban", region: "서울",
+      address: "주소", latitude: 37.5, longitude: 127.0, permit_type: "정보 확인 필요",
+      contact_name: null, contact_phone: null, permit_note: null, noise_sources: null, source_url: null,
+      location_images: [{ id: "img-1", image_url: "https://example.com/a.jpg", alt: null }],
+      parking: [],
+      ...overrides,
+    };
+  }
+
+  it("accepts a row with every attribution key present (post-migration shape)", () => {
+    const rows = parseLocationRows([{
+      ...legacyRow(),
+      source: "Wikidata", author: "A", license: "CC BY 4.0", license_url: "https://x", last_verified_at: "2026-01-01T00:00:00Z",
+      location_images: [{ id: "img-1", image_url: "https://example.com/a.jpg", alt: null, source: "Commons", source_url: null, author: null, license: null, license_url: null, last_verified_at: null }],
+    }]);
+    expect(rows).toHaveLength(1);
+  });
+
+  it("accepts a row missing every attribution key entirely (legacy/pre-migration shape) without throwing", () => {
+    expect(() => parseLocationRows([legacyRow()])).not.toThrow();
+    expect(() => parseLocationRow(legacyRow())).not.toThrow();
+    const [row] = parseLocationRows([legacyRow()]);
+    expect(row.source).toBeUndefined();
+    expect(row.last_verified_at).toBeUndefined();
+  });
+
+  it("parseLocationRows treats a null/undefined response as zero rows", () => {
+    expect(parseLocationRows(null)).toEqual([]);
+    expect(parseLocationRows(undefined)).toEqual([]);
+  });
+
+  it("parseLocationRow treats a null/undefined response as no row (not a parse error)", () => {
+    expect(parseLocationRow(null)).toBeNull();
+    expect(parseLocationRow(undefined)).toBeNull();
+  });
+
+  it("throws a clear error when a required scalar column is missing -- a select-string bug, not bad data", () => {
+    const withoutName: Record<string, unknown> = legacyRow();
+    delete withoutName.name;
+    expect(() => parseLocationRows([withoutName])).toThrow();
+    expect(() => parseLocationRow(withoutName)).toThrow();
   });
 });
 

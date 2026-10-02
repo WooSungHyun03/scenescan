@@ -64,7 +64,7 @@ describe.skipIf(!env)("schema and RLS (live Supabase)", () => {
     // corrected there in this same change.
     const seedId = randomUUID();
     const { error: seedError } = await adminClient.from("locations").insert({
-      id: seedId, name: "RLS 실제 테스트", description: "", category: "urban", region: "서울", address: "주소", latitude: 37.0, longitude: 127.0, source: "manual",
+      id: seedId, name: "RLS 실제 테스트", description: "", category: "urban", region: "서울", address: "주소", latitude: 37.0, longitude: 127.0,
     });
     expect(seedError).toBeNull();
 

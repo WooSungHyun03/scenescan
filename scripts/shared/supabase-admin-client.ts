@@ -21,13 +21,17 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 export type SupabaseAdminEnvironment = { url: string; serviceRoleKey: string };
 
 export function readSupabaseAdminEnvironment(env: Readonly<Record<string, string | undefined>>): SupabaseAdminEnvironment {
-  if (env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY) {
+  // SUPABASE_SECRET_KEY is Supabase's current API key name; SUPABASE_SERVICE_ROLE_KEY
+  // is accepted as a legacy fallback (SECRET_KEY wins if both are set) --
+  // matches scripts/embeddings/import.ts's readDatabaseEnvironment
+  // (Member 1's file, not duplicated here, but kept in sync by convention).
+  if (env.NEXT_PUBLIC_SUPABASE_SECRET_KEY || env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY) {
     throw new Error("Service role credentials must never use a NEXT_PUBLIC_ environment variable");
   }
   const url = env.SUPABASE_URL?.trim();
-  const serviceRoleKey = env.SUPABASE_SERVICE_ROLE_KEY?.trim();
+  const serviceRoleKey = env.SUPABASE_SECRET_KEY?.trim() || env.SUPABASE_SERVICE_ROLE_KEY?.trim();
   if (!url || !serviceRoleKey) {
-    throw new Error("SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are required for this operation");
+    throw new Error("SUPABASE_URL and SUPABASE_SECRET_KEY (or legacy SUPABASE_SERVICE_ROLE_KEY) are required for this operation");
   }
   const parsedUrl = new URL(url);
   if (parsedUrl.protocol !== "https:" && parsedUrl.hostname !== "localhost" && parsedUrl.hostname !== "127.0.0.1") {

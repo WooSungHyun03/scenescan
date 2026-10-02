@@ -1,5 +1,6 @@
 import { z } from "zod";
 import type { Location, LocationFilter, LocationListQuery, LocationSearchResult } from "./domain";
+import { LOCATION_CATEGORY_VALUES, REGION_VALUES } from "./location-options";
 
 // POST /api/search body size cap. 512 finite-number JSON floats run at most
 // a few KB (worst case ~20 bytes/value including a leading "-", full
@@ -11,8 +12,8 @@ import type { Location, LocationFilter, LocationListQuery, LocationSearchResult 
 export const MAX_SEARCH_REQUEST_BYTES = 32 * 1024;
 
 export const locationFilterSchema = z.object({
-  region: z.enum(["서울", "부산", "인천", "경기"]).optional(),
-  category: z.enum(["urban", "nature", "industrial", "interior"]).optional(),
+  region: z.enum(REGION_VALUES).optional(),
+  category: z.enum(LOCATION_CATEGORY_VALUES).optional(),
 });
 
 // Not currently used by any HTTP route (getLocations is called directly from
@@ -83,4 +84,8 @@ export interface SearchResponse {
 export interface LocationListResponse {
   locations: Location[];
   filters: LocationFilter;
+}
+
+export interface SimilarLocationsResponse {
+  results: LocationSearchResult[];
 }

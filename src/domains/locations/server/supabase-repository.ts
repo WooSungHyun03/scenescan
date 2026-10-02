@@ -5,9 +5,10 @@ import { logger } from "@/shared/observability/logger";
 import { SEARCH_MATCH_COUNT_DEFAULT, SEARCH_MATCH_THRESHOLD_DEFAULT } from "@/types/contracts";
 import type { Location, LocationDetail, LocationFilter, LocationListQuery, LocationSearchResult, SearchQueryOptions } from "@/types/domain";
 import { groupImageMatches, type ImageMatch } from "@/domains/locations/services/group-image-matches";
+import { rankSimilarLocations } from "@/domains/locations/services/similar-locations";
 import { CLIP_MODEL_ID, CLIP_MODEL_REVISION } from "@/lib/ai/embedding-service";
 import { resolveLocationListPagination } from "./pagination";
-import { parseMatchLocationImagesRows, toImageMatch, toLocation, type LocationRow } from "./supabase-mappers";
+import { parseLocationRow, parseLocationRows, parseMatchLocationImagesRows, toImageMatch, toLocation, type LocationRow } from "./supabase-mappers";
 
 // TODO(embedding-model-key): src/lib/ai/embedding-service.ts (Member 1's
 // module) exports CLIP_MODEL_ID and CLIP_MODEL_REVISION separately but has
@@ -28,14 +29,55 @@ export function buildEmbeddingModelKey(modelId: string, revision: string): strin
 // has to stay in sync with the offline importer's model/revision.
 const EXPECTED_EMBEDDING_MODEL = buildEmbeddingModelKey(CLIP_MODEL_ID, CLIP_MODEL_REVISION);
 
-const LOCATION_SELECT = "*, location_images(id, image_url, alt), parking(id, name, latitude, longitude, capacity, opening_hours, price_info, source)";
+// LOCATION_SELECT includes the attribution columns added by
+// 20261001000000_location_attribution.sql (origin/main). On a project where
+// that migration hasn't been applied yet, PostgREST returns a schema error
+// (42703/PGRST204) naming those columns -- isMissingImageAttributionSchema
+// recognizes that specific failure and every read below retries once with
+// LEGACY_LOCATION_SELECT (no attribution columns) instead of failing the
+// request outright.
+const LOCATION_SELECT = "*, location_images(id, image_url, alt, source, source_url, author, license, license_url, last_verified_at), parking(id, name, latitude, longitude, capacity, opening_hours, price_info, source)";
+const LEGACY_LOCATION_SELECT = "*, location_images(id, image_url, alt), parking(id, name, latitude, longitude, capacity, opening_hours, price_info, source)";
+const IMAGE_ATTRIBUTION_COLUMNS = ["source", "source_url", "author", "license", "license_url", "last_verified_at"];
+
+type SupabaseQueryError = {
+  code?: string;
+  message?: string;
+  details?: string;
+  hint?: string;
+};
+
+function isMissingImageAttributionSchema(error: unknown): boolean {
+  if (!error || typeof error !== "object") return false;
+  const queryError = error as SupabaseQueryError;
+  if (queryError.code !== "42703" && queryError.code !== "PGRST204") return false;
+  const description = [queryError.message, queryError.details, queryError.hint]
+    .filter((value): value is string => typeof value === "string")
+    .join(" ")
+    .toLowerCase();
+  return description.includes("location_images")
+    && IMAGE_ATTRIBUTION_COLUMNS.some((column) => description.includes(column));
+}
+
+function warnAboutLegacyAttributionSchema(error: unknown): void {
+  const queryError = error as SupabaseQueryError;
+  logger.warn("Image attribution columns are unavailable; using the legacy location schema", {
+    code: queryError.code ?? "unknown",
+  });
+}
 
 function logRowWarnings(locationId: string, warnings: ReturnType<typeof toLocation>["warnings"]): void {
   if (warnings.length === 0) return;
   logger.warn("Dropped malformed location sub-resource row", { locationId, warnings });
 }
 
-function mapRows(rows: LocationRow[]): Location[] {
+function mapRows(data: unknown): Location[] {
+  let rows: LocationRow[];
+  try {
+    rows = parseLocationRows(data);
+  } catch (parseError) {
+    throw dataAccessError("Unexpected locations response shape", parseError);
+  }
   return rows.map((row) => {
     const { location, warnings } = toLocation(row);
     logRowWarnings(row.id, warnings);
@@ -43,48 +85,75 @@ function mapRows(rows: LocationRow[]): Location[] {
   });
 }
 
+function mapRow(data: unknown): Location | null {
+  let row: LocationRow | null;
+  try {
+    row = parseLocationRow(data);
+  } catch (parseError) {
+    throw dataAccessError("Unexpected location response shape", parseError);
+  }
+  if (!row) return null;
+  const { location, warnings } = toLocation(row);
+  logRowWarnings(location.id, warnings);
+  return location;
+}
+
 export async function getSupabaseLocations(query: LocationListQuery = {}): Promise<Location[]> {
   const { limit, offset } = resolveLocationListPagination(query);
   // .order("id") is a tiebreaker: without it, rows with an equal `name`
   // have no guaranteed stable order, which .range()-based pagination
   // depends on to avoid skipping or repeating rows across pages.
-  let dbQuery = getSupabaseClient().from("locations").select(LOCATION_SELECT).order("name").order("id").range(offset, offset + limit - 1);
-  if (query.region) dbQuery = dbQuery.eq("region", query.region);
-  if (query.category) dbQuery = dbQuery.eq("category", query.category);
-  const { data, error } = await dbQuery;
+  function buildQuery(relations: string) {
+    let dbQuery = getSupabaseClient().from("locations").select(relations).order("name").order("id").range(offset, offset + limit - 1);
+    if (query.region) dbQuery = dbQuery.eq("region", query.region);
+    if (query.category) dbQuery = dbQuery.eq("category", query.category);
+    return dbQuery;
+  }
+  let { data, error } = await buildQuery(LOCATION_SELECT);
+  if (isMissingImageAttributionSchema(error)) {
+    warnAboutLegacyAttributionSchema(error);
+    ({ data, error } = await buildQuery(LEGACY_LOCATION_SELECT));
+  }
   if (error) throw dataAccessError("Failed to list locations", error);
-  return mapRows(data as LocationRow[]);
+  return mapRows(data);
 }
 
-// Hydrates full Location metadata for an explicit set of IDs, used only by
-// search (see searchSupabaseLocations). Deliberately does not accept a
-// LocationFilter: eligibility (region/category) is now decided entirely by
-// match_location_images's filter_region/filter_category, so the app no
-// longer re-applies a filter predicate when loading result metadata -- it
-// only loads whatever locations the RPC actually returned.
+// Hydrates full Location metadata for an explicit set of IDs, used by
+// search (see searchSupabaseLocations) and similar-locations (see
+// getSupabaseSimilarLocations). Deliberately does not accept a
+// LocationFilter or pagination: eligibility (region/category) is decided
+// entirely by match_location_images's filter_region/filter_category, so the
+// app only loads whatever locations the RPC actually returned, by id.
 export async function getSupabaseLocationsByIds(ids: readonly string[]): Promise<Location[]> {
   if (ids.length === 0) return [];
-  const { data, error } = await getSupabaseClient().from("locations").select(LOCATION_SELECT).in("id", ids);
+  let { data, error } = await getSupabaseClient().from("locations").select(LOCATION_SELECT).in("id", ids);
+  if (isMissingImageAttributionSchema(error)) {
+    warnAboutLegacyAttributionSchema(error);
+    ({ data, error } = await getSupabaseClient().from("locations").select(LEGACY_LOCATION_SELECT).in("id", ids));
+  }
   if (error) throw dataAccessError("Failed to load locations by id", error);
-  return mapRows(data as LocationRow[]);
+  return mapRows(data);
 }
 
 export async function getSupabaseLocation(id: string): Promise<LocationDetail | null> {
-  const { data, error } = await getSupabaseClient().from("locations")
+  let { data, error } = await getSupabaseClient().from("locations")
     .select(LOCATION_SELECT)
     .eq("id", id).maybeSingle();
+  if (isMissingImageAttributionSchema(error)) {
+    warnAboutLegacyAttributionSchema(error);
+    ({ data, error } = await getSupabaseClient().from("locations")
+      .select(LEGACY_LOCATION_SELECT)
+      .eq("id", id).maybeSingle());
+  }
   if (error) throw dataAccessError(`Failed to load location ${id}`, error);
-  if (!data) return null;
-  const { location, warnings } = toLocation(data as LocationRow);
-  logRowWarnings(location.id, warnings);
-  return location;
+  return mapRow(data);
 }
 
 // RPC response -> LocationSearchResult[], shared by searchSupabaseLocations
 // and getSupabaseSimilarLocations. Location metadata is loaded only for the
 // IDs the RPC actually returned (getSupabaseLocationsByIds), never by
 // re-running a filter query -- so there is nothing app-side left to keep in
-// sync with the RPC's own filter_region/filter_category/exclude_location_id.
+// sync with the RPC's own filter_region/filter_category.
 // getSupabaseLocationsByIds does not guarantee row order matches the RPC's
 // similarity order; that's fine because groupImageMatches/rankLocationImageHits
 // (Member 1's utility) re-sorts by similarity itself and only uses the
@@ -120,53 +189,38 @@ export async function searchSupabaseLocations(
   return resolveRankedResults(data);
 }
 
-// TODO(similar-locations-embedding): no existing utility (Member 1's or
-// otherwise) defines how to pick/combine a location's own embedding(s) for
-// similar-locations search -- location-ranking.ts and group-image-matches.ts
-// both operate on an already-produced hit list. Simplest reasonable choice
-// pending Member 1 input: the location's oldest location_images row (by
-// created_at, then id) with a non-null embedding matching the server's
-// expected model/revision. An averaged/pooled embedding across a location's
-// images is a plausible alternative; see docs/search-ranking.md.
-//
-// Selects the raw column rather than going through supabase-mappers because
-// pgvector values round-trip through supabase-js/PostgREST as their text
-// literal ("[0.1,0.2,...]"), which can be forwarded as-is into the next
-// RPC's vector parameter -- verified directly against a disposable
-// Postgres+PostgREST stack; no JS-side float parsing needed or done.
-async function getSupabaseRepresentativeEmbedding(locationId: string): Promise<string | null> {
-  const { data, error } = await getSupabaseClient()
-    .from("location_images")
-    .select("embedding")
-    .eq("location_id", locationId)
-    .eq("embedding_model", EXPECTED_EMBEDDING_MODEL)
-    .not("embedding", "is", null)
-    .order("created_at")
-    .order("id")
-    .limit(1)
-    .maybeSingle();
-  if (error) throw dataAccessError(`Failed to load a representative embedding for location ${locationId}`, error);
-  return (data as { embedding: string } | null)?.embedding ?? null;
-}
-
+// Embedding selection for similar-locations (the mean of all of this
+// location's non-null image embeddings, computed in SQL) and the
+// self-exclusion/grouping policy are Member 1's (match_similar_location_images,
+// supabase/migrations/20260928000000_similar_locations.sql; rankSimilarLocations,
+// src/domains/locations/services/similar-locations.ts) -- reused as-is, not
+// reimplemented here. Unlike match_location_images, this RPC has no
+// expected_embedding_model gate; if more than one CLIP model/revision's
+// embeddings ever coexist in location_images, it could silently average or
+// compare across them. Flagged as a proposal for Member 1, not fixed here.
 export async function getSupabaseSimilarLocations(locationId: string): Promise<LocationSearchResult[]> {
-  const representativeEmbedding = await getSupabaseRepresentativeEmbedding(locationId);
-  // No usable embedding (no images, or none from the currently expected
-  // model) -- an empty result, not an error.
-  if (!representativeEmbedding) return [];
-  const { data, error } = await getSupabaseClient().rpc("match_location_images", {
-    query_embedding: representativeEmbedding,
+  const { data, error } = await getSupabaseClient().rpc("match_similar_location_images", {
+    source_location_id: locationId,
     match_threshold: SEARCH_MATCH_THRESHOLD_DEFAULT,
     match_count: SEARCH_MATCH_COUNT_DEFAULT,
-    expected_embedding_model: EXPECTED_EMBEDDING_MODEL,
-    // Excluded in SQL, not by filtering the RPC's response in JS afterward:
-    // the query vector is one of this location's own images, so its other
-    // images are near-guaranteed to dominate the raw top-match_count
-    // candidates. Removing them after the fact could starve the result the
-    // same way the old app-side region/category filter did (see
-    // docs/search-ranking.md).
-    exclude_location_id: locationId,
   });
-  if (error) throw dataAccessError(`Failed to search similar locations for ${locationId}`, error);
-  return resolveRankedResults(data);
+  if (error) throw dataAccessError(`Failed to find locations similar to ${locationId}`, error);
+  const rows = (data ?? []) as Array<{ location_image_id: string; location_id: string; similarity: number }>;
+  const matches: ImageMatch[] = rows.map((row) => ({
+    locationImageId: row.location_image_id,
+    locationId: row.location_id,
+    similarity: row.similarity,
+  }));
+  // getSupabaseLocationsByIds, not getSupabaseLocations(): the latter is now
+  // paginated (LOCATION_LIST_DEFAULT_LIMIT = 20), so calling it with no
+  // arguments would silently miss any location past the first page --
+  // both for the matched candidates and, critically, for the selected
+  // location itself. rankSimilarLocations's own "is selectedLocationId a
+  // real location" guard checks membership in the `locations` array it's
+  // given, so the selected id is included here even though the RPC's SQL
+  // already excludes it from `matches`/the candidate ids -- otherwise that
+  // guard would always see it missing and return [] unconditionally.
+  const locationIds = [...new Set([...matches.map((match) => match.locationId), locationId])];
+  const locations = await getSupabaseLocationsByIds(locationIds);
+  return rankSimilarLocations(locationId, matches, locations, 8);
 }

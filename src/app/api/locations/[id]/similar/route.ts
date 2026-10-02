@@ -2,7 +2,9 @@ import { NextResponse } from "next/server";
 import { getLocation, getSimilarLocations } from "@/domains/locations/server/repository";
 import { notFoundError, validationError } from "@/shared/errors/application-error";
 import { apiErrorResponse } from "@/shared/http/api-error-response";
-import { locationIdSchema } from "@/types/contracts";
+import { locationIdSchema, type SimilarLocationsResponse } from "@/types/contracts";
+
+export const dynamic = "force-dynamic";
 
 export async function GET(_request: Request, context: { params: Promise<{ id: string }> }) {
   const { id } = await context.params;
@@ -22,7 +24,8 @@ export async function GET(_request: Request, context: { params: Promise<{ id: st
       return apiErrorResponse(notFoundError(`Location ${idResult.data} not found`), "locations.similar.not-found");
     }
     const results = await getSimilarLocations(idResult.data);
-    return NextResponse.json({ results });
+    const response: SimilarLocationsResponse = { results };
+    return NextResponse.json(response, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
     return apiErrorResponse(error, "locations.similar.execute");
   }

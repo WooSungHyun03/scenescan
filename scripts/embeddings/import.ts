@@ -43,13 +43,13 @@ export function parseImportCliArgs(args: string[]): ImportCliOptions {
 export type DatabaseEnvironment = { url: string; serviceRoleKey: string };
 
 export function readDatabaseEnvironment(env: Readonly<Record<string, string | undefined>>): DatabaseEnvironment {
-  if (env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY) {
-    throw new Error("Service role credentials must never use a NEXT_PUBLIC_ environment variable");
+  if (env.NEXT_PUBLIC_SUPABASE_SECRET_KEY || env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY) {
+    throw new Error("Supabase secret credentials must never use a NEXT_PUBLIC_ environment variable");
   }
   const url = env.SUPABASE_URL?.trim();
-  const serviceRoleKey = env.SUPABASE_SERVICE_ROLE_KEY?.trim();
+  const serviceRoleKey = env.SUPABASE_SECRET_KEY?.trim() || env.SUPABASE_SERVICE_ROLE_KEY?.trim();
   if (!url || !serviceRoleKey) {
-    throw new Error("SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are required for dry-run/apply");
+    throw new Error("SUPABASE_URL and SUPABASE_SECRET_KEY (or legacy SUPABASE_SERVICE_ROLE_KEY) are required for dry-run/apply");
   }
   const parsedUrl = new URL(url);
   if (parsedUrl.protocol !== "https:" && parsedUrl.hostname !== "localhost" && parsedUrl.hostname !== "127.0.0.1") {

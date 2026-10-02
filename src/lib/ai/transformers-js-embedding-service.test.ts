@@ -136,6 +136,7 @@ describe("TransformersJsEmbeddingService", () => {
 
     await vi.advanceTimersByTimeAsync(25);
     await timeoutExpectation;
+    expect(firstWorker.messages.at(-1)).toEqual({ type: "cancel", id: 1 });
     expect(firstWorker.terminate).toHaveBeenCalledOnce();
     expect(service.getStatus()).toEqual({ state: "idle" });
 
@@ -156,6 +157,22 @@ describe("TransformersJsEmbeddingService", () => {
     await expect(result).rejects.toMatchObject({ name: "AbortError" });
     expect(worker.terminate).toHaveBeenCalledOnce();
     expect(service.getStatus()).toEqual({ state: "idle" });
+  });
+
+  it("cancels one queued request without terminating work that is still pending", async () => {
+    const worker = new FakeWorker();
+    const service = new TransformersJsEmbeddingService(() => worker);
+    const controller = new AbortController();
+    const cancelled = service.embed(pngBlob("cancelled"), { signal: controller.signal });
+    const retained = service.embed(pngBlob("retained"));
+
+    controller.abort();
+    await expect(cancelled).rejects.toMatchObject({ name: "AbortError" });
+    expect(worker.messages.at(-1)).toEqual({ type: "cancel", id: 1 });
+    expect(worker.terminate).not.toHaveBeenCalled();
+
+    worker.reply({ type: "result", id: 2, embedding: validEmbedding() });
+    await expect(retained).resolves.toHaveLength(CLIP_EMBEDDING_DIMENSION);
   });
 
   it("rejects unsupported input before starting a worker", async () => {
@@ -189,5 +206,49 @@ describe("TransformersJsEmbeddingService", () => {
     const results = await Promise.all(requests);
     expect(results).toHaveLength(25);
     expect(results.every((embedding) => embedding.length === CLIP_EMBEDDING_DIMENSION)).toBe(true);
+  });
+
+  it("keeps a bounded copy-safe performance snapshot", async () => {
+    const worker = new FakeWorker();
+    let now = 100;
+    const service = new TransformersJsEmbeddingService(() => worker, 1, () => now);
+    const requests = Array.from({ length: 25 }, (_, index) => {
+      now = 100 + index;
+      return service.embed(pngBlob(`${index}`));
+    });
+
+    worker.messages.forEach(({ id }, index) => {
+      now = 200 + index;
+      worker.reply({
+        type: "result",
+        id,
+        embedding: validEmbedding(),
+        timing: {
+          totalMs: 80,
+          decodeMs: 4,
+          modelWaitMs: index === 0 ? 50 : 0,
+          queueWaitMs: index,
+          inferenceMs: 20,
+          modelWasCached: index !== 0,
+          device: "wasm",
+        },
+      });
+    });
+    await Promise.all(requests);
+
+    const snapshot = service.getPerformanceSnapshot();
+    expect(snapshot).toHaveLength(20);
+    expect(snapshot[0]?.requestId).toBe(6);
+    expect(snapshot.at(-1)).toEqual(expect.objectContaining({
+      requestId: 25,
+      workerMs: 80,
+      decodeMs: 4,
+      queueWaitMs: 24,
+      inferenceMs: 20,
+      modelWasCached: true,
+      device: "wasm",
+    }));
+    snapshot[0]!.requestId = 999;
+    expect(service.getPerformanceSnapshot()[0]?.requestId).toBe(6);
   });
 });

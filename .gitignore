@@ -10,3 +10,6 @@ coverage/
 pnpm-debug.log*
 .vercel
 .idea/
+data-work/
+data/production/storage/
+public/locations/*.jpg

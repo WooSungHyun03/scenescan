@@ -65,4 +65,14 @@ describe("mock location repository", () => {
   it("similar locations: a nonexistent location returns an empty array, not an error", () => {
     expect(getMockSimilarLocations("missing")).toEqual([]);
   });
+
+  it("distinguishes on-site parking from nearby parking fixtures", () => {
+    const onSite = getMockLocation(fixtureId(1));
+    const nearby = getMockLocation(fixtureId(2));
+
+    expect(onSite?.parking[0].locationId).toBe(onSite?.id);
+    expect(onSite?.parking[0].point).toEqual(onSite?.point);
+    expect(nearby?.parking[0].locationId).toBeNull();
+    expect(nearby?.parking[0].point).not.toEqual(nearby?.point);
+  });
 });

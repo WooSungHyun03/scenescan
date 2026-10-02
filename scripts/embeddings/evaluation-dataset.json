@@ -1,0 +1,192 @@
+{
+  "schema_version": 1,
+  "name": "SceneScan synthetic multi-category ranking evaluation v1",
+  "provenance": {
+    "kind": "synthetic",
+    "license": "MIT (project-created fixtures)",
+    "source_url": "https://github.com/WooSungHyun03/scenescan/blob/main/DATA_LICENSES.md",
+    "score_origin": "curated-ranking-scenario"
+  },
+  "queries": [
+    {
+      "query_id": "urban-stairs-defining-view",
+      "category": "urban",
+      "reference_image_path": "public/images/demo-02.svg",
+      "expected_location_ids": ["demo-02"],
+      "qualitative_note": "A single distractor view is stronger, but the expected stairs location has two consistent views.",
+      "hits": [
+        { "location_image_id": "u1-demo-05-a", "location_id": "demo-05", "similarity": 0.91 },
+        { "location_image_id": "u1-demo-05-b", "location_id": "demo-05", "similarity": 0.3 },
+        { "location_image_id": "u1-demo-02-a", "location_id": "demo-02", "similarity": 0.88 },
+        { "location_image_id": "u1-demo-02-b", "location_id": "demo-02", "similarity": 0.84 },
+        { "location_image_id": "u1-demo-09-a", "location_id": "demo-09", "similarity": 0.7 },
+        { "location_image_id": "u1-demo-09-b", "location_id": "demo-09", "similarity": 0.66 }
+      ]
+    },
+    {
+      "query_id": "urban-brick-single-view",
+      "category": "urban",
+      "reference_image_path": "public/images/demo-05.svg",
+      "expected_location_ids": ["demo-05"],
+      "qualitative_note": "The expected brick alley has one defining view while a distractor is more consistent across images.",
+      "hits": [
+        { "location_image_id": "u2-demo-05-a", "location_id": "demo-05", "similarity": 0.9 },
+        { "location_image_id": "u2-demo-05-b", "location_id": "demo-05", "similarity": 0.55 },
+        { "location_image_id": "u2-demo-02-a", "location_id": "demo-02", "similarity": 0.86 },
+        { "location_image_id": "u2-demo-02-b", "location_id": "demo-02", "similarity": 0.84 },
+        { "location_image_id": "u2-demo-09-a", "location_id": "demo-09", "similarity": 0.61 },
+        { "location_image_id": "u2-demo-09-b", "location_id": "demo-09", "similarity": 0.6 }
+      ]
+    },
+    {
+      "query_id": "urban-flexible-options",
+      "category": "urban",
+      "reference_image_path": "public/images/demo-09.svg",
+      "expected_location_ids": ["demo-02", "demo-05"],
+      "qualitative_note": "Two locations are acceptable; an attractive but incorrect plaza ranks first.",
+      "hits": [
+        { "location_image_id": "u3-demo-09-a", "location_id": "demo-09", "similarity": 0.83 },
+        { "location_image_id": "u3-demo-09-b", "location_id": "demo-09", "similarity": 0.82 },
+        { "location_image_id": "u3-demo-02-a", "location_id": "demo-02", "similarity": 0.8 },
+        { "location_image_id": "u3-demo-02-b", "location_id": "demo-02", "similarity": 0.78 },
+        { "location_image_id": "u3-demo-05-a", "location_id": "demo-05", "similarity": 0.72 },
+        { "location_image_id": "u3-demo-05-b", "location_id": "demo-05", "similarity": 0.7 }
+      ]
+    },
+    {
+      "query_id": "nature-water-consistent-view",
+      "category": "nature",
+      "reference_image_path": "public/images/demo-03.svg",
+      "expected_location_ids": ["demo-03"],
+      "qualitative_note": "A wetland distractor has one strong image; the expected waterside path is consistently similar.",
+      "hits": [
+        { "location_image_id": "n1-demo-10-a", "location_id": "demo-10", "similarity": 0.85 },
+        { "location_image_id": "n1-demo-10-b", "location_id": "demo-10", "similarity": 0.4 },
+        { "location_image_id": "n1-demo-03-a", "location_id": "demo-03", "similarity": 0.82 },
+        { "location_image_id": "n1-demo-03-b", "location_id": "demo-03", "similarity": 0.8 },
+        { "location_image_id": "n1-demo-06-a", "location_id": "demo-06", "similarity": 0.68 },
+        { "location_image_id": "n1-demo-06-b", "location_id": "demo-06", "similarity": 0.65 }
+      ]
+    },
+    {
+      "query_id": "nature-hill-clear-match",
+      "category": "nature",
+      "reference_image_path": "public/images/demo-06.svg",
+      "expected_location_ids": ["demo-06"],
+      "qualitative_note": "A clear match should remain stable across aggregation choices.",
+      "hits": [
+        { "location_image_id": "n2-demo-06-a", "location_id": "demo-06", "similarity": 0.89 },
+        { "location_image_id": "n2-demo-06-b", "location_id": "demo-06", "similarity": 0.87 },
+        { "location_image_id": "n2-demo-10-a", "location_id": "demo-10", "similarity": 0.76 },
+        { "location_image_id": "n2-demo-10-b", "location_id": "demo-10", "similarity": 0.72 },
+        { "location_image_id": "n2-demo-03-a", "location_id": "demo-03", "similarity": 0.7 },
+        { "location_image_id": "n2-demo-03-b", "location_id": "demo-03", "similarity": 0.69 }
+      ]
+    },
+    {
+      "query_id": "nature-two-valid-water-edges",
+      "category": "nature",
+      "reference_image_path": "public/images/demo-10.svg",
+      "expected_location_ids": ["demo-03", "demo-10"],
+      "qualitative_note": "Both water-edge locations are acceptable; a strict threshold removes the weaker expected option.",
+      "hits": [
+        { "location_image_id": "n3-demo-06-a", "location_id": "demo-06", "similarity": 0.81 },
+        { "location_image_id": "n3-demo-06-b", "location_id": "demo-06", "similarity": 0.79 },
+        { "location_image_id": "n3-demo-10-a", "location_id": "demo-10", "similarity": 0.8 },
+        { "location_image_id": "n3-demo-10-b", "location_id": "demo-10", "similarity": 0.77 },
+        { "location_image_id": "n3-demo-03-a", "location_id": "demo-03", "similarity": 0.74 },
+        { "location_image_id": "n3-demo-03-b", "location_id": "demo-03", "similarity": 0.73 }
+      ]
+    },
+    {
+      "query_id": "industrial-warehouse-defining-view",
+      "category": "industrial",
+      "reference_image_path": "public/images/demo-01.svg",
+      "expected_location_ids": ["demo-01"],
+      "qualitative_note": "The warehouse has one highly defining view; mean aggregation penalizes its diverse second view.",
+      "hits": [
+        { "location_image_id": "i1-demo-01-a", "location_id": "demo-01", "similarity": 0.93 },
+        { "location_image_id": "i1-demo-01-b", "location_id": "demo-01", "similarity": 0.35 },
+        { "location_image_id": "i1-demo-07-a", "location_id": "demo-07", "similarity": 0.84 },
+        { "location_image_id": "i1-demo-07-b", "location_id": "demo-07", "similarity": 0.82 },
+        { "location_image_id": "i1-demo-05-a", "location_id": "demo-05", "similarity": 0.63 },
+        { "location_image_id": "i1-demo-05-b", "location_id": "demo-05", "similarity": 0.6 }
+      ]
+    },
+    {
+      "query_id": "industrial-workshop-consistent-view",
+      "category": "industrial",
+      "reference_image_path": "public/images/demo-07.svg",
+      "expected_location_ids": ["demo-07"],
+      "qualitative_note": "The expected workshop is consistent while a warehouse distractor has one slightly stronger image.",
+      "hits": [
+        { "location_image_id": "i2-demo-01-a", "location_id": "demo-01", "similarity": 0.81 },
+        { "location_image_id": "i2-demo-01-b", "location_id": "demo-01", "similarity": 0.31 },
+        { "location_image_id": "i2-demo-07-a", "location_id": "demo-07", "similarity": 0.79 },
+        { "location_image_id": "i2-demo-07-b", "location_id": "demo-07", "similarity": 0.77 },
+        { "location_image_id": "i2-demo-05-a", "location_id": "demo-05", "similarity": 0.62 },
+        { "location_image_id": "i2-demo-05-b", "location_id": "demo-05", "similarity": 0.59 }
+      ]
+    },
+    {
+      "query_id": "industrial-two-valid-spaces",
+      "category": "industrial",
+      "reference_image_path": "public/images/demo-01.svg",
+      "expected_location_ids": ["demo-01", "demo-07"],
+      "qualitative_note": "Two industrial spaces are acceptable but both are below an intentionally strict threshold.",
+      "hits": [
+        { "location_image_id": "i3-demo-05-a", "location_id": "demo-05", "similarity": 0.76 },
+        { "location_image_id": "i3-demo-05-b", "location_id": "demo-05", "similarity": 0.75 },
+        { "location_image_id": "i3-demo-01-a", "location_id": "demo-01", "similarity": 0.74 },
+        { "location_image_id": "i3-demo-01-b", "location_id": "demo-01", "similarity": 0.73 },
+        { "location_image_id": "i3-demo-07-a", "location_id": "demo-07", "similarity": 0.72 },
+        { "location_image_id": "i3-demo-07-b", "location_id": "demo-07", "similarity": 0.7 }
+      ]
+    },
+    {
+      "query_id": "interior-studio-close-pair",
+      "category": "interior",
+      "reference_image_path": "public/images/demo-04.svg",
+      "expected_location_ids": ["demo-04"],
+      "qualitative_note": "Two close interior candidates test deterministic ordering without an artificial large margin.",
+      "hits": [
+        { "location_image_id": "r1-demo-04-a", "location_id": "demo-04", "similarity": 0.78 },
+        { "location_image_id": "r1-demo-04-b", "location_id": "demo-04", "similarity": 0.75 },
+        { "location_image_id": "r1-demo-08-a", "location_id": "demo-08", "similarity": 0.77 },
+        { "location_image_id": "r1-demo-08-b", "location_id": "demo-08", "similarity": 0.76 },
+        { "location_image_id": "r1-demo-02-a", "location_id": "demo-02", "similarity": 0.6 },
+        { "location_image_id": "r1-demo-02-b", "location_id": "demo-02", "similarity": 0.58 }
+      ]
+    },
+    {
+      "query_id": "interior-warm-room-low-margin",
+      "category": "interior",
+      "reference_image_path": "public/images/demo-08.svg",
+      "expected_location_ids": ["demo-08"],
+      "qualitative_note": "The expected match wins by a narrow margin but disappears under a 0.75 threshold.",
+      "hits": [
+        { "location_image_id": "r2-demo-08-a", "location_id": "demo-08", "similarity": 0.74 },
+        { "location_image_id": "r2-demo-08-b", "location_id": "demo-08", "similarity": 0.72 },
+        { "location_image_id": "r2-demo-04-a", "location_id": "demo-04", "similarity": 0.73 },
+        { "location_image_id": "r2-demo-04-b", "location_id": "demo-04", "similarity": 0.71 },
+        { "location_image_id": "r2-demo-02-a", "location_id": "demo-02", "similarity": 0.59 },
+        { "location_image_id": "r2-demo-02-b", "location_id": "demo-02", "similarity": 0.55 }
+      ]
+    },
+    {
+      "query_id": "interior-two-valid-rooms",
+      "category": "interior",
+      "reference_image_path": "public/images/demo-04.svg",
+      "expected_location_ids": ["demo-04", "demo-08"],
+      "qualitative_note": "Both rooms are acceptable; a plaza is the first false positive and thresholding reduces recall.",
+      "hits": [
+        { "location_image_id": "r3-demo-09-a", "location_id": "demo-09", "similarity": 0.8 },
+        { "location_image_id": "r3-demo-09-b", "location_id": "demo-09", "similarity": 0.79 },
+        { "location_image_id": "r3-demo-04-a", "location_id": "demo-04", "similarity": 0.76 },
+        { "location_image_id": "r3-demo-04-b", "location_id": "demo-04", "similarity": 0.72 },
+        { "location_image_id": "r3-demo-08-a", "location_id": "demo-08", "similarity": 0.71 },
+        { "location_image_id": "r3-demo-08-b", "location_id": "demo-08", "similarity": 0.69 }
+      ]
+    }
+  ]
+}

@@ -34,7 +34,7 @@ describe.skipIf(!env)("Supabase repository (live Supabase)", () => {
     const id = randomUUID();
     const { error } = await adminClient.from("locations").insert({
       id, name: overrides.name ?? `장소 ${id.slice(0, 8)}`, description: "설명", category: overrides.category ?? "urban",
-      region: overrides.region ?? "서울", address: "주소", latitude: 37.5, longitude: 127.0, source: "manual",
+      region: overrides.region ?? "서울", address: "주소", latitude: 37.5, longitude: 127.0,
     });
     if (error) throw error;
     createdLocationIds.push(id);

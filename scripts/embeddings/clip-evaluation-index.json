@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "name": "SceneScan CLIP synthetic image regression v1",
+  "license": "MIT (project-created fixtures and derived crops)",
+  "source_url": "https://github.com/WooSungHyun03/scenescan/blob/main/DATA_LICENSES.md",
+  "candidates": [
+    { "location_id": "demo-01", "location_image_id": "demo-01-candidate", "category": "industrial", "image_path": "scripts/embeddings/evaluation-images/candidates/demo-01.png" },
+    { "location_id": "demo-02", "location_image_id": "demo-02-candidate", "category": "urban", "image_path": "scripts/embeddings/evaluation-images/candidates/demo-02.png" },
+    { "location_id": "demo-03", "location_image_id": "demo-03-candidate", "category": "nature", "image_path": "scripts/embeddings/evaluation-images/candidates/demo-03.png" },
+    { "location_id": "demo-04", "location_image_id": "demo-04-candidate", "category": "interior", "image_path": "scripts/embeddings/evaluation-images/candidates/demo-04.png" },
+    { "location_id": "demo-05", "location_image_id": "demo-05-candidate", "category": "urban", "image_path": "scripts/embeddings/evaluation-images/candidates/demo-05.png" },
+    { "location_id": "demo-06", "location_image_id": "demo-06-candidate", "category": "nature", "image_path": "scripts/embeddings/evaluation-images/candidates/demo-06.png" },
+    { "location_id": "demo-07", "location_image_id": "demo-07-candidate", "category": "industrial", "image_path": "scripts/embeddings/evaluation-images/candidates/demo-07.png" },
+    { "location_id": "demo-08", "location_image_id": "demo-08-candidate", "category": "interior", "image_path": "scripts/embeddings/evaluation-images/candidates/demo-08.png" },
+    { "location_id": "demo-09", "location_image_id": "demo-09-candidate", "category": "urban", "image_path": "scripts/embeddings/evaluation-images/candidates/demo-09.png" },
+    { "location_id": "demo-10", "location_image_id": "demo-10-candidate", "category": "nature", "image_path": "scripts/embeddings/evaluation-images/candidates/demo-10.png" }
+  ],
+  "queries": [
+    { "query_id": "clip-demo-01", "category": "industrial", "image_path": "scripts/embeddings/evaluation-images/queries/demo-01-query.png", "expected_location_ids": ["demo-01"] },
+    { "query_id": "clip-demo-02", "category": "urban", "image_path": "scripts/embeddings/evaluation-images/queries/demo-02-query.png", "expected_location_ids": ["demo-02"] },
+    { "query_id": "clip-demo-03", "category": "nature", "image_path": "scripts/embeddings/evaluation-images/queries/demo-03-query.png", "expected_location_ids": ["demo-03"] },
+    { "query_id": "clip-demo-04", "category": "interior", "image_path": "scripts/embeddings/evaluation-images/queries/demo-04-query.png", "expected_location_ids": ["demo-04"] },
+    { "query_id": "clip-demo-05", "category": "urban", "image_path": "scripts/embeddings/evaluation-images/queries/demo-05-query.png", "expected_location_ids": ["demo-05"] },
+    { "query_id": "clip-demo-06", "category": "nature", "image_path": "scripts/embeddings/evaluation-images/queries/demo-06-query.png", "expected_location_ids": ["demo-06"] },
+    { "query_id": "clip-demo-07", "category": "industrial", "image_path": "scripts/embeddings/evaluation-images/queries/demo-07-query.png", "expected_location_ids": ["demo-07"] },
+    { "query_id": "clip-demo-08", "category": "interior", "image_path": "scripts/embeddings/evaluation-images/queries/demo-08-query.png", "expected_location_ids": ["demo-08"] },
+    { "query_id": "clip-demo-09", "category": "urban", "image_path": "scripts/embeddings/evaluation-images/queries/demo-09-query.png", "expected_location_ids": ["demo-09"] },
+    { "query_id": "clip-demo-10", "category": "nature", "image_path": "scripts/embeddings/evaluation-images/queries/demo-10-query.png", "expected_location_ids": ["demo-10"] }
+  ]
+}

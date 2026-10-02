@@ -28,7 +28,7 @@ describe("describeSearchRequestError", () => {
   });
 
   it("describes a disallowed region without naming the field internally", () => {
-    const message = messageFor({ embedding: validEmbedding(), filters: { region: "제주" } });
+    const message = messageFor({ embedding: validEmbedding(), filters: { region: "평양" } });
     expect(message).toBe("허용되지 않는 지역입니다.");
   });
 

@@ -1,5 +1,7 @@
-export type LocationCategory = "urban" | "nature" | "industrial" | "interior";
-export type Region = "서울" | "부산" | "인천" | "경기";
+import type { LOCATION_CATEGORY_VALUES, REGION_VALUES } from "./location-options";
+
+export type LocationCategory = (typeof LOCATION_CATEGORY_VALUES)[number];
+export type Region = (typeof REGION_VALUES)[number];
 
 export interface GeoPoint {
   latitude: number;
@@ -24,19 +26,33 @@ export interface ParkingInfo {
   source: string | null;
 }
 
+export interface ParkingDistanceResult {
+  parking: ParkingInfo;
+  distanceMeters: number | null;
+}
+
 export interface NoiseSource {
   kind: string;
   note: string;
 }
 
-export interface LocationImage {
+export interface SourceMetadata {
+  source: string | null;
+  sourceUrl: string | null;
+  author: string | null;
+  license: string | null;
+  licenseUrl: string | null;
+  lastVerifiedAt: string | null;
+}
+
+export interface LocationImage extends SourceMetadata {
   id: string;
   locationId: string;
   imageUrl: string;
   alt: string;
 }
 
-export interface Location {
+export interface Location extends SourceMetadata {
   id: string;
   name: string;
   description: string;
@@ -48,7 +64,6 @@ export interface Location {
   permit: PermitInfo;
   parking: ParkingInfo[];
   noiseSources: NoiseSource[];
-  sourceUrl: string | null;
 }
 
 export type LocationDetail = Location;
@@ -95,3 +110,8 @@ export interface SolarPosition {
   altitudeDegrees: number;
   isAboveHorizon: boolean;
 }
+
+export type LightingClassification =
+  | "front-light"
+  | "side-light"
+  | "back-light";

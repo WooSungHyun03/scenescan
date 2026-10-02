@@ -9,6 +9,7 @@ services:
         NEXT_PUBLIC_KAKAO_MAP_KEY: ${NEXT_PUBLIC_KAKAO_MAP_KEY:-}
         NEXT_PUBLIC_USE_MOCK_DATA: ${NEXT_PUBLIC_USE_MOCK_DATA:-true}
         NEXT_PUBLIC_USE_MOCK_AI: ${NEXT_PUBLIC_USE_MOCK_AI:-true}
+        NEXT_PUBLIC_CLIP_DEVICE: ${NEXT_PUBLIC_CLIP_DEVICE:-wasm}
     ports:
       - "${PORT:-3000}:3000"
     init: true

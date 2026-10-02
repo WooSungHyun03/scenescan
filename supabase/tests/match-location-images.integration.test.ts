@@ -30,7 +30,7 @@ describe.skipIf(!env)("match_location_images regressions (live Supabase)", () =>
     const id = randomUUID();
     const { error } = await adminClient.from("locations").insert({
       id, name: `테스트 ${id.slice(0, 8)}`, description: "", category: overrides.category ?? "urban",
-      region: overrides.region ?? "서울", address: "주소", latitude: 37.5, longitude: 127.0, source: "manual",
+      region: overrides.region ?? "서울", address: "주소", latitude: 37.5, longitude: 127.0,
     });
     if (error) throw error;
     createdLocationIds.push(id);
@@ -66,25 +66,15 @@ describe.skipIf(!env)("match_location_images regressions (live Supabase)", () =>
     expect(filtered.data[0].location_id).toBe(eligibleId);
   });
 
-  it("exclude_location_id: a location's own dominant images are excluded from its own similar-locations search", async () => {
-    const targetId = await seedLocation();
-    const otherId = await seedLocation();
-    for (let i = 1; i <= 4; i += 1) {
-      await seedImage(targetId, vec((index) => (index === 0 ? 1 - 0.0001 * i : 0)));
-    }
-    await seedImage(otherId, vec((index) => (index === 0 ? 0.6 : index === 511 ? 0.8 : 0)));
-
-    const unexcluded = await adminClient.rpc("match_location_images", {
-      query_embedding: QUERY_VECTOR, match_threshold: 0, match_count: 3, expected_embedding_model: EXPECTED_MODEL,
-    });
-    expect(unexcluded.data.every((row: { location_id: string }) => row.location_id === targetId)).toBe(true);
-
-    const excluded = await adminClient.rpc("match_location_images", {
-      query_embedding: QUERY_VECTOR, match_threshold: 0, match_count: 3, expected_embedding_model: EXPECTED_MODEL, exclude_location_id: targetId,
-    });
-    expect(excluded.data).toHaveLength(1);
-    expect(excluded.data[0].location_id).toBe(otherId);
-  });
+  // There used to be an exclude_location_id regression test here, covering
+  // a now-removed match_location_images parameter -- similar-locations
+  // search was switched to origin/main's match_similar_location_images RPC
+  // (supabase/migrations/20260928000000_similar_locations.sql) during the
+  // feat/backend-supabase merge, which does its own exclusion in SQL. That
+  // RPC's self-exclusion is covered end-to-end by
+  // src/domains/locations/server/supabase-repository.integration.test.ts's
+  // "getSupabaseSimilarLocations: excludes the target location" case
+  // instead -- not duplicated here.
 
   it("expected_embedding_model fails closed: a mismatched row is excluded, and omitting the parameter matches nothing", async () => {
     // Scoped to this test's own seeded row via filter_category rather than

@@ -17,11 +17,12 @@ vi.mock("@/shared/observability/logger", () => ({
 
 const { getSupabaseLocation, getSupabaseLocations, getSupabaseSimilarLocations, searchSupabaseLocations } = await import("./supabase-repository");
 
-type QueryResult = { data: unknown; error: { message: string } | null };
+type QueryResult = { data: unknown; error: { message: string; code?: string } | null };
 
 class QueryStub implements PromiseLike<QueryResult> {
   readonly calls: { method: string; args: unknown[] }[] = [];
-  constructor(private readonly result: QueryResult) {}
+  private callIndex = 0;
+  constructor(private readonly results: QueryResult[]) {}
   private record(method: string, args: unknown[]): this {
     this.calls.push({ method, args });
     return this;
@@ -38,16 +39,25 @@ class QueryStub implements PromiseLike<QueryResult> {
     onfulfilled?: ((value: QueryResult) => T1 | PromiseLike<T1>) | null,
     onrejected?: ((reason: unknown) => T2 | PromiseLike<T2>) | null,
   ): PromiseLike<T1 | T2> {
-    return Promise.resolve(this.result).then(onfulfilled, onrejected);
+    // Each chain call (select/eq/in/...) returns `this` and is awaited only
+    // once at the end, but a retry path (legacy-attribution fallback) builds
+    // a brand new QueryStub per attempt via fakeClient's queue -- see below.
+    const result = this.results[Math.min(this.callIndex, this.results.length - 1)];
+    this.callIndex += 1;
+    return Promise.resolve(result).then(onfulfilled, onrejected);
   }
 }
 
-function fakeClient(options: { query?: QueryResult; rpc?: QueryResult; fromByTable?: Record<string, QueryResult> } = {}) {
-  const queryStub = new QueryStub(options.query ?? { data: [], error: null });
-  const rpcStub = new QueryStub(options.rpc ?? { data: [], error: null });
+function fakeClient(options: { query?: QueryResult | QueryResult[]; rpc?: QueryResult; fromByTable?: Record<string, QueryResult | QueryResult[]> } = {}) {
+  const toList = (value: QueryResult | QueryResult[] | undefined, fallback: QueryResult) =>
+    value === undefined ? [fallback] : Array.isArray(value) ? value : [value];
+  const queryStub = new QueryStub(toList(options.query, { data: [], error: null }));
+  const rpcStub = new QueryStub([options.rpc ?? { data: [], error: null }]);
   const fromCalls: string[] = [];
   const tableStubs = new Map<string, QueryStub>();
-  for (const [table, result] of Object.entries(options.fromByTable ?? {})) tableStubs.set(table, new QueryStub(result));
+  for (const [table, result] of Object.entries(options.fromByTable ?? {})) {
+    tableStubs.set(table, new QueryStub(toList(result, { data: [], error: null })));
+  }
   return {
     client: {
       from: (table: string) => {
@@ -73,6 +83,25 @@ function locationRow(overrides: Record<string, unknown> = {}) {
     ...overrides,
   };
 }
+
+// Same shape as locationRow() plus the attribution columns added by
+// 20261001000000_location_attribution.sql (origin/main) -- used by the
+// attribution-mapping and legacy-fallback tests below.
+function attributedLocationRow(overrides: Record<string, unknown> = {}) {
+  return locationRow({
+    source: "Wikidata", source_url: "https://www.wikidata.org/wiki/Q1", author: null, license: null,
+    license_url: null, last_verified_at: "2026-09-29T04:00:00Z",
+    location_images: [{
+      id: "img-1", image_url: "https://example.com/a.jpg", alt: null,
+      source: "Wikimedia Commons", source_url: "https://commons.wikimedia.org/wiki/File:Test.jpg",
+      author: "Example Author", license: "CC BY 4.0", license_url: "https://creativecommons.org/licenses/by/4.0",
+      last_verified_at: "2026-09-29T04:00:00Z",
+    }],
+    ...overrides,
+  });
+}
+
+const SCHEMA_MISSING_ATTRIBUTION_ERROR = { message: "column location_images.last_verified_at does not exist", code: "42703" };
 
 beforeEach(() => {
   getSupabaseClientMock.mockReset();
@@ -107,6 +136,46 @@ describe("SupabaseLocationRepository / MockLocationRepository contract parity", 
     expect(queryStub.calls.find((call) => call.method === "range")?.args).toEqual([0, 49]);
   });
 
+  it("getLocations: maps location and image attribution metadata when the attribution columns are present", async () => {
+    const { client } = fakeClient({ query: { data: [attributedLocationRow()], error: null } });
+    getSupabaseClientMock.mockReturnValue(client);
+    const [location] = await getSupabaseLocations();
+    expect(location).toMatchObject({
+      source: "Wikidata",
+      sourceUrl: "https://www.wikidata.org/wiki/Q1",
+      lastVerifiedAt: "2026-09-29T04:00:00Z",
+      images: [{
+        source: "Wikimedia Commons",
+        author: "Example Author",
+        license: "CC BY 4.0",
+        licenseUrl: "https://creativecommons.org/licenses/by/4.0",
+      }],
+    });
+  });
+
+  it("getLocations: retries with the legacy image relation when attribution columns are not migrated yet", async () => {
+    const { client, queryStub } = fakeClient({
+      query: [
+        { data: null, error: SCHEMA_MISSING_ATTRIBUTION_ERROR },
+        { data: [locationRow()], error: null },
+      ],
+    });
+    getSupabaseClientMock.mockReturnValue(client);
+    const results = await getSupabaseLocations();
+    expect(results).toHaveLength(1);
+    expect(loggerWarnMock).toHaveBeenCalledWith(
+      "Image attribution columns are unavailable; using the legacy location schema",
+      expect.objectContaining({ code: "42703" }),
+    );
+    expect(queryStub.calls.filter((call) => call.method === "select")).toHaveLength(2);
+  });
+
+  it("getLocations: does not retry for an unrelated Supabase failure", async () => {
+    const { client } = fakeClient({ query: { data: null, error: { message: "permission denied for table locations", code: "42501" } } });
+    getSupabaseClientMock.mockReturnValue(client);
+    await expect(getSupabaseLocations()).rejects.toMatchObject({ code: "DATA_UNAVAILABLE", status: 503 });
+  });
+
   it("getLocation: both return null for a missing id", async () => {
     expect(getMockLocation("missing")).toBeNull();
 
@@ -132,6 +201,19 @@ describe("SupabaseLocationRepository / MockLocationRepository contract parity", 
     expect(location!.parking).toEqual([]);
     expect(loggerWarnMock).toHaveBeenCalledTimes(1);
     expect(loggerWarnMock.mock.calls[0][1]).toMatchObject({ locationId: "loc-1" });
+  });
+
+  it("getLocation: retries with the legacy image relation when attribution columns are not migrated yet", async () => {
+    const { client, queryStub } = fakeClient({
+      query: [
+        { data: null, error: SCHEMA_MISSING_ATTRIBUTION_ERROR },
+        { data: locationRow(), error: null },
+      ],
+    });
+    getSupabaseClientMock.mockReturnValue(client);
+    const location = await getSupabaseLocation("loc-1");
+    expect(location).toMatchObject({ id: "loc-1", images: [{ source: null, sourceUrl: null, author: null, license: null, licenseUrl: null, lastVerifiedAt: null }] });
+    expect(queryStub.calls.filter((call) => call.method === "select")).toHaveLength(2);
   });
 
   it("getLocation: a Supabase error is surfaced as a thrown application error, not a silent null", async () => {
@@ -220,73 +302,71 @@ describe("SupabaseLocationRepository / MockLocationRepository contract parity", 
   });
 
   describe("similar locations", () => {
-    it("both never include the location itself", async () => {
-      const similarMock = getMockSimilarLocations("00000000-0000-4000-8000-000000000001");
-      expect(similarMock.some((result) => result.location.id === "00000000-0000-4000-8000-000000000001")).toBe(false);
-
+    // getSupabaseSimilarLocations delegates embedding selection (the mean of
+    // all of a location's image embeddings) and self-exclusion/grouping to
+    // Member 1's match_similar_location_images RPC + rankSimilarLocations --
+    // these tests check the repository's own wiring (RPC call shape,
+    // metadata lookup, error mapping), not the ranking logic itself.
+    it("calls match_similar_location_images with the documented default threshold/count, and never includes the source location", async () => {
       const targetId = "55555555-5555-4555-8555-555555555555";
       const otherId = "66666666-6666-4666-8666-666666666666";
-      const { client, rpcStub } = fakeClient({
+      const { client, rpcStub, tableStubs } = fakeClient({
         fromByTable: {
-          location_images: { data: { embedding: "[1,0,0,0]" }, error: null },
-          locations: { data: [locationRow({ id: otherId })], error: null },
+          locations: { data: [locationRow({ id: otherId }), locationRow({ id: targetId })], error: null },
         },
-        rpc: { data: [{ image_id: "77777777-7777-4777-8777-777777777777", location_id: otherId, image_url: "https://example.com/x.jpg", similarity: 0.7 }], error: null },
+        rpc: { data: [{ location_image_id: "img-x", location_id: otherId, similarity: 0.7 }], error: null },
       });
       getSupabaseClientMock.mockReturnValue(client);
       const results = await getSupabaseSimilarLocations(targetId);
       expect(results.every((result) => result.location.id !== targetId)).toBe(true);
+      expect(results.map((result) => result.location.id)).toEqual([otherId]);
       const rpcCall = rpcStub.calls.find((call) => call.method === "rpc")?.args as [string, Record<string, unknown>];
-      expect(rpcCall[1].exclude_location_id).toBe(targetId);
-      expect(rpcCall[1].query_embedding).toBe("[1,0,0,0]");
+      expect(rpcCall[0]).toBe("match_similar_location_images");
+      expect(rpcCall[1]).toEqual({ source_location_id: targetId, match_threshold: 0, match_count: 200 });
+      // The metadata lookup is by the exact matched + source ids (via
+      // getSupabaseLocationsByIds's .in()), never a plain/paginated
+      // getSupabaseLocations() call -- see the comment in
+      // supabase-repository.ts for why that distinction matters once
+      // getSupabaseLocations() became paginated.
+      const locationsStub = tableStubs.get("locations")!;
+      expect(locationsStub.calls.some((call) => call.method === "range")).toBe(false);
+      const inCall = locationsStub.calls.find((call) => call.method === "in")?.args as [string, string[]];
+      expect(new Set(inCall[1])).toEqual(new Set([otherId, targetId]));
     });
 
-    it("fetches the representative embedding filtered by location_id, expected embedding_model, and non-null, ordered deterministically", async () => {
-      const targetId = "55555555-5555-4555-8555-555555555555";
-      const { client, tableStubs } = fakeClient({
-        fromByTable: { location_images: { data: null, error: null } },
+    it("a nonexistent location still returns [] (no error) via the RPC's own exclusion + rankSimilarLocations' existence guard", async () => {
+      const { client, rpcStub } = fakeClient({
+        fromByTable: { locations: { data: [], error: null } },
+        rpc: { data: [], error: null },
       });
       getSupabaseClientMock.mockReturnValue(client);
-      await getSupabaseSimilarLocations(targetId);
-      const imagesStub = tableStubs.get("location_images")!;
-      const eqCalls = imagesStub.calls.filter((call) => call.method === "eq").map((call) => call.args);
-      expect(eqCalls).toEqual([["location_id", targetId], ["embedding_model", "Xenova/clip-vit-base-patch32@main"]]);
-      expect(imagesStub.calls.some((call) => call.method === "not" && call.args[0] === "embedding")).toBe(true);
-      expect(imagesStub.calls.filter((call) => call.method === "order").map((call) => call.args[0])).toEqual(["created_at", "id"]);
+      const results = await getSupabaseSimilarLocations("missing");
+      expect(results).toEqual([]);
+      expect(rpcStub.calls).toHaveLength(1);
     });
 
-    it("real: no representative embedding -> [] without calling the RPC", async () => {
-      const { client, rpcStub } = fakeClient({ fromByTable: { location_images: { data: null, error: null } } });
+    it("a location with no usable embedding (RPC returns no candidates) returns []", async () => {
+      const targetId = "55555555-5555-4555-8555-555555555555";
+      const { client } = fakeClient({
+        fromByTable: { locations: { data: [locationRow({ id: targetId })], error: null } },
+        rpc: { data: [], error: null },
+      });
       getSupabaseClientMock.mockReturnValue(client);
-      const results = await getSupabaseSimilarLocations("55555555-5555-4555-8555-555555555555");
-      expect(results).toEqual([]);
-      expect(rpcStub.calls).toHaveLength(0);
+      await expect(getSupabaseSimilarLocations(targetId)).resolves.toEqual([]);
     });
 
     it("mock: a location with no same-category peers returns []", () => {
       expect(getMockSimilarLocations("missing")).toEqual([]);
     });
 
-    it("self-domination regression: excluding the target location returns other locations even when the target's own images would otherwise fill every slot", async () => {
+    it("maps an RPC failure to the shared data-access error contract", async () => {
       const targetId = "55555555-5555-4555-8555-555555555555";
-      const otherId = "66666666-6666-4666-8666-666666666666";
-      const { client, rpcStub } = fakeClient({
-        fromByTable: {
-          location_images: { data: { embedding: "[1,0,0,0]" }, error: null },
-          locations: { data: [locationRow({ id: otherId })], error: null },
-        },
-        // The RPC itself is responsible for excluding the target's own
-        // images (verified against real Postgres in docs/search-ranking.md);
-        // this test only asserts the repository passes exclude_location_id
-        // through and correctly maps whatever the RPC returns.
-        rpc: { data: [{ image_id: "77777777-7777-4777-8777-777777777777", location_id: otherId, image_url: "https://example.com/x.jpg", similarity: 0.6 }], error: null },
+      const { client } = fakeClient({
+        fromByTable: { locations: { data: [locationRow({ id: targetId })], error: null } },
+        rpc: { data: null, error: { message: "RPC unavailable" } },
       });
       getSupabaseClientMock.mockReturnValue(client);
-      const results = await getSupabaseSimilarLocations(targetId);
-      expect(results).toHaveLength(1);
-      expect(results[0]?.location.id).toBe(otherId);
-      const rpcCall = rpcStub.calls.find((call) => call.method === "rpc")?.args as [string, Record<string, unknown>];
-      expect(rpcCall[1].exclude_location_id).toBe(targetId);
+      await expect(getSupabaseSimilarLocations(targetId)).rejects.toMatchObject({ code: "DATA_UNAVAILABLE", status: 503 });
     });
   });
 });

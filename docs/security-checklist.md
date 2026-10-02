@@ -93,3 +93,16 @@ That file was accurate as of 2026-09-27 but several of its "실제 구현 상태
 | service-role 클라이언트 구조 | "`src/infrastructure`에 별도 모듈 없음" | `src/infrastructure/supabase/admin-client.ts`가 `server-only` 가드와 함께 존재 (현재 어떤 읽기 경로도 사용하지 않음) |
 
 **제안**: `docs/security-audit-context.md`를 삭제하고 이 문서로 대체 — 삭제 전 사용자 확인 필요 (아직 삭제하지 않음).
+
+## 9. 머지 전 확인 항목 (`feat/backend-supabase` → `main`)
+
+- **[팀]** 실제 Supabase 프로젝트에 어떤 migration까지 적용됐는지 확인:
+  ```bash
+  npx supabase login
+  npx supabase link --project-ref <project-ref>
+  npx supabase migration list
+  ```
+  로컬 파일(9개, `20260920000000`~`20261001000005`)과 "Remote" 컬럼을 비교해 `20261001000000_location_attribution.sql` 이후 파일들이 아직 적용 안 됐는지 확인.
+- **[팀]** 실제 DB에 migration을 먼저 적용한 뒤 PR을 머지한다 — 반대 순서(코드만 먼저 배포)로 하면 `embedding_model`/`match_location_images` 신호 시그니처가 없는 상태로 코드가 돌아 검색 자체가 깨진다.
+- **[Member 1]** `scripts/embeddings/import.ts`가 `location_images` upsert 시 `embedding_model`을 명시적으로 넣는지 확인 (현재 안 넣음 — 기본값 제거 migration 때문에 신규 삽입은 `not_null` 위반으로 실패하도록 의도된 동작. §4/§7 참조).
+- **[Member 1]** `scripts/data/production-importer.ts`도 동일한 문제가 있음을 확인 — `ImageMetadataRow`에 `embedding`/`embedding_model` 필드 자체가 없어, 이 스크립트로 재적재하면 같은 이유로 실패한다 (로컬에서 직접 재현 확인됨). 코드는 고치지 않음 — import.ts와 마찬가지로 의도된 fail-loud.

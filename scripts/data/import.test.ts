@@ -78,7 +78,7 @@ describe("location import CLI (validate-only, no database needed)", () => {
     const reportPath = join(root, "report.json");
     await writeFile(inputPath, JSON.stringify(datasetWith([
       location(),
-      location({ id: "00000000-0000-4000-8000-000000000102", region: "제주" }),
+      location({ id: "00000000-0000-4000-8000-000000000102", region: "평양" }),
     ])), "utf8");
 
     await runImport({ inputPath, reportPath, mode: "validate-only", batchSize: 100, imageRoot: join(root, "images") });

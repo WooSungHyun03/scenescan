@@ -74,14 +74,14 @@ Verification:
 
 ## DAY 4 — Supabase pgvector Integration
 
-Status: local implementation complete (2026-09-22); remote integration blocked until project credentials and authorized rows are available
+Status: complete (remote integration verified 2026-09-29)
 
 - [x] Verify pgvector extension and `vector(512)` schema.
 - [x] Review foreign keys, indexes, and RLS against the committed backend migration.
 - [x] Add a controlled validate/dry-run/apply upsert workflow with duplicate prevention.
 - [x] Reject invalid and zero-norm vectors and keep service-role credentials server-only.
 - [x] Verify cosine normalization utilities, RPC bounds in SQL, empty result handling, and malformed query rejection locally.
-- [ ] Run real integration checks when credentials and authorized location rows are available.
+- [x] Run real integration checks with server-only credentials and authorized location rows.
 - [x] Document migration and import operations.
 
 Verification:
@@ -90,7 +90,9 @@ Verification:
 - Import preflight tests cover missing locations, cross-location UUID replacement, duplicate URL, unresolved failure, zero norm, invalid RPC similarity, dry-run no-write behavior, and apply batching.
 - Search request validation rejects non-finite, wrong-dimension, and all-zero query vectors before RPC execution.
 - Automated suite after local DAY 4 implementation: 62 tests passed.
-- Remote dry-run/apply remains intentionally unverified because no Supabase service-role credential or authorized production rows were available on this host.
+- Production (2026-09-29): 159 licensed locations and 209 image rows imported; all 209 rows contain finite 512-D CLIP embeddings.
+- Real `match_location_images` and `match_similar_location_images` probes each returned eight finite results. Runtime image URLs resolve through the public `location-images` Supabase Storage bucket.
+- The nationwide region constraint and partial cosine HNSW index were applied through `20260929000000_scale_location_catalog.sql`.
 
 ## DAY 5 — Search Ranking
 
@@ -116,47 +118,72 @@ Verification:
 
 ## DAY 6 — Similar Locations
 
-Status: not started
+Status: complete, including production activation (2026-09-29)
 
-- [ ] Implement `getSimilarLocations` with the backend owner.
-- [ ] Exclude the selected location and remove duplicates.
-- [ ] Define representative embedding and Top-K behavior.
-- [ ] Handle missing embeddings and unknown IDs.
-- [ ] Evaluate reference blending only if evidence justifies it.
-- [ ] Add tests and confirm API contract consistency.
+- [x] Implement `getSimilarLocations` through the existing repository contract.
+- [x] Exclude the selected location and remove duplicates.
+- [x] Define representative embedding and Top-K behavior.
+- [x] Handle missing embeddings and unknown IDs.
+- [x] Evaluate reference blending only if evidence justifies it.
+- [x] Add tests and confirm API contract consistency.
+
+Verification:
+
+- Representative query: mean of every non-null CLIP image embedding for the selected location; cosine distance is used for candidates.
+- SQL and application layers both exclude the selected location. Max-per-location aggregation, Top 8, malformed/orphan removal, and deterministic ties reuse the production ranker.
+- Mock and Supabase adapters cover unknown IDs, no embeddings, duplicate candidates, RPC failures, and source exclusion.
+- Migration audit covers representative `vector(512)`, invoker rights, public execute grant, bounded threshold/count, source exclusion, and deterministic order; 20 schema checks pass across all migrations.
+- Production RPC is deployed and returns eight results while excluding the source location; the 159-location catalog has embeddings for all 209 image rows.
+- Reference + selected-location blending remains disabled until DAY 7 supplies retrieval evidence.
 
 ## DAY 7 — Retrieval Evaluation
 
-Status: not started
+Status: complete for the authorized synthetic baseline (2026-09-29); production photographic relevance remains a documented data limitation
 
-- [ ] Create an authorized or synthetic multi-category evaluation set.
-- [ ] Record expected matches and failure cases.
-- [ ] Implement Top-1, Top-3, and Top-5/Recall@K evaluation.
-- [ ] Compare max similarity, top-k mean, and thresholds.
-- [ ] Record qualitative examples without unsupported tuning.
-- [ ] Create `docs/ai-retrieval-evaluation.md` and select final settings.
+- [x] Create an authorized or synthetic multi-category evaluation set.
+- [x] Record expected matches and failure cases.
+- [x] Implement Top-1, Top-3, and Top-5/Recall@K evaluation.
+- [x] Compare max similarity, top-k mean, and thresholds.
+- [x] Record qualitative examples without unsupported tuning.
+- [x] Create `docs/ai-retrieval-evaluation.md` and select final settings.
+
+Verification:
+
+- Real `Xenova/clip-vit-base-patch32` run: 20/20 finite 512-D embeddings for ten MIT-licensed candidate/query pairs; 100% Top-1/3/5 and Recall@1/3/5 on the synthetic transform regression set.
+- Correct-pair cosine range: 0.966855–0.977649; Top-1 margins: 0.000624–0.012440. These narrow margins confirm the same-template set is regression evidence, not production relevance evidence.
+- Twelve balanced ranking scenarios compare max and top-2 mean at thresholds 0, 0.5, and 0.75. Top-2 mean/0 reached 50.0% Top-1 versus max/0 at 41.7%, but both reached 100% Top-3/5; the curated set does not justify changing production.
+- Threshold 0.75 reduced macro Recall@3/5 to 70.8% and produced 8.3% empty results. Production stays at max, threshold 0, Top 8; blending stays disabled.
+- Focused evaluation and ranking suites validate malformed data, duplicate IDs, missing images/embeddings, multi-answer recall, empty threshold results, deterministic output, and model provenance.
 
 ## DAY 8 — AI Performance
 
-Status: not started
+Status: in progress (offline and cache-warm production browser baselines recorded; cold-download and heap device matrix remain)
 
-- [ ] Benchmark initial load and repeated inference.
-- [ ] Measure worker and preprocessing overhead.
-- [ ] Confirm lazy loading, caching, and duplicate-init prevention.
-- [ ] Check repeated-use memory behavior.
-- [ ] Evaluate WebGPU capability without making it mandatory.
-- [ ] Preserve WASM/CPU fallback, cancellation, and timeout behavior.
-- [ ] Add regression tests and benchmark documentation.
+Preliminary baseline (not a browser result): with the model already present in the local Hugging Face cache, a fresh Node 22 process loaded the production CLIP pipeline and embedded the 20-image evaluation set in five batches of four in 1.75 seconds wall time. Peak RSS was 830,912 KB. The generated score file SHA-256 was `a0aa27ae6de76e99307e5fbfece7143412129a8c0d0dc467c310753ec36239ec`. DAY 8 remains open until cold browser loading, repeated worker inference, preprocessing overhead, memory behavior, WebGPU capability, and fallback paths are measured separately.
+
+- [ ] Benchmark first-visit network/model load; cache-warm Worker initialization and repeated inference are recorded.
+- [x] Add bounded worker decode/model-wait/inference and main-thread overhead measurements.
+- [x] Confirm lazy loading, caching, and duplicate-init prevention.
+- [ ] Measure long-run browser heap; worker serialization and bounded telemetry now prevent decoded-image concurrency and unbounded diagnostic retention.
+- [ ] Run the WebGPU device benchmark; opt-in selection and automatic WASM initialization fallback are implemented and tested.
+- [x] Preserve explicit WASM fallback, cancellation, and timeout behavior.
+- [x] Add regression tests and benchmark documentation.
+
+Production browser verification (2026-09-30): a new Worker with model files already cached completed the full image-to-Top-8 flow in 3,334 ms. Five same-Worker searches took 2,168/1,947/1,952/2,266/1,955 ms (2,058 ms mean; 1,955 ms median), returned 선유도공원 first at 88%, and emitted no console warning/error. See `docs/ai-performance.md`. Cold network load and browser heap remain explicitly unverified.
+
+Reliability follow-up (2026-10-01): concurrent Worker requests now serialize decode/inference, report queue wait and actual execution device, and drop cancelled queued requests without terminating unrelated work. `NEXT_PUBLIC_CLIP_DEVICE=webgpu` is an explicit build-time experiment and retries with WASM if WebGPU setup fails; four focused fallback tests and concurrent cancellation/serialization regressions pass. A physical WebGPU comparison and trustworthy browser heap run remain open.
 
 ## DAY 9 — CI
 
-Status: not started
+Status: complete (2026-09-29)
 
-- [ ] Add GitHub Actions checkout, Node 22, and pnpm setup.
-- [ ] Use frozen lockfile install and dependency caching.
-- [ ] Run lint, typecheck, test, and build with clear failures.
-- [ ] Apply minimum permissions, concurrency cancellation, and timeout.
-- [ ] Validate workflow syntax and document CI in README.
+- [x] Add GitHub Actions checkout, Node 22, and pnpm setup.
+- [x] Use frozen lockfile install and dependency caching.
+- [x] Run lint, typecheck, test, and build with clear failures.
+- [x] Apply minimum permissions, concurrency cancellation, and timeout.
+- [x] Validate workflow syntax and document CI in README.
+
+Verification: GitHub Actions run `36521957799` passed the Docker-based lint, typecheck, 160-test suite, standalone build, production image build, and container smoke checks in 3m44s with read-only permissions, a 25-minute timeout, dependency/build caching, and concurrency cancellation.
 
 ## DAY 10 — Environment / Secret Security
 
@@ -171,13 +198,15 @@ Status: not started
 
 ## DAY 11 — Production Deployment
 
-Status: not started
+Status: complete (2026-09-29)
 
-- [ ] Verify Vercel Hobby build, Node, pnpm, and environment settings.
-- [ ] Verify Supabase migrations, pgvector, RLS, RPC, and licensed sample data.
-- [ ] Run a production build and deploy when credentials are available.
-- [ ] Smoke-test home, search, detail, API, and real AI search paths.
-- [ ] Record external credential blockers without blocking local work.
+- [x] Verify Vercel Hobby build, Node, pnpm, and environment settings.
+- [x] Verify Supabase migrations, pgvector, RLS, RPC, and licensed sample data.
+- [x] Run a production build and deploy when credentials are available.
+- [x] Smoke-test home, search, detail, API, and real AI search paths.
+- [x] Record external credential blockers without blocking local work.
+
+Verification: Vercel deployed commit `edc063a` in 38 seconds and assigned `beceleb.org`. Production returned 200 for health/home/search/detail, loaded Kakao Maps and Supabase Storage images, returned eight finite RPC results, and completed a real browser CLIP search with the matching location ranked first. No credential blocker remains; Resend/Auth are intentionally absent because the MVP has no email/auth flow.
 
 ## DAY 12 — Production Reliability
 

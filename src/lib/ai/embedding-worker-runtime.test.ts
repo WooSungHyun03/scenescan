@@ -149,4 +149,79 @@ describe("embedding worker runtime", () => {
 
     expect(replies).toContainEqual({ type: "status", status: "loading", progress: 100 });
   });
+
+  it("reports decode, model wait, inference, and cache timing without changing the embedding", async () => {
+    const replies: EmbeddingWorkerReply[] = [];
+    let clock = 0;
+    const handle = createEmbeddingWorkerHandler({
+      loadExtractor: async () => async () => ({
+        data: new Float32Array(CLIP_EMBEDDING_DIMENSION).fill(0.25),
+      }),
+      decodeImage: async (blob) => blob,
+      getDimensions: () => ({ width: 800, height: 600 }),
+      postMessage: (reply) => replies.push(reply),
+      now: () => {
+        const current = clock;
+        clock += 2;
+        return current;
+      },
+    });
+
+    await handle({ type: "embed", id: 20, image });
+    await handle({ type: "embed", id: 21, image });
+
+    const results = replies.filter((reply) => reply.type === "result");
+    expect(results).toHaveLength(2);
+    expect(results[0]).toEqual(expect.objectContaining({
+      id: 20,
+      timing: {
+        totalMs: 16,
+        decodeMs: 2,
+        modelWaitMs: 2,
+        queueWaitMs: 2,
+        inferenceMs: 2,
+        modelWasCached: false,
+        device: "wasm",
+      },
+    }));
+    expect(results[1]).toEqual(expect.objectContaining({
+      id: 21,
+      timing: expect.objectContaining({ modelWasCached: true }),
+    }));
+  });
+
+  it("serializes inference and drops a cancelled queued request", async () => {
+    const replies: EmbeddingWorkerReply[] = [];
+    let active = 0;
+    let maximumActive = 0;
+    const extractor = vi.fn(async () => {
+      active += 1;
+      maximumActive = Math.max(maximumActive, active);
+      await new Promise((resolve) => setTimeout(resolve, 1));
+      active -= 1;
+      return { data: new Float32Array(CLIP_EMBEDDING_DIMENSION).fill(0.5) };
+    });
+    const handle = createEmbeddingWorkerHandler({
+      loadExtractor: async () => extractor,
+      decodeImage: async (blob) => blob,
+      getDimensions: () => ({ width: 800, height: 600 }),
+      postMessage: (reply) => replies.push(reply),
+    });
+
+    const first = handle({ type: "embed", id: 31, image });
+    const cancelled = handle({ type: "embed", id: 32, image });
+    await handle({ type: "cancel", id: 32 });
+    const third = handle({ type: "embed", id: 33, image });
+    await Promise.all([first, cancelled, third]);
+
+    expect(maximumActive).toBe(1);
+    expect(extractor).toHaveBeenCalledTimes(2);
+    expect(replies).toEqual(expect.arrayContaining([
+      expect.objectContaining({ type: "result", id: 31 }),
+      expect.objectContaining({ type: "result", id: 33 }),
+    ]));
+    expect(replies).not.toEqual(expect.arrayContaining([
+      expect.objectContaining({ type: "result", id: 32 }),
+    ]));
+  });
 });

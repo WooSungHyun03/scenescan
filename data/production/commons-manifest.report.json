@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "discovered_candidates": 255,
+  "licensed_images_accepted": 173,
+  "images_rejected": 108,
+  "existing_locations": 10,
+  "new_locations": 149,
+  "total_locations": 159
+}

@@ -15,12 +15,17 @@ Runtime: image → browser ImageEmbeddingService → Web Worker CLIP (or mock)
 
 Offline: licensed location image → scripts/embeddings/prepare.ts
        → validated manifest → batched/resumable 512D CLIP vector JSON
-       → reviewed import into Supabase location_images
+       → reviewed upload to Supabase Storage → import into Supabase location_images
+
+Similar: selected location → mean of its non-null image embeddings
+       → pgvector cosine search excluding selected location → deterministic Top 8 locations
 ```
 
-The runtime worker is loaded only if `NEXT_PUBLIC_USE_MOCK_AI=false`. The UI remains responsive while the model loads. Initial model download and browser memory usage need device testing. Offline and runtime embeddings must use the same model and preprocessing. The [Transformers.js image-feature-extraction documentation](https://huggingface.co/docs/transformers.js/api/pipelines) shows `Xenova/clip-vit-base-patch32` yielding `[1, 512]`.
+The runtime worker is loaded only if `NEXT_PUBLIC_USE_MOCK_AI=false`. The UI remains responsive while the model loads. Runtime defaults to the Transformers.js WASM device so browsers without WebGPU remain supported. An experimental build may set `NEXT_PUBLIC_CLIP_DEVICE=webgpu`; a WebGPU initialization failure retries once with WASM and records the actual device in performance diagnostics. Invalid values also resolve to WASM. Offline and runtime embeddings use the same model and preprocessing. The [Transformers.js image-feature-extraction documentation](https://huggingface.co/docs/transformers.js/api/pipelines) shows `Xenova/clip-vit-base-patch32` yielding `[1, 512]`.
 
 Runtime AI accepts JPEG, PNG, and WebP files up to 15 MB, 8192 px on either axis, and 20 megapixels. The main thread validates the file envelope; the worker validates decoded dimensions and rejects malformed or non-finite model output. One service instance owns one worker, and the worker owns one lazily initialized model promise. Requests are correlated by ID, default to a 120-second timeout, may be cancelled with an `AbortSignal`, and are retried once on a worker crash. Model state is observable as `idle`, `loading` (with optional aggregate download percentage), `ready`, or `error`.
+
+Each successful real inference records timing for worker queue wait, decode, model wait, inference, total worker time, and main-thread transfer/queue overhead plus the actual execution device. The worker serializes decode and inference so rapid concurrent requests cannot create multiple decoded-image/model executions at once. A cancelled queued request is dropped before decode; active inference remains non-preemptive and its late reply is ignored. The service retains only the latest 20 small numeric samples so diagnostics cannot grow without bound or retain user image data. See `docs/ai-performance.md`.
 
 The offline pipeline imports the same model ID, revision, dimension, image envelope, and decoded-dimension validators as runtime AI. Its versioned manifest records image/location UUIDs plus source provenance. Output has deterministic manifest order and no timestamps; it records the installed Transformers.js version and writes an atomic checkpoint after each batch. A normal rerun resumes matching completed records and retries failures. See `docs/offline-embeddings.md`.
 
@@ -34,6 +39,10 @@ The offline pipeline imports the same model ID, revision, dimension, image envel
 
 Pages compose domains and call application APIs or repository-backed server components. API routes validate shared contracts before calling domain repositories. The location map service switches between a Kakao adapter and a no-key preview, while solar calculation remains a pure domain service except for SunCalc. Exceptions cross the API boundary through one structured mapper, and server/client error surfaces use the shared logger.
 
+The shortlist remains a browser-only workflow: it stores only location IDs under a versioned `localStorage` key, synchronizes changes across cards and browser tabs, and resolves those IDs against the existing read-only location repository. It does not add authentication, server writes, or a new database contract.
+
+The browser map adapter loads the official Kakao Maps JavaScript SDK only when `NEXT_PUBLIC_KAKAO_MAP_KEY` is configured. The Kakao Developers application must register every local and production JavaScript SDK domain. Missing keys and SDK load failures preserve the no-key map preview; neither case blocks location detail or search results. The adapter receives WGS84 coordinates and display labels from the location domain and does not geocode inside the UI.
+
 The Docker build uses Next.js standalone output, installs dependencies in a dedicated stage, and runs the final image as an unprivileged user. `/api/health` is the container and deployment liveness endpoint. GitHub Actions runs lint, type checking, tests, the Next.js build, image build, and container smoke checks inside Docker. Vercel's existing Git integration remains the only production deploy trigger, avoiding a duplicate CI deployment.
 
 ## Known scaffold limits
@@ -41,6 +50,7 @@ The Docker build uses Next.js standalone output, installs dependencies in a dedi
 - Mock search ranking is synthetic and only proves the end-to-end contract. The percentage badge is not a measured visual match in mock mode.
 - Max-per-location is the production aggregation default. A pure top-k mean alternative exists for DAY 7 evaluation but is not enabled without retrieval evidence. See `docs/search-ranking.md`.
 - The real RPC retrieves at most 200 top images before app-side region/category filtering. A larger dataset may need SQL-side filters to avoid excluding eligible lower-ranked images.
-- Real-mode similar-location ranking is reserved for Member 1 and 3; the UI currently shows an empty state.
+- Production image search uses a partial HNSW cosine index. The current 159-location/209-image catalog is well below Supabase Free database and Storage limits; monthly image egress is the first capacity metric to watch.
+- Real-mode similar-location ranking requires the `20260928000000_similar_locations.sql` migration and authorized embedded location rows. Unknown locations or sources without embeddings intentionally return an empty state.
 - The offline preparation script emits deterministic JSON for review. A separate importer defaults to offline validation, performs remote foreign-key/RPC preflight in dry-run mode, and requires an explicit apply mode plus a server-only service role for controlled upsert. No external records or images are bundled.
 - This public read-only MVP has no authentication or authoring UI. Production data insertion uses controlled Supabase tooling.

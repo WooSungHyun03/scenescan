@@ -12,6 +12,10 @@ export class MockEmbeddingService implements ImageEmbeddingService {
     return { state: "ready" };
   }
 
+  getPerformanceSnapshot(): readonly [] {
+    return [];
+  }
+
   subscribe(listener: EmbeddingStatusListener): () => void {
     listener(this.getStatus());
     return () => undefined;

@@ -12,10 +12,16 @@ describe("embedding import CLI", () => {
 
   it("keeps service-role credentials server-only and requires HTTPS remotely", () => {
     expect(() => readDatabaseEnvironment({ NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY: "secret" })).toThrow("NEXT_PUBLIC");
+    expect(() => readDatabaseEnvironment({ NEXT_PUBLIC_SUPABASE_SECRET_KEY: "secret" })).toThrow("NEXT_PUBLIC");
     expect(() => readDatabaseEnvironment({ SUPABASE_URL: "https://project.supabase.co" })).toThrow("required");
     expect(() => readDatabaseEnvironment({ SUPABASE_URL: "http://project.supabase.co", SUPABASE_SERVICE_ROLE_KEY: "secret" }))
       .toThrow("HTTPS");
     expect(readDatabaseEnvironment({ SUPABASE_URL: "http://localhost:54321", SUPABASE_SERVICE_ROLE_KEY: "secret" }))
       .toEqual({ url: "http://localhost:54321", serviceRoleKey: "secret" });
+    expect(readDatabaseEnvironment({
+      SUPABASE_URL: "https://project.supabase.co",
+      SUPABASE_SECRET_KEY: "preferred",
+      SUPABASE_SERVICE_ROLE_KEY: "legacy",
+    })).toEqual({ url: "https://project.supabase.co", serviceRoleKey: "preferred" });
   });
 });

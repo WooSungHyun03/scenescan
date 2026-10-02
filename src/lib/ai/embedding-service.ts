@@ -1,6 +1,7 @@
 export interface ImageEmbeddingService {
   embed(image: File | Blob, options?: EmbeddingRequestOptions): Promise<number[]>;
   getStatus(): EmbeddingServiceStatus;
+  getPerformanceSnapshot(): readonly EmbeddingPerformanceSample[];
   subscribe(listener: EmbeddingStatusListener): () => void;
 }
 
@@ -16,6 +17,28 @@ export const MAX_IMAGE_BYTES = 15 * 1024 * 1024;
 export const MAX_IMAGE_DIMENSION = 8192;
 export const MAX_IMAGE_PIXELS = 20_000_000;
 export const DEFAULT_EMBEDDING_TIMEOUT_MS = 120_000;
+export const EMBEDDING_PERFORMANCE_SAMPLE_LIMIT = 20;
+
+export type ClipBrowserDevice = "wasm" | "webgpu";
+
+export function selectClipBrowserDevice(value: string | undefined): ClipBrowserDevice {
+  return value === "webgpu" ? "webgpu" : "wasm";
+}
+
+export const CLIP_BROWSER_DEVICE = selectClipBrowserDevice(process.env.NEXT_PUBLIC_CLIP_DEVICE);
+
+export type EmbeddingPerformanceSample = {
+  requestId: number;
+  totalMs: number;
+  workerMs: number;
+  transferAndQueueMs: number;
+  decodeMs: number;
+  modelWaitMs: number;
+  queueWaitMs: number;
+  inferenceMs: number;
+  modelWasCached: boolean;
+  device: ClipBrowserDevice;
+};
 
 export type EmbeddingRequestOptions = {
   signal?: AbortSignal;

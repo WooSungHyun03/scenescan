@@ -45,13 +45,19 @@ $$;
 -- pre-generated UUID as the canonical record's own `id` (validated in
 -- scripts/data/validator.ts), so the existing locations.id primary key is
 -- the upsert key scripts/data/location-importer.ts already uses.
+-- Nullable, no default: origin/main's own production data pipeline
+-- (scripts/data/production-importer.ts) writes `locations` rows directly
+-- and has no concept of a scripts/data import batch, so it never sets this
+-- column -- a NOT NULL default would mislabel every one of its rows as
+-- 'manual', which is simply false. Null here means "not written by
+-- scripts/data's batch importer", which is an accurate, not a missing, fact.
 alter table public.locations
-  add column import_batch text not null default 'manual',
+  add column import_batch text,
   add column reference_date date,
   add column updated_at timestamptz not null default now();
 
 comment on column public.locations.import_batch is
-  'Dataset/batch name that produced this row via scripts/data (DataProvenance.source), e.g. a scripts/data source key. Default manual covers hand-entered rows that predate batch tracking. Distinct from locations.source (added by 20261001000000_location_attribution.sql), which is the human-readable, user-facing attribution source -- these are two different concepts that happen to share the word "source".';
+  'Dataset/batch name that produced this row via scripts/data (DataProvenance.source), e.g. a scripts/data source key. Null means this row was not written by scripts/data (e.g. origin/main''s production-importer.ts). Distinct from locations.source (added by 20261001000000_location_attribution.sql), which is the human-readable, user-facing attribution source -- these are two different concepts that happen to share the word "source".';
 comment on column public.locations.reference_date is
   'Date the source dataset describes this location as of (DataProvenance.referenceDate), when the source is a dated snapshot rather than live.';
 

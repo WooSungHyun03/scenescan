@@ -10,6 +10,12 @@ export type LocationImageRow = {
   id: unknown;
   image_url: unknown;
   alt: unknown;
+  source?: unknown;
+  source_url?: unknown;
+  author?: unknown;
+  license?: unknown;
+  license_url?: unknown;
+  last_verified_at?: unknown;
 };
 
 export type ParkingRow = {
@@ -38,9 +44,66 @@ export type LocationRow = {
   permit_note: string | null;
   noise_sources: Location["noiseSources"] | null;
   source_url: string | null;
+  source?: unknown;
+  author?: unknown;
+  license?: unknown;
+  license_url?: unknown;
+  last_verified_at?: unknown;
   location_images: LocationImageRow[] | null;
   parking: ParkingRow[] | null;
 };
+
+// getSupabaseClient() (src/infrastructure/supabase/server-client.ts) creates
+// a plain, un-parameterized SupabaseClient -- this project has no generated
+// Database type, so supabase-js's .select() always falls back to its
+// internal GenericStringError placeholder type regardless of what's
+// selected, with essentially no structural overlap with LocationRow. A
+// direct `as LocationRow` cast is rejected by tsc for exactly that reason.
+// Validating the required scalar columns here (all `not null` in
+// supabase/migrations/20260920000000_initial_schema.sql, so a real row
+// always has them) turns that unchecked cast into a checked one: a
+// mismatch -- most plausibly a renamed/typo'd column in LOCATION_SELECT,
+// a real bug, not malformed data -- throws a clear ZodError naming the
+// field instead of silently propagating `undefined` into the API
+// response. location_images/parking stay loosely typed (just "array of
+// objects, or null"): per-field validation of those is mapImage/mapParking's
+// job below, which already drops a malformed sub-row instead of throwing.
+const locationRowSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  description: z.string(),
+  category: z.string(),
+  region: z.string(),
+  address: z.string(),
+  latitude: z.number(),
+  longitude: z.number(),
+  permit_type: z.string(),
+  contact_name: z.string().nullable(),
+  contact_phone: z.string().nullable(),
+  permit_note: z.string().nullable(),
+  noise_sources: z.unknown().nullable().optional(),
+  source_url: z.string().nullable(),
+  source: z.unknown().optional(),
+  author: z.unknown().optional(),
+  license: z.unknown().optional(),
+  license_url: z.unknown().optional(),
+  last_verified_at: z.unknown().optional(),
+  location_images: z.array(z.record(z.string(), z.unknown())).nullable(),
+  parking: z.array(z.record(z.string(), z.unknown())).nullable(),
+});
+
+const locationRowsSchema = z.array(locationRowSchema);
+
+/** Throws a ZodError on an unexpected shape; the caller wraps it into a dataAccessError, same as parseMatchLocationImagesRows below. */
+export function parseLocationRows(data: unknown): LocationRow[] {
+  return locationRowsSchema.parse(data ?? []) as unknown as LocationRow[];
+}
+
+/** Single-row counterpart of parseLocationRows, for .maybeSingle() callers. Returns null for a null/undefined row (missing id). */
+export function parseLocationRow(data: unknown): LocationRow | null {
+  if (data === null || data === undefined) return null;
+  return locationRowSchema.parse(data) as unknown as LocationRow;
+}
 
 export type MapperWarning = { field: "location_images" | "parking"; reason: string; value: unknown };
 
@@ -63,7 +126,18 @@ function mapImage(row: LocationImageRow, locationId: string, fallbackAlt: string
     warnings.push({ field: "location_images", reason: "missing required id or image_url", value: row });
     return null;
   }
-  return { id: row.id, locationId, imageUrl: row.image_url, alt: optionalString(row.alt) ?? fallbackAlt };
+  return {
+    id: row.id,
+    locationId,
+    imageUrl: row.image_url,
+    alt: optionalString(row.alt) ?? fallbackAlt,
+    source: optionalString(row.source),
+    sourceUrl: optionalString(row.source_url),
+    author: optionalString(row.author),
+    license: optionalString(row.license),
+    licenseUrl: optionalString(row.license_url),
+    lastVerifiedAt: optionalString(row.last_verified_at),
+  };
 }
 
 function mapParking(row: ParkingRow, locationId: string, warnings: MapperWarning[]): ParkingInfo | null {
@@ -110,7 +184,12 @@ export function toLocation(row: LocationRow): MapLocationResult {
     permit: { type: row.permit_type, contactName: row.contact_name, contactPhone: row.contact_phone, note: row.permit_note },
     parking,
     noiseSources: row.noise_sources ?? [],
+    source: optionalString(row.source),
     sourceUrl: row.source_url,
+    author: optionalString(row.author),
+    license: optionalString(row.license),
+    licenseUrl: optionalString(row.license_url),
+    lastVerifiedAt: optionalString(row.last_verified_at),
   };
   return { location, warnings };
 }

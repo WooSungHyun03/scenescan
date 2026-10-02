@@ -110,6 +110,85 @@ Validation rejects unknown mapping fields, unsafe object paths, missing required
 
 This command only reads local JSON and writes reviewed JSON. It does not download images, call a provider API, or write to Supabase. A source URL records provenance but does not establish redistribution rights; document the license and attribution in `DATA_LICENSES.md` before committing real records or images.
 
+## Curated production seed
+
+`data/production/commons-manifest.json` is the reviewed source manifest for the production dataset. It currently contains 159 Korean filming-location candidates and 209 explicitly licensed Wikimedia Commons images across all 17 first-level regions. Ten hand-reviewed seed locations retain six views each; automatically discovered Wikidata locations use one representative Commons image to maximize geographic coverage within free-tier bandwidth.
+
+### Region and category coverage gate
+
+The initial balancing target is **at least three locations in every one of the 68 region × category cells** (17 regions × `urban`/`nature`/`industrial`/`interior`). This is a minimum filter-coverage target, not a claim that three records make a statistically representative dataset. Raising the target requires a reviewed storage, embedding, and Supabase capacity plan.
+
+Generate the deterministic coverage report before discovery:
+
+```bash
+node --experimental-strip-types scripts/data/report-coverage.ts \
+  data/production/commons-manifest.json \
+  --output data/production/coverage-report.json \
+  --target 3
+```
+
+The report records category and region totals, every cell count, empty and under-target cells, and the number of reviewed locations still required. Discovery fetches Commons metadata only for candidates related to cells below the target. It chooses the least-covered cells first and stops adding to a cell once the target is met, so a large `--max` value cannot continue increasing an already dominant category. The review queue includes the affected cells' current count and deficit and is ordered with empty cells first.
+
+Wikidata discovery uses only the official Wikidata Query Service and Wikimedia Commons API. Commons metadata must pass the existing CC0/Public Domain/CC BY/CC BY-SA allowlist and additional-restriction gate before a candidate can be selected. Do not scrape FilmKorea, search-result pages, tourism sites, or any source whose reuse rights are not explicit.
+
+Candidates mapped to more than one SceneScan category are never resolved by category priority. A Wikidata item discovered under more than one first-level region is also held because a single point may not identify the correct side of a river, mountain, island, or other cross-boundary feature. Temples, parks, caves, campuses, and broad natural features such as mountains, rivers, islands, wetlands, tidal flats, forests, coasts, lakes, waterfalls, and trails require manual review even when Wikidata yields one category. These candidates are written to the discovery report's `review_queue` with their QID, Wikidata types, candidate regions/categories, coordinate, region-specific addresses, and official source URL. Copy `scripts/data/wikidata-review-decisions.example.json`, record an attributable accept/reject decision, and rerun discovery with `--review-decisions`. An accepted category and region must be supported by the candidate's Wikidata results; the selected region's address is preserved in the final candidate.
+
+```bash
+pnpm data:discover-wikidata \
+  data-work/wikidata/commons-manifest.json \
+  --base data/production/commons-manifest.json \
+  --target 3 \
+  --max 400 \
+  --review-decisions data-work/wikidata/review-decisions.json \
+  --verified-at 2026-10-01T09:00:00+09:00
+```
+
+Discovery blocks coordinates outside broad South Korea bounds, addresses that do not match the requested first-level region, unsuitable school/hospital/prison/post-office/research-institute records, names or coordinates within 120 metres of an existing place, duplicate Commons files, and images rejected by the Commons license gate. The manifest remains a candidate artifact until a reviewer checks the report and representative cases.
+
+Discover additional candidates from Wikidata's CC0 location metadata before collection. Discovery requires an address, coordinate, representative image, supported place type, matching first-level region, and an image accepted by the Commons license gate. It excludes schools, hospitals, non-place artifacts, malformed addresses, near-duplicate coordinates, and duplicate source images.
+
+```bash
+pnpm data:discover-wikidata \
+  data-work/wikidata/commons-manifest.json \
+  --base data/production/commons-manifest.json \
+  --max 400
+```
+
+Review the generated manifest and report, then promote it to `data/production/commons-manifest.json`. Rebuild local working images and derived manifests with:
+
+```bash
+pnpm data:collect-commons
+pnpm data:validate data/production/locations.json data/production/validation-report.json --image-root .
+pnpm data:upload-storage data/production/locations.json data/production/embeddings-manifest.json data/production --dry-run
+pnpm data:upload-storage data/production/locations.json data/production/embeddings-manifest.json data/production --apply
+pnpm embeddings:prepare data/production/embeddings-manifest.json data/production/embeddings.json --batch-size 8 --retries 2
+pnpm data:import-production data/production/locations.json data/production/embeddings-manifest.json --validate-only
+pnpm embeddings:import data/production/embeddings.json --validate-only
+```
+
+The collector re-fetches Commons metadata and fails closed when a file is missing, is not JPEG, has neither an approved Creative Commons license nor a verified public-domain declaration, declares extra restrictions, exceeds 15 MB, or does not have a complete JPEG signature. Downloads run four at a time with bounded retry. It writes files atomically and produces:
+
+- `public/locations/*.jpg`: local 1024-pixel working images used for review and embedding generation;
+- `data/production/locations.json`: canonical location records;
+- `data/production/image-licenses.json`: source and local checksums plus exact attribution;
+- `data/production/IMAGE_LICENSES.md`: complete human-readable attribution table;
+- `data/production/embeddings-manifest.json`: offline CLIP input.
+
+Running the collector is deterministic for a fixed Commons source revision except for a provider-side regenerated thumbnail. Review any checksum change before committing it. The discovery step produces candidates, not an authority to bypass the license and validation gates. `public/locations/wikidata-*.jpg` is ignored because these working files are reproducibly downloaded and production serves their uploaded Storage copies. The collector and both `--validate-only` commands do not write to Supabase.
+
+`data:import-production` reads `image-licenses.json` from the directory containing `locations.json` by default. Use `--image-licenses <path>` only when the reviewed catalog lives elsewhere. It joins attribution by stable `image_id`, rejects missing or duplicate license records, mismatched location ownership, and non-HTTP(S) source/license URLs. Reusing the same source image in different locations remains valid when each use has its own stable image UUID and reviewed catalog entry.
+
+After the schema migrations are installed, use the explicit production import sequence below from a trusted local shell. The service-role key must never be placed in a `NEXT_PUBLIC_*` variable or Vercel. The first importer writes location and image metadata; the second adds the validated vectors to those image rows. Both operations are idempotent by stable UUID. Always run `--dry-run` immediately before `--apply`.
+
+```bash
+export SUPABASE_URL="https://<project-ref>.supabase.co"
+export SUPABASE_SECRET_KEY="<server-only secret>"
+pnpm data:import-production data/production/locations.json data/production/embeddings-manifest.json --dry-run
+pnpm data:import-production data/production/locations.json data/production/embeddings-manifest.json --apply
+pnpm embeddings:import data/production/embeddings.json --dry-run
+pnpm embeddings:import data/production/embeddings.json --apply
+```
+
 ## Validation gate
 
 Run validation after normalization and before any database import. Relative image paths are resolved from the normalized file's directory unless `--image-root` is provided.

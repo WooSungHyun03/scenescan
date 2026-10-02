@@ -1,7 +1,45 @@
 @import "tailwindcss";
 
 :root { color-scheme: light; }
-body { background: #f8f7f3; color: #1c2924; font-family: Arial, Helvetica, sans-serif; }
+html { min-width: 320px; }
+body { min-width: 320px; background: #f8f7f3; color: #1c2924; font-family: Arial, Helvetica, sans-serif; }
 button, input, select { font: inherit; }
 .scene-panel { border: 1px solid #deded5; border-radius: 1rem; background: #fff; }
 .scene-label { color: #66716a; font-size: .75rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+
+:where(a, button, input, select, textarea, [role="button"], [tabindex]):focus-visible {
+  outline: 3px solid #047857;
+  outline-offset: 3px;
+}
+
+.scene-skip-link {
+  position: fixed;
+  top: .75rem;
+  left: .75rem;
+  z-index: 100;
+  transform: translateY(-200%);
+  border-radius: .5rem;
+  background: #064e3b;
+  color: white;
+  padding: .75rem 1rem;
+  font-size: .875rem;
+  font-weight: 700;
+}
+
+.scene-skip-link:focus-visible { transform: translateY(0); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
+
+@media (forced-colors: active) {
+  [aria-pressed="true"], [aria-current="true"], [data-highlighted="true"] {
+    outline: 2px solid CanvasText;
+    outline-offset: 2px;
+  }
+}

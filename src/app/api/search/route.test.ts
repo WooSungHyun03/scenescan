@@ -97,7 +97,7 @@ describe("POST /api/search", () => {
   });
 
   it("400s a disallowed region", async () => {
-    const response = await POST(request({ embedding: validEmbedding(), filters: { region: "제주" } }));
+    const response = await POST(request({ embedding: validEmbedding(), filters: { region: "평양" } }));
     expect(response.status).toBe(400);
     const body = await response.json();
     expect(body.error.code).toBe("VALIDATION_ERROR");
