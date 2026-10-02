@@ -34,6 +34,13 @@ function database(overrides: Partial<EmbeddingImportDatabase> = {}): EmbeddingIm
 }
 
 describe("embedding importer", () => {
+  it("rejects legacy fp32 output before any database access", async () => {
+    const output = validOutput();
+    output.model.dtype = "fp32";
+    const db = database();
+    await expect(importEmbeddings(output, "dry-run", 100, db)).rejects.toThrow("dtype does not match");
+    expect(db.findLocationIds).not.toHaveBeenCalled();
+  });
   it("validates offline without database access", async () => {
     await expect(importEmbeddings(validOutput(), "validate-only", 100)).resolves.toEqual({
       mode: "validate-only", validated: 1, existing: 0, written: 0,

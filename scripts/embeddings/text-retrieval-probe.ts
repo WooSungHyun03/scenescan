@@ -1,7 +1,7 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { performance } from "node:perf_hooks";
 import { AutoTokenizer, CLIPTextModelWithProjection } from "@huggingface/transformers";
-import { CLIP_MODEL_ID, CLIP_MODEL_REVISION } from "../../src/lib/ai/embedding-service.ts";
+import { CLIP_MODEL_ID, CLIP_MODEL_REVISION, CLIP_MODEL_DTYPE } from "../../src/lib/ai/embedding-service.ts";
 import { toValidatedEmbedding } from "../../src/lib/ai/embedding-validation.ts";
 import { cosineSimilarity } from "../../src/lib/ai/vector-math.ts";
 import { parseOutput } from "./contracts.ts";
@@ -27,7 +27,7 @@ const completedFiles = new Set<string>();
 const tokenizer = await AutoTokenizer.from_pretrained(CLIP_MODEL_ID, { revision: CLIP_MODEL_REVISION });
 const model = await CLIPTextModelWithProjection.from_pretrained(CLIP_MODEL_ID, {
   revision: CLIP_MODEL_REVISION,
-  dtype: "q8",
+  dtype: CLIP_MODEL_DTYPE,
   progress_callback: (event) => {
     if (event.status === "progress" && event.loaded === event.total && !completedFiles.has(event.file)) {
       completedFiles.add(event.file);
@@ -60,9 +60,9 @@ for (const pair of queries) {
   results.push(languages);
 }
 await model.dispose();
-const report = { model_id: CLIP_MODEL_ID, revision: CLIP_MODEL_REVISION, dtype: "q8", dimension: 512,
+const report = { model_id: CLIP_MODEL_ID, revision: CLIP_MODEL_REVISION, dtype: CLIP_MODEL_DTYPE, dimension: 512,
   locations: catalog.locations.length, images: output.items.length, load_ms: loadMs,
-  downloaded_bytes_observed: downloadedBytes, rss_bytes: process.memoryUsage().rss,
+  model_file_bytes_observed: downloadedBytes, rss_bytes: process.memoryUsage().rss,
   note: "Small qualitative feasibility probe, not a labelled relevance benchmark or mobile measurement.", results };
 await writeFile(process.argv[2] ?? "data-work/text-retrieval-probe.json", `${JSON.stringify(report, null, 2)}\n`);
 console.log(`Text probe: pairs=${results.length}, load_ms=${Math.round(loadMs)}, bytes=${downloadedBytes}, report=${process.argv[2] ?? "data-work/text-retrieval-probe.json"}`);

@@ -12,6 +12,13 @@ const entry = {
 };
 
 describe("embedding contracts", () => {
+  it("pins new output to q8 and identifies old files as fp32", () => {
+    const output = createEmptyOutput("4.3.0");
+    expect(output.model.dtype).toBe("q8");
+    const legacyModel = { ...output.model } as { dtype?: string };
+    delete legacyModel.dtype;
+    expect(parseOutput({ ...output, model: legacyModel }).model.dtype).toBe("fp32");
+  });
   it("parses the versioned manifest", () => {
     expect(parseManifest({ schema_version: 1, items: [entry] }).items).toEqual([entry]);
   });

@@ -3,6 +3,7 @@
 ## Runtime policy
 
 - Model: `Xenova/clip-vit-base-patch32` at revision `main`
+- Precision: explicitly `q8` in browser and offline pipelines; never rely on device defaults (WASM q8 vs Node fp32).
 - Output contract: finite 512-dimensional projected image vectors; real browser/offline inference returns the same raw model projection. Cosine distance normalizes by vector norms at comparison time. Mock vectors are explicitly normalized; real vectors are not necessarily unit-length.
 - Browser backend: Transformers.js `wasm` by default; build-time `webgpu` experiment with automatic WASM initialization fallback
 - Lifecycle: one lazily created Worker per service and one shared model promise per Worker

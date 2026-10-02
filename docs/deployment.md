@@ -8,7 +8,7 @@ The current production topology is Vercel Hobby for the Next.js application, Sup
 4. Run `pnpm data:upload-storage ... --dry-run` and then `--apply`. The apply command creates the public `location-images` bucket when absent, enforces a 5 MB JPEG object limit, uploads deterministic object paths, and rewrites runtime URLs. Record rights in `DATA_LICENSES.md`.
 5. Run `pnpm embeddings:audit-schema`, then import `data/production/locations.json` with `pnpm data:import-production ... --dry-run` and `--apply`. Validate and import `data/production/embeddings.json` afterward. The exact commands are in `scripts/data/README.md`. `SUPABASE_SECRET_KEY` is needed only in the trusted local import process and must not be added to Vercel; the legacy service-role variable remains accepted during migration.
 6. Set `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`. Set both mock flags to `false` only after real data, embeddings, and keys are ready. Configure a Kakao JavaScript app key and allowed web domains for the real map.
-7. Create a Vercel Hobby project and connect the GitHub repository. The root is the Next.js app; no custom `vercel.json` is needed.
+7. Create a Vercel Hobby project and connect the GitHub repository. The root is the Next.js app. Committed `vercel.json` selects a single Seoul (`icn1`) function region for Korean users instead of default IAD1. Hobby permits one region; no paid multi-region/failover is enabled. Recheck placement and actual API latency after deployment, especially if the DB region changes.
 8. Copy the same public environment variables into Vercel project settings and deploy.
 9. Verify the home, search, and detail pages plus a real image query. Confirm browser model download size and latency on target devices.
 
