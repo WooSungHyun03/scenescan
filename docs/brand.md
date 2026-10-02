@@ -11,3 +11,5 @@ Pretendard Variable 1.3.9 is self-hosted with `next/font/local` and `font-displa
 Public copy describes tasks, not implementation: 참고 이미지, 촬영 장소, 검색 결과, 빛의 방향. Mock mode is explicitly identified as a demonstration; missing facts stay unverified. There is no sign-in flow: saved locations are held in the current browser only.
 
 Descriptions without Korean text use neutral Korean guidance in cards and detail summaries. The original text remains accessible in the source disclosure; neither database content nor translations are fabricated.
+
+The global error screen offers an explicit full-page reload for stale deployment chunks and retains the existing retry behavior for application errors. Reloading preserves browser-stored saved locations but does not persist an uploaded reference photo.
