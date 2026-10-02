@@ -1,0 +1,30 @@
+-- Backend-owned follow-up to 20261001000001_location_import_metadata.sql.
+-- Removes the temporary column defaults on location_images.embedding_model
+-- and locations.import_batch, keeping both columns not null.
+--
+-- Those defaults existed only so the previous migration could introduce
+-- not-null columns without a backfill UPDATE statement. By the time this
+-- runs against the real deployed project, real rows already exist (159
+-- locations from origin/main's production seed, imported before this
+-- branch's migrations were ever applied anywhere -- see the merge report
+-- for how that was confirmed). That is not a problem for the backfill
+-- itself: adding a not-null column with a DEFAULT to a populated table
+-- fills every existing row with that default value as part of the ADD
+-- COLUMN statement in the previous migration, before this one runs. Those
+-- existing rows keep that already-correct value after DROP DEFAULT, since
+-- DROP DEFAULT only changes what happens on a future INSERT/UPDATE that
+-- omits the column -- it never rewrites rows that already have a value.
+--
+-- Dropping the default is deliberate, not cosmetic: origin/main's
+-- scripts/embeddings/import.ts does not set embedding_model (or
+-- import_batch) when it upserts location_images/locations (confirmed by
+-- reading that file during the merge analysis). With a default in place,
+-- that gap fails silently -- every newly imported row would just get
+-- today's placeholder value, which is wrong for a future model/revision
+-- upgrade. Without a default, the same insert fails loudly with a
+-- not_null violation on embedding_model until the importer is updated to
+-- pass it explicitly (see docs/data-pipeline.md and the merge report for
+-- the proposed one-line diff to scripts/embeddings/import.ts, not applied
+-- here -- that file is Member 1's).
+alter table public.location_images alter column embedding_model drop default;
+alter table public.locations alter column import_batch drop default;

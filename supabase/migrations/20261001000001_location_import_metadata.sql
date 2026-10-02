@@ -1,8 +1,23 @@
 -- Backend-owned follow-up to 20260920000000_initial_schema.sql.
--- Adds source/freshness provenance (aligned with scripts/data
+-- Adds import/freshness provenance (aligned with scripts/data
 -- DataProvenance), embedding provenance, image de-duplication, and
 -- updated_at tracking. Does not touch RLS read policies or the
 -- match_location_images RPC contract.
+--
+-- Retimestamped to run after 20261001000000_location_attribution.sql
+-- (origin/main) during the feat/backend-supabase merge, since that
+-- migration already exists on the real deployed project and this one does
+-- not (verified: this branch's migrations had never been applied anywhere
+-- before the merge). locations.last_verified_at and location_images.source
+-- are therefore NOT re-added here -- 20261001000000_location_attribution.sql
+-- already creates them. See the merge report for the full analysis: this
+-- migration originally named its own batch-provenance column
+-- `locations.source`, which collided in *meaning* (not SQL) with
+-- 20261001000000_location_attribution.sql's `locations.source` ("human-
+-- readable source of the location metadata", shown to end users). Renamed
+-- to `locations.import_batch` here to remove that collision; the two
+-- `source` columns from the attribution migration keep their attribution
+-- meaning exclusively.
 
 -- updated_at auto-refresh trigger, shared by all three tables.
 create function public.set_updated_at()
@@ -15,47 +30,45 @@ begin
 end;
 $$;
 
--- locations: provenance/freshness for re-running the offline data importer,
--- plus verification freshness for permit/contact info.
+-- locations: which scripts/data import batch last wrote this row, plus
+-- updated_at. (reference_date/last_verified_at were going to live here too,
+-- but last_verified_at now comes from 20261001000000_location_attribution.sql
+-- -- see note above -- and reference_date is still added below since that
+-- migration does not create it.)
 --
--- Column names and meaning mirror scripts/data/contracts.ts DataProvenance
--- (source, sourceUrl, referenceDate, lastVerifiedAt), which
--- scripts/data/normalizer.ts already produces per location and per parking
--- record. sourceUrl already exists as locations.source_url from the initial
--- migration. There is no separate source_id column: normalizeRecordWithCategory
--- assigns an optional pre-generated UUID as the canonical record's own `id`
--- (validated in scripts/data/validator.ts), so the existing locations.id
--- primary key is the intended upsert key once a Supabase-writing importer is
--- built for scripts/data output, the same way scripts/embeddings/importer.ts
--- upserts location_images by id. See report for the open question this raises.
+-- Column name/meaning mirrors scripts/data/contracts.ts DataProvenance.source
+-- (which scripts/data/normalizer.ts produces per location and per parking
+-- record), deliberately renamed off the plain `source` name to avoid
+-- colliding with 20261001000000_location_attribution.sql's
+-- user-facing-attribution `locations.source`. There is no separate
+-- source_id column: normalizeRecordWithCategory assigns an optional
+-- pre-generated UUID as the canonical record's own `id` (validated in
+-- scripts/data/validator.ts), so the existing locations.id primary key is
+-- the upsert key scripts/data/location-importer.ts already uses.
 alter table public.locations
-  add column source text not null default 'manual',
+  add column import_batch text not null default 'manual',
   add column reference_date date,
-  add column last_verified_at timestamptz,
   add column updated_at timestamptz not null default now();
 
-comment on column public.locations.source is
-  'Dataset/batch name that produced this row (scripts/data DataProvenance.source), e.g. a scripts/data source key. Default manual covers hand-entered rows that predate source tracking.';
+comment on column public.locations.import_batch is
+  'Dataset/batch name that produced this row via scripts/data (DataProvenance.source), e.g. a scripts/data source key. Default manual covers hand-entered rows that predate batch tracking. Distinct from locations.source (added by 20261001000000_location_attribution.sql), which is the human-readable, user-facing attribution source -- these are two different concepts that happen to share the word "source".';
 comment on column public.locations.reference_date is
   'Date the source dataset describes this location as of (DataProvenance.referenceDate), when the source is a dated snapshot rather than live.';
-comment on column public.locations.last_verified_at is
-  'When this row (permit/contact/noise info in particular) was last human-verified (DataProvenance.lastVerifiedAt). Null means never verified, matching the "정보 확인 필요" permit_type default.';
 
 create trigger locations_set_updated_at
   before update on public.locations
   for each row execute function public.set_updated_at();
 
--- location_images: embedding provenance, dedup, and updated_at.
+-- location_images: embedding provenance, dedup, and updated_at. source
+-- (attribution) already exists as of 20261001000000_location_attribution.sql
+-- -- not re-added here.
 alter table public.location_images
   add column embedding_model text not null default 'Xenova/clip-vit-base-patch32@main',
-  add column source text,
   add column storage_path text,
   add column updated_at timestamptz not null default now();
 
 comment on column public.location_images.embedding_model is
   'Model ID (+ revision) that produced this row''s embedding, e.g. Xenova/clip-vit-base-patch32@main. Runtime and offline embeddings must share this value or ranking quality degrades silently. Default matches src/lib/ai/embedding-service.ts CLIP_MODEL_ID/CLIP_MODEL_REVISION as of this migration; confirm against the offline importer before real data import (see report).';
-comment on column public.location_images.source is
-  'Where this image file came from (e.g. a scripts/data source key or manual upload), independent of locations.source.';
 comment on column public.location_images.storage_path is
   'Path in Supabase Storage when the image is hosted there; null if image_url points elsewhere. Used for de-duplication together with location_id.';
 
@@ -71,8 +84,11 @@ create trigger location_images_set_updated_at
   for each row execute function public.set_updated_at();
 
 -- parking: data freshness and updated_at. parking.source already exists
--- (initial migration) and lines up with scripts/data DataProvenance.source
--- for CanonicalParkingRecord; these two columns cover the remaining
+-- (initial migration, a plain free-text label -- not part of the
+-- locations/location_images attribution-vs-import-batch collision above,
+-- since parking is untouched by 20261001000000_location_attribution.sql)
+-- and lines up with scripts/data DataProvenance.source for
+-- CanonicalParkingRecord; these two columns cover the remaining
 -- DataProvenance fields (referenceDate, lastVerifiedAt) for parking.
 alter table public.parking
   add column last_verified_at timestamptz,

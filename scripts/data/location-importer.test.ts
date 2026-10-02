@@ -49,7 +49,7 @@ describe("buildImportRows", () => {
     expect(locationRows).toEqual([{
       id: "11111111-1111-4111-8111-111111111111", name: "테스트 장소", description: "설명", category: "urban", region: "서울",
       address: "주소", latitude: 37.5, longitude: 127.0, permit_type: "문의 필요", contact_name: null, contact_phone: null, permit_note: null,
-      source_url: "https://example.com/source", source: "kofic", reference_date: "2026-09-01", last_verified_at: "2026-09-20T00:00:00Z",
+      source_url: "https://example.com/source", import_batch: "kofic", reference_date: "2026-09-01", last_verified_at: "2026-09-20T00:00:00Z",
     }]);
     expect(parkingRows).toEqual([{
       location_id: "11111111-1111-4111-8111-111111111111", name: "A 주차장", latitude: 37.5, longitude: 127.0,
