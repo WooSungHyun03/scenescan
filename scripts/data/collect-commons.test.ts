@@ -1,9 +1,12 @@
 import { describe, expect, it } from "vitest";
+import { createHash } from "node:crypto";
 import {
   buildLocationDataset,
   parseCollectionManifest,
   parseCommonsImageInfo,
   stripMarkup,
+  reusableImage,
+  assertUniqueImageContent,
 } from "./collect-commons.ts";
 
 const locationId = "00000000-0000-4000-8000-000000000001";
@@ -52,6 +55,22 @@ function imageInfo(license = "CC BY-SA 4.0", restrictions = "") {
 }
 
 describe("Commons production data collection", () => {
+  it("reuses only a complete checksum-matching image with the current source revision", () => {
+    const bytes = Buffer.from([0xff, 0xd8, 0, 0xff, 0xd9]);
+    const details = parseCommonsImageInfo("File:Test.jpg", imageInfo());
+    const cached = { image_id: imageId, source_sha1: details.sourceSha1,
+      local_sha256: createHash("sha256").update(bytes).digest("hex"), downloaded_thumbnail_url: details.thumbnailUrl };
+    expect(reusableImage(bytes, details, cached)?.bytes).toBe(5);
+    expect(reusableImage(bytes, details, { ...cached, source_sha1: "changed" })).toBeNull();
+    expect(reusableImage(Buffer.from([0]), details, cached)).toBeNull();
+    expect(reusableImage(Buffer.from([0xff, 0xd8, 1, 0xff, 0xd9]), details, cached)).toBeNull();
+    expect(reusableImage(bytes, details, undefined)).toBeNull();
+  });
+
+  it("rejects identical source content under different Commons titles", () => {
+    const details = parseCommonsImageInfo("File:Test.jpg", imageInfo());
+    expect(() => assertUniqueImageContent(new Map([["first", details], ["second", details]]))).toThrow("Duplicate Commons image content");
+  });
   it("sanitizes attribution markup and accepts the allowlisted license", () => {
     expect(stripMarkup("<span>A &amp; B</span>")).toBe("A & B");
     const result = parseCommonsImageInfo("File:Test.jpg", imageInfo());

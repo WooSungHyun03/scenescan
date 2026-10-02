@@ -147,6 +147,7 @@ export function SearchWorkspace({ examples }: { examples: Location[] }) {
   const [embeddingStatus, setEmbeddingStatus] = useState(() => embeddingService.getStatus());
   const fileInputRef = useRef<HTMLInputElement>(null);
   const searchInFlightRef = useRef(false);
+  const analyzedImageRef = useRef<{ file: File; embedding: number[] } | null>(null);
 
   useEffect(() => {
     const url = file ? URL.createObjectURL(file) : null;
@@ -172,6 +173,7 @@ export function SearchWorkspace({ examples }: { examples: Location[] }) {
       return;
     }
     setFile(next);
+    analyzedImageRef.current = null;
     setSearchError(null);
     setResults(null);
     setActiveLocationId(null);
@@ -179,6 +181,7 @@ export function SearchWorkspace({ examples }: { examples: Location[] }) {
   }
 
   function removeFile() {
+    analyzedImageRef.current = null;
     setFile(null);
     setSearchError(null);
     setResults(null);
@@ -212,6 +215,14 @@ export function SearchWorkspace({ examples }: { examples: Location[] }) {
       setSearchError({ kind: "missing-image", title: "참고 이미지를 선택해 주세요", description: "장면을 찾을 사진을 업로드한 뒤 검색을 시작할 수 있습니다.", retryable: false });
       return;
     }
+    // Avoid a model download for a known-empty catalog filter. Never broaden
+    // the requested region/category silently or substitute invented places.
+    if (!examples.some((location) => (!region || location.region === region) && (!category || location.category === category))) {
+      setSearchError(null);
+      setResults([]);
+      setSearchStage("complete");
+      return;
+    }
     const controller = new AbortController();
     requestRef.current = controller;
     searchInFlightRef.current = true;
@@ -219,10 +230,13 @@ export function SearchWorkspace({ examples }: { examples: Location[] }) {
     setSearchError(null);
     setResults(null);
     setActiveLocationId(null);
-    setSearchStage("embedding");
+    const cached = analyzedImageRef.current?.file === file ? analyzedImageRef.current.embedding : null;
+    setSearchStage(cached ? "searching" : "embedding");
     let executionStage: "embedding" | "searching" = "embedding";
     try {
-      const embedding = await embeddingService.embed(file, { signal: controller.signal });
+      const embedding = cached ?? await embeddingService.embed(file, { signal: controller.signal });
+      if (controller.signal.aborted) return;
+      analyzedImageRef.current = { file, embedding };
       executionStage = "searching";
       setSearchStage("searching");
       const response = await fetch("/api/search", { method: "POST", signal: controller.signal, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ embedding, filters: { region: region || undefined, category: category || undefined } }) });
@@ -272,6 +286,7 @@ export function SearchWorkspace({ examples }: { examples: Location[] }) {
           <label className="text-sm font-medium">지역<select name="region" className="scene-input mt-2" value={region} disabled={busy} onChange={(e) => { setRegion(e.target.value as Region | ""); clearSearchResults(); setVisibleCount(12); }}><option value="">전국</option>{regionOptions.map((option) => <option key={option} value={option}>{option}</option>)}</select></label>
           <label className="text-sm font-medium">공간 종류<select name="category" className="scene-input mt-2" value={category} disabled={busy} onChange={(e) => { setCategory(e.target.value as LocationCategory | ""); clearSearchResults(); setVisibleCount(12); }}><option value="">전체</option>{categoryOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label>
         </div>
+        <p className="mt-3 text-xs leading-relaxed text-muted">{region || "전국"} · {categoryOptions.find((option) => option.value === category)?.label ?? "전체 공간"}에 등록된 장소 {filteredExamples.length}곳{filteredExamples.length === 0 ? " — 조건을 넓혀보세요." : "."}</p>
       </div>
       <Button onClick={search} disabled={busy} aria-busy={busy} size="lg" className="mt-5 w-full">{busy ? <LoaderCircle size={18} className="animate-spin" aria-hidden="true" /> : <Search size={18} aria-hidden="true" />}{busy ? searchButtonText : results ? "다시 검색하기" : "이 이미지로 장소 찾기"}</Button>
       {aiUiState && aiUiState.kind !== "error" && <div role="status" aria-live="polite" className="mt-4 rounded-md bg-brand-soft p-4 text-brand">

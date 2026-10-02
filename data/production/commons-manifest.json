@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "verified_at": "2026-09-29T13:00:00+09:00",
+  "verified_at": "2026-10-02T13:15:30.979Z",
   "public_base_url": "https://beceleb.org/locations",
   "attribution_url": "https://github.com/WooSungHyun03/scenescan/blob/main/DATA_LICENSES.md#production-location-images",
   "locations": [
@@ -3640,6 +3640,933 @@
           "file_title": "File:Three sacred holes in Jeju.JPG",
           "filename": "wikidata-q7410332-01.jpg",
           "alt": "삼성혈 전경"
+        }
+      ]
+    },
+    {
+      "id": "b452d2b3-2b35-59e1-b812-8e761f3df0cc",
+      "slug": "wikidata-q12438381",
+      "name": "부산항",
+      "description": "부산의 부산항. 위치와 원본 사진 출처를 확인하고 방문 전 촬영 조건을 문의해 주세요.",
+      "category": "industrial",
+      "region": "부산",
+      "address": "부산 부산광역시",
+      "latitude": 35.10388889,
+      "longitude": 129.07888889,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q12438381",
+      "images": [
+        {
+          "id": "4dd13a2c-fed8-53b3-a1a0-440ba0805d83",
+          "file_title": "File:Korea busan pusan harbour cargo container terminal.JPG",
+          "filename": "wikidata-q12438381-01.jpg",
+          "alt": "부산항 사진 1"
+        }
+      ]
+    },
+    {
+      "id": "68ab3564-cbd5-5fae-be21-6d91b6aaf75d",
+      "slug": "wikidata-q12584496",
+      "name": "고현항 (거제시)",
+      "description": "경남의 고현항 (거제시). 위치와 원본 사진 출처를 확인하고 방문 전 촬영 조건을 문의해 주세요.",
+      "category": "industrial",
+      "region": "경남",
+      "address": "경남 경상남도",
+      "latitude": 34.894241666,
+      "longitude": 128.620894444,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q12584496",
+      "images": [
+        {
+          "id": "ab212fda-eb95-5167-98ec-aaeff784d103",
+          "file_title": "File:Gohyun Harbor - Minam Cruise1, Geoje City.jpg",
+          "filename": "wikidata-q12584496-01.jpg",
+          "alt": "고현항 (거제시) 사진 1"
+        }
+      ]
+    },
+    {
+      "id": "2f564dd3-06fc-5cab-a6ed-fc26c60e1833",
+      "slug": "wikidata-q12616503",
+      "name": "제주항",
+      "description": "제주의 제주항. 위치와 원본 사진 출처를 확인하고 방문 전 촬영 조건을 문의해 주세요.",
+      "category": "industrial",
+      "region": "제주",
+      "address": "제주 제주시",
+      "latitude": 33.52239444,
+      "longitude": 126.54078611,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q12616503",
+      "images": [
+        {
+          "id": "3452002a-2f4a-5253-921b-a93ab3c50837",
+          "file_title": "File:Jeju Costral Ferry Terminal.JPG",
+          "filename": "wikidata-q12616503-01.jpg",
+          "alt": "제주항 사진 1"
+        }
+      ]
+    },
+    {
+      "id": "20a1df36-854f-5280-8a70-fbd88a47a42b",
+      "slug": "wikidata-q490572",
+      "name": "태종대",
+      "description": "부산의 태종대. 위치와 원본 사진 출처를 확인하고 방문 전 촬영 조건을 문의해 주세요.",
+      "category": "nature",
+      "region": "부산",
+      "address": "부산 부산광역시",
+      "latitude": 35.05,
+      "longitude": 129.083,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q490572",
+      "images": [
+        {
+          "id": "8df748f9-2dbc-55bf-a517-abf11b392b1d",
+          "file_title": "File:Korea-Busan-Taejongdae-03.jpg",
+          "filename": "wikidata-q490572-01.jpg",
+          "alt": "태종대 사진 1"
+        }
+      ]
+    },
+    {
+      "id": "4e3c8fcb-ba96-51cb-8fe9-1d4691b66ff3",
+      "slug": "wikidata-q16161579",
+      "name": "광주천",
+      "description": "광주의 광주천. 위치와 원본 사진 출처를 확인하고 방문 전 촬영 조건을 문의해 주세요.",
+      "category": "nature",
+      "region": "광주",
+      "address": "광주 광주광역시",
+      "latitude": 35.148444444,
+      "longitude": 126.830083333,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q16161579",
+      "images": [
+        {
+          "id": "718864ae-0ae7-5780-b0f7-1e1074649822",
+          "file_title": "File:Yuchon 3rd Bridge, Gwangju 광주광역시 유촌3교.jpg",
+          "filename": "wikidata-q16161579-01.jpg",
+          "alt": "광주천 사진 1"
+        }
+      ]
+    },
+    {
+      "id": "060d70e3-3e51-57d4-b9aa-968dd8418742",
+      "slug": "wikidata-q624528",
+      "name": "엑스포과학공원",
+      "description": "대전의 엑스포과학공원. 위치와 원본 사진 출처를 확인하고 방문 전 촬영 조건을 문의해 주세요.",
+      "category": "nature",
+      "region": "대전",
+      "address": "대전 대전광역시",
+      "latitude": 36.377,
+      "longitude": 127.385,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q624528",
+      "images": [
+        {
+          "id": "b5807f6f-80c1-5eba-a443-2e10cfc8f853",
+          "file_title": "File:Expo Science Park in Daejeon.jpg",
+          "filename": "wikidata-q624528-01.jpg",
+          "alt": "엑스포과학공원 사진 1"
+        }
+      ]
+    },
+    {
+      "id": "c76fd195-b6fc-554c-a1dc-0c5e91f04e8a",
+      "slug": "wikidata-q64506499",
+      "name": "세종호수공원",
+      "description": "세종의 세종호수공원. 위치와 원본 사진 출처를 확인하고 방문 전 촬영 조건을 문의해 주세요.",
+      "category": "nature",
+      "region": "세종",
+      "address": "세종 세종특별자치시",
+      "latitude": 36.494,
+      "longitude": 127.274,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q64506499",
+      "images": [
+        {
+          "id": "c06f36f7-1673-527a-add1-badb0e062639",
+          "file_title": "File:Sejong lake park 190609 17.jpg",
+          "filename": "wikidata-q64506499-01.jpg",
+          "alt": "세종호수공원 사진 1"
+        },
+        {
+          "id": "b0f7e26b-6bd4-58b1-86de-e8a210c2a36e",
+          "file_title": "File:Sejong lake park 190609 04.jpg",
+          "filename": "wikidata-q64506499-02.jpg",
+          "alt": "세종호수공원 호수 주변 풍경"
+        },
+        {
+          "id": "298202e3-7860-5809-8a55-b6262700b9e2",
+          "file_title": "File:Sejong lake park 190609 14.jpg",
+          "filename": "wikidata-q64506499-03.jpg",
+          "alt": "세종호수공원의 다른 시점"
+        }
+      ]
+    },
+    {
+      "id": "05ba17a9-7151-5e8a-9d10-7699d35c8d6c",
+      "slug": "wikidata-q12583924",
+      "name": "경포호",
+      "description": "강원의 경포호. 위치와 원본 사진 출처를 확인하고 방문 전 촬영 조건을 문의해 주세요.",
+      "category": "nature",
+      "region": "강원",
+      "address": "강원 강원특별자치도",
+      "latitude": 37.797222222,
+      "longitude": 128.902777777,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q12583924",
+      "images": [
+        {
+          "id": "037e24ca-c1e0-5e07-a0d8-2c4d99052fc5",
+          "file_title": "File:Korea-Gangneung-Gyeongpo (Lake) pano.JPG",
+          "filename": "wikidata-q12583924-01.jpg",
+          "alt": "경포호 사진 1"
+        }
+      ]
+    },
+    {
+      "id": "0d087a56-f2c0-52c1-834e-4953be686f41",
+      "slug": "wikidata-q277173",
+      "name": "도담삼봉",
+      "description": "충북의 도담삼봉. 위치와 원본 사진 출처를 확인하고 방문 전 촬영 조건을 문의해 주세요.",
+      "category": "nature",
+      "region": "충북",
+      "address": "충북 단양군",
+      "latitude": 37.000164,
+      "longitude": 128.343975,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q277173",
+      "images": [
+        {
+          "id": "7f86f51c-affd-5c0a-8221-0252a93c624c",
+          "file_title": "File:Korea-Danyang-Dodamsambong 3087-07.JPG",
+          "filename": "wikidata-q277173-01.jpg",
+          "alt": "도담삼봉 사진 1"
+        }
+      ]
+    },
+    {
+      "id": "a4967ec1-a834-5a42-b0ca-d21b1a8aea0e",
+      "slug": "wikidata-q12591871",
+      "name": "대천해수욕장",
+      "description": "충남의 대천해수욕장. 위치와 원본 사진 출처를 확인하고 방문 전 촬영 조건을 문의해 주세요.",
+      "category": "nature",
+      "region": "충남",
+      "address": "충남 대천동",
+      "latitude": 36.3127202,
+      "longitude": 126.509697,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q12591871",
+      "images": [
+        {
+          "id": "f306fef6-25ae-5e91-84fb-98e18b0d4357",
+          "file_title": "File:Daecheon Beach, Korea.jpg",
+          "filename": "wikidata-q12591871-01.jpg",
+          "alt": "대천해수욕장 사진 1"
+        },
+        {
+          "id": "a5a9f900-fda2-5a3d-b0b0-6559d91144ba",
+          "file_title": "File:Korea-Boreyong-Daecheon Beach-01.jpg",
+          "filename": "wikidata-q12591871-02.jpg",
+          "alt": "대천해수욕장 해안 풍경"
+        },
+        {
+          "id": "c1b01e8a-0920-5f39-9222-17adecc5db94",
+          "file_title": "File:Korea-Boreyong-Daecheon Beach-07.jpg",
+          "filename": "wikidata-q12591871-03.jpg",
+          "alt": "대천해수욕장의 다른 시점"
+        }
+      ]
+    },
+    {
+      "id": "480b6e7b-fb93-5ab5-96ce-1506c1cfeaf2",
+      "slug": "wikidata-q562938",
+      "name": "마이산",
+      "description": "전북의 마이산. 위치와 원본 사진 출처를 확인하고 방문 전 촬영 조건을 문의해 주세요.",
+      "category": "nature",
+      "region": "전북",
+      "address": "전북 진안군",
+      "latitude": 35.76111111,
+      "longitude": 127.41222222,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q562938",
+      "images": [
+        {
+          "id": "3917e27d-42bb-53fc-9a70-1708d4ff42c1",
+          "file_title": "File:Maisan.jpg",
+          "filename": "wikidata-q562938-01.jpg",
+          "alt": "마이산 사진 1"
+        }
+      ]
+    },
+    {
+      "id": "a4cd022c-d346-50fa-a289-f42c78d79e37",
+      "slug": "wikidata-q122225",
+      "name": "성산일출봉 천연보호구역",
+      "description": "제주의 성산일출봉 천연보호구역. 위치와 원본 사진 출처를 확인하고 방문 전 촬영 조건을 문의해 주세요.",
+      "category": "nature",
+      "region": "제주",
+      "address": "제주 제주특별자치도",
+      "latitude": 33.45805556,
+      "longitude": 126.9425,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q122225",
+      "images": [
+        {
+          "id": "6eb8b3a2-4274-5603-a048-4a5401a81b58",
+          "file_title": "File:Seongsan Ilchulbong from the air.jpg",
+          "filename": "wikidata-q122225-01.jpg",
+          "alt": "성산일출봉 천연보호구역 사진 1"
+        },
+        {
+          "id": "a85e2b9e-8909-5d40-8864-f7c633f9b49e",
+          "file_title": "File:성산일출봉 천연보호구역 2019년 촬영(출처 문화재청 대변인실).jpg",
+          "filename": "wikidata-q122225-02.jpg",
+          "alt": "성산일출봉 천연보호구역 사진 2"
+        }
+      ]
+    },
+    {
+      "id": "6800790b-af90-5543-b56e-d28936ba983f",
+      "slug": "wikidata-q16099490",
+      "name": "인천항",
+      "description": "인천의 인천항. 위치와 원본 사진 출처를 확인하고 방문 전 촬영 조건을 문의해 주세요.",
+      "category": "industrial",
+      "region": "인천",
+      "address": "인천 인천광역시",
+      "latitude": 37.460105,
+      "longitude": 126.624899,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q16099490",
+      "images": [
+        {
+          "id": "1d4bbdb8-da76-587e-beda-4ed1fe3eefa2",
+          "file_title": "File:20050502 Port of Incheon 010.jpg",
+          "filename": "wikidata-q16099490-01.jpg",
+          "alt": "인천항 사진 1"
+        }
+      ]
+    },
+    {
+      "id": "36cdd288-a26f-5818-879f-041669cdac63",
+      "slug": "wikidata-q484880",
+      "name": "도산공원",
+      "description": "서울의 도산공원. 위치와 원본 사진 출처를 확인하고 방문 전 촬영 조건을 문의해 주세요.",
+      "category": "nature",
+      "region": "서울",
+      "address": "서울 강남구",
+      "latitude": 37.52441667,
+      "longitude": 127.03522222,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q484880",
+      "images": [
+        {
+          "id": "503e417d-c0e6-56bb-a233-5ec445caac52",
+          "file_title": "File:Dosan Memorial Park - Seoul, South Korea - DSC00412.JPG",
+          "filename": "wikidata-q484880-01.jpg",
+          "alt": "도산공원 사진 1"
+        }
+      ]
+    },
+    {
+      "id": "687c5d31-e572-55c8-bdf4-4de745fff604",
+      "slug": "wikidata-q491203",
+      "name": "해운대해수욕장",
+      "description": "부산의 해운대해수욕장. 위치와 원본 사진 출처를 확인하고 방문 전 촬영 조건을 문의해 주세요.",
+      "category": "nature",
+      "region": "부산",
+      "address": "부산 해운대구",
+      "latitude": 35.158552435,
+      "longitude": 129.160539102,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q491203",
+      "images": [
+        {
+          "id": "665c1cf3-5804-56ea-bafc-b81483ec7f06",
+          "file_title": "File:Haeundae Beach in Busan.jpg",
+          "filename": "wikidata-q491203-01.jpg",
+          "alt": "해운대해수욕장 사진 1"
+        },
+        {
+          "id": "d775553d-388d-523e-a120-287fb1f559ea",
+          "file_title": "File:Haeundae Beach at night, Busan.jpg",
+          "filename": "wikidata-q491203-02.jpg",
+          "alt": "해운대해수욕장의 야간 풍경"
+        },
+        {
+          "id": "16ca9f4c-7fad-57ae-a852-f1252656d7fa",
+          "file_title": "File:Haeundae Beach - view 1 - sept5-2013.jpg",
+          "filename": "wikidata-q491203-03.jpg",
+          "alt": "해운대해수욕장의 다른 시점"
+        }
+      ]
+    },
+    {
+      "id": "af9bcc19-e6b7-5104-a67f-c9ac5e5a8fe4",
+      "slug": "wikidata-q16094197",
+      "name": "옹진 백령도 남포리 콩돌해안",
+      "description": "인천의 옹진 백령도 남포리 콩돌해안. 위치와 원본 사진 출처를 확인하고 방문 전 촬영 조건을 문의해 주세요.",
+      "category": "nature",
+      "region": "인천",
+      "address": "인천 인천광역시",
+      "latitude": 37.936111111,
+      "longitude": 124.687777777,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q16094197",
+      "images": [
+        {
+          "id": "a013ca95-8c0a-50f8-8824-cc40b8ae3cd4",
+          "file_title": "File:Kongdol Pebble Beach in Nampo-ri, Baengnyeongdo Island.jpg",
+          "filename": "wikidata-q16094197-01.jpg",
+          "alt": "옹진 백령도 남포리 콩돌해안 사진 1"
+        }
+      ]
+    },
+    {
+      "id": "a92fb25d-402c-5e77-989e-d47ba87d9962",
+      "slug": "wikidata-q16172014",
+      "name": "한밭수목원",
+      "description": "대전의 한밭수목원. 위치와 원본 사진 출처를 확인하고 방문 전 촬영 조건을 문의해 주세요.",
+      "category": "nature",
+      "region": "대전",
+      "address": "대전 대전광역시",
+      "latitude": 36.369853,
+      "longitude": 127.388203,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q16172014",
+      "images": [
+        {
+          "id": "bc646510-30da-59ff-a073-113783cedb06",
+          "file_title": "File:Hanbat Treegarden West Flowers.JPG",
+          "filename": "wikidata-q16172014-01.jpg",
+          "alt": "한밭수목원 사진 1"
+        }
+      ]
+    },
+    {
+      "id": "0b5a6abe-5802-5c1a-9c18-884a5fec9c12",
+      "slug": "wikidata-q16182443",
+      "name": "경포해수욕장",
+      "description": "강원의 경포해수욕장. 위치와 원본 사진 출처를 확인하고 방문 전 촬영 조건을 문의해 주세요.",
+      "category": "nature",
+      "region": "강원",
+      "address": "강원 강릉시",
+      "latitude": 37.805666666,
+      "longitude": 128.910755555,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q16182443",
+      "images": [
+        {
+          "id": "f4391040-d27e-561b-afed-c2b241503a39",
+          "file_title": "File:Gyeongpo Beach 1.jpg",
+          "filename": "wikidata-q16182443-01.jpg",
+          "alt": "경포해수욕장 사진 1"
+        },
+        {
+          "id": "a13420cc-123c-592b-a490-2ce7effaef69",
+          "file_title": "File:Gyeongpo Beach 2.jpg",
+          "filename": "wikidata-q16182443-02.jpg",
+          "alt": "경포해수욕장 해안 풍경"
+        },
+        {
+          "id": "a642f3d4-a54c-5a40-babc-9eaf8cf6fd69",
+          "file_title": "File:Gyeongpo Beach 20220502 004.jpg",
+          "filename": "wikidata-q16182443-03.jpg",
+          "alt": "경포해수욕장의 다른 시점"
+        }
+      ]
+    },
+    {
+      "id": "73622563-1233-58b3-a875-2b9a4ba7d889",
+      "slug": "wikidata-q7082647",
+      "name": "옥순봉",
+      "description": "충북의 옥순봉. 위치와 원본 사진 출처를 확인하고 방문 전 촬영 조건을 문의해 주세요.",
+      "category": "nature",
+      "region": "충북",
+      "address": "충북 충청북도",
+      "latitude": 36.943333333,
+      "longitude": 128.2375,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q7082647",
+      "images": [
+        {
+          "id": "97e38649-b57f-5aa2-b837-3f3ce4abae44",
+          "file_title": "File:Eight Scenic Wonders of Danyang - Oksunbong (8081618595).jpg",
+          "filename": "wikidata-q7082647-01.jpg",
+          "alt": "옥순봉 사진 1"
+        }
+      ]
+    },
+    {
+      "id": "7514eae1-3aeb-5e89-b295-ea4cc09548ee",
+      "slug": "wikidata-q30156824",
+      "name": "두웅습지",
+      "description": "충남의 두웅습지. 위치와 원본 사진 출처를 확인하고 방문 전 촬영 조건을 문의해 주세요.",
+      "category": "nature",
+      "region": "충남",
+      "address": "충남 충청남도",
+      "latitude": 36.833333333,
+      "longitude": 126.183333333,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q30156824",
+      "images": [
+        {
+          "id": "2e62804e-f509-5a5f-a23e-e7a69ead30de",
+          "file_title": "File:Duwung wetland image 1.jpg",
+          "filename": "wikidata-q30156824-01.jpg",
+          "alt": "두웅습지 사진 1"
+        }
+      ]
+    },
+    {
+      "id": "b9dc9d63-9ca6-560e-9cf6-4e33240912ed",
+      "slug": "wikidata-q12594774",
+      "name": "만경강",
+      "description": "전북의 만경강. 위치와 원본 사진 출처를 확인하고 방문 전 촬영 조건을 문의해 주세요.",
+      "category": "nature",
+      "region": "전북",
+      "address": "전북 전북특별자치도",
+      "latitude": 35.8518,
+      "longitude": 126.5985,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q12594774",
+      "images": [
+        {
+          "id": "f82d63c7-85e5-5fe1-82a8-c31a6a01faf5",
+          "file_title": "File:Mangyeong River (Wanju) - October 2017 (2).jpg",
+          "filename": "wikidata-q12594774-01.jpg",
+          "alt": "만경강 사진 1"
+        }
+      ]
+    },
+    {
+      "id": "d9a65b3c-4d49-51fb-a0fb-b322bb29aa45",
+      "slug": "wikidata-q482741",
+      "name": "월출산",
+      "description": "전남의 월출산. 위치와 원본 사진 출처를 확인하고 방문 전 촬영 조건을 문의해 주세요.",
+      "category": "nature",
+      "region": "전남",
+      "address": "전남 전라남도",
+      "latitude": 34.767777777,
+      "longitude": 126.704444444,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q482741",
+      "images": [
+        {
+          "id": "e2b679a4-b324-5507-a32e-fd5c960a3356",
+          "file_title": "File:Wolchulsan mountain peak.jpg",
+          "filename": "wikidata-q482741-01.jpg",
+          "alt": "월출산 사진 1"
+        }
+      ]
+    },
+    {
+      "id": "277e7603-7b7d-551f-a690-db72a8609bb1",
+      "slug": "wikidata-q625993",
+      "name": "정방폭포",
+      "description": "제주의 정방폭포. 위치와 원본 사진 출처를 확인하고 방문 전 촬영 조건을 문의해 주세요.",
+      "category": "nature",
+      "region": "제주",
+      "address": "제주 서귀동",
+      "latitude": 33.244647222,
+      "longitude": 126.571661111,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q625993",
+      "images": [
+        {
+          "id": "b6376748-26ef-544e-a3a1-c1e5c945f22f",
+          "file_title": "File:Jeongbang Falls.jpg",
+          "filename": "wikidata-q625993-01.jpg",
+          "alt": "정방폭포 사진 1"
+        },
+        {
+          "id": "1baa08d7-1a3e-5475-a9f0-0a23f9d6f17b",
+          "file_title": "File:Jeongbang From a Distance.jpg",
+          "filename": "wikidata-q625993-02.jpg",
+          "alt": "정방폭포의 주변 해안과 폭포"
+        },
+        {
+          "id": "9be35bc1-c0a7-5ff4-b1d0-760d3740a202",
+          "file_title": "File:Toppling Water of Jeongbang.jpg",
+          "filename": "wikidata-q625993-03.jpg",
+          "alt": "정방폭포의 다른 시점"
+        }
+      ]
+    },
+    {
+      "id": "566c2f6c-2877-5568-b94b-6341006eafb4",
+      "slug": "wikidata-q24861751",
+      "name": "경의선숲길",
+      "description": "서울의 경의선숲길. 위치와 원본 사진 출처를 확인하고 방문 전 촬영 조건을 문의해 주세요.",
+      "category": "nature",
+      "region": "서울",
+      "address": "서울 용산구",
+      "latitude": 37.559397072,
+      "longitude": 126.924869497,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q24861751",
+      "images": [
+        {
+          "id": "0b3ded1c-ce71-5eab-b4f6-988544763960",
+          "file_title": "File:Gyeonguiseon Forest Trail Park and Ttaeng-ttaeng Street in Seoul (near Hongdae, 1).jpg",
+          "filename": "wikidata-q24861751-01.jpg",
+          "alt": "경의선숲길 사진 1"
+        }
+      ]
+    },
+    {
+      "id": "08d5793f-8b36-549b-8383-e569de9c2091",
+      "slug": "wikidata-q12613619",
+      "name": "일광해수욕장",
+      "description": "부산의 일광해수욕장. 위치와 원본 사진 출처를 확인하고 방문 전 촬영 조건을 문의해 주세요.",
+      "category": "nature",
+      "region": "부산",
+      "address": "부산 기장군",
+      "latitude": 35.2609778,
+      "longitude": 129.2336709,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q12613619",
+      "images": [
+        {
+          "id": "16a27e24-caf5-521d-afea-2d7ca55a387c",
+          "file_title": "File:일광해수욕장.jpg",
+          "filename": "wikidata-q12613619-01.jpg",
+          "alt": "일광해수욕장 사진 1"
+        }
+      ]
+    },
+    {
+      "id": "651d0e16-92f9-5e45-8bc1-9a2b70ff19d6",
+      "slug": "wikidata-q66175402",
+      "name": "소래습지생태공원",
+      "description": "인천의 소래습지생태공원. 위치와 원본 사진 출처를 확인하고 방문 전 촬영 조건을 문의해 주세요.",
+      "category": "nature",
+      "region": "인천",
+      "address": "인천 인천광역시",
+      "latitude": 37.4122,
+      "longitude": 126.7474,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q66175402",
+      "images": [
+        {
+          "id": "09f89cea-0bf6-5383-bf73-d8cecdc871d2",
+          "file_title": "File:Sunrise In The Park (192216089).jpeg",
+          "filename": "wikidata-q66175402-01.jpg",
+          "alt": "소래습지생태공원 사진 1"
+        }
+      ]
+    },
+    {
+      "id": "3e422663-5bf3-5614-93e0-a89a39410ec4",
+      "slug": "wikidata-q64769089",
+      "name": "우암사적공원",
+      "description": "대전의 우암사적공원. 위치와 원본 사진 출처를 확인하고 방문 전 촬영 조건을 문의해 주세요.",
+      "category": "nature",
+      "region": "대전",
+      "address": "대전 대전광역시",
+      "latitude": 36.347748,
+      "longitude": 127.4582,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q64769089",
+      "images": [
+        {
+          "id": "95a5fa4e-4d72-504a-9582-5e2cff6bde24",
+          "file_title": "File:Uam Historical Park 01.jpg",
+          "filename": "wikidata-q64769089-01.jpg",
+          "alt": "우암사적공원 사진 1"
+        }
+      ]
+    },
+    {
+      "id": "1e06b023-c5df-5d15-a2ad-2bef2a9866e0",
+      "slug": "wikidata-q12595938",
+      "name": "물향기수목원",
+      "description": "경기의 물향기수목원. 위치와 원본 사진 출처를 확인하고 방문 전 촬영 조건을 문의해 주세요.",
+      "category": "nature",
+      "region": "경기",
+      "address": "경기 오산시",
+      "latitude": 37.167114,
+      "longitude": 127.06002,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q12595938",
+      "images": [
+        {
+          "id": "c1a74f9e-eaf4-5431-972c-5d2a93502192",
+          "file_title": "File:2025 Osan Jjw 2.jpg",
+          "filename": "wikidata-q12595938-01.jpg",
+          "alt": "물향기수목원 사진 1"
+        }
+      ]
+    },
+    {
+      "id": "34af7026-688f-5035-ba0f-7f1f7cff9745",
+      "slug": "wikidata-q24565460",
+      "name": "강릉솔향수목원",
+      "description": "강원의 강릉솔향수목원. 위치와 원본 사진 출처를 확인하고 방문 전 촬영 조건을 문의해 주세요.",
+      "category": "nature",
+      "region": "강원",
+      "address": "강원 구정면",
+      "latitude": 37.694863888,
+      "longitude": 128.859086111,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q24565460",
+      "images": [
+        {
+          "id": "b5f17845-279d-57f0-945c-c7a54ae5f38c",
+          "file_title": "File:2016년 5월 22일 강원도 강릉시 솔향수목원 DSC00629.jpg",
+          "filename": "wikidata-q24565460-01.jpg",
+          "alt": "강릉솔향수목원 사진 1"
+        }
+      ]
+    },
+    {
+      "id": "487b5378-9fd9-58a3-aa53-a49679b7582d",
+      "slug": "wikidata-q12598904",
+      "name": "부안 격포리 후박나무 군락",
+      "description": "전북의 부안 격포리 후박나무 군락. 위치와 원본 사진 출처를 확인하고 방문 전 촬영 조건을 문의해 주세요.",
+      "category": "nature",
+      "region": "전북",
+      "address": "전북 부안군",
+      "latitude": 35.635403,
+      "longitude": 126.462188,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q12598904",
+      "images": [
+        {
+          "id": "80ff272a-976c-5ea4-b9f1-57df57120548",
+          "file_title": "File:Buan Gyeokpo-ri Hubak Namu(Persera thunbergii) community 001.jpg",
+          "filename": "wikidata-q12598904-01.jpg",
+          "alt": "부안 격포리 후박나무 군락 사진 1"
+        }
+      ]
+    },
+    {
+      "id": "01c56b73-38b6-55f9-8c3d-b0f35f738eee",
+      "slug": "wikidata-q16092652",
+      "name": "담양 관방제림",
+      "description": "전남의 담양 관방제림. 위치와 원본 사진 출처를 확인하고 방문 전 촬영 조건을 문의해 주세요.",
+      "category": "nature",
+      "region": "전남",
+      "address": "전남 담양군",
+      "latitude": 35.322166666,
+      "longitude": 126.987805555,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q16092652",
+      "images": [
+        {
+          "id": "52e81805-7065-57c9-b36f-9a1873402d2d",
+          "file_title": "File:관방제림.JPG",
+          "filename": "wikidata-q16092652-01.jpg",
+          "alt": "담양 관방제림 사진 1"
+        }
+      ]
+    },
+    {
+      "id": "8e81adfe-bbd9-5a40-8c10-1f059274295c",
+      "slug": "wikidata-q491088",
+      "name": "경주 계림",
+      "description": "경북의 경주 계림. 위치와 원본 사진 출처를 확인하고 방문 전 촬영 조건을 문의해 주세요.",
+      "category": "nature",
+      "region": "경북",
+      "address": "경북 경주시",
+      "latitude": 35.8675,
+      "longitude": 129.223,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q491088",
+      "images": [
+        {
+          "id": "24c22d2e-e0dd-5781-9607-2dffe53fa4bb",
+          "file_title": "File:Korea-Gyeongju-Gyerim Forest-Shrine-01.jpg",
+          "filename": "wikidata-q491088-01.jpg",
+          "alt": "경주 계림 사진 1"
+        }
+      ]
+    },
+    {
+      "id": "4ff49935-b688-5f7f-9736-0972e48b961b",
+      "slug": "wikidata-q626162",
+      "name": "천지연폭포",
+      "description": "제주의 천지연폭포. 위치와 원본 사진 출처를 확인하고 방문 전 촬영 조건을 문의해 주세요.",
+      "category": "nature",
+      "region": "제주",
+      "address": "제주 서귀동",
+      "latitude": 33.246927777,
+      "longitude": 126.554405555,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q626162",
+      "images": [
+        {
+          "id": "f0b1c4c5-9d90-5aae-a423-c61bbf8d8606",
+          "file_title": "File:Cheonjiyeon Waterfall 20160616 092608.jpg",
+          "filename": "wikidata-q626162-01.jpg",
+          "alt": "천지연폭포 사진 1"
+        }
+      ]
+    },
+    {
+      "id": "9655eba5-5ee0-5651-a7cf-4e7ac4ed722f",
+      "slug": "wikidata-q16178122",
+      "name": "송도해수욕장",
+      "description": "부산의 송도해수욕장. 위치와 원본 사진 출처를 확인하고 방문 전 촬영 조건을 문의해 주세요.",
+      "category": "nature",
+      "region": "부산",
+      "address": "부산 부산광역시",
+      "latitude": 35.076194,
+      "longitude": 129.018031,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q16178122",
+      "images": [
+        {
+          "id": "672e4e8a-e6b3-5b6d-b2f9-4474dca1966c",
+          "file_title": "File:Busan - Songdo beach.jpg",
+          "filename": "wikidata-q16178122-01.jpg",
+          "alt": "송도해수욕장 사진 1"
+        }
+      ]
+    },
+    {
+      "id": "fb91b054-f5d3-5af9-997d-c974d843be86",
+      "slug": "wikidata-q108914532",
+      "name": "유림공원",
+      "description": "대전의 유림공원. 위치와 원본 사진 출처를 확인하고 방문 전 촬영 조건을 문의해 주세요.",
+      "category": "nature",
+      "region": "대전",
+      "address": "대전 유성구",
+      "latitude": 36.360722222,
+      "longitude": 127.357888888,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q108914532",
+      "images": [
+        {
+          "id": "2bfbd04a-f84e-5118-9ec4-695fcd81063a",
+          "file_title": "File:유림공원 반도지.jpg",
+          "filename": "wikidata-q108914532-01.jpg",
+          "alt": "유림공원 사진 1"
+        }
+      ]
+    },
+    {
+      "id": "cc567574-ebfc-5318-9787-f6dc159d29f5",
+      "slug": "wikidata-q12597864",
+      "name": "백운호수",
+      "description": "경기의 백운호수. 위치와 원본 사진 출처를 확인하고 방문 전 촬영 조건을 문의해 주세요.",
+      "category": "nature",
+      "region": "경기",
+      "address": "경기 의왕시",
+      "latitude": 37.3797,
+      "longitude": 127.006,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q12597864",
+      "images": [
+        {
+          "id": "ef3dde74-0509-5b2f-8d4c-0869b6254de0",
+          "file_title": "File:20150808최광모RX10DSC00958.JPG",
+          "filename": "wikidata-q12597864-01.jpg",
+          "alt": "백운호수 사진 1"
+        }
+      ]
+    },
+    {
+      "id": "983c5a65-0c1e-5a52-920e-778962200571",
+      "slug": "wikidata-q49316331",
+      "name": "영랑호",
+      "description": "강원의 영랑호. 위치와 원본 사진 출처를 확인하고 방문 전 촬영 조건을 문의해 주세요.",
+      "category": "nature",
+      "region": "강원",
+      "address": "강원 강원특별자치도",
+      "latitude": 38.218055555,
+      "longitude": 128.581388888,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q49316331",
+      "images": [
+        {
+          "id": "7d73f6bd-05e9-560e-8538-918e0c7beb18",
+          "file_title": "File:Yeongnangho.jpg",
+          "filename": "wikidata-q49316331-01.jpg",
+          "alt": "영랑호 사진 1"
+        }
+      ]
+    },
+    {
+      "id": "a8d11a37-2bc5-58cd-933f-f000bc14fc72",
+      "slug": "wikidata-q85989821",
+      "name": "희방폭포",
+      "description": "경북의 희방폭포. 위치와 원본 사진 출처를 확인하고 방문 전 촬영 조건을 문의해 주세요.",
+      "category": "nature",
+      "region": "경북",
+      "address": "경북 영주시",
+      "latitude": 36.91788,
+      "longitude": 128.45811,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q85989821",
+      "images": [
+        {
+          "id": "9280eb3f-ed31-5e53-a397-0ebf5f19432a",
+          "file_title": "File:Huibang Waterfall (2).jpg",
+          "filename": "wikidata-q85989821-01.jpg",
+          "alt": "희방폭포 사진 1"
+        }
+      ]
+    },
+    {
+      "id": "6eff1e42-af82-571f-a4f4-b3b96a922b5c",
+      "slug": "wikidata-q5952045",
+      "name": "황매산",
+      "description": "경남의 황매산. 위치와 원본 사진 출처를 확인하고 방문 전 촬영 조건을 문의해 주세요.",
+      "category": "nature",
+      "region": "경남",
+      "address": "경남 합천군",
+      "latitude": 35.49638889,
+      "longitude": 127.97444444,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q5952045",
+      "images": [
+        {
+          "id": "0950a53d-aca2-5aba-a0a9-e0642bf97aef",
+          "file_title": "File:Hwangmaesan Mountain in autumn.jpg",
+          "filename": "wikidata-q5952045-01.jpg",
+          "alt": "황매산 사진 1"
+        }
+      ]
+    },
+    {
+      "id": "9fe0478b-87cc-5666-8f97-d4f899580428",
+      "slug": "wikidata-q12600001",
+      "name": "산방산",
+      "description": "제주의 산방산. 위치와 원본 사진 출처를 확인하고 방문 전 촬영 조건을 문의해 주세요.",
+      "category": "nature",
+      "region": "제주",
+      "address": "제주 서귀포시",
+      "latitude": 33.240555555,
+      "longitude": 126.313611111,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q12600001",
+      "images": [
+        {
+          "id": "7b8f4e52-57ce-5166-9a69-c138b64a9034",
+          "file_title": "File:Sanbangsan (5983281424).jpg",
+          "filename": "wikidata-q12600001-01.jpg",
+          "alt": "산방산 사진 1"
+        }
+      ]
+    },
+    {
+      "id": "7d4bbb91-22aa-5c6f-b9cf-cc7bf081e80a",
+      "slug": "wikidata-q105061220",
+      "name": "설악산 토왕성폭포",
+      "description": "강원의 설악산 토왕성폭포. 위치와 원본 사진 출처를 확인하고 방문 전 촬영 조건을 문의해 주세요.",
+      "category": "nature",
+      "region": "강원",
+      "address": "강원 속초시",
+      "latitude": 38.154216,
+      "longitude": 128.494609,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q105061220",
+      "images": [
+        {
+          "id": "fbd95646-f4fd-5be9-bc80-8e975c2c347e",
+          "file_title": "File:토왕성 폭포.jpg",
+          "filename": "wikidata-q105061220-01.jpg",
+          "alt": "설악산 토왕성폭포 사진 1"
         }
       ]
     }

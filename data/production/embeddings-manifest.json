@@ -1672,6 +1672,422 @@
       "image_url": "https://ptdvhzjzxcsmrontrdlm.supabase.co/storage/v1/object/public/location-images/9ba387f5-29be-54d3-9f3c-8ab0404172e8/76dc8527-6010-5a65-82b0-ca59cdb100c6.jpg",
       "source": "Wikimedia Commons — Ryuch — CC BY-SA 3.0",
       "source_url": "https://commons.wikimedia.org/wiki/File:Three_sacred_holes_in_Jeju.JPG"
+    },
+    {
+      "image_id": "4dd13a2c-fed8-53b3-a1a0-440ba0805d83",
+      "location_id": "b452d2b3-2b35-59e1-b812-8e761f3df0cc",
+      "image_path": "../../public/locations/wikidata-q12438381-01.jpg",
+      "image_url": "https://ptdvhzjzxcsmrontrdlm.supabase.co/storage/v1/object/public/location-images/b452d2b3-2b35-59e1-b812-8e761f3df0cc/4dd13a2c-fed8-53b3-a1a0-440ba0805d83.jpg",
+      "source": "Wikimedia Commons — Martin Pueschel Eastberliner — CC BY-SA 3.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Korea_busan_pusan_harbour_cargo_container_terminal.JPG"
+    },
+    {
+      "image_id": "ab212fda-eb95-5167-98ec-aaeff784d103",
+      "location_id": "68ab3564-cbd5-5fae-be21-6d91b6aaf75d",
+      "image_path": "../../public/locations/wikidata-q12584496-01.jpg",
+      "image_url": "https://ptdvhzjzxcsmrontrdlm.supabase.co/storage/v1/object/public/location-images/68ab3564-cbd5-5fae-be21-6d91b6aaf75d/ab212fda-eb95-5167-98ec-aaeff784d103.jpg",
+      "source": "Wikimedia Commons — Asfreeas — CC BY-SA 3.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Gohyun_Harbor_-_Minam_Cruise1,_Geoje_City.jpg"
+    },
+    {
+      "image_id": "3452002a-2f4a-5253-921b-a93ab3c50837",
+      "location_id": "2f564dd3-06fc-5cab-a6ed-fc26c60e1833",
+      "image_path": "../../public/locations/wikidata-q12616503-01.jpg",
+      "image_url": "https://ptdvhzjzxcsmrontrdlm.supabase.co/storage/v1/object/public/location-images/2f564dd3-06fc-5cab-a6ed-fc26c60e1833/3452002a-2f4a-5253-921b-a93ab3c50837.jpg",
+      "source": "Wikimedia Commons — Jjw — CC BY-SA 4.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Jeju_Costral_Ferry_Terminal.JPG"
+    },
+    {
+      "image_id": "8df748f9-2dbc-55bf-a517-abf11b392b1d",
+      "location_id": "20a1df36-854f-5280-8a70-fbd88a47a42b",
+      "image_path": "../../public/locations/wikidata-q490572-01.jpg",
+      "image_url": "https://ptdvhzjzxcsmrontrdlm.supabase.co/storage/v1/object/public/location-images/20a1df36-854f-5280-8a70-fbd88a47a42b/8df748f9-2dbc-55bf-a517-abf11b392b1d.jpg",
+      "source": "Wikimedia Commons — *intacto — CC BY 2.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Korea-Busan-Taejongdae-03.jpg"
+    },
+    {
+      "image_id": "718864ae-0ae7-5780-b0f7-1e1074649822",
+      "location_id": "4e3c8fcb-ba96-51cb-8fe9-1d4691b66ff3",
+      "image_path": "../../public/locations/wikidata-q16161579-01.jpg",
+      "image_url": "https://ptdvhzjzxcsmrontrdlm.supabase.co/storage/v1/object/public/location-images/4e3c8fcb-ba96-51cb-8fe9-1d4691b66ff3/718864ae-0ae7-5780-b0f7-1e1074649822.jpg",
+      "source": "Wikimedia Commons — Mic33key — CC BY-SA 4.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Yuchon_3rd_Bridge,_Gwangju_%EA%B4%91%EC%A3%BC%EA%B4%91%EC%97%AD%EC%8B%9C_%EC%9C%A0%EC%B4%8C3%EA%B5%90.jpg"
+    },
+    {
+      "image_id": "b5807f6f-80c1-5eba-a443-2e10cfc8f853",
+      "location_id": "060d70e3-3e51-57d4-b9aa-968dd8418742",
+      "image_path": "../../public/locations/wikidata-q624528-01.jpg",
+      "image_url": "https://ptdvhzjzxcsmrontrdlm.supabase.co/storage/v1/object/public/location-images/060d70e3-3e51-57d4-b9aa-968dd8418742/b5807f6f-80c1-5eba-a443-2e10cfc8f853.jpg",
+      "source": "Wikimedia Commons — Yoo Chung — CC BY-SA 3.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Expo_Science_Park_in_Daejeon.jpg"
+    },
+    {
+      "image_id": "c06f36f7-1673-527a-add1-badb0e062639",
+      "location_id": "c76fd195-b6fc-554c-a1dc-0c5e91f04e8a",
+      "image_path": "../../public/locations/wikidata-q64506499-01.jpg",
+      "image_url": "https://ptdvhzjzxcsmrontrdlm.supabase.co/storage/v1/object/public/location-images/c76fd195-b6fc-554c-a1dc-0c5e91f04e8a/c06f36f7-1673-527a-add1-badb0e062639.jpg",
+      "source": "Wikimedia Commons — *Youngjin — CC BY-SA 3.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Sejong_lake_park_190609_17.jpg"
+    },
+    {
+      "image_id": "b0f7e26b-6bd4-58b1-86de-e8a210c2a36e",
+      "location_id": "c76fd195-b6fc-554c-a1dc-0c5e91f04e8a",
+      "image_path": "../../public/locations/wikidata-q64506499-02.jpg",
+      "image_url": "https://ptdvhzjzxcsmrontrdlm.supabase.co/storage/v1/object/public/location-images/c76fd195-b6fc-554c-a1dc-0c5e91f04e8a/b0f7e26b-6bd4-58b1-86de-e8a210c2a36e.jpg",
+      "source": "Wikimedia Commons — *Youngjin — CC BY-SA 3.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Sejong_lake_park_190609_04.jpg"
+    },
+    {
+      "image_id": "298202e3-7860-5809-8a55-b6262700b9e2",
+      "location_id": "c76fd195-b6fc-554c-a1dc-0c5e91f04e8a",
+      "image_path": "../../public/locations/wikidata-q64506499-03.jpg",
+      "image_url": "https://ptdvhzjzxcsmrontrdlm.supabase.co/storage/v1/object/public/location-images/c76fd195-b6fc-554c-a1dc-0c5e91f04e8a/298202e3-7860-5809-8a55-b6262700b9e2.jpg",
+      "source": "Wikimedia Commons — *Youngjin — CC BY-SA 3.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Sejong_lake_park_190609_14.jpg"
+    },
+    {
+      "image_id": "037e24ca-c1e0-5e07-a0d8-2c4d99052fc5",
+      "location_id": "05ba17a9-7151-5e8a-9d10-7699d35c8d6c",
+      "image_path": "../../public/locations/wikidata-q12583924-01.jpg",
+      "image_url": "https://ptdvhzjzxcsmrontrdlm.supabase.co/storage/v1/object/public/location-images/05ba17a9-7151-5e8a-9d10-7699d35c8d6c/037e24ca-c1e0-5e07-a0d8-2c4d99052fc5.jpg",
+      "source": "Wikimedia Commons — Steve46814 — CC BY-SA 3.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Korea-Gangneung-Gyeongpo_(Lake)_pano.JPG"
+    },
+    {
+      "image_id": "7f86f51c-affd-5c0a-8221-0252a93c624c",
+      "location_id": "0d087a56-f2c0-52c1-834e-4953be686f41",
+      "image_path": "../../public/locations/wikidata-q277173-01.jpg",
+      "image_url": "https://ptdvhzjzxcsmrontrdlm.supabase.co/storage/v1/object/public/location-images/0d087a56-f2c0-52c1-834e-4953be686f41/7f86f51c-affd-5c0a-8221-0252a93c624c.jpg",
+      "source": "Wikimedia Commons — Steve46814 — CC BY-SA 3.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Korea-Danyang-Dodamsambong_3087-07.JPG"
+    },
+    {
+      "image_id": "f306fef6-25ae-5e91-84fb-98e18b0d4357",
+      "location_id": "a4967ec1-a834-5a42-b0ca-d21b1a8aea0e",
+      "image_path": "../../public/locations/wikidata-q12591871-01.jpg",
+      "image_url": "https://ptdvhzjzxcsmrontrdlm.supabase.co/storage/v1/object/public/location-images/a4967ec1-a834-5a42-b0ca-d21b1a8aea0e/f306fef6-25ae-5e91-84fb-98e18b0d4357.jpg",
+      "source": "Wikimedia Commons — Ken Eckert — CC BY-SA 4.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Daecheon_Beach,_Korea.jpg"
+    },
+    {
+      "image_id": "a5a9f900-fda2-5a3d-b0b0-6559d91144ba",
+      "location_id": "a4967ec1-a834-5a42-b0ca-d21b1a8aea0e",
+      "image_path": "../../public/locations/wikidata-q12591871-02.jpg",
+      "image_url": "https://ptdvhzjzxcsmrontrdlm.supabase.co/storage/v1/object/public/location-images/a4967ec1-a834-5a42-b0ca-d21b1a8aea0e/a5a9f900-fda2-5a3d-b0b0-6559d91144ba.jpg",
+      "source": "Wikimedia Commons — Stinkie Pinkie — CC BY 2.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Korea-Boreyong-Daecheon_Beach-01.jpg"
+    },
+    {
+      "image_id": "c1b01e8a-0920-5f39-9222-17adecc5db94",
+      "location_id": "a4967ec1-a834-5a42-b0ca-d21b1a8aea0e",
+      "image_path": "../../public/locations/wikidata-q12591871-03.jpg",
+      "image_url": "https://ptdvhzjzxcsmrontrdlm.supabase.co/storage/v1/object/public/location-images/a4967ec1-a834-5a42-b0ca-d21b1a8aea0e/c1b01e8a-0920-5f39-9222-17adecc5db94.jpg",
+      "source": "Wikimedia Commons — Stinkie Pinkie — CC BY 2.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Korea-Boreyong-Daecheon_Beach-07.jpg"
+    },
+    {
+      "image_id": "3917e27d-42bb-53fc-9a70-1708d4ff42c1",
+      "location_id": "480b6e7b-fb93-5ab5-96ce-1506c1cfeaf2",
+      "image_path": "../../public/locations/wikidata-q562938-01.jpg",
+      "image_url": "https://ptdvhzjzxcsmrontrdlm.supabase.co/storage/v1/object/public/location-images/480b6e7b-fb93-5ab5-96ce-1506c1cfeaf2/3917e27d-42bb-53fc-9a70-1708d4ff42c1.jpg",
+      "source": "Wikimedia Commons — Joachim Dirauf — CC BY 3.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Maisan.jpg"
+    },
+    {
+      "image_id": "6eb8b3a2-4274-5603-a048-4a5401a81b58",
+      "location_id": "a4cd022c-d346-50fa-a289-f42c78d79e37",
+      "image_path": "../../public/locations/wikidata-q122225-01.jpg",
+      "image_url": "https://ptdvhzjzxcsmrontrdlm.supabase.co/storage/v1/object/public/location-images/a4cd022c-d346-50fa-a289-f42c78d79e37/6eb8b3a2-4274-5603-a048-4a5401a81b58.jpg",
+      "source": "Wikimedia Commons — Korea.net / Korean Culture and Information Service — CC BY-SA 2.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Seongsan_Ilchulbong_from_the_air.jpg"
+    },
+    {
+      "image_id": "a85e2b9e-8909-5d40-8864-f7c633f9b49e",
+      "location_id": "a4cd022c-d346-50fa-a289-f42c78d79e37",
+      "image_path": "../../public/locations/wikidata-q122225-02.jpg",
+      "image_url": "https://ptdvhzjzxcsmrontrdlm.supabase.co/storage/v1/object/public/location-images/a4cd022c-d346-50fa-a289-f42c78d79e37/a85e2b9e-8909-5d40-8864-f7c633f9b49e.jpg",
+      "source": "Wikimedia Commons — Korea Heritage Service — CC BY-SA 4.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:%EC%84%B1%EC%82%B0%EC%9D%BC%EC%B6%9C%EB%B4%89_%EC%B2%9C%EC%97%B0%EB%B3%B4%ED%98%B8%EA%B5%AC%EC%97%AD_2019%EB%85%84_%EC%B4%AC%EC%98%81(%EC%B6%9C%EC%B2%98_%EB%AC%B8%ED%99%94%EC%9E%AC%EC%B2%AD_%EB%8C%80%EB%B3%80%EC%9D%B8%EC%8B%A4).jpg"
+    },
+    {
+      "image_id": "1d4bbdb8-da76-587e-beda-4ed1fe3eefa2",
+      "location_id": "6800790b-af90-5543-b56e-d28936ba983f",
+      "image_path": "../../public/locations/wikidata-q16099490-01.jpg",
+      "image_url": "https://ptdvhzjzxcsmrontrdlm.supabase.co/storage/v1/object/public/location-images/6800790b-af90-5543-b56e-d28936ba983f/1d4bbdb8-da76-587e-beda-4ed1fe3eefa2.jpg",
+      "source": "Wikimedia Commons — Jjw — CC BY-SA 4.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:20050502_Port_of_Incheon_010.jpg"
+    },
+    {
+      "image_id": "503e417d-c0e6-56bb-a233-5ec445caac52",
+      "location_id": "36cdd288-a26f-5818-879f-041669cdac63",
+      "image_path": "../../public/locations/wikidata-q484880-01.jpg",
+      "image_url": "https://ptdvhzjzxcsmrontrdlm.supabase.co/storage/v1/object/public/location-images/36cdd288-a26f-5818-879f-041669cdac63/503e417d-c0e6-56bb-a233-5ec445caac52.jpg",
+      "source": "Wikimedia Commons — Daderot — CC0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Dosan_Memorial_Park_-_Seoul,_South_Korea_-_DSC00412.JPG"
+    },
+    {
+      "image_id": "665c1cf3-5804-56ea-bafc-b81483ec7f06",
+      "location_id": "687c5d31-e572-55c8-bdf4-4de745fff604",
+      "image_path": "../../public/locations/wikidata-q491203-01.jpg",
+      "image_url": "https://ptdvhzjzxcsmrontrdlm.supabase.co/storage/v1/object/public/location-images/687c5d31-e572-55c8-bdf4-4de745fff604/665c1cf3-5804-56ea-bafc-b81483ec7f06.jpg",
+      "source": "Wikimedia Commons — StephNurnberg — CC BY 2.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Haeundae_Beach_in_Busan.jpg"
+    },
+    {
+      "image_id": "d775553d-388d-523e-a120-287fb1f559ea",
+      "location_id": "687c5d31-e572-55c8-bdf4-4de745fff604",
+      "image_path": "../../public/locations/wikidata-q491203-02.jpg",
+      "image_url": "https://ptdvhzjzxcsmrontrdlm.supabase.co/storage/v1/object/public/location-images/687c5d31-e572-55c8-bdf4-4de745fff604/d775553d-388d-523e-a120-287fb1f559ea.jpg",
+      "source": "Wikimedia Commons — VN.NguyenDucDuy — CC BY-SA 4.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Haeundae_Beach_at_night,_Busan.jpg"
+    },
+    {
+      "image_id": "16ca9f4c-7fad-57ae-a852-f1252656d7fa",
+      "location_id": "687c5d31-e572-55c8-bdf4-4de745fff604",
+      "image_path": "../../public/locations/wikidata-q491203-03.jpg",
+      "image_url": "https://ptdvhzjzxcsmrontrdlm.supabase.co/storage/v1/object/public/location-images/687c5d31-e572-55c8-bdf4-4de745fff604/16ca9f4c-7fad-57ae-a852-f1252656d7fa.jpg",
+      "source": "Wikimedia Commons — Nesnad — CC BY-SA 4.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Haeundae_Beach_-_view_1_-_sept5-2013.jpg"
+    },
+    {
+      "image_id": "a013ca95-8c0a-50f8-8824-cc40b8ae3cd4",
+      "location_id": "af9bcc19-e6b7-5104-a67f-c9ac5e5a8fe4",
+      "image_path": "../../public/locations/wikidata-q16094197-01.jpg",
+      "image_url": "https://ptdvhzjzxcsmrontrdlm.supabase.co/storage/v1/object/public/location-images/af9bcc19-e6b7-5104-a67f-c9ac5e5a8fe4/a013ca95-8c0a-50f8-8824-cc40b8ae3cd4.jpg",
+      "source": "Wikimedia Commons — Trainholic — CC BY-SA 4.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Kongdol_Pebble_Beach_in_Nampo-ri,_Baengnyeongdo_Island.jpg"
+    },
+    {
+      "image_id": "bc646510-30da-59ff-a073-113783cedb06",
+      "location_id": "a92fb25d-402c-5e77-989e-d47ba87d9962",
+      "image_path": "../../public/locations/wikidata-q16172014-01.jpg",
+      "image_url": "https://ptdvhzjzxcsmrontrdlm.supabase.co/storage/v1/object/public/location-images/a92fb25d-402c-5e77-989e-d47ba87d9962/bc646510-30da-59ff-a073-113783cedb06.jpg",
+      "source": "Wikimedia Commons — Created by 람다람쥐 — CC BY-SA 3.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Hanbat_Treegarden_West_Flowers.JPG"
+    },
+    {
+      "image_id": "f4391040-d27e-561b-afed-c2b241503a39",
+      "location_id": "0b5a6abe-5802-5c1a-9c18-884a5fec9c12",
+      "image_path": "../../public/locations/wikidata-q16182443-01.jpg",
+      "image_url": "https://ptdvhzjzxcsmrontrdlm.supabase.co/storage/v1/object/public/location-images/0b5a6abe-5802-5c1a-9c18-884a5fec9c12/f4391040-d27e-561b-afed-c2b241503a39.jpg",
+      "source": "Wikimedia Commons — Christophe95 — CC BY-SA 4.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Gyeongpo_Beach_1.jpg"
+    },
+    {
+      "image_id": "a13420cc-123c-592b-a490-2ce7effaef69",
+      "location_id": "0b5a6abe-5802-5c1a-9c18-884a5fec9c12",
+      "image_path": "../../public/locations/wikidata-q16182443-02.jpg",
+      "image_url": "https://ptdvhzjzxcsmrontrdlm.supabase.co/storage/v1/object/public/location-images/0b5a6abe-5802-5c1a-9c18-884a5fec9c12/a13420cc-123c-592b-a490-2ce7effaef69.jpg",
+      "source": "Wikimedia Commons — Christophe95 — CC BY-SA 4.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Gyeongpo_Beach_2.jpg"
+    },
+    {
+      "image_id": "a642f3d4-a54c-5a40-babc-9eaf8cf6fd69",
+      "location_id": "0b5a6abe-5802-5c1a-9c18-884a5fec9c12",
+      "image_path": "../../public/locations/wikidata-q16182443-03.jpg",
+      "image_url": "https://ptdvhzjzxcsmrontrdlm.supabase.co/storage/v1/object/public/location-images/0b5a6abe-5802-5c1a-9c18-884a5fec9c12/a642f3d4-a54c-5a40-babc-9eaf8cf6fd69.jpg",
+      "source": "Wikimedia Commons — Mobius6 — CC BY-SA 4.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Gyeongpo_Beach_20220502_004.jpg"
+    },
+    {
+      "image_id": "97e38649-b57f-5aa2-b837-3f3ce4abae44",
+      "location_id": "73622563-1233-58b3-a875-2b9a4ba7d889",
+      "image_path": "../../public/locations/wikidata-q7082647-01.jpg",
+      "image_url": "https://ptdvhzjzxcsmrontrdlm.supabase.co/storage/v1/object/public/location-images/73622563-1233-58b3-a875-2b9a4ba7d889/97e38649-b57f-5aa2-b837-3f3ce4abae44.jpg",
+      "source": "Wikimedia Commons — Fox Totorus — CC BY 2.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Eight_Scenic_Wonders_of_Danyang_-_Oksunbong_(8081618595).jpg"
+    },
+    {
+      "image_id": "2e62804e-f509-5a5f-a23e-e7a69ead30de",
+      "location_id": "7514eae1-3aeb-5e89-b295-ea4cc09548ee",
+      "image_path": "../../public/locations/wikidata-q30156824-01.jpg",
+      "image_url": "https://ptdvhzjzxcsmrontrdlm.supabase.co/storage/v1/object/public/location-images/7514eae1-3aeb-5e89-b295-ea4cc09548ee/2e62804e-f509-5a5f-a23e-e7a69ead30de.jpg",
+      "source": "Wikimedia Commons — Jjw — CC BY-SA 4.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Duwung_wetland_image_1.jpg"
+    },
+    {
+      "image_id": "f82d63c7-85e5-5fe1-82a8-c31a6a01faf5",
+      "location_id": "b9dc9d63-9ca6-560e-9cf6-4e33240912ed",
+      "image_path": "../../public/locations/wikidata-q12594774-01.jpg",
+      "image_url": "https://ptdvhzjzxcsmrontrdlm.supabase.co/storage/v1/object/public/location-images/b9dc9d63-9ca6-560e-9cf6-4e33240912ed/f82d63c7-85e5-5fe1-82a8-c31a6a01faf5.jpg",
+      "source": "Wikimedia Commons — Shamus7792003 — CC BY-SA 4.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Mangyeong_River_(Wanju)_-_October_2017_(2).jpg"
+    },
+    {
+      "image_id": "e2b679a4-b324-5507-a32e-fd5c960a3356",
+      "location_id": "d9a65b3c-4d49-51fb-a0fb-b322bb29aa45",
+      "image_path": "../../public/locations/wikidata-q482741-01.jpg",
+      "image_url": "https://ptdvhzjzxcsmrontrdlm.supabase.co/storage/v1/object/public/location-images/d9a65b3c-4d49-51fb-a0fb-b322bb29aa45/e2b679a4-b324-5507-a32e-fd5c960a3356.jpg",
+      "source": "Wikimedia Commons — No machine-readable author provided. Fbjon assumed (based on copyright claims). — CC BY-SA 3.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Wolchulsan_mountain_peak.jpg"
+    },
+    {
+      "image_id": "b6376748-26ef-544e-a3a1-c1e5c945f22f",
+      "location_id": "277e7603-7b7d-551f-a690-db72a8609bb1",
+      "image_path": "../../public/locations/wikidata-q625993-01.jpg",
+      "image_url": "https://ptdvhzjzxcsmrontrdlm.supabase.co/storage/v1/object/public/location-images/277e7603-7b7d-551f-a690-db72a8609bb1/b6376748-26ef-544e-a3a1-c1e5c945f22f.jpg",
+      "source": "Wikimedia Commons — Badara25.ba This photo was taken with iPhone 6S Plus — CC BY-SA 3.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Jeongbang_Falls.jpg"
+    },
+    {
+      "image_id": "1baa08d7-1a3e-5475-a9f0-0a23f9d6f17b",
+      "location_id": "277e7603-7b7d-551f-a690-db72a8609bb1",
+      "image_path": "../../public/locations/wikidata-q625993-02.jpg",
+      "image_url": "https://ptdvhzjzxcsmrontrdlm.supabase.co/storage/v1/object/public/location-images/277e7603-7b7d-551f-a690-db72a8609bb1/1baa08d7-1a3e-5475-a9f0-0a23f9d6f17b.jpg",
+      "source": "Wikimedia Commons — Lcarrion88 — CC BY-SA 4.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Jeongbang_From_a_Distance.jpg"
+    },
+    {
+      "image_id": "9be35bc1-c0a7-5ff4-b1d0-760d3740a202",
+      "location_id": "277e7603-7b7d-551f-a690-db72a8609bb1",
+      "image_path": "../../public/locations/wikidata-q625993-03.jpg",
+      "image_url": "https://ptdvhzjzxcsmrontrdlm.supabase.co/storage/v1/object/public/location-images/277e7603-7b7d-551f-a690-db72a8609bb1/9be35bc1-c0a7-5ff4-b1d0-760d3740a202.jpg",
+      "source": "Wikimedia Commons — Lcarrion88 — CC BY-SA 4.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Toppling_Water_of_Jeongbang.jpg"
+    },
+    {
+      "image_id": "0b3ded1c-ce71-5eab-b4f6-988544763960",
+      "location_id": "566c2f6c-2877-5568-b94b-6341006eafb4",
+      "image_path": "../../public/locations/wikidata-q24861751-01.jpg",
+      "image_url": "https://ptdvhzjzxcsmrontrdlm.supabase.co/storage/v1/object/public/location-images/566c2f6c-2877-5568-b94b-6341006eafb4/0b3ded1c-ce71-5eab-b4f6-988544763960.jpg",
+      "source": "Wikimedia Commons — Christian Bolz (크리스티안 볼츠) — CC BY-SA 4.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Gyeonguiseon_Forest_Trail_Park_and_Ttaeng-ttaeng_Street_in_Seoul_(near_Hongdae,_1).jpg"
+    },
+    {
+      "image_id": "16a27e24-caf5-521d-afea-2d7ca55a387c",
+      "location_id": "08d5793f-8b36-549b-8383-e569de9c2091",
+      "image_path": "../../public/locations/wikidata-q12613619-01.jpg",
+      "image_url": "https://ptdvhzjzxcsmrontrdlm.supabase.co/storage/v1/object/public/location-images/08d5793f-8b36-549b-8383-e569de9c2091/16a27e24-caf5-521d-afea-2d7ca55a387c.jpg",
+      "source": "Wikimedia Commons — Kma80jihun — CC BY-SA 3.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:%EC%9D%BC%EA%B4%91%ED%95%B4%EC%88%98%EC%9A%95%EC%9E%A5.jpg"
+    },
+    {
+      "image_id": "09f89cea-0bf6-5383-bf73-d8cecdc871d2",
+      "location_id": "651d0e16-92f9-5e45-8bc1-9a2b70ff19d6",
+      "image_path": "../../public/locations/wikidata-q66175402-01.jpg",
+      "image_url": "https://ptdvhzjzxcsmrontrdlm.supabase.co/storage/v1/object/public/location-images/651d0e16-92f9-5e45-8bc1-9a2b70ff19d6/09f89cea-0bf6-5383-bf73-d8cecdc871d2.jpg",
+      "source": "Wikimedia Commons — Mathew Schwartz — CC BY 3.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Sunrise_In_The_Park_(192216089).jpeg"
+    },
+    {
+      "image_id": "95a5fa4e-4d72-504a-9582-5e2cff6bde24",
+      "location_id": "3e422663-5bf3-5614-93e0-a89a39410ec4",
+      "image_path": "../../public/locations/wikidata-q64769089-01.jpg",
+      "image_url": "https://ptdvhzjzxcsmrontrdlm.supabase.co/storage/v1/object/public/location-images/3e422663-5bf3-5614-93e0-a89a39410ec4/95a5fa4e-4d72-504a-9582-5e2cff6bde24.jpg",
+      "source": "Wikimedia Commons — Exj — CC BY-SA 4.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Uam_Historical_Park_01.jpg"
+    },
+    {
+      "image_id": "c1a74f9e-eaf4-5431-972c-5d2a93502192",
+      "location_id": "1e06b023-c5df-5d15-a2ad-2bef2a9866e0",
+      "image_path": "../../public/locations/wikidata-q12595938-01.jpg",
+      "image_url": "https://ptdvhzjzxcsmrontrdlm.supabase.co/storage/v1/object/public/location-images/1e06b023-c5df-5d15-a2ad-2bef2a9866e0/c1a74f9e-eaf4-5431-972c-5d2a93502192.jpg",
+      "source": "Wikimedia Commons — Jjw — CC BY-SA 4.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:2025_Osan_Jjw_2.jpg"
+    },
+    {
+      "image_id": "b5f17845-279d-57f0-945c-c7a54ae5f38c",
+      "location_id": "34af7026-688f-5035-ba0f-7f1f7cff9745",
+      "image_path": "../../public/locations/wikidata-q24565460-01.jpg",
+      "image_url": "https://ptdvhzjzxcsmrontrdlm.supabase.co/storage/v1/object/public/location-images/34af7026-688f-5035-ba0f-7f1f7cff9745/b5f17845-279d-57f0-945c-c7a54ae5f38c.jpg",
+      "source": "Wikimedia Commons — 최광모 (Choe Kwangmo) — CC0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:2016%EB%85%84_5%EC%9B%94_22%EC%9D%BC_%EA%B0%95%EC%9B%90%EB%8F%84_%EA%B0%95%EB%A6%89%EC%8B%9C_%EC%86%94%ED%96%A5%EC%88%98%EB%AA%A9%EC%9B%90_DSC00629.jpg"
+    },
+    {
+      "image_id": "80ff272a-976c-5ea4-b9f1-57df57120548",
+      "location_id": "487b5378-9fd9-58a3-aa53-a49679b7582d",
+      "image_path": "../../public/locations/wikidata-q12598904-01.jpg",
+      "image_url": "https://ptdvhzjzxcsmrontrdlm.supabase.co/storage/v1/object/public/location-images/487b5378-9fd9-58a3-aa53-a49679b7582d/80ff272a-976c-5ea4-b9f1-57df57120548.jpg",
+      "source": "Wikimedia Commons — Jjw — CC BY-SA 4.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Buan_Gyeokpo-ri_Hubak_Namu(Persera_thunbergii)_community_001.jpg"
+    },
+    {
+      "image_id": "52e81805-7065-57c9-b36f-9a1873402d2d",
+      "location_id": "01c56b73-38b6-55f9-8c3d-b0f35f738eee",
+      "image_path": "../../public/locations/wikidata-q16092652-01.jpg",
+      "image_url": "https://ptdvhzjzxcsmrontrdlm.supabase.co/storage/v1/object/public/location-images/01c56b73-38b6-55f9-8c3d-b0f35f738eee/52e81805-7065-57c9-b36f-9a1873402d2d.jpg",
+      "source": "Wikimedia Commons — Dalgial — CC BY-SA 3.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:%EA%B4%80%EB%B0%A9%EC%A0%9C%EB%A6%BC.JPG"
+    },
+    {
+      "image_id": "24c22d2e-e0dd-5781-9607-2dffe53fa4bb",
+      "location_id": "8e81adfe-bbd9-5a40-8c10-1f059274295c",
+      "image_path": "../../public/locations/wikidata-q491088-01.jpg",
+      "image_url": "https://ptdvhzjzxcsmrontrdlm.supabase.co/storage/v1/object/public/location-images/8e81adfe-bbd9-5a40-8c10-1f059274295c/24c22d2e-e0dd-5781-9607-2dffe53fa4bb.jpg",
+      "source": "Wikimedia Commons — Alain Seguin from Ottawa, Canada — CC BY-SA 3.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Korea-Gyeongju-Gyerim_Forest-Shrine-01.jpg"
+    },
+    {
+      "image_id": "f0b1c4c5-9d90-5aae-a423-c61bbf8d8606",
+      "location_id": "4ff49935-b688-5f7f-9736-0972e48b961b",
+      "image_path": "../../public/locations/wikidata-q626162-01.jpg",
+      "image_url": "https://ptdvhzjzxcsmrontrdlm.supabase.co/storage/v1/object/public/location-images/4ff49935-b688-5f7f-9736-0972e48b961b/f0b1c4c5-9d90-5aae-a423-c61bbf8d8606.jpg",
+      "source": "Wikimedia Commons — Yhnn0065 This photo was taken with Sony ILCE-6000 — CC BY-SA 3.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Cheonjiyeon_Waterfall_20160616_092608.jpg"
+    },
+    {
+      "image_id": "672e4e8a-e6b3-5b6d-b2f9-4474dca1966c",
+      "location_id": "9655eba5-5ee0-5651-a7cf-4e7ac4ed722f",
+      "image_path": "../../public/locations/wikidata-q16178122-01.jpg",
+      "image_url": "https://ptdvhzjzxcsmrontrdlm.supabase.co/storage/v1/object/public/location-images/9655eba5-5ee0-5651-a7cf-4e7ac4ed722f/672e4e8a-e6b3-5b6d-b2f9-4474dca1966c.jpg",
+      "source": "Wikimedia Commons — Michiel1972 — CC BY-SA 3.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Busan_-_Songdo_beach.jpg"
+    },
+    {
+      "image_id": "2bfbd04a-f84e-5118-9ec4-695fcd81063a",
+      "location_id": "fb91b054-f5d3-5af9-997d-c974d843be86",
+      "image_path": "../../public/locations/wikidata-q108914532-01.jpg",
+      "image_url": "https://ptdvhzjzxcsmrontrdlm.supabase.co/storage/v1/object/public/location-images/fb91b054-f5d3-5af9-997d-c974d843be86/2bfbd04a-f84e-5118-9ec4-695fcd81063a.jpg",
+      "source": "Wikimedia Commons — Uconhe — CC BY-SA 3.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:%EC%9C%A0%EB%A6%BC%EA%B3%B5%EC%9B%90_%EB%B0%98%EB%8F%84%EC%A7%80.jpg"
+    },
+    {
+      "image_id": "ef3dde74-0509-5b2f-8d4c-0869b6254de0",
+      "location_id": "cc567574-ebfc-5318-9787-f6dc159d29f5",
+      "image_path": "../../public/locations/wikidata-q12597864-01.jpg",
+      "image_url": "https://ptdvhzjzxcsmrontrdlm.supabase.co/storage/v1/object/public/location-images/cc567574-ebfc-5318-9787-f6dc159d29f5/ef3dde74-0509-5b2f-8d4c-0869b6254de0.jpg",
+      "source": "Wikimedia Commons — 최광모 — CC0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:20150808%EC%B5%9C%EA%B4%91%EB%AA%A8RX10DSC00958.JPG"
+    },
+    {
+      "image_id": "7d73f6bd-05e9-560e-8538-918e0c7beb18",
+      "location_id": "983c5a65-0c1e-5a52-920e-778962200571",
+      "image_path": "../../public/locations/wikidata-q49316331-01.jpg",
+      "image_url": "https://ptdvhzjzxcsmrontrdlm.supabase.co/storage/v1/object/public/location-images/983c5a65-0c1e-5a52-920e-778962200571/7d73f6bd-05e9-560e-8538-918e0c7beb18.jpg",
+      "source": "Wikimedia Commons — Christophe95 — CC BY-SA 4.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Yeongnangho.jpg"
+    },
+    {
+      "image_id": "9280eb3f-ed31-5e53-a397-0ebf5f19432a",
+      "location_id": "a8d11a37-2bc5-58cd-933f-f000bc14fc72",
+      "image_path": "../../public/locations/wikidata-q85989821-01.jpg",
+      "image_url": "https://ptdvhzjzxcsmrontrdlm.supabase.co/storage/v1/object/public/location-images/a8d11a37-2bc5-58cd-933f-f000bc14fc72/9280eb3f-ed31-5e53-a397-0ebf5f19432a.jpg",
+      "source": "Wikimedia Commons — Ashy Minivet — CC0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Huibang_Waterfall_(2).jpg"
+    },
+    {
+      "image_id": "0950a53d-aca2-5aba-a0a9-e0642bf97aef",
+      "location_id": "6eff1e42-af82-571f-a4f4-b3b96a922b5c",
+      "image_path": "../../public/locations/wikidata-q5952045-01.jpg",
+      "image_url": "https://ptdvhzjzxcsmrontrdlm.supabase.co/storage/v1/object/public/location-images/6eff1e42-af82-571f-a4f4-b3b96a922b5c/0950a53d-aca2-5aba-a0a9-e0642bf97aef.jpg",
+      "source": "Wikimedia Commons — Choi2451 — CC BY-SA 3.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Hwangmaesan_Mountain_in_autumn.jpg"
+    },
+    {
+      "image_id": "7b8f4e52-57ce-5166-9a69-c138b64a9034",
+      "location_id": "9fe0478b-87cc-5666-8f97-d4f899580428",
+      "image_path": "../../public/locations/wikidata-q12600001-01.jpg",
+      "image_url": "https://ptdvhzjzxcsmrontrdlm.supabase.co/storage/v1/object/public/location-images/9fe0478b-87cc-5666-8f97-d4f899580428/7b8f4e52-57ce-5166-9a69-c138b64a9034.jpg",
+      "source": "Wikimedia Commons — Korea.net / Korean Culture and Information Service — CC BY-SA 2.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Sanbangsan_(5983281424).jpg"
+    },
+    {
+      "image_id": "fbd95646-f4fd-5be9-bc80-8e975c2c347e",
+      "location_id": "7d4bbb91-22aa-5c6f-b9cf-cc7bf081e80a",
+      "image_path": "../../public/locations/wikidata-q105061220-01.jpg",
+      "image_url": "https://ptdvhzjzxcsmrontrdlm.supabase.co/storage/v1/object/public/location-images/7d4bbb91-22aa-5c6f-b9cf-cc7bf081e80a/fbd95646-f4fd-5be9-bc80-8e975c2c347e.jpg",
+      "source": "Wikimedia Commons — Camangbarry — CC BY-SA 3.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:%ED%86%A0%EC%99%95%EC%84%B1_%ED%8F%AD%ED%8F%AC.jpg"
     }
   ]
 }

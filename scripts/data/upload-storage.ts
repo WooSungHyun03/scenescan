@@ -5,7 +5,7 @@ import { createClient } from "@supabase/supabase-js";
 import { parseManifest } from "../embeddings/contracts.ts";
 import { readDatabaseEnvironment } from "../embeddings/import.ts";
 import { parseNormalizedLocationOutput } from "./contracts.ts";
-import { buildStoragePlan, readValidatedJpeg } from "./storage-uploader.ts";
+import { buildStoragePlan, readValidatedJpeg, isIdenticalStoredJpeg } from "./storage-uploader.ts";
 
 type Mode = "dry-run" | "apply";
 type CliOptions = {
@@ -76,10 +76,8 @@ async function main(): Promise<void> {
     options.outputDirectory,
   );
   let totalBytes = 0;
-  const buffers = new Map<string, Buffer>();
   await mapConcurrent(plan.items, options.concurrency, async (item) => {
     const buffer = await readValidatedJpeg(item.localPath);
-    buffers.set(item.imageId, buffer);
     totalBytes += buffer.length;
   });
 
@@ -104,12 +102,24 @@ async function main(): Promise<void> {
   }
 
   let uploaded = 0;
+  let skipped = 0;
   await mapConcurrent(plan.items, options.concurrency, async (item) => {
-    const buffer = buffers.get(item.imageId)!;
+    // Validate all files before the first write, but retain only the current
+    // concurrent uploads in memory instead of the entire image catalog.
+    const buffer = await readValidatedJpeg(item.localPath);
+    const existingObject = await client.storage.from(options.bucket).info(item.objectPath);
+    if (existingObject.data && isIdenticalStoredJpeg(buffer, existingObject.data)) {
+      skipped += 1;
+      return;
+    }
+    if (existingObject.data) throw new Error(`Existing Storage image differs: ${item.objectPath}; assign a reviewed new image UUID instead of overwriting production bytes`);
+    if (existingObject.error && !["404", "400"].includes(existingObject.error.statusCode ?? "")) {
+      throw new Error(`Unable to inspect ${item.objectPath}: ${existingObject.error.message}`);
+    }
     const result = await client.storage.from(options.bucket).upload(item.objectPath, buffer, {
       contentType: "image/jpeg",
       cacheControl: "31536000",
-      upsert: true,
+      upsert: false,
     });
     if (result.error) throw new Error(`Unable to upload ${item.objectPath}: ${result.error.message}`);
     uploaded += 1;
@@ -119,7 +129,7 @@ async function main(): Promise<void> {
   await mkdir(options.outputDirectory, { recursive: true });
   await writeJsonAtomic(resolve(options.outputDirectory, "locations.json"), plan.dataset);
   await writeJsonAtomic(resolve(options.outputDirectory, "embeddings-manifest.json"), plan.manifest);
-  console.log(`Storage upload: mode=apply, bucket=${options.bucket}, files=${uploaded}, bytes=${totalBytes}`);
+  console.log(`Storage upload: mode=apply, bucket=${options.bucket}, uploaded=${uploaded}, unchanged=${skipped}, catalog_bytes=${totalBytes}`);
 }
 
 const isDirectExecution = process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href;

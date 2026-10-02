@@ -208,6 +208,7 @@ export async function importProductionData(
   mode: ProductionImportMode,
   batchSize: number,
   database?: ProductionImportDatabase,
+  preserveExisting = false,
 ): Promise<ProductionImportResult> {
   if (!Number.isInteger(batchSize) || batchSize < 1 || batchSize > 500) {
     throw new Error("import batch size must be an integer between 1 and 500");
@@ -243,13 +244,17 @@ export async function importProductionData(
   if (mode === "dry-run") {
     return { ...base, existingLocations: existingLocationIds.length, existingImages: existingImages.length };
   }
-  for (const batch of chunks(rows.locations, batchSize)) await database.upsertLocations(batch);
-  for (const batch of chunks(rows.images, batchSize)) await database.upsertImages(batch);
+  const locationIds = new Set(existingLocationIds);
+  const imageIds = new Set(existingImages.map((image) => image.id));
+  const locationsToWrite = preserveExisting ? rows.locations.filter((row) => !locationIds.has(row.id)) : rows.locations;
+  const imagesToWrite = preserveExisting ? rows.images.filter((row) => !imageIds.has(row.id)) : rows.images;
+  for (const batch of chunks(locationsToWrite, batchSize)) await database.upsertLocations(batch);
+  for (const batch of chunks(imagesToWrite, batchSize)) await database.upsertImages(batch);
   return {
     ...base,
     existingLocations: existingLocationIds.length,
     existingImages: existingImages.length,
-    locationsWritten: rows.locations.length,
-    imagesWritten: rows.images.length,
+    locationsWritten: locationsToWrite.length,
+    imagesWritten: imagesToWrite.length,
   };
 }

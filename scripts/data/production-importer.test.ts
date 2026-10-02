@@ -81,6 +81,20 @@ function database(overrides: Partial<ProductionImportDatabase> = {}): Production
 }
 
 describe("production data importer", () => {
+  it("preserves existing production metadata during append-only expansion", async () => {
+    const db = database({ findLocationIds: vi.fn(async () => [locationId]),
+      findExistingImages: vi.fn(async () => [{ id: imageId, location_id: locationId }]) });
+    await expect(importProductionData(rows(), "apply", 100, db, true)).resolves.toMatchObject({ locationsWritten: 0, imagesWritten: 0 });
+    expect(db.upsertLocations).not.toHaveBeenCalled();
+    expect(db.upsertImages).not.toHaveBeenCalled();
+  });
+
+  it("allows a new view without replacing an existing location's permit metadata", async () => {
+    const db = database({ findLocationIds: vi.fn(async () => [locationId]) });
+    await expect(importProductionData(rows(), "apply", 100, db, true)).resolves.toMatchObject({ locationsWritten: 0, imagesWritten: 1 });
+    expect(db.upsertLocations).not.toHaveBeenCalled();
+    expect(db.upsertImages).toHaveBeenCalled();
+  });
   it("joins stable image IDs without inventing unreviewed values", () => {
     expect(rows()).toEqual({
       locations: [expect.objectContaining({ id: locationId, permit_type: "문의 필요", noise_sources: [] })],

@@ -6,7 +6,7 @@ vi.mock("@/infrastructure/supabase/server-client", () => ({
   getSupabaseClient: getSupabaseClientMock,
 }));
 
-import { getSupabaseLocation, getSupabaseLocations, getSupabaseSimilarLocations } from "./supabase-repository";
+import { getSupabaseLocation, getSupabaseLocations, getSupabaseSimilarLocations, searchSupabaseLocations } from "./supabase-repository";
 
 const row = (id: string, name: string) => ({
   id,
@@ -51,6 +51,47 @@ function clientWith(locations: ReturnType<typeof row>[], matches: unknown[] = []
 
 describe("Supabase similar location repository", () => {
   beforeEach(() => getSupabaseClientMock.mockReset());
+
+  it("filters before the SQL limit and fetches only matched locations", async () => {
+    const eq = vi.fn();
+    const inIds = vi.fn();
+    const query = { eq, in: inIds, then: (resolve: (value: unknown) => unknown) =>
+      Promise.resolve({ data: [row("candidate", "Candidate")], error: null }).then(resolve) };
+    eq.mockReturnValue(query);
+    inIds.mockReturnValue(query);
+    const rpc = vi.fn(async () => ({ data: [{ location_image_id: "candidate-image", location_id: "candidate", similarity: 0.8 }], error: null }));
+    getSupabaseClientMock.mockReturnValue({ rpc, from: vi.fn(() => ({ select: vi.fn(() => ({ order: vi.fn(() => query) })) })) });
+    const embedding = Array(512).fill(1);
+    const result = await searchSupabaseLocations(embedding, { region: "서울", category: "urban" });
+    expect(rpc).toHaveBeenCalledWith("match_location_images_filtered", {
+      query_embedding: embedding, match_threshold: 0, match_count: 8, filter_region: "서울", filter_category: "urban",
+    });
+    expect(eq.mock.calls).toEqual([["region", "서울"], ["category", "urban"]]);
+    expect(inIds).toHaveBeenCalledWith("id", ["candidate"]);
+    expect(result).toHaveLength(1);
+  });
+
+  it("avoids loading the entire catalog for an empty search", async () => {
+    const from = vi.fn();
+    getSupabaseClientMock.mockReturnValue({ rpc: vi.fn(async () => ({ data: [], error: null })), from });
+    await expect(searchSupabaseLocations(Array(512).fill(1))).resolves.toEqual([]);
+    expect(from).not.toHaveBeenCalled();
+  });
+
+  it("does not silently apply post-limit filters while a migration is missing", async () => {
+    const rpc = vi.fn(async () => ({ data: null, error: { code: "PGRST202", message: "Could not find match_location_images_filtered" } }));
+    getSupabaseClientMock.mockReturnValue({ rpc });
+    await expect(searchSupabaseLocations(Array(512).fill(1), { region: "제주" })).rejects.toMatchObject({ code: "DATA_ACCESS_ERROR" });
+    expect(rpc).toHaveBeenCalledTimes(1);
+  });
+
+  it("allows a narrowly scoped legacy fallback only for an unfiltered query", async () => {
+    const rpc = vi.fn().mockResolvedValueOnce({ data: null, error: { code: "PGRST202", message: "Could not find match_location_images_filtered" } })
+      .mockResolvedValueOnce({ data: [], error: null });
+    getSupabaseClientMock.mockReturnValue({ rpc });
+    await expect(searchSupabaseLocations(Array(512).fill(1))).resolves.toEqual([]);
+    expect(rpc).toHaveBeenLastCalledWith("match_location_images", { query_embedding: Array(512).fill(1), match_threshold: 0, match_count: 200 });
+  });
 
   it("maps location and image attribution metadata", async () => {
     const { client } = clientWith([row("source", "Source")]);

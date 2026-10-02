@@ -5,6 +5,10 @@
 node_modules
 coverage
 out
+output
+data-work
+.playwright-cli
+public/locations/*.jpg
 .env
 .env.*
 !.env.example

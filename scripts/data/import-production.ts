@@ -22,16 +22,18 @@ type CliOptions = {
   imageLicensesPath: string;
   mode: ProductionImportMode;
   batchSize: number;
+  preserveExisting: boolean;
 };
 
 export function parseProductionImportArgs(args: string[]): CliOptions {
   const [locationsPath, manifestPath, ...flags] = args;
   if (!locationsPath || !manifestPath) {
-    throw new Error("Usage: pnpm data:import-production <locations.json> <embeddings-manifest.json> [--image-licenses PATH] [--validate-only | --dry-run | --apply] [--batch-size N]");
+    throw new Error("Usage: pnpm data:import-production <locations.json> <embeddings-manifest.json> [--image-licenses PATH] [--validate-only | --dry-run | --apply] [--batch-size N] [--insert-only]");
   }
   let mode: ProductionImportMode = "validate-only";
   let selectedMode = false;
   let batchSize = 100;
+  let preserveExisting = false;
   let imageLicensesPath = resolve(dirname(locationsPath), "image-licenses.json");
   for (let index = 0; index < flags.length; index += 1) {
     const flag = flags[index];
@@ -39,6 +41,8 @@ export function parseProductionImportArgs(args: string[]): CliOptions {
       if (selectedMode) throw new Error("Select exactly one import mode");
       selectedMode = true;
       mode = flag.slice(2) as ProductionImportMode;
+    } else if (flag === "--insert-only") {
+      preserveExisting = true;
     } else if (flag === "--batch-size") {
       batchSize = Number(flags[++index]);
     } else if (flag === "--image-licenses") {
@@ -49,7 +53,7 @@ export function parseProductionImportArgs(args: string[]): CliOptions {
       throw new Error(`Unknown option: ${flag}`);
     }
   }
-  return { locationsPath, manifestPath, imageLicensesPath, mode, batchSize };
+  return { locationsPath, manifestPath, imageLicensesPath, mode, batchSize, preserveExisting };
 }
 
 function failOnSupabaseError(error: { message: string } | null, action: string): void {
@@ -97,7 +101,7 @@ async function main(): Promise<void> {
     });
     database = createProductionImportDatabase(client);
   }
-  const result = await importProductionData(rows, options.mode, options.batchSize, database);
+  const result = await importProductionData(rows, options.mode, options.batchSize, database, options.preserveExisting);
   console.log(
     `Production data import: mode=${result.mode}, locations=${result.locationsValidated}, images=${result.imagesValidated}, existing=${result.existingLocations}/${result.existingImages}, written=${result.locationsWritten}/${result.imagesWritten}`,
   );

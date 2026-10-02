@@ -80,10 +80,11 @@ function warnAboutLegacyAttributionSchema(error: unknown): void {
   });
 }
 
-async function listLocationRows(relations: string, filters: LocationFilter) {
+async function listLocationRows(relations: string, filters: LocationFilter, ids?: string[]) {
   let query = getSupabaseClient().from("locations").select(relations).order("name");
   if (filters.region) query = query.eq("region", filters.region);
   if (filters.category) query = query.eq("category", filters.category);
+  if (ids) query = query.in("id", ids);
   return query;
 }
 
@@ -93,11 +94,12 @@ async function loadLocationRow(id: string, relations: string) {
     .eq("id", id).maybeSingle();
 }
 
-export async function getSupabaseLocations(filters: LocationFilter = {}): Promise<Location[]> {
-  let { data, error } = await listLocationRows(LOCATION_RELATIONS, filters);
+export async function getSupabaseLocations(filters: LocationFilter = {}, ids?: string[]): Promise<Location[]> {
+  if (ids?.length === 0) return [];
+  let { data, error } = await listLocationRows(LOCATION_RELATIONS, filters, ids);
   if (isMissingImageAttributionSchema(error)) {
     warnAboutLegacyAttributionSchema(error);
-    ({ data, error } = await listLocationRows(LEGACY_LOCATION_RELATIONS, filters));
+    ({ data, error } = await listLocationRows(LEGACY_LOCATION_RELATIONS, filters, ids));
   }
   if (error) throw dataAccessError("Failed to list locations", error);
   return (data as unknown as Row[]).map(toLocation);
@@ -115,16 +117,26 @@ export async function getSupabaseLocation(id: string): Promise<Location | null> 
 
 export async function searchSupabaseLocations(embedding: number[], filters: LocationFilter = {}): Promise<LocationSearchResult[]> {
   const client = getSupabaseClient();
-  const { data, error } = await client.rpc("match_location_images", {
+  let { data, error } = await client.rpc("match_location_images_filtered", {
     query_embedding: embedding,
     match_threshold: 0,
-    match_count: 200,
+    match_count: 8,
+    filter_region: filters.region ?? null,
+    filter_category: filters.category ?? null,
   });
+  // Rolling deployment only: never silently use incorrect post-limit filtering.
+  if (error?.code === "PGRST202" && error.message?.includes("match_location_images_filtered")
+    && !filters.region && !filters.category) {
+    logger.warn("Filtered search RPC migration is pending; using legacy unfiltered search");
+    ({ data, error } = await client.rpc("match_location_images", {
+      query_embedding: embedding, match_threshold: 0, match_count: 200,
+    }));
+  }
   if (error) throw dataAccessError("Failed to search location images", error);
   const matches: ImageMatch[] = (data ?? []).map((row: { location_image_id: string; location_id: string; similarity: number }) => ({
     locationImageId: row.location_image_id, locationId: row.location_id, similarity: row.similarity,
   }));
-  const locations = await getSupabaseLocations(filters);
+  const locations = await getSupabaseLocations(filters, [...new Set(matches.map((match) => match.locationId))]);
   return groupImageMatches(matches, locations, 8);
 }
 

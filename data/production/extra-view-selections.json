@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "note": "Commons category candidates; publish only after license, checksum, visual and embedding duplicate review.",
+  "items": [
+    {"qid":"Q491203","file_title":"File:Haeundae Beach at night, Busan.jpg","alt":"해운대해수욕장의 야간 풍경"},
+    {"qid":"Q491203","file_title":"File:Haeundae Beach - view 1 - sept5-2013.jpg","alt":"해운대해수욕장의 다른 시점"},
+    {"qid":"Q16182443","file_title":"File:Gyeongpo Beach 2.jpg","alt":"경포해수욕장 해안 풍경"},
+    {"qid":"Q16182443","file_title":"File:Gyeongpo Beach 20220502 004.jpg","alt":"경포해수욕장의 다른 시점"},
+    {"qid":"Q12591871","file_title":"File:Korea-Boreyong-Daecheon Beach-01.jpg","alt":"대천해수욕장 해안 풍경"},
+    {"qid":"Q12591871","file_title":"File:Korea-Boreyong-Daecheon Beach-07.jpg","alt":"대천해수욕장의 다른 시점"},
+    {"qid":"Q625993","file_title":"File:Jeongbang From a Distance.jpg","alt":"정방폭포의 주변 해안과 폭포"},
+    {"qid":"Q625993","file_title":"File:Toppling Water of Jeongbang.jpg","alt":"정방폭포의 다른 시점"},
+    {"qid":"Q64506499","file_title":"File:Sejong lake park 190609 04.jpg","alt":"세종호수공원 호수 주변 풍경"},
+    {"qid":"Q64506499","file_title":"File:Sejong lake park 190609 14.jpg","alt":"세종호수공원의 다른 시점"}
+  ]
+}
