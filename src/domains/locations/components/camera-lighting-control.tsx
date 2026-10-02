@@ -63,13 +63,13 @@ export function CameraLightingControl({
     >
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h4
+          <h3
             id={`${sliderId}-title`}
             className="flex items-center gap-2 text-sm font-semibold text-stone-900"
           >
             <Camera size={16} aria-hidden="true" />
             카메라 방향
-          </h4>
+          </h3>
           <p id={descriptionId} className="mt-1 text-xs text-stone-600">
             녹색 화살표가 카메라가 바라보는 방향입니다.
           </p>

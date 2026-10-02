@@ -11,3 +11,5 @@ pnpm-debug.log*
 data-work/
 data/production/storage/
 public/locations/*.jpg
+.playwright-cli/
+output/playwright/

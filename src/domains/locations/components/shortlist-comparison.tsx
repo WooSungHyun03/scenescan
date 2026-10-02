@@ -26,7 +26,7 @@ const categoryLabels: Record<Location["category"], string> = {
 };
 
 function displayValue(value: string | null | undefined) {
-  return value?.trim() || "정보 없음";
+  return value?.trim() || "확인된 정보 없음";
 }
 
 function getImageSource(location: Location) {
@@ -58,7 +58,7 @@ function ComparisonImage({ location }: { location: Location }) {
           className="flex h-full flex-col items-center justify-center gap-2 px-3 text-center text-stone-500"
         >
           <ImageOff size={24} aria-hidden="true" />
-          <span className="text-xs font-medium">이미지 정보 없음</span>
+          <span className="text-xs font-medium">사진을 불러올 수 없습니다</span>
         </div>
       ) : (
         <Image
@@ -76,7 +76,7 @@ function ComparisonImage({ location }: { location: Location }) {
   );
 }
 
-function MissingValue({ children = "정보 없음" }: { children?: ReactNode }) {
+function MissingValue({ children = "확인된 정보 없음" }: { children?: ReactNode }) {
   return <span className="text-stone-500">{children}</span>;
 }
 
@@ -230,7 +230,6 @@ export function ShortlistComparison({ locations }: { locations: Location[] }) {
     <section className="mt-10" aria-labelledby="comparison-title">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="scene-label">COMPARE</p>
           <h2 id="comparison-title" className="mt-1 text-2xl font-bold">
             후보 장소 비교
           </h2>

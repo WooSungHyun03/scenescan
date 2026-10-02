@@ -122,12 +122,12 @@ export function SourceAttribution({
       {showLabel && <p className="font-semibold text-stone-600">{label}</p>}
       <div className={`${showLabel ? "mt-1" : ""} space-y-1`}>
         {!hasMetadata ? (
-          <p className="text-stone-500">출처 정보 없음</p>
+          <p className="text-stone-500">확인된 출처가 없습니다</p>
         ) : (
           <>
             <p className="break-words text-stone-700">
               <span className="font-medium text-stone-900">출처</span>{" "}
-              {attribution.source ?? "정보 없음"}
+              {attribution.source ?? "미확인"}
               {attribution.sourceUrl && (
                 <span className="ml-2 inline-block">
                   <ExternalTextLink href={attribution.sourceUrl} ariaLabel={`${label} 원문`}>
@@ -145,11 +145,11 @@ export function SourceAttribution({
               <>
                 <p className="break-words text-stone-700">
                   <span className="font-medium text-stone-900">저작자</span>{" "}
-                  {attribution.author ?? "정보 없음"}
+                  {attribution.author ?? "미확인"}
                 </p>
                 <p className="break-words text-stone-700">
                   <span className="font-medium text-stone-900">라이선스</span>{" "}
-                  {attribution.license ?? "정보 없음"}
+                  {attribution.license ?? "미확인"}
                   {attribution.licenseUrl && (
                     <span className="ml-2 inline-block">
                       <ExternalTextLink href={attribution.licenseUrl} ariaLabel={`${label} 라이선스`}>
@@ -163,7 +163,7 @@ export function SourceAttribution({
                 )}
                 <p className="text-stone-600">
                   <span className="font-medium text-stone-900">최근 확인</span>{" "}
-                  {attribution.lastVerifiedAt ?? "정보 없음"}
+                  {attribution.lastVerifiedAt ?? "미확인"}
                 </p>
               </>
             )}

@@ -1,6 +1,6 @@
 "use client";
 
-import { LoaderCircle, RefreshCw, Sparkles } from "lucide-react";
+import { LoaderCircle, RefreshCw, Search } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { LocationCard } from "@/domains/locations/components/location-card";
 import type { SimilarLocationsResponse } from "@/types/contracts";
@@ -115,15 +115,14 @@ export function SimilarLocationsSection({
   const isLoading = status === "loading";
 
   return (
-    <section className="mt-14" aria-labelledby="similar-locations-title">
+    <section id="similar" className="scene-section" aria-labelledby="similar-locations-title">
       <div className="mb-5 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
         <div>
-          <p className="scene-label">다시 탐색하기</p>
           <h2 id="similar-locations-title" className="mt-1 text-2xl font-bold">
-            비슷한 촬영 장소
+            비슷한 장소도 살펴보세요
           </h2>
           <p className="mt-2 max-w-2xl text-sm leading-relaxed text-stone-600">
-            현재 장소와 유사한 후보를 새로 불러와 비교할 수 있습니다.
+            사진의 분위기가 비슷한 촬영 후보입니다. 위치와 촬영 조건도 함께 비교해 보세요.
           </p>
         </div>
 
@@ -139,13 +138,13 @@ export function SimilarLocationsSection({
           ) : status === "error" ? (
             <RefreshCw size={17} aria-hidden="true" />
           ) : (
-            <Sparkles size={17} aria-hidden="true" />
+            <RefreshCw size={17} aria-hidden="true" />
           )}
           {isLoading
             ? "비슷한 장소 찾는 중…"
             : status === "error"
               ? "다시 시도"
-              : "이 장소 말고 비슷한 데 더"}
+              : "목록 새로고침"}
         </button>
       </div>
 
@@ -169,7 +168,7 @@ export function SimilarLocationsSection({
         {isLoading ? (
           <ResultSkeleton />
         ) : results.length ? (
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="scene-grid grid gap-x-6 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
             {results.map(({ location, similarity }, index) => (
               <LocationCard
                 key={location.id}
@@ -182,7 +181,7 @@ export function SimilarLocationsSection({
           </div>
         ) : (
           <div className="rounded-xl border border-dashed border-stone-300 bg-stone-50 px-5 py-8 text-center">
-            <Sparkles
+            <Search
               size={24}
               className="mx-auto text-stone-400"
               aria-hidden="true"

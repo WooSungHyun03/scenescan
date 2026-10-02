@@ -57,6 +57,7 @@ export function SolarPanel({ point }: { point: GeoPoint }) {
           <input
             id={dateInputId}
             type="date"
+            name="shoot-date"
             aria-describedby={timeZoneNoteId}
             value={shootDate}
             onChange={(event) => setShootDate(event.target.value)}
@@ -71,6 +72,7 @@ export function SolarPanel({ point }: { point: GeoPoint }) {
           <input
             id={timeInputId}
             type="time"
+            name="shoot-time"
             aria-describedby={timeZoneNoteId}
             step={60}
             value={shootTime}

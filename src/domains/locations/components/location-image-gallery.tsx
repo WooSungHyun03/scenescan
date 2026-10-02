@@ -69,12 +69,12 @@ export function LocationImageGallery({
     return (
       <section aria-labelledby="image-gallery-title">
         <h2 id="image-gallery-title" className="mb-3 text-lg font-semibold">
-          이미지 갤러리
+          장소 사진
         </h2>
         <div className="scene-panel flex aspect-[16/10] flex-col items-center justify-center bg-stone-100 text-stone-500">
           <Images size={32} aria-hidden="true" />
           <p className="mt-3 text-sm font-semibold">등록된 이미지가 없습니다</p>
-          <p className="mt-1 text-xs">정보 없음</p>
+          <p className="mt-1 text-sm">위치와 촬영 정보를 먼저 확인해 주세요.</p>
         </div>
         <div className="mt-3">
           <SourceAttribution
@@ -93,7 +93,7 @@ export function LocationImageGallery({
     <section aria-labelledby="image-gallery-title">
       <div className="mb-3 flex items-center justify-between gap-3">
         <h2 id="image-gallery-title" className="text-lg font-semibold">
-          이미지 갤러리
+          장소 사진
         </h2>
         <span className="text-sm text-stone-500">
           {selectedIndex + 1} / {availableImages.length}
@@ -122,7 +122,7 @@ export function LocationImageGallery({
             priority
             unoptimized
             sizes="(max-width: 1024px) 100vw, 65vw"
-            className="object-cover"
+            className="object-contain"
             onError={() => markImageAsFailed(selectedImage.id)}
           />
         )}
@@ -167,7 +167,8 @@ export function LocationImageGallery({
         </div>
       )}
 
-      <div className="mt-3">
+      <details className="mt-3 text-sm text-muted">
+        <summary className="min-h-11 py-2 font-medium hover:text-brand">사진 출처·이용 조건 확인</summary>
         <SourceAttribution
           source={selectedImage.source}
           sourceUrl={selectedImage.sourceUrl}
@@ -179,7 +180,7 @@ export function LocationImageGallery({
           compact
           showDetails
         />
-      </div>
+      </details>
     </section>
   );
 }

@@ -50,7 +50,7 @@ export function LocationMap({
           return;
         }
         controller = fallbackController;
-        setError("Kakao 지도를 불러오지 못해 미리보기를 표시합니다.");
+        setError("지도를 불러오지 못했습니다. 위치 미리보기와 주소를 참고해 주세요.");
       });
 
     return () => {
@@ -69,7 +69,7 @@ export function LocationMap({
       />
       {!key && (
         <p className="mt-2 text-xs leading-relaxed text-stone-500">
-          Kakao JavaScript 앱 키가 설정되지 않아 no-key 미리보기를 표시합니다.
+          지도 연결 전에는 위치 미리보기를 표시합니다.
         </p>
       )}
       {error && (
