@@ -9,3 +9,5 @@ The palette is neutral white `#ffffff`, canvas `#f6f7f7`, ink `#182823`, seconda
 Pretendard Variable 1.3.9 is self-hosted with `next/font/local` and `font-display: swap`. Its SIL Open Font License is included in `public/fonts/OFL.txt`. Font source: https://github.com/orioncactus/pretendard/tree/v1.3.9. Body uses 16 px/1.65, supporting content 14 px/1.6, headings 20–48 px with balanced Korean line breaks. Interactive targets are at least 44 px. Motion is restricted to user-triggered state feedback and respects reduced-motion preferences.
 
 Public copy describes tasks, not implementation: 참고 이미지, 촬영 장소, 검색 결과, 빛의 방향. Mock mode is explicitly identified as a demonstration; missing facts stay unverified. There is no sign-in flow: saved locations are held in the current browser only.
+
+Descriptions without Korean text use neutral Korean guidance in cards and detail summaries. The original text remains accessible in the source disclosure; neither database content nor translations are fabricated.

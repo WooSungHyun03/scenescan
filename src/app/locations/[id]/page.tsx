@@ -11,6 +11,7 @@ import { ShortlistButton } from "@/domains/locations/components/shortlist-button
 import { SolarPanel } from "@/domains/locations/components/solar-panel";
 import { SourceAttribution } from "@/domains/locations/components/source-attribution";
 import { getLocation, getSimilarLocations } from "@/domains/locations/server/repository";
+import { getKoreanDescription } from "@/domains/locations/components/location-copy";
 
 const categoryLabels = {
   urban: "도시",
@@ -39,14 +40,14 @@ export default async function LocationPage({ params }: { params: Promise<{ id: s
       <section id="photos" className="min-w-0" aria-label="장소 사진"><LocationImageGallery images={location.images} locationName={location.name} /></section>
       <section aria-labelledby="location-overview-title" className="border-t border-line pt-6 lg:border-t-0 lg:pt-0">
         <h2 id="location-overview-title" className="text-xl font-semibold">이 장소를 살펴보세요</h2>
-        <p className="mt-4 leading-relaxed text-muted">{location.description.trim() || "확인된 장소 설명이 없습니다. 사진과 위치를 참고해 촬영 후보를 검토해 주세요."}</p>
+        <p className="mt-4 leading-relaxed text-muted">{getKoreanDescription(location.description, "한국어로 확인된 장소 설명이 없습니다. 사진과 위치를 참고해 촬영 후보를 검토해 주세요.")}</p>
         <dl className="mt-6 divide-y divide-line border-y border-line text-sm">
           <div className="flex justify-between gap-5 py-4"><dt className="text-muted">공간 종류</dt><dd className="font-semibold">{categoryLabels[location.category]}</dd></div>
           <div className="flex justify-between gap-5 py-4"><dt className="text-muted">촬영 허가</dt><dd className="font-semibold">{location.permit.type.trim() || "사전 확인 필요"}</dd></div>
           <div className="flex justify-between gap-5 py-4"><dt className="text-muted">주차</dt><dd className="text-right font-semibold">{location.parking.length ? `등록 정보 ${location.parking.length}곳` : "확인된 정보 없음"}</dd></div>
         </dl>
         <p className="mt-4 text-sm leading-relaxed text-muted">장소 등록이 촬영 허가를 의미하지 않습니다. 일정과 장비가 정해지면 운영기관에 이용 조건을 확인해 주세요.</p>
-        <details className="mt-5 border-t border-line pt-3"><summary className="min-h-11 py-2 text-sm font-semibold text-brand">장소 정보 출처 확인</summary><SourceAttribution source={location.source} sourceUrl={location.sourceUrl} author={location.author} license={location.license} licenseUrl={location.licenseUrl} lastVerifiedAt={location.lastVerifiedAt} label="장소 정보 출처" showLabel={false} showDetails /></details>
+        <details className="mt-5 border-t border-line pt-3"><summary className="min-h-11 py-2 text-sm font-semibold text-brand">장소 정보 출처 확인</summary><SourceAttribution source={location.source} sourceUrl={location.sourceUrl} author={location.author} license={location.license} licenseUrl={location.licenseUrl} lastVerifiedAt={location.lastVerifiedAt} label="장소 정보 출처" showLabel={false} showDetails />{location.description.trim() && <p className="mt-3 break-words text-sm text-muted"><span className="font-semibold">원문 설명</span> · {location.description}</p>}</details>
       </section>
     </div>
     <div className="scene-section grid gap-8 lg:grid-cols-2">

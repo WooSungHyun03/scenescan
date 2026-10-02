@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ImageOff } from "lucide-react";
 import { useState } from "react";
 import { ShortlistButton } from "@/domains/locations/components/shortlist-button";
+import { getKoreanDescription } from "./location-copy";
 import type { Location } from "@/types/domain";
 
 const categoryLabels: Record<Location["category"], string> = {
@@ -104,7 +105,7 @@ export function LocationCard({
         <p className="mt-1 text-sm text-stone-600">
           {location.region} · {categoryLabels[location.category]}
         </p>
-        <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-muted">{location.description.trim() || "장소 상세에서 위치와 촬영 조건을 확인하세요."}</p>
+        <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-muted">{getKoreanDescription(location.description, "장소 상세에서 위치와 촬영 조건을 확인하세요.")}</p>
         <p className="mt-3 text-xs text-muted">{location.permit.type || "촬영 조건 확인 필요"}{location.parking.length > 0 ? ` · 주차 정보 ${location.parking.length}곳` : " · 주차 사전 확인"}</p>
       </div>
     </article>
