@@ -42,7 +42,7 @@ as $$
   from public.location_images li
   join public.locations l on l.id = li.location_id
   where li.embedding is not null
-    and li.embedding_model = expected_embedding_model
+    and (expected_embedding_model is null or li.embedding_model = expected_embedding_model)
     and (filter_region is null or l.region = filter_region)
     and (filter_category is null or l.category = filter_category)
     and 1 - (li.embedding <=> query_embedding) >= greatest(0, least(match_threshold, 1))
@@ -53,7 +53,7 @@ $$;
 comment on function public.match_location_images(
   extensions.vector, double precision, integer, text, text, text
 ) is
-  'Ranks location_images by cosine similarity (1 - cosine distance, via the <=> operator) to query_embedding, highest first, returning up to match_count rows (capped at 200) at or above match_threshold (compared against similarity, not raw distance). filter_region/filter_category restrict candidates by the joined location''s region/category when non-null; a null filter applies no restriction. expected_embedding_model restricts candidates to rows whose location_images.embedding_model matches exactly; passing null matches zero rows (fail closed) rather than skipping the check, so callers must always supply the model/revision string their query_embedding was produced with. Results are image-level and not deduplicated by location -- callers group by location_id (see src/domains/locations/services/group-image-matches.ts) and should request enough rows (via match_count) to fill their location-level result limit after grouping and filtering.';
+  'Ranks location_images by cosine similarity (1 - cosine distance, via the <=> operator) to query_embedding, highest first, returning up to match_count rows (capped at 200) at or above match_threshold (compared against similarity, not raw distance). filter_region/filter_category/expected_embedding_model each restrict candidates (by the joined location''s region/category, or by an exact location_images.embedding_model match) only when non-null; a null value applies no restriction for that parameter. Application callers always pass expected_embedding_model (see src/domains/locations/server/supabase-repository.ts); the null-is-unrestricted behavior is a defense-in-depth default, not the primary safety mechanism. Results are image-level and not deduplicated by location -- callers group by location_id (see src/domains/locations/services/group-image-matches.ts) and should request enough rows (via match_count) to fill their location-level result limit after grouping and filtering.';
 
 grant execute on function public.match_location_images(
   extensions.vector, double precision, integer, text, text, text
