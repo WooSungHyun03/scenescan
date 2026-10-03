@@ -219,3 +219,29 @@ export function toImageMatch(row: MatchLocationImagesRow): ImageMatch {
 export function parseMatchLocationImagesRows(data: unknown): MatchLocationImagesRow[] {
   return matchLocationImagesRowsSchema.parse(data ?? []);
 }
+
+// match_location_images_filtered RPC response shape (see
+// supabase/migrations/20261002000000_filtered_location_search.sql) --
+// already deduplicated to one row per location by the RPC's own
+// `distinct on (location_id)`, so unlike match_location_images there is no
+// image_url column and the id column is named location_image_id, not
+// image_id. Same validation rationale as matchLocationImagesRowSchema
+// above.
+export const matchLocationImageHitSchema = z.object({
+  location_image_id: z.string().uuid(),
+  location_id: z.string().uuid(),
+  similarity: z.number().finite(),
+});
+
+export const matchLocationImageHitsSchema = z.array(matchLocationImageHitSchema);
+
+export type MatchLocationImageHit = z.infer<typeof matchLocationImageHitSchema>;
+
+export function toImageMatchFromHit(hit: MatchLocationImageHit): ImageMatch {
+  return { locationImageId: hit.location_image_id, locationId: hit.location_id, similarity: hit.similarity };
+}
+
+/** Throws a ZodError on an unexpected shape; the caller wraps it into a dataAccessError. */
+export function parseMatchLocationImageHits(data: unknown): MatchLocationImageHit[] {
+  return matchLocationImageHitsSchema.parse(data ?? []);
+}

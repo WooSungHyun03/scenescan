@@ -25,13 +25,13 @@ Top-k mean remains evaluation-only. On 12 balanced synthetic policy scenarios, t
 
 ## Candidate cap
 
-The RPC returns at most 200 image hits. Historically these were unfiltered by region/category, and eligibility was decided entirely in application code (see "SQL-side region/category filtering" below for why that was a bug). The ranker is deterministic for the candidates it receives, but a larger production dataset may still require a measured candidate-limit change so eligible locations are not hidden beyond that boundary, now scoped to a matching region/category rather than the whole table.
+`SEARCH_MATCH_COUNT_DEFAULT` (200, `src/types/contracts.ts`) remains `match_location_images`'s and `match_similar_location_images`'s ceiling -- both are still image-level RPCs that need a large-enough raw candidate window for `groupImageMatches`/`rankSimilarLocations` to dedupe down to 8 locations afterward. `searchSupabaseLocations`'s primary path no longer needs that margin: `match_location_images_filtered` (`supabase/migrations/20261002000000_filtered_location_search.sql`, `origin/main`) deduplicates to one image per location *inside SQL* (`distinct on (location_id)`), so its `match_count` directly caps the number of places returned and is passed as a fixed `8`, not `SEARCH_MATCH_COUNT_DEFAULT`. `searchSupabaseLocations` only passes `SEARCH_MATCH_COUNT_DEFAULT` to `match_location_images` on its legacy fallback path (filtered RPC's migration not yet applied, unfiltered query only), where the old image-level-then-group behavior still applies.
 
-`src/domains/locations/server/supabase-repository.ts` fixes `match_count` at `SEARCH_MATCH_COUNT_DEFAULT` (200, the RPC's own ceiling, not a smaller "typical" number) for both search and similar-locations -- specifically because images-per-location is not yet measured for a real dataset. A location with few images could be crowded out of a smaller candidate window by one location with many near-duplicate images; at this dataset's size, a vector scan over 200 rows versus 40 has no meaningful cost (see `docs/database.md`), so there's no offsetting reason to default lower. `match_count` is **not** client-configurable via `POST /api/search` (an earlier revision of this endpoint exposed a `count` field; it was removed from the public request schema because there was no product need for a client to widen/narrow the server's own candidate-retrieval window, only to narrow via `threshold`). `POST /api/search` still lets a caller pass `threshold` (validated `[0,1]`) to narrow the pre-aggregation candidate window; it does not change the fixed 8-location result limit above.
+`match_count` is **not** client-configurable via `POST /api/search` (an earlier revision of this endpoint exposed a `count` field; it was removed from the public request schema because there was no product need for a client to widen/narrow the server's own candidate-retrieval window, only to narrow via `threshold`). `POST /api/search` still lets a caller pass `threshold` (validated `[0,1]`) to narrow the candidate window on either RPC path; it does not change the fixed 8-location result limit above.
 
 ## `match_location_images` RPC contract
 
-Defined in `supabase/migrations/20260920000000_initial_schema.sql` and replaced in place (same function name, extended signature each time) by `supabase/migrations/20260928010000_match_location_images_filters.sql` and then `supabase/migrations/20260928030000_match_location_images_exclude_location.sql`.
+Defined in `supabase/migrations/20260920000000_initial_schema.sql` and replaced in place (same function name, extended signature) by `supabase/migrations/20261001000003_match_location_images_filters.sql`. No longer this project's primary search path as of the `main` merge that added `match_location_images_filtered` (below) -- kept as `searchSupabaseLocations`'s legacy fallback for an unfiltered query while that RPC's migration is rolling out, and still used directly by `supabase/tests/match-location-images.integration.test.ts`'s region-filter regression test.
 
 ```sql
 match_location_images(
@@ -40,8 +40,7 @@ match_location_images(
   match_count integer default 40,
   filter_region text default null,
   filter_category text default null,
-  expected_embedding_model text default null,
-  exclude_location_id uuid default null
+  expected_embedding_model text default null
 ) returns table (
   image_id uuid,
   location_id uuid,
@@ -54,13 +53,12 @@ match_location_images(
 - **Ordering**: ascending `embedding <=> query_embedding`, i.e. descending similarity, highest match first.
 - **`match_count`**: clamped inside the function to `[1, 200]` via `limit least(greatest(match_count, 1), 200)`. Results are image-level, not deduplicated by location, so callers must request enough rows for a full 8-location result after grouping (see "Aggregation" above).
 - **`filter_region` / `filter_category`**: applied in the query via a join to `locations` (`(filter_region is null or l.region = filter_region)`, and likewise for category). A `null` filter applies no restriction. This is SQL-side filtering, not a post-hoc application-side check.
-- **`expected_embedding_model`**: must equal `location_images.embedding_model` exactly for a row to be a candidate. Passing `null` matches zero rows (fail closed) rather than skipping the check -- every caller must supply this explicitly. `location_images.embedding` is always excluded when `null` regardless of this parameter.
-- **`exclude_location_id`**: when non-null, drops every candidate image belonging to that location before `match_count` is applied. Used by similar-locations search (see below); `null` (the default) excludes nothing, so `searchSupabaseLocations` (plain image search) never sets it.
+- **`expected_embedding_model`**: an *optional* filter with the same null-means-unrestricted convention as `filter_region`/`filter_category` -- a non-null value must equal `location_images.embedding_model` exactly for a row to be a candidate; `null` applies no restriction (see "Why `expected_embedding_model` exists" below for why application code never actually passes `null`).
 - **RLS/grants**: `security invoker` (the caller's own row-level security and table grants apply; there is no elevated access inside the function), `set search_path = public, extensions`, `execute` granted to `anon` and `authenticated`.
 
-### Why `expected_embedding_model` exists and fails closed
+### Why `expected_embedding_model` exists
 
-`location_images.embedding_model` (added in `20260928000000_location_data_integrity.sql`) records the exact model/revision that produced each stored vector. Comparing a query embedding against a vector from a different model (or a different quantization of the same model) produces a numerically valid but meaningless cosine similarity -- it degrades ranking quality without raising any error. Requiring the caller to pass the expected value, and treating a missing value as "match nothing" rather than "match everything," makes that failure mode loud instead of silent. `src/domains/locations/server/supabase-repository.ts` passes `` `${CLIP_MODEL_ID}@${CLIP_MODEL_REVISION}` `` (from `src/lib/ai/embedding-service.ts`, reused as-is) as this value.
+`location_images.embedding_model` (added in `20261001000001_location_import_metadata.sql`) records the exact model/revision that produced each stored vector. Comparing a query embedding against a vector from a different model (or a different quantization of the same model) produces a numerically valid but meaningless cosine similarity -- it degrades ranking quality without raising any error. `src/domains/locations/server/supabase-repository.ts` always passes `` `${CLIP_MODEL_ID}@${CLIP_MODEL_REVISION}` `` (from `src/lib/ai/embedding-service.ts`, reused as-is) as this value on every call to either RPC -- the parameter being nullable at the SQL level is a defense-in-depth default (consistent with `filter_region`/`filter_category`'s own semantics), not the primary safety mechanism; application code is what actually prevents a cross-model comparison. **Follow-up, not done here**: this key does not include `CLIP_MODEL_DTYPE` (`src/lib/ai/embedding-service.ts`, currently `"q8"`) -- if a future dtype change needs to be distinguished from the existing `'...@main'`-tagged rows, switching the key format must ship together with a backfill migration for existing rows, not as a standalone key-format change (which would otherwise silently stop matching every already-imported embedding).
 
 ### SQL-side region/category filtering: the bug this fixes
 
@@ -98,7 +96,31 @@ Actual output from the verification run:
 (1 row)
 ```
 
-Also verified in the same run: a `location_images` row with a different `embedding_model` value is excluded when the correct `expected_embedding_model` is passed (0 rows), and omitting `expected_embedding_model` entirely returns 0 rows across the whole table (fail closed), even though otherwise-matching rows exist.
+Also verified in the same run: a `location_images` row with a different `embedding_model` value is excluded when the correct `expected_embedding_model` is passed (0 rows). As of the optional-filter change (see above), omitting `expected_embedding_model` now matches across every model instead of matching nothing -- re-verified directly in this project's `supabase/tests/match-location-images.integration.test.ts` ("optional filter" test), not re-run against the disposable container this section's other examples used.
+
+## `match_location_images_filtered` RPC contract
+
+Added by `origin/main` (`supabase/migrations/20261002000000_filtered_location_search.sql`) as `searchSupabaseLocations`'s primary RPC; `expected_embedding_model` added by the backend-owned follow-up `20261002000001_match_location_images_filtered_model.sql`.
+
+```sql
+match_location_images_filtered(
+  query_embedding extensions.vector(512),
+  match_threshold double precision default 0,
+  match_count integer default 8,
+  filter_region text default null,
+  filter_category text default null,
+  expected_embedding_model text default null
+) returns table (
+  location_image_id uuid,
+  location_id uuid,
+  similarity double precision
+)
+```
+
+- Picks the single highest-similarity image per location *inside SQL* (`distinct on (location_id)`, ties broken by `location_id` then `location_image_id`), so `match_count` caps the number of **places** returned, not a raw image pool -- unlike `match_location_images`, there is no separate app-level grouping step needed to reach a per-location result (`searchSupabaseLocations` still runs the result through `groupImageMatches` for consistency with the legacy-fallback path, but it is a no-op on an already-deduplicated list).
+- `filter_region`/`filter_category`/`expected_embedding_model` all follow the same null-means-unrestricted convention as `match_location_images` (see above) -- application code always passes `expected_embedding_model` explicitly.
+- No `image_url` column (unlike `match_location_images`) -- the row shape is the same `{location_image_id, location_id, similarity}` triple `match_similar_location_images` returns.
+- **Rolling-deploy fallback**: if this RPC is missing (PostgREST `PGRST202`, meaning its migration hasn't reached this project yet) and the request has no `filter_region`/`filter_category`, `searchSupabaseLocations` falls back to `match_location_images` instead. A filtered request during that same window fails explicitly (`DATA_UNAVAILABLE`) rather than silently returning unfiltered results, since the legacy RPC cannot honor the filter.
 
 ## Similar locations (`GET /api/locations/[id]/similar`)
 

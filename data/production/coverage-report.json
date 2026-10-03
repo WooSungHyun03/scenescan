@@ -2,38 +2,38 @@
   "schemaVersion": 1,
   "targetMinimumPerCell": 3,
   "targetMinimumLocations": 204,
-  "totalLocations": 159,
+  "totalLocations": 200,
   "categoryTotals": {
     "urban": 126,
-    "nature": 10,
-    "industrial": 6,
+    "nature": 47,
+    "industrial": 10,
     "interior": 17
   },
   "regionTotals": {
-    "서울": 47,
-    "부산": 8,
+    "서울": 49,
+    "부산": 13,
     "대구": 3,
-    "인천": 6,
-    "광주": 1,
-    "대전": 1,
+    "인천": 9,
+    "광주": 2,
+    "대전": 5,
     "울산": 1,
-    "세종": 1,
-    "경기": 29,
-    "강원": 3,
-    "충북": 7,
-    "충남": 8,
-    "전북": 7,
-    "전남": 11,
-    "경북": 14,
-    "경남": 11,
-    "제주": 1
+    "세종": 2,
+    "경기": 31,
+    "강원": 8,
+    "충북": 9,
+    "충남": 10,
+    "전북": 10,
+    "전남": 13,
+    "경북": 16,
+    "경남": 13,
+    "제주": 6
   },
   "summary": {
     "totalCells": 68,
-    "cellsMeetingTarget": 14,
-    "underTargetCells": 54,
-    "emptyCells": 33,
-    "totalDeficit": 135
+    "cellsMeetingTarget": 24,
+    "underTargetCells": 44,
+    "emptyCells": 21,
+    "totalDeficit": 102
   },
   "cells": [
     {
@@ -47,10 +47,10 @@
     {
       "region": "서울",
       "category": "nature",
-      "count": 1,
+      "count": 3,
       "target": 3,
-      "deficit": 2,
-      "meetsTarget": false
+      "deficit": 0,
+      "meetsTarget": true
     },
     {
       "region": "서울",
@@ -79,17 +79,17 @@
     {
       "region": "부산",
       "category": "nature",
-      "count": 0,
+      "count": 4,
       "target": 3,
-      "deficit": 3,
-      "meetsTarget": false
+      "deficit": 0,
+      "meetsTarget": true
     },
     {
       "region": "부산",
       "category": "industrial",
-      "count": 0,
+      "count": 1,
       "target": 3,
-      "deficit": 3,
+      "deficit": 2,
       "meetsTarget": false
     },
     {
@@ -143,17 +143,17 @@
     {
       "region": "인천",
       "category": "nature",
-      "count": 1,
+      "count": 3,
       "target": 3,
-      "deficit": 2,
-      "meetsTarget": false
+      "deficit": 0,
+      "meetsTarget": true
     },
     {
       "region": "인천",
       "category": "industrial",
-      "count": 1,
+      "count": 2,
       "target": 3,
-      "deficit": 2,
+      "deficit": 1,
       "meetsTarget": false
     },
     {
@@ -175,9 +175,9 @@
     {
       "region": "광주",
       "category": "nature",
-      "count": 0,
+      "count": 1,
       "target": 3,
-      "deficit": 3,
+      "deficit": 2,
       "meetsTarget": false
     },
     {
@@ -207,10 +207,10 @@
     {
       "region": "대전",
       "category": "nature",
-      "count": 0,
+      "count": 4,
       "target": 3,
-      "deficit": 3,
-      "meetsTarget": false
+      "deficit": 0,
+      "meetsTarget": true
     },
     {
       "region": "대전",
@@ -271,9 +271,9 @@
     {
       "region": "세종",
       "category": "nature",
-      "count": 0,
+      "count": 1,
       "target": 3,
-      "deficit": 3,
+      "deficit": 2,
       "meetsTarget": false
     },
     {
@@ -303,10 +303,10 @@
     {
       "region": "경기",
       "category": "nature",
-      "count": 2,
+      "count": 4,
       "target": 3,
-      "deficit": 1,
-      "meetsTarget": false
+      "deficit": 0,
+      "meetsTarget": true
     },
     {
       "region": "경기",
@@ -335,10 +335,10 @@
     {
       "region": "강원",
       "category": "nature",
-      "count": 0,
+      "count": 5,
       "target": 3,
-      "deficit": 3,
-      "meetsTarget": false
+      "deficit": 0,
+      "meetsTarget": true
     },
     {
       "region": "강원",
@@ -367,9 +367,9 @@
     {
       "region": "충북",
       "category": "nature",
-      "count": 0,
+      "count": 2,
       "target": 3,
-      "deficit": 3,
+      "deficit": 1,
       "meetsTarget": false
     },
     {
@@ -399,9 +399,9 @@
     {
       "region": "충남",
       "category": "nature",
-      "count": 0,
+      "count": 2,
       "target": 3,
-      "deficit": 3,
+      "deficit": 1,
       "meetsTarget": false
     },
     {
@@ -430,102 +430,6 @@
     },
     {
       "region": "전북",
-      "category": "nature",
-      "count": 0,
-      "target": 3,
-      "deficit": 3,
-      "meetsTarget": false
-    },
-    {
-      "region": "전북",
-      "category": "industrial",
-      "count": 0,
-      "target": 3,
-      "deficit": 3,
-      "meetsTarget": false
-    },
-    {
-      "region": "전북",
-      "category": "interior",
-      "count": 1,
-      "target": 3,
-      "deficit": 2,
-      "meetsTarget": false
-    },
-    {
-      "region": "전남",
-      "category": "urban",
-      "count": 10,
-      "target": 3,
-      "deficit": 0,
-      "meetsTarget": true
-    },
-    {
-      "region": "전남",
-      "category": "nature",
-      "count": 1,
-      "target": 3,
-      "deficit": 2,
-      "meetsTarget": false
-    },
-    {
-      "region": "전남",
-      "category": "industrial",
-      "count": 0,
-      "target": 3,
-      "deficit": 3,
-      "meetsTarget": false
-    },
-    {
-      "region": "전남",
-      "category": "interior",
-      "count": 0,
-      "target": 3,
-      "deficit": 3,
-      "meetsTarget": false
-    },
-    {
-      "region": "경북",
-      "category": "urban",
-      "count": 10,
-      "target": 3,
-      "deficit": 0,
-      "meetsTarget": true
-    },
-    {
-      "region": "경북",
-      "category": "nature",
-      "count": 2,
-      "target": 3,
-      "deficit": 1,
-      "meetsTarget": false
-    },
-    {
-      "region": "경북",
-      "category": "industrial",
-      "count": 1,
-      "target": 3,
-      "deficit": 2,
-      "meetsTarget": false
-    },
-    {
-      "region": "경북",
-      "category": "interior",
-      "count": 1,
-      "target": 3,
-      "deficit": 2,
-      "meetsTarget": false
-    },
-    {
-      "region": "경남",
-      "category": "urban",
-      "count": 6,
-      "target": 3,
-      "deficit": 0,
-      "meetsTarget": true
-    },
-    {
-      "region": "경남",
       "category": "nature",
       "count": 3,
       "target": 3,
@@ -533,11 +437,107 @@
       "meetsTarget": true
     },
     {
-      "region": "경남",
+      "region": "전북",
       "category": "industrial",
       "count": 0,
       "target": 3,
       "deficit": 3,
+      "meetsTarget": false
+    },
+    {
+      "region": "전북",
+      "category": "interior",
+      "count": 1,
+      "target": 3,
+      "deficit": 2,
+      "meetsTarget": false
+    },
+    {
+      "region": "전남",
+      "category": "urban",
+      "count": 10,
+      "target": 3,
+      "deficit": 0,
+      "meetsTarget": true
+    },
+    {
+      "region": "전남",
+      "category": "nature",
+      "count": 3,
+      "target": 3,
+      "deficit": 0,
+      "meetsTarget": true
+    },
+    {
+      "region": "전남",
+      "category": "industrial",
+      "count": 0,
+      "target": 3,
+      "deficit": 3,
+      "meetsTarget": false
+    },
+    {
+      "region": "전남",
+      "category": "interior",
+      "count": 0,
+      "target": 3,
+      "deficit": 3,
+      "meetsTarget": false
+    },
+    {
+      "region": "경북",
+      "category": "urban",
+      "count": 10,
+      "target": 3,
+      "deficit": 0,
+      "meetsTarget": true
+    },
+    {
+      "region": "경북",
+      "category": "nature",
+      "count": 4,
+      "target": 3,
+      "deficit": 0,
+      "meetsTarget": true
+    },
+    {
+      "region": "경북",
+      "category": "industrial",
+      "count": 1,
+      "target": 3,
+      "deficit": 2,
+      "meetsTarget": false
+    },
+    {
+      "region": "경북",
+      "category": "interior",
+      "count": 1,
+      "target": 3,
+      "deficit": 2,
+      "meetsTarget": false
+    },
+    {
+      "region": "경남",
+      "category": "urban",
+      "count": 6,
+      "target": 3,
+      "deficit": 0,
+      "meetsTarget": true
+    },
+    {
+      "region": "경남",
+      "category": "nature",
+      "count": 4,
+      "target": 3,
+      "deficit": 0,
+      "meetsTarget": true
+    },
+    {
+      "region": "경남",
+      "category": "industrial",
+      "count": 1,
+      "target": 3,
+      "deficit": 2,
       "meetsTarget": false
     },
     {
@@ -559,17 +559,17 @@
     {
       "region": "제주",
       "category": "nature",
-      "count": 0,
+      "count": 4,
       "target": 3,
-      "deficit": 3,
-      "meetsTarget": false
+      "deficit": 0,
+      "meetsTarget": true
     },
     {
       "region": "제주",
       "category": "industrial",
-      "count": 0,
+      "count": 1,
       "target": 3,
-      "deficit": 3,
+      "deficit": 2,
       "meetsTarget": false
     },
     {

@@ -7,6 +7,8 @@ export interface ImageEmbeddingService {
 
 export const CLIP_MODEL_ID = "Xenova/clip-vit-base-patch32";
 export const CLIP_MODEL_REVISION = "main";
+// Pin precision across browser and offline runtimes. Device defaults differ.
+export const CLIP_MODEL_DTYPE = "q8";
 export const CLIP_EMBEDDING_DIMENSION = 512;
 export const SUPPORTED_IMAGE_MIME_TYPES = [
   "image/jpeg",

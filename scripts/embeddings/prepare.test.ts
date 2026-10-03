@@ -1,7 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { parseCliArgs } from "./prepare.ts";
+import { extractIndividually, parseCliArgs } from "./prepare.ts";
 
 describe("embedding CLI", () => {
+  it("extracts each image separately to match browser q8 activation ranges", async () => {
+    const seen: unknown[] = [];
+    const values = await extractIndividually(async (image) => { seen.push(image); return { data: [seen.length, 0.5] }; }, ["first", "second"]);
+    expect(seen).toEqual(["first", "second"]);
+    expect(values).toEqual([1, 0.5, 2, 0.5]);
+  });
   it("uses safe resume defaults", () => {
     expect(parseCliArgs(["manifest.json", "output.json"])).toEqual({
       manifestPath: "manifest.json",

@@ -1,6 +1,6 @@
 import { readFile } from "node:fs/promises";
 import { describe, expect, it } from "vitest";
-import { auditAttributionSchema, auditEmbeddingSchema, auditSimilarLocationSchema } from "./schema-audit.ts";
+import { auditAttributionSchema, auditEmbeddingSchema, auditSimilarLocationSchema, auditFilteredSearchSchema } from "./schema-audit.ts";
 import { auditSchemaFile } from "./audit-schema.ts";
 
 const migration = new URL("../../supabase/migrations/20260920000000_initial_schema.sql", import.meta.url);
@@ -10,7 +10,14 @@ const attributionMigration = new URL("../../supabase/migrations/20261001000000_l
 
 describe("embedding database schema audit", () => {
   it("audits every committed migration by default", async () => {
-    await expect(auditSchemaFile()).resolves.toBe(26);
+    await expect(auditSchemaFile()).resolves.toBe(30);
+  });
+
+  it("requires filtering and location grouping before the match limit", async () => {
+    const sql = await readFile(new URL("../../supabase/migrations/20261002000000_filtered_location_search.sql", import.meta.url), "utf8");
+    expect(auditFilteredSearchSchema(sql).checks).toHaveLength(4);
+    expect(() => auditFilteredSearchSchema(sql.replace("distinct on (li.location_id)", ""))).toThrow("one best image");
+    expect(() => auditFilteredSearchSchema(sql.replace("l.region = filter_region", "true"))).toThrow("filter before limit");
   });
 
   it("passes the committed migration contract", async () => {

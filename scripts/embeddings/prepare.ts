@@ -4,6 +4,7 @@ import { pipeline } from "@huggingface/transformers";
 import {
   CLIP_MODEL_ID,
   CLIP_MODEL_REVISION,
+  CLIP_MODEL_DTYPE,
 } from "../../src/lib/ai/embedding-service.ts";
 import { decodeLocalImage, prepareEmbeddings } from "./pipeline.ts";
 
@@ -39,6 +40,15 @@ async function transformersVersion(): Promise<string> {
   return packageJson.version;
 }
 
+export async function extractIndividually(
+  extractor: (image: unknown) => Promise<{ data: ArrayLike<number | bigint> }>,
+  images: unknown[],
+): Promise<number[]> {
+  const values: number[] = [];
+  for (const image of images) values.push(...Array.from((await extractor(image)).data, Number));
+  return values;
+}
+
 async function main(): Promise<void> {
   const options = parseCliArgs(process.argv.slice(2));
   const version = await transformersVersion();
@@ -48,10 +58,13 @@ async function main(): Promise<void> {
     loadExtractor: async () => {
       const extractor = await pipeline("image-feature-extraction", CLIP_MODEL_ID, {
         revision: CLIP_MODEL_REVISION,
+        dtype: CLIP_MODEL_DTYPE,
       });
-      return async (images) => (
-        await extractor(images as Parameters<typeof extractor>[0])
-      ).data;
+      // Dynamic q8 activation quantization depends on batch contents. Match
+      // the browser's one-image inference while retaining checkpoint batches.
+      return (images) => extractIndividually(
+        (image) => extractor(image as Parameters<typeof extractor>[0]), images,
+      );
     },
     onProgress: console.log,
   });

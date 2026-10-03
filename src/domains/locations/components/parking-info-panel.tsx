@@ -76,7 +76,7 @@ export function ParkingInfoPanel({
           </div>
         </div>
         <span className="shrink-0 rounded-full bg-stone-100 px-2.5 py-1 text-xs font-semibold text-stone-600">
-          {sortedParking.length ? `${sortedParking.length}곳` : "정보 없음"}
+          {sortedParking.length ? `${sortedParking.length}곳` : "확인된 정보 없음"}
         </span>
       </div>
 
@@ -124,7 +124,7 @@ export function ParkingInfoPanel({
                       name ? "text-stone-900" : "text-stone-500"
                     }`}
                   >
-                    {name ?? "정보 없음"}
+                    {name ?? "확인된 정보 없음"}
                   </h3>
 
                   <dl className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
@@ -137,7 +137,7 @@ export function ParkingInfoPanel({
                         }
                       >
                         {item.capacity === null
-                          ? "정보 없음"
+                          ? "확인된 정보 없음"
                           : `${item.capacity.toLocaleString("ko-KR")}면`}
                       </span>
                     </ParkingField>
@@ -148,7 +148,7 @@ export function ParkingInfoPanel({
                           openingHours ? "text-stone-900" : "text-stone-500"
                         }
                       >
-                        {openingHours ?? "정보 없음"}
+                        {openingHours ?? "확인된 정보 없음"}
                       </span>
                     </ParkingField>
 
@@ -158,7 +158,7 @@ export function ParkingInfoPanel({
                           priceInfo ? "text-stone-900" : "text-stone-500"
                         }
                       >
-                        {priceInfo ?? "정보 없음"}
+                        {priceInfo ?? "확인된 정보 없음"}
                       </span>
                     </ParkingField>
 
@@ -189,7 +189,7 @@ export function ParkingInfoPanel({
             aria-hidden="true"
           />
           <p className="mt-2 text-sm font-semibold text-stone-700">
-            등록된 주차 정보가 없습니다.
+            확인된 주차 정보가 없습니다.
           </p>
           <p className="mt-1 text-xs text-stone-500">
             촬영 전 장소 담당자에게 차량 진입과 주변 주차 가능 여부를 확인해

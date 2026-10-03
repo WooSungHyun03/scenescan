@@ -102,7 +102,8 @@ That file was accurate as of 2026-09-27 but several of its "실제 구현 상태
   npx supabase link --project-ref <project-ref>
   npx supabase migration list
   ```
-  로컬 파일(9개, `20260920000000`~`20261001000005`)과 "Remote" 컬럼을 비교해 `20261001000000_location_attribution.sql` 이후 파일들이 아직 적용 안 됐는지 확인.
-- **[팀]** 실제 DB에 migration을 먼저 적용한 뒤 PR을 머지한다 — 반대 순서(코드만 먼저 배포)로 하면 `embedding_model`/`match_location_images` 신호 시그니처가 없는 상태로 코드가 돌아 검색 자체가 깨진다.
+  로컬 파일(11개, `20260920000000`~`20261002000001`)과 "Remote" 컬럼을 비교해 `20261001000000_location_attribution.sql`과 `20261002000000_filtered_location_search.sql`(둘 다 `main`) 이후 파일들이 아직 적용 안 됐는지 확인.
+- **[팀]** 실제 DB에 migration을 먼저 적용한 뒤 PR을 머지한다 — 반대 순서(코드만 먼저 배포)로 하면 `embedding_model`/`match_location_images`/`match_location_images_filtered` 시그니처가 없는 상태로 코드가 돌아 검색 자체가 깨진다.
 - **[Member 1]** `scripts/embeddings/import.ts`가 `location_images` upsert 시 `embedding_model`을 명시적으로 넣는지 확인 (현재 안 넣음 — 기본값 제거 migration 때문에 신규 삽입은 `not_null` 위반으로 실패하도록 의도된 동작. §4/§7 참조).
 - **[Member 1]** `scripts/data/production-importer.ts`도 동일한 문제가 있음을 확인 — `ImageMetadataRow`에 `embedding`/`embedding_model` 필드 자체가 없어, 이 스크립트로 재적재하면 같은 이유로 실패한다 (로컬에서 직접 재현 확인됨). 코드는 고치지 않음 — import.ts와 마찬가지로 의도된 fail-loud.
+- **[참고]** `expected_embedding_model`(RPC 파라미터, `match_location_images`/`match_location_images_filtered` 둘 다)은 더 이상 fail-closed가 아니라 선택적 필터로 바뀜 — null이면 모델 필터 없음, 값이 있으면 그 모델만. 위 두 항목(`embedding_model` 컬럼 자체의 NOT NULL)과는 다른 메커니즘이니 혼동하지 말 것. 앱 코드는 항상 값을 명시적으로 넘기므로 실제 동작은 바뀌지 않음.

@@ -1,4 +1,4 @@
-import { CLIP_EMBEDDING_DIMENSION } from "../../src/lib/ai/embedding-service.ts";
+import { CLIP_EMBEDDING_DIMENSION, CLIP_MODEL_DTYPE } from "../../src/lib/ai/embedding-service.ts";
 import { toValidatedEmbedding } from "../../src/lib/ai/embedding-validation.ts";
 import { vectorNorm } from "../../src/lib/ai/vector-math.ts";
 import type { EmbeddingOutput, EmbeddingOutputItem } from "./contracts.ts";
@@ -45,6 +45,7 @@ function validateItem(item: EmbeddingOutputItem): ImportRow {
 }
 
 export function createImportRows(output: EmbeddingOutput): ImportRow[] {
+  if (output.model.dtype !== CLIP_MODEL_DTYPE) throw new Error("Embedding dtype does not match browser CLIP; regenerate before import");
   if (output.failures.length > 0) {
     throw new Error(`Embedding output contains ${output.failures.length} unresolved failure(s)`);
   }

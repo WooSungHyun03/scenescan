@@ -1,12 +1,21 @@
 import { describe, expect, it } from "vitest";
 import { parseManifest } from "../embeddings/contracts.ts";
 import { parseNormalizedLocationOutput } from "./contracts.ts";
-import { buildStoragePlan } from "./storage-uploader.ts";
+import { buildStoragePlan, isIdenticalStoredJpeg } from "./storage-uploader.ts";
+import { createHash } from "node:crypto";
 
 const locationId = "00000000-0000-4000-8000-000000000001";
 const imageId = "00000000-0000-4000-8000-000000000002";
 
 describe("Supabase Storage upload planning", () => {
+  it("skips only a byte-identical JPEG, not a same-size replacement", () => {
+    const bytes = Buffer.from("original");
+    const stored = { size: bytes.length, contentType: "image/jpeg", etag: `"${createHash("md5").update(bytes).digest("hex")}"` };
+    expect(isIdenticalStoredJpeg(bytes, stored)).toBe(true);
+    expect(isIdenticalStoredJpeg(Buffer.from("modified"), stored)).toBe(false);
+    expect(isIdenticalStoredJpeg(bytes, { ...stored, contentType: "image/png" })).toBe(false);
+    expect(isIdenticalStoredJpeg(bytes, { ...stored, etag: "multipart-2" })).toBe(false);
+  });
   it("rewrites runtime and embedding URLs to stable public object URLs", () => {
     const previousUrl = "https://beceleb.org/locations/test.jpg";
     const dataset = parseNormalizedLocationOutput({

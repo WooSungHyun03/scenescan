@@ -7,12 +7,11 @@ export default async function ShortlistPage() {
   const locations = await getLocations();
 
   return (
-    <main className="mx-auto max-w-6xl px-5 py-10">
+    <main className="scene-container py-8 sm:py-10">
       <div className="mb-8">
-        <p className="scene-label">SHORTLIST</p>
         <h1 className="mt-2 text-3xl font-bold">관심 장소</h1>
         <p className="mt-3 max-w-2xl leading-relaxed text-stone-600">
-          저장한 촬영 후보 중 2~4곳을 골라 이미지, 주소, 허가, 주변 주차와
+          저장한 후보 중 2~4곳을 골라 사진, 주소, 촬영 허가, 주차와
           같은 촬영 시각의 태양 조건을 비교하세요.
         </p>
       </div>

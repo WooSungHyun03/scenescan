@@ -7,6 +7,7 @@ import {
   CLIP_EMBEDDING_DIMENSION,
   CLIP_MODEL_ID,
   CLIP_MODEL_REVISION,
+  CLIP_MODEL_DTYPE,
 } from "../../src/lib/ai/embedding-service.ts";
 import { toValidatedEmbedding } from "../../src/lib/ai/embedding-validation.ts";
 import { cosineSimilarity } from "../../src/lib/ai/vector-math.ts";
@@ -119,7 +120,7 @@ async function transformersVersion(): Promise<string> {
 }
 
 async function embedPaths(paths: readonly string[], batchSize: number): Promise<Map<string, number[]>> {
-  const extractor = await pipeline("image-feature-extraction", CLIP_MODEL_ID, { revision: CLIP_MODEL_REVISION });
+  const extractor = await pipeline("image-feature-extraction", CLIP_MODEL_ID, { revision: CLIP_MODEL_REVISION, dtype: CLIP_MODEL_DTYPE });
   const result = new Map<string, number[]>();
   for (let offset = 0; offset < paths.length; offset += batchSize) {
     const batchPaths = paths.slice(offset, offset + batchSize);

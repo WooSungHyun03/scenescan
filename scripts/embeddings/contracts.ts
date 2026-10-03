@@ -3,6 +3,7 @@ import {
   CLIP_EMBEDDING_DIMENSION,
   CLIP_MODEL_ID,
   CLIP_MODEL_REVISION,
+  CLIP_MODEL_DTYPE,
 } from "../../src/lib/ai/embedding-service.ts";
 import { toValidatedEmbedding } from "../../src/lib/ai/embedding-validation.ts";
 
@@ -44,6 +45,7 @@ const outputSchema = z.object({
     revision: z.literal(CLIP_MODEL_REVISION),
     embedding_dimension: z.literal(CLIP_EMBEDDING_DIMENSION),
     transformers_js_version: z.string().min(1),
+    dtype: z.enum(["fp32", "q8"]).default("fp32"),
   }).strict(),
   items: z.array(outputItemSchema),
   failures: z.array(failureSchema),
@@ -88,6 +90,7 @@ export function createEmptyOutput(transformersVersion: string): EmbeddingOutput 
       revision: CLIP_MODEL_REVISION,
       embedding_dimension: CLIP_EMBEDDING_DIMENSION,
       transformers_js_version: transformersVersion,
+      dtype: CLIP_MODEL_DTYPE,
     },
     items: [],
     failures: [],

@@ -31,6 +31,17 @@ afterEach(async () => {
 });
 
 describe("offline embedding pipeline", () => {
+  it("refuses resuming an output generated with a different precision", async () => {
+    const paths = await workspace([entry(1)]);
+    const dependencies = { transformersVersion: "4.3.0",
+      decodeImage: async (path: string) => ({ value: path, width: 800, height: 600 }),
+      loadExtractor: async () => async () => Array(512).fill(0.5) };
+    const result = await prepareEmbeddings({ ...paths, batchSize: 1, retries: 0, resume: true }, dependencies);
+    result.output.model.dtype = "fp32";
+    await writeFile(paths.outputPath, JSON.stringify(result.output));
+    await expect(prepareEmbeddings({ ...paths, batchSize: 1, retries: 0, resume: true }, dependencies))
+      .rejects.toThrow("different CLIP dtype");
+  });
   it("detects image bytes instead of trusting extensions", () => {
     expect(detectImageMime(Uint8Array.from([0xff, 0xd8, 0xff]))).toBe("image/jpeg");
     expect(detectImageMime(Uint8Array.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])))

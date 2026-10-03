@@ -8,7 +8,16 @@ import { groupImageMatches, type ImageMatch } from "@/domains/locations/services
 import { rankSimilarLocations } from "@/domains/locations/services/similar-locations";
 import { CLIP_MODEL_ID, CLIP_MODEL_REVISION } from "@/lib/ai/embedding-service";
 import { resolveLocationListPagination } from "./pagination";
-import { parseLocationRow, parseLocationRows, parseMatchLocationImagesRows, toImageMatch, toLocation, type LocationRow } from "./supabase-mappers";
+import {
+  parseLocationRow,
+  parseLocationRows,
+  parseMatchLocationImageHits,
+  parseMatchLocationImagesRows,
+  toImageMatch,
+  toImageMatchFromHit,
+  toLocation,
+  type LocationRow,
+} from "./supabase-mappers";
 
 // TODO(embedding-model-key): src/lib/ai/embedding-service.ts (Member 1's
 // module) exports CLIP_MODEL_ID and CLIP_MODEL_REVISION separately but has
@@ -149,24 +158,14 @@ export async function getSupabaseLocation(id: string): Promise<LocationDetail | 
   return mapRow(data);
 }
 
-// RPC response -> LocationSearchResult[], shared by searchSupabaseLocations
-// and getSupabaseSimilarLocations. Location metadata is loaded only for the
-// IDs the RPC actually returned (getSupabaseLocationsByIds), never by
-// re-running a filter query -- so there is nothing app-side left to keep in
-// sync with the RPC's own filter_region/filter_category.
-// getSupabaseLocationsByIds does not guarantee row order matches the RPC's
-// similarity order; that's fine because groupImageMatches/rankLocationImageHits
-// (Member 1's utility) re-sorts by similarity itself and only uses the
-// `locations` array as an id -> metadata lookup (verified in
-// supabase-repository.test.ts).
-async function resolveRankedResults(data: unknown): Promise<LocationSearchResult[]> {
-  let rows;
-  try {
-    rows = parseMatchLocationImagesRows(data);
-  } catch (parseError) {
-    throw dataAccessError("Unexpected match_location_images response shape", parseError);
-  }
-  const matches: ImageMatch[] = rows.map(toImageMatch);
+// Shared by both match_location_images_filtered and its legacy fallback
+// below: hydrates Location metadata for exactly the matched IDs
+// (getSupabaseLocationsByIds), never a filter re-query, then applies
+// Member 1's grouping/limit. Safe to call even when `matches` already has
+// at most one row per location (match_location_images_filtered's own
+// `distinct on (location_id)` already guarantees that) -- groupImageMatches
+// is a no-op in that case, not a second filtering pass to keep in sync.
+async function toSearchResults(matches: ImageMatch[]): Promise<LocationSearchResult[]> {
   const locationIds = [...new Set(matches.map((match) => match.locationId))];
   const locations = await getSupabaseLocationsByIds(locationIds);
   return groupImageMatches(matches, locations, 8);
@@ -177,16 +176,49 @@ export async function searchSupabaseLocations(
   filters: LocationFilter = {},
   options: SearchQueryOptions = {},
 ): Promise<LocationSearchResult[]> {
-  const { data, error } = await getSupabaseClient().rpc("match_location_images", {
+  const client = getSupabaseClient();
+  const matchThreshold = options.threshold ?? SEARCH_MATCH_THRESHOLD_DEFAULT;
+  const { data, error } = await client.rpc("match_location_images_filtered", {
     query_embedding: embedding,
-    match_threshold: options.threshold ?? SEARCH_MATCH_THRESHOLD_DEFAULT,
-    match_count: options.count ?? SEARCH_MATCH_COUNT_DEFAULT,
+    match_threshold: matchThreshold,
+    match_count: 8,
     filter_region: filters.region ?? null,
     filter_category: filters.category ?? null,
     expected_embedding_model: EXPECTED_EMBEDDING_MODEL,
   });
+  // Rolling deployment only: match_location_images_filtered
+  // (20261002000000_filtered_location_search.sql, plus its
+  // expected_embedding_model follow-up) might not exist yet on a project
+  // mid-deploy. Only fall back for an unfiltered query -- the legacy RPC
+  // can't honor filter_region/filter_category, so silently using it for a
+  // filtered request would return wrong (unfiltered) results instead of a
+  // clear error.
+  if (error?.code === "PGRST202" && error.message?.includes("match_location_images_filtered")
+    && !filters.region && !filters.category) {
+    logger.warn("Filtered search RPC migration is pending; using legacy unfiltered search");
+    const legacy = await client.rpc("match_location_images", {
+      query_embedding: embedding,
+      match_threshold: matchThreshold,
+      match_count: SEARCH_MATCH_COUNT_DEFAULT,
+      expected_embedding_model: EXPECTED_EMBEDDING_MODEL,
+    });
+    if (legacy.error) throw dataAccessError("Failed to search location images", legacy.error);
+    let legacyRows;
+    try {
+      legacyRows = parseMatchLocationImagesRows(legacy.data);
+    } catch (parseError) {
+      throw dataAccessError("Unexpected match_location_images response shape", parseError);
+    }
+    return toSearchResults(legacyRows.map(toImageMatch));
+  }
   if (error) throw dataAccessError("Failed to search location images", error);
-  return resolveRankedResults(data);
+  let hits;
+  try {
+    hits = parseMatchLocationImageHits(data);
+  } catch (parseError) {
+    throw dataAccessError("Unexpected match_location_images_filtered response shape", parseError);
+  }
+  return toSearchResults(hits.map(toImageMatchFromHit));
 }
 
 // Embedding selection for similar-locations (the mean of all of this

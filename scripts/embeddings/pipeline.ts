@@ -4,6 +4,7 @@ import {
   CLIP_EMBEDDING_DIMENSION,
   CLIP_MODEL_ID,
   CLIP_MODEL_REVISION,
+  CLIP_MODEL_DTYPE,
   MAX_IMAGE_BYTES,
 } from "../../src/lib/ai/embedding-service.ts";
 import { toValidatedEmbedding } from "../../src/lib/ai/embedding-validation.ts";
@@ -168,6 +169,9 @@ export async function prepareEmbeddings(
 
   if (options.resume && await pathExists(options.outputPath)) {
     const existing = parseOutput(await readJson(options.outputPath));
+    if (existing.model.dtype !== CLIP_MODEL_DTYPE) {
+      throw new Error("Existing output uses a different CLIP dtype; regenerate with --no-resume");
+    }
     if (existing.model.transformers_js_version !== dependencies.transformersVersion) {
       throw new Error("Existing output uses a different Transformers.js version; rerun with --no-resume");
     }

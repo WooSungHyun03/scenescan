@@ -2,15 +2,18 @@
 
 import Link from "next/link";
 import { Heart } from "lucide-react";
+import { usePathname } from "next/navigation";
 import { useShortlist } from "./use-shortlist";
 
 export function ShortlistNavLink() {
   const { count, isReady } = useShortlist();
+  const pathname = usePathname();
 
   return (
     <Link
       href="/shortlist"
-      className="inline-flex min-h-11 items-center gap-1.5 rounded-md px-1.5 text-sm font-semibold text-stone-700 hover:text-emerald-800"
+      className="scene-nav-link"
+      aria-current={pathname === "/shortlist" ? "page" : undefined}
     >
       <Heart size={16} aria-hidden="true" />
       관심 장소

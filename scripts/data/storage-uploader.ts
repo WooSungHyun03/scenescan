@@ -1,4 +1,5 @@
 import { readFile } from "node:fs/promises";
+import { createHash } from "node:crypto";
 import { dirname, extname, relative, resolve } from "node:path";
 import type { NormalizedLocationOutput } from "./contracts.ts";
 import type { EmbeddingManifest } from "../embeddings/contracts.ts";
@@ -17,6 +18,11 @@ export type StoragePlan = {
   manifest: EmbeddingManifest;
   items: StoragePlanItem[];
 };
+
+export function isIdenticalStoredJpeg(bytes: Buffer, stored: { size?: number; contentType?: string; etag?: string }): boolean {
+  return stored.size === bytes.length && stored.contentType === "image/jpeg"
+    && stored.etag?.replaceAll('"', "") === createHash("md5").update(bytes).digest("hex");
+}
 
 function publicObjectUrl(projectUrl: string, bucket: string, objectPath: string): string {
   const encodedPath = objectPath.split("/").map(encodeURIComponent).join("/");

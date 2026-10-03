@@ -57,3 +57,17 @@ export function auditAttributionSchema(sql: string): SchemaAuditResult {
   }
   return { checks: ATTRIBUTION_CHECKS.map(([name]) => name) };
 }
+
+export function auditFilteredSearchSchema(sql: string): SchemaAuditResult {
+  const match = /create\s+or\s+replace\s+function\s+public\.match_location_images_filtered[\s\S]*?\$\$;/.exec(sql);
+  if (!match) throw new Error("Filtered search schema audit failed: missing RPC");
+  const checks: Array<[string, RegExp]> = [
+    ["filter before limit", /filter_region\s+is\s+null\s+or\s+l\.region\s*=\s*filter_region[\s\S]*filter_category\s+is\s+null\s+or\s+l\.category\s*=\s*filter_category[\s\S]*limit/i],
+    ["one best image per place before limit", /distinct\s+on\s*\(\s*li\.location_id\s*\)[\s\S]*limit/i],
+    ["deterministic filtered order", /order\s+by\s+distance\s*,\s*best_images\.location_id\s*,\s*id/i],
+    ["filtered invoker rights", /language\s+sql\s+stable\s+security\s+invoker/i],
+  ];
+  const missing = checks.filter(([, pattern]) => !pattern.test(match[0])).map(([name]) => name);
+  if (missing.length) throw new Error(`Filtered search schema audit failed: ${missing.join(", ")}`);
+  return { checks: checks.map(([name]) => name) };
+}

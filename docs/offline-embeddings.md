@@ -38,12 +38,13 @@ The pipeline checks file existence, regular-file status, byte signatures, the 15
 
 - model: `Xenova/clip-vit-base-patch32`
 - revision: `main`
+- dtype: `q8`, pinned centrally with model ID/revision (not a device-dependent default)
 - embedding dimension: 512
 - Transformers.js `image-feature-extraction` preprocessing
 
 Each successful item repeats the model ID, revision, installed Transformers.js version, source metadata, and a finite 512-D embedding. The root `model` object provides the same import-wide metadata. Failures contain the full manifest entry, cumulative attempt count, and error. Output ordering always follows manifest ordering and omits timestamps for deterministic reruns.
 
-Resume refuses output created by a different Transformers.js version. If manifest metadata changes for an existing `image_id`, that image is recomputed. A malformed persisted vector, duplicate output ID, or completed/failed overlap stops the run instead of silently trusting corrupt state.
+Resume refuses output created by a different Transformers.js version or dtype. Legacy files without `model.dtype` are identified as fp32 and must be regenerated with `--no-resume`; import rejects them rather than mix precision policies. Checkpoint `--batch-size` still controls decoding/output grouping, but the actual q8 extractor runs one image at a time, matching browser inference: dynamic activation quantization can depend on the other images in a tensor batch. If manifest metadata changes for an existing `image_id`, that image is recomputed. A malformed persisted vector, duplicate output ID, or completed/failed overlap stops the run instead of silently trusting corrupt state.
 
 The process exits non-zero when failures remain, but the valid checkpoint stays available. Fix the source problem and rerun the same command; successful items will be skipped and failed items retried.
 

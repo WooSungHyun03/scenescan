@@ -88,7 +88,7 @@ export function SearchResultsMap({
         }
         controllerRef.current = fallbackController;
         fallbackController.setActiveMarker(activeLocationRef.current);
-        setError("Kakao 결과 지도를 불러오지 못해 미리보기를 표시합니다.");
+        setError("지도를 불러오지 못했습니다. 위치 미리보기를 참고해 주세요.");
       });
 
     return () => {
@@ -121,11 +121,11 @@ export function SearchResultsMap({
             검색 결과 지도
           </h3>
           <p className="mt-1 text-xs text-stone-500">
-            마커 버튼을 선택하거나 결과 카드에 포커스해 위치를 비교하세요.
+            지도 위 번호를 선택하면 해당 장소 사진을 확인할 수 있습니다.
           </p>
         </div>
         <span className="shrink-0 text-xs font-semibold text-stone-500">
-          {markers.length}개 마커
+          {markers.length}곳
         </span>
       </div>
       {markers.length > 0 ? (

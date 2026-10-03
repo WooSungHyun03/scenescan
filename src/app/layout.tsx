@@ -1,47 +1,47 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
+import localFont from "next/font/local";
 import Link from "next/link";
-import { ShortlistNavLink } from "@/domains/locations/components/shortlist-nav-link";
+import { Brand } from "@/shared/ui/brand";
+import { SiteNavigation } from "@/shared/ui/site-navigation";
 import { SkipLink } from "@/shared/ui/skip-link";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "SceneScan",
-  description: "레퍼런스 이미지로 촬영 장소를 탐색하는 오픈소스 프로젝트",
+  title: { default: "SceneScan — 이미지로 촬영 장소 찾기", template: "%s | SceneScan" },
+  description: "원하는 장면의 사진을 올리고 비슷한 촬영 장소를 찾아보세요. 장소 사진, 지도, 빛의 방향과 촬영 조건을 함께 비교합니다.",
+  icons: { icon: "/icon.svg", apple: "/brand/app-icon.svg" },
 };
+export const viewport: Viewport = { themeColor: "#185b4b" };
+const pretendard = localFont({ src: "../../public/fonts/PretendardVariable.woff2", variable: "--font-pretendard", weight: "100 900", display: "swap" });
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="ko">
+    <html lang="ko" className={pretendard.variable}>
       <body>
         <SkipLink targetId="main-content" />
-        <header className="border-b border-stone-200 bg-white">
+        <header className="sticky top-0 z-40 border-b border-line bg-white">
           <nav
-            className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-4 sm:px-5"
+            className="scene-container flex min-h-18 items-center justify-between gap-2 py-3"
             aria-label="주 메뉴"
           >
             <Link
               href="/"
-              className="inline-flex min-h-11 shrink-0 items-center rounded-md px-1 text-lg font-bold tracking-tight text-emerald-900 sm:text-xl"
+              className="inline-flex min-h-11 shrink-0 items-center rounded-md"
               aria-label="SceneScan 홈"
             >
-              SceneScan<span className="text-amber-600" aria-hidden="true">.</span>
+              <Brand />
             </Link>
-            <div className="flex min-w-0 items-center gap-2 sm:gap-4">
-              <Link
-                href="/search"
-                className="inline-flex min-h-11 items-center rounded-md px-1.5 py-2 text-sm font-semibold text-stone-700 hover:text-emerald-800 sm:px-2"
-              >
-                장소 검색
-              </Link>
-              <ShortlistNavLink />
-            </div>
+            <SiteNavigation />
           </nav>
         </header>
         <div id="main-content" tabIndex={-1}>
           {children}
         </div>
-        <footer className="mx-auto max-w-6xl px-5 py-10 text-sm text-stone-500">
-          SceneScan · 오픈소스 촬영 로케이션 탐색
+        <footer className="mt-12 border-t border-line bg-white">
+          <div className="scene-container flex flex-col justify-between gap-5 py-8 sm:flex-row sm:items-center">
+            <Link href="/" aria-label="SceneScan 홈"><Brand /></Link>
+            <div className="max-w-xl text-sm text-muted"><p>장면을 찾는 시작, SceneScan.</p><p className="mt-1">촬영 허가와 이용 조건은 방문 전 운영기관에 확인해 주세요.</p></div>
+          </div>
         </footer>
       </body>
     </html>

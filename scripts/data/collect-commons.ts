@@ -60,6 +60,29 @@ export type CommonsMetadata = {
 };
 
 type CommonsApiValue = { value?: unknown };
+
+type CachedImage = { image_id: string; source_sha1: string; local_sha256: string; downloaded_thumbnail_url: string };
+const cachedCatalogSchema = z.object({ items: z.array(z.object({
+  image_id: z.string().uuid(), source_sha1: z.string().min(1),
+  local_sha256: z.string().regex(/^[a-f0-9]{64}$/), downloaded_thumbnail_url: z.string().url(),
+}).passthrough()) }).passthrough();
+
+export function reusableImage(bytes: Buffer, details: CommonsMetadata, cached: CachedImage | undefined): { sha256: string; bytes: number } | null {
+  if (!cached || cached.source_sha1 !== details.sourceSha1 || cached.downloaded_thumbnail_url !== details.thumbnailUrl) return null;
+  if (!bytes.length || bytes.length > MAX_IMAGE_BYTES || bytes[0] !== 0xff || bytes[1] !== 0xd8
+    || bytes.at(-2) !== 0xff || bytes.at(-1) !== 0xd9) return null;
+  const sha256 = createHash("sha256").update(bytes).digest("hex");
+  return sha256 === cached.local_sha256 ? { sha256, bytes: bytes.length } : null;
+}
+
+export function assertUniqueImageContent(metadata: ReadonlyMap<string, CommonsMetadata>): void {
+  const seen = new Map<string, string>();
+  for (const [title, image] of metadata) {
+    const previous = seen.get(image.sourceSha1);
+    if (previous) throw new Error(`Duplicate Commons image content: ${previous} / ${title}`);
+    seen.set(image.sourceSha1, title);
+  }
+}
 type CommonsApiImageInfo = {
   url?: unknown;
   descriptionurl?: unknown;
@@ -137,12 +160,12 @@ export function parseCollectionManifest(value: unknown): CollectionManifest {
   return manifest;
 }
 
-async function fetchWithRetry(url: string, attempts = 3): Promise<Response> {
+async function fetchWithRetry(url: string, attempts = 4): Promise<Response> {
   let lastError: unknown;
   for (let attempt = 1; attempt <= attempts; attempt += 1) {
     let response: Response | undefined;
     try {
-      response = await fetch(url, { headers: { "User-Agent": USER_AGENT } });
+      response = await fetch(url, { signal: AbortSignal.timeout(45_000), headers: { "User-Agent": USER_AGENT } });
     } catch (error) {
       lastError = error;
     }
@@ -151,7 +174,7 @@ async function fetchWithRetry(url: string, attempts = 3): Promise<Response> {
       throw new Error(`HTTP ${response.status} for ${url}`);
     }
     if (response) lastError = new Error(`HTTP ${response.status} for ${url}`);
-    if (attempt < attempts) await new Promise((accept) => setTimeout(accept, 250 * 2 ** (attempt - 1)));
+    if (attempt < attempts) await new Promise((accept) => setTimeout(accept, 1_000 * 2 ** (attempt - 1)));
   }
   throw lastError instanceof Error ? lastError : new Error(`Request failed: ${url}`);
 }
@@ -325,14 +348,41 @@ export async function collectCommonsDataset(manifestPath: string, repositoryRoot
   const manifest = parseCollectionManifest(raw);
   const imageEntries = manifest.locations.flatMap((location) => location.images.map((image) => ({ location, image })));
   const metadata = await fetchCommonsMetadata(imageEntries.map(({ image }) => image.file_title));
+  assertUniqueImageContent(metadata);
+  let cachedImages: CachedImage[] = [];
+  try {
+    cachedImages = cachedCatalogSchema.parse(JSON.parse(await readFile(resolve(repositoryRoot, "data/production/image-licenses.json"), "utf8"))).items;
+  } catch (error) {
+    if (!(error instanceof Error && "code" in error && error.code === "ENOENT")) throw error;
+  }
+  const cachedById = new Map(cachedImages.map((image) => [image.image_id, image]));
+  // Existing vectors must not be silently reused after a source file changes.
+  for (const { image } of imageEntries) {
+    const cached = cachedById.get(image.id);
+    if (cached && cached.source_sha1 !== metadata.get(image.file_title)!.sourceSha1) {
+      throw new Error(`Source image changed: ${image.file_title}; review the new revision and assign a new image UUID before embedding`);
+    }
+  }
   const downloads = new Map<string, { sha256: string; bytes: number }>();
 
   await mapConcurrent(imageEntries, 4, async ({ image }) => {
     const details = metadata.get(image.file_title);
     if (!details) throw new Error(`Missing verified metadata for ${image.file_title}`);
-    const result = await downloadImage(details.thumbnailUrl, resolve(repositoryRoot, "public/locations", image.filename));
+    const localPath = resolve(repositoryRoot, "public/locations", image.filename);
+    const receiptPath = resolve(repositoryRoot, "data-work/commons-downloads", `${image.id}.json`);
+    let cached = cachedById.get(image.id);
+    if (!cached) {
+      try { cached = cachedCatalogSchema.parse({ items: [JSON.parse(await readFile(receiptPath, "utf8"))] }).items[0]; }
+      catch (error) { if (!(error instanceof Error && "code" in error && error.code === "ENOENT")) throw error; }
+    }
+    let reused: ReturnType<typeof reusableImage> = null;
+    try { reused = reusableImage(await readFile(localPath), details, cached); }
+    catch (error) { if (!(error instanceof Error && "code" in error && error.code === "ENOENT")) throw error; }
+    const result = reused ?? await downloadImage(details.thumbnailUrl, localPath);
+    await writeJsonAtomic(receiptPath, { image_id: image.id, source_sha1: details.sourceSha1,
+      local_sha256: result.sha256, downloaded_thumbnail_url: details.thumbnailUrl });
     downloads.set(image.id, result);
-    console.log(`Downloaded ${image.filename} (${result.bytes} bytes)`);
+    console.log(`${reused ? "Reused verified" : "Downloaded"} ${image.filename} (${result.bytes} bytes)`);
   });
 
   const locations = buildLocationDataset(manifest);

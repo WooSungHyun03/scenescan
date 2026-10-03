@@ -29,7 +29,7 @@ function PermitField({
   children: ReactNode;
 }) {
   return (
-    <div className="flex items-start gap-3 rounded-lg border border-stone-200 bg-stone-50 p-3">
+    <div className="flex items-start gap-3 border-b border-line py-3">
       <span className="mt-0.5 shrink-0 text-stone-500" aria-hidden="true">
         {icon}
       </span>
@@ -64,7 +64,7 @@ export function PermitInfoPanel({
         />
         <div>
           <h2 id="permit-title" className="text-lg font-semibold">
-            촬영 허가 문의
+            촬영 허가
           </h2>
           <p className="mt-1 text-xs leading-relaxed text-stone-500">
             제공된 문의 정보를 확인한 뒤 촬영 조건과 절차를 직접 확인해 주세요.
@@ -75,10 +75,10 @@ export function PermitInfoPanel({
       <dl className="mt-4 space-y-3">
         <PermitField
           icon={<ShieldQuestion size={17} />}
-          label="허가 정보 유형"
+          label="허가 안내"
         >
           <span className={type ? "text-stone-900" : "text-stone-500"}>
-            {type ?? "정보 없음"}
+            {type ?? "확인된 정보 없음"}
           </span>
         </PermitField>
 
@@ -86,7 +86,7 @@ export function PermitInfoPanel({
           <span
             className={contactName ? "text-stone-900" : "text-stone-500"}
           >
-            {contactName ?? "정보 없음"}
+            {contactName ?? "확인된 정보 없음"}
           </span>
         </PermitField>
 
@@ -100,14 +100,14 @@ export function PermitInfoPanel({
             </a>
           ) : (
             <span className={contactPhone ? "text-stone-900" : "text-stone-500"}>
-              {contactPhone ?? "정보 없음"}
+              {contactPhone ?? "확인된 정보 없음"}
             </span>
           )}
         </PermitField>
 
         <PermitField icon={<FileText size={17} />} label="참고 사항">
           <span className={note ? "text-stone-900" : "text-stone-500"}>
-            {note ?? "정보 없음"}
+            {note ?? "확인된 정보 없음"}
           </span>
         </PermitField>
 

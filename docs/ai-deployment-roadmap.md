@@ -236,3 +236,11 @@ Status: not started
 - [ ] Audit CI, Vercel, Supabase, environment security, and production behavior.
 - [ ] Search `TODO|FIXME|HACK|XXX` and remove only confirmed dead or duplicate code.
 - [ ] Run the complete quality suite and final production smoke checks.
+
+## Product / data integration — 2026-10-02
+
+Latest user-directed work retains the DAY completion gates above; it does not mark unrelated failure/device tests complete. Reviewed catalog grew from 159/209 to 200/261 places/photos across 17 regions, with nature 10→47 and industrial 6→10. Existing vectors and operational place metadata were preserved. Added filtered max-per-place RPC before limit, matched-ID-only metadata fetch, same-file inference reuse, and known-empty filter guidance. Attribution migration was missing in production and is now applied; 261 image rows have real source/author/license fields. No RLS or paid-plan changes.
+
+Korean/English paired text projection experiment failed the Korean relevance gate, so no text input/model download was added to production. Full lint/typecheck/209 tests/build and Docker build/run/health passed; the former local build limitation did not reproduce. Mock Playwright flows passed desktop/laptop/mobile viewport checks. See `docs/search-and-data-feasibility.md` for license decisions, actual DB/Storage/RPC measurements, raw-vector policy, and remaining interior/multi-view/device gaps.
+
+Real production verification then exposed legacy browser-q8/offline-fp32 device-default drift. Explicit q8 is now shared, precision is recorded in output, incompatible resume/import is rejected, and all 261 vectors were deliberately regenerated/imported without altering photos/IDs or permit/contact metadata. One-image extraction matches browser tensor batch shape; checkpoint batches remain resumable. The expanded Korean text probe still fails relevance. Full 213-test/build/Docker checks pass. Real image queries rank their source places first; filters reuse the same embedding, gallery attribution/Kakao/solar/similar-exclusion work, and initial release CI is green. Dashboard showed IAD1 and 1.6-second API HTTP latency; the next deployment pins single-region ICN1. Do not treat emulated phone viewports as physical-device memory benchmarks or promise identical browser/Node decode output.

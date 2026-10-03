@@ -29,7 +29,7 @@ export function NoiseSourcePanel({
           </div>
         </div>
         <span className="shrink-0 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-900">
-          {noiseSources.length ? `${noiseSources.length}개` : "정보 없음"}
+          {noiseSources.length ? `${noiseSources.length}개` : "확인된 정보 없음"}
         </span>
       </div>
 
@@ -96,7 +96,7 @@ export function NoiseSourcePanel({
             aria-hidden="true"
           />
           <p className="mt-2 text-sm font-semibold text-stone-700">
-            등록된 예상 소음원이 없습니다.
+            확인된 주변 소음 정보가 없습니다.
           </p>
           <p className="mt-1 text-xs leading-relaxed text-stone-500">
             소음이 없다는 의미는 아니므로 촬영 시간대에 현장을 직접 확인해
@@ -108,7 +108,7 @@ export function NoiseSourcePanel({
       <div className="mt-4 flex items-start gap-2 rounded-lg bg-stone-100 p-3 text-xs leading-relaxed text-stone-600">
         <Info size={15} className="mt-0.5 shrink-0" aria-hidden="true" />
         <p>
-          예상 소음원은 주변 환경에 대한 휴리스틱 참고 정보이며 실제 소음 측정값
+          주변 소음 안내는 주변 시설과 환경을 바탕으로 한 참고 정보이며 실제 소음 측정값
           또는 dB 수치가 아닙니다.
         </p>
       </div>

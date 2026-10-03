@@ -76,7 +76,7 @@ describe.skipIf(!env)("match_location_images regressions (live Supabase)", () =>
   // "getSupabaseSimilarLocations: excludes the target location" case
   // instead -- not duplicated here.
 
-  it("expected_embedding_model fails closed: a mismatched row is excluded, and omitting the parameter matches nothing", async () => {
+  it("expected_embedding_model is an optional filter on match_location_images: a mismatched row is excluded only when a model is actually requested", async () => {
     // Scoped to this test's own seeded row via filter_category rather than
     // asserting a global "0 rows in the whole table" -- a shared live DB
     // (a developer's local Supabase, or another concurrently-running
@@ -91,14 +91,66 @@ describe.skipIf(!env)("match_location_images regressions (live Supabase)", () =>
     });
     expect(withCorrectModel.data.some((row: { location_id: string }) => row.location_id === locationId)).toBe(false);
 
+    // Optional filter, not fail-closed: omitting expected_embedding_model
+    // means "no model restriction", so the mismatched row is now included
+    // (this project's application code never actually omits it -- see
+    // docs/search-ranking.md -- but the RPC itself must behave this way).
     const withoutModel = await adminClient.rpc("match_location_images", {
       query_embedding: QUERY_VECTOR, match_threshold: 0, match_count: 10, filter_category: uniqueCategory,
     });
-    expect(withoutModel.data.some((row: { location_id: string }) => row.location_id === locationId)).toBe(false);
+    expect(withoutModel.data.some((row: { location_id: string }) => row.location_id === locationId)).toBe(true);
 
     const withMatchingModel = await adminClient.rpc("match_location_images", {
       query_embedding: QUERY_VECTOR, match_threshold: 0, match_count: 10, filter_category: uniqueCategory, expected_embedding_model: "some-other-model@v2",
     });
     expect(withMatchingModel.data.some((row: { location_id: string }) => row.location_id === locationId)).toBe(true);
+  });
+
+  it("expected_embedding_model is an optional filter on match_location_images_filtered too, with the same null-means-unrestricted behavior", async () => {
+    const uniqueCategory = "nature"; // distinct from the category used above, same reasoning
+    const locationId = await seedLocation({ category: uniqueCategory });
+    await seedImage(locationId, QUERY_VECTOR, "some-other-model@v2");
+
+    const withCorrectModel = await adminClient.rpc("match_location_images_filtered", {
+      query_embedding: QUERY_VECTOR, match_threshold: 0, match_count: 10, filter_category: uniqueCategory, expected_embedding_model: EXPECTED_MODEL,
+    });
+    expect(withCorrectModel.error).toBeNull();
+    expect(withCorrectModel.data.some((row: { location_id: string }) => row.location_id === locationId)).toBe(false);
+
+    const withoutModel = await adminClient.rpc("match_location_images_filtered", {
+      query_embedding: QUERY_VECTOR, match_threshold: 0, match_count: 10, filter_category: uniqueCategory,
+    });
+    expect(withoutModel.error).toBeNull();
+    expect(withoutModel.data.some((row: { location_id: string }) => row.location_id === locationId)).toBe(true);
+
+    const withMatchingModel = await adminClient.rpc("match_location_images_filtered", {
+      query_embedding: QUERY_VECTOR, match_threshold: 0, match_count: 10, filter_category: uniqueCategory, expected_embedding_model: "some-other-model@v2",
+    });
+    expect(withMatchingModel.error).toBeNull();
+    expect(withMatchingModel.data.some((row: { location_id: string }) => row.location_id === locationId)).toBe(true);
+  });
+
+  it("match_location_images_filtered: a location outside a dominant cluster's raw top-N is still returned when it matches the filter, deduplicated to one image per place", async () => {
+    const dominantId = await seedLocation({ region: "서울" });
+    const eligibleId = await seedLocation({ region: "부산" });
+    for (let i = 1; i <= 5; i += 1) {
+      await seedImage(dominantId, vec((index) => (index === 0 ? 1 - 0.0001 * i : 0)));
+    }
+    await seedImage(eligibleId, vec((index) => (index === 0 ? 0.6 : index === 511 ? 0.8 : 0)));
+
+    const filtered = await adminClient.rpc("match_location_images_filtered", {
+      query_embedding: QUERY_VECTOR, match_threshold: 0, match_count: 3, filter_region: "부산", expected_embedding_model: EXPECTED_MODEL,
+    });
+    expect(filtered.error).toBeNull();
+    expect(filtered.data).toHaveLength(1);
+    expect(filtered.data[0].location_id).toBe(eligibleId);
+
+    const unfiltered = await adminClient.rpc("match_location_images_filtered", {
+      query_embedding: QUERY_VECTOR, match_threshold: 0, match_count: 3, expected_embedding_model: EXPECTED_MODEL,
+    });
+    expect(unfiltered.error).toBeNull();
+    // Deduplicated to one row per location even though the dominant
+    // location has 5 near-identical images -- not 5 separate rows.
+    expect(unfiltered.data.filter((row: { location_id: string }) => row.location_id === dominantId)).toHaveLength(1);
   });
 });

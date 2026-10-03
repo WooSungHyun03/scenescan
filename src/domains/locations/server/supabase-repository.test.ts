@@ -48,11 +48,11 @@ class QueryStub implements PromiseLike<QueryResult> {
   }
 }
 
-function fakeClient(options: { query?: QueryResult | QueryResult[]; rpc?: QueryResult; fromByTable?: Record<string, QueryResult | QueryResult[]> } = {}) {
+function fakeClient(options: { query?: QueryResult | QueryResult[]; rpc?: QueryResult | QueryResult[]; fromByTable?: Record<string, QueryResult | QueryResult[]> } = {}) {
   const toList = (value: QueryResult | QueryResult[] | undefined, fallback: QueryResult) =>
     value === undefined ? [fallback] : Array.isArray(value) ? value : [value];
   const queryStub = new QueryStub(toList(options.query, { data: [], error: null }));
-  const rpcStub = new QueryStub([options.rpc ?? { data: [], error: null }]);
+  const rpcStub = new QueryStub(toList(options.rpc, { data: [], error: null }));
   const fromCalls: string[] = [];
   const tableStubs = new Map<string, QueryStub>();
   for (const [table, result] of Object.entries(options.fromByTable ?? {})) {
@@ -229,7 +229,7 @@ describe("SupabaseLocationRepository / MockLocationRepository contract parity", 
     const { client, queryStub, rpcStub } = fakeClient({
       query: { data: [locationRow({ id: locationId })], error: null },
       rpc: {
-        data: [{ image_id: "11111111-1111-4111-8111-111111111111", location_id: locationId, image_url: "https://example.com/a.jpg", similarity: 0.9 }],
+        data: [{ location_image_id: "11111111-1111-4111-8111-111111111111", location_id: locationId, similarity: 0.9 }],
         error: null,
       },
     });
@@ -246,25 +246,35 @@ describe("SupabaseLocationRepository / MockLocationRepository contract parity", 
     expect(queryStub.calls.some((call) => call.method === "eq")).toBe(false);
   });
 
-  it("search: region/category filters and threshold/count reach the RPC as SQL parameters, not applied afterward in JS", async () => {
+  it("search: calls match_location_images_filtered (not the raw match_location_images) with region/category/threshold/model as SQL parameters", async () => {
     const { client, rpcStub } = fakeClient({ query: { data: [], error: null }, rpc: { data: [], error: null } });
     getSupabaseClientMock.mockReturnValue(client);
-    await searchSupabaseLocations(Array(512).fill(0), { region: "부산", category: "nature" }, { threshold: 0.4, count: 60 });
+    await searchSupabaseLocations(Array(512).fill(0), { region: "부산", category: "nature" }, { threshold: 0.4 });
     const rpcCall = rpcStub.calls.find((call) => call.method === "rpc")?.args as [string, Record<string, unknown>];
-    expect(rpcCall[1]).toMatchObject({
+    expect(rpcCall[0]).toBe("match_location_images_filtered");
+    expect(rpcCall[1]).toEqual({
+      query_embedding: Array(512).fill(0),
       filter_region: "부산",
       filter_category: "nature",
       match_threshold: 0.4,
-      match_count: 60,
+      match_count: 8,
+      expected_embedding_model: "Xenova/clip-vit-base-patch32@main",
     });
   });
 
-  it("search: an omitted filter/threshold/count falls back to the documented server defaults", async () => {
+  it("search: an omitted filter/threshold falls back to the documented server defaults", async () => {
     const { client, rpcStub } = fakeClient({ query: { data: [], error: null }, rpc: { data: [], error: null } });
     getSupabaseClientMock.mockReturnValue(client);
     await searchSupabaseLocations(Array(512).fill(0));
     const rpcCall = rpcStub.calls.find((call) => call.method === "rpc")?.args as [string, Record<string, unknown>];
-    expect(rpcCall[1]).toMatchObject({ filter_region: null, filter_category: null, match_threshold: 0, match_count: 200 });
+    expect(rpcCall[1]).toMatchObject({ filter_region: null, filter_category: null, match_threshold: 0, match_count: 8 });
+  });
+
+  it("search: avoids loading any location metadata for an empty result", async () => {
+    const { client, fromCalls } = fakeClient({ rpc: { data: [], error: null } });
+    getSupabaseClientMock.mockReturnValue(client);
+    await expect(searchSupabaseLocations(Array(512).fill(0))).resolves.toEqual([]);
+    expect(fromCalls).toHaveLength(0);
   });
 
   it("search: an unexpected RPC response shape throws a clear error instead of crashing the ranker", async () => {
@@ -274,6 +284,34 @@ describe("SupabaseLocationRepository / MockLocationRepository contract parity", 
     });
     getSupabaseClientMock.mockReturnValue(client);
     await expect(searchSupabaseLocations(Array(512).fill(0))).rejects.toThrow();
+  });
+
+  it("search: falls back to the legacy match_location_images RPC (with expected_embedding_model) only for an unfiltered query, when the filtered RPC's migration is missing", async () => {
+    const { client, rpcStub } = fakeClient({
+      query: { data: [], error: null },
+      rpc: [
+        { data: null, error: { code: "PGRST202", message: "Could not find the function public.match_location_images_filtered" } },
+        { data: [], error: null },
+      ],
+    });
+    getSupabaseClientMock.mockReturnValue(client);
+    await expect(searchSupabaseLocations(Array(512).fill(0))).resolves.toEqual([]);
+    const calls = rpcStub.calls.filter((call) => call.method === "rpc").map((call) => call.args);
+    expect(calls).toHaveLength(2);
+    expect(calls[0][0]).toBe("match_location_images_filtered");
+    expect(calls[1]).toEqual(["match_location_images", {
+      query_embedding: Array(512).fill(0), match_threshold: 0, match_count: 200,
+      expected_embedding_model: "Xenova/clip-vit-base-patch32@main",
+    }]);
+  });
+
+  it("search: does not silently fall back to the unfiltered legacy RPC when a region/category filter was requested", async () => {
+    const { client, rpcStub } = fakeClient({
+      rpc: { data: null, error: { code: "PGRST202", message: "Could not find the function public.match_location_images_filtered" } },
+    });
+    getSupabaseClientMock.mockReturnValue(client);
+    await expect(searchSupabaseLocations(Array(512).fill(0), { region: "부산" })).rejects.toMatchObject({ code: "DATA_UNAVAILABLE", status: 503 });
+    expect(rpcStub.calls.filter((call) => call.method === "rpc")).toHaveLength(1);
   });
 
   it("search/similar: getSupabaseLocationsByIds's row order does not affect the final result order -- similarity does", async () => {
@@ -289,8 +327,8 @@ describe("SupabaseLocationRepository / MockLocationRepository contract parity", 
       },
       rpc: {
         data: [
-          { image_id: "11111111-1111-4111-8111-111111111111", location_id: lowId, image_url: "https://example.com/low.jpg", similarity: 0.2 },
-          { image_id: "22222222-2222-4222-8222-222222222222", location_id: highId, image_url: "https://example.com/high.jpg", similarity: 0.9 },
+          { location_image_id: "11111111-1111-4111-8111-111111111111", location_id: lowId, similarity: 0.2 },
+          { location_image_id: "22222222-2222-4222-8222-222222222222", location_id: highId, similarity: 0.9 },
         ],
         error: null,
       },
