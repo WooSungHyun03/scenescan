@@ -28,6 +28,19 @@ describe("production import CLI", () => {
     ])).toThrow("cannot be combined");
   });
 
+  it("parses permit-only as a separate safe write scope", () => {
+    expect(parseProductionImportArgs([
+      "data/production/locations.json",
+      "data/production/embeddings-manifest.json",
+      "--dry-run",
+      "--permit-only",
+    ])).toMatchObject({
+      mode: "dry-run",
+      preserveExisting: false,
+      writeScope: "permit-only",
+    });
+  });
+
   it("runs the documented validate-only command in plain Node", async () => {
     const locations = JSON.parse(await readFile("data/production/locations.json", "utf8")) as {
       locations: unknown[];
@@ -77,6 +90,17 @@ describe("production import CLI", () => {
       license_url: "https://creativecommons.org/licenses/by/4.0",
       last_verified_at: "2026-10-02T00:00:00Z",
     }]);
+    await database.updatePermitMetadata([{
+      id: "00000000-0000-4000-8000-000000000001",
+      permit_type: "기관 직접 문의",
+      contact_name: "Official desk",
+      contact_phone: "02-1234-5678",
+      permit_note: "Check current conditions",
+      permit_source: "Official guide",
+      permit_source_url: "https://example.com/permit",
+      permit_reference_date: "2026-01-01",
+      permit_last_verified_at: "2026-10-03T00:00:00Z",
+    }]);
 
     expect(locationUpdate).toHaveBeenCalledWith({
       source: "Wikidata (CC0)",
@@ -90,6 +114,16 @@ describe("production import CLI", () => {
       expect.not.objectContaining({ image_url: expect.anything() }),
       { count: "exact" },
     );
+    expect(locationUpdate).toHaveBeenCalledWith({
+      permit_type: "기관 직접 문의",
+      contact_name: "Official desk",
+      contact_phone: "02-1234-5678",
+      permit_note: "Check current conditions",
+      permit_source: "Official guide",
+      permit_source_url: "https://example.com/permit",
+      permit_reference_date: "2026-01-01",
+      permit_last_verified_at: "2026-10-03T00:00:00Z",
+    }, { count: "exact" });
     expect(locationEq).toHaveBeenCalledWith("id", "00000000-0000-4000-8000-000000000001");
     expect(imageEq).toHaveBeenCalledWith("id", "00000000-0000-4000-8000-000000000002");
   });

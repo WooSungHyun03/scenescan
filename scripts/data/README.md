@@ -84,6 +84,8 @@ Missing or blank source status uses the safe `defaults.permitType`, which defaul
 
 `contactName` and `contactPhone` are read only from the paths explicitly configured under `permit`. When a source does not provide those paths or values, normalization stores `null`. It does not derive contacts from the location name, permit guidance, address, or similarly named unmapped fields. Permit provenance records the source used for the stored guidance.
 
+The production Commons manifest may add a reviewed `permit` object to a location. The collector copies that object into canonical `permit.provenance`; locations without it retain the conservative `문의 필요` fallback. Add only information manually checked on an official operating organization, municipality, public reservation service, or heritage-management page. When a page exposes only a representative switchboard, say that explicitly in `note`. Record the source content date in `reference_date` when known and the actual manual check time in `last_verified_at`. The current priority set and source limitations are recorded in `data/production/PERMIT_SOURCES.md`.
+
 ### Data provenance
 
 Every normalized location, permit object, and parking entry contains frontend-readable provenance:
@@ -180,7 +182,7 @@ Running the collector is deterministic for a fixed Commons source revision excep
 
 `data:import-production` reads `image-licenses.json` from the directory containing `locations.json` by default. Use `--image-licenses <path>` only when the reviewed catalog lives elsewhere. It joins attribution by stable `image_id`, rejects missing or duplicate license records, mismatched location ownership, and non-HTTP(S) source/license URLs. Reusing the same source image in different locations remains valid when each use has its own stable image UUID and reviewed catalog entry.
 
-`data:check-attribution-links` checks the canonical place source, each Commons source page, and every license URL before publishing. Duplicate URLs are requested once while the JSON report retains every location/image reference that uses them. HTTP 404/410 responses are reported as `broken` and make the command fail only after a range `GET` confirms the `HEAD` result. Authentication, rate-limit, server, timeout, and network failures remain `unverified` so the report does not falsely call a provider-blocked URL broken. Providers that reject or do not implement `HEAD` are retried with a one-byte range `GET`. Review both `broken` and `unverified` rows; never replace a source URL with a guessed URL.
+`data:check-attribution-links` checks the canonical place source, permit-specific official source, each Commons source page, and every license URL before publishing. Duplicate URLs are requested once while the JSON report retains every location/image reference that uses them. HTTP 404/410 responses are reported as `broken` and make the command fail only after a range `GET` confirms the `HEAD` result. Authentication, rate-limit, server, timeout, and network failures remain `unverified` so the report does not falsely call a provider-blocked URL broken. Providers that reject or do not implement `HEAD` are retried with a one-byte range `GET`. Review both `broken` and `unverified` rows; never replace a source URL with a guessed URL.
 
 After the schema migrations are installed, use the explicit production import sequence below from a trusted local shell. The service-role key must never be placed in a `NEXT_PUBLIC_*` variable or Vercel. The first importer writes location and image metadata; the second adds the validated vectors to those image rows. Both operations are idempotent by stable UUID. Always run `--dry-run` immediately before `--apply`.
 
@@ -201,6 +203,15 @@ pnpm data:import-production data/production/locations.json data/production/embed
 ```
 
 This mode updates only `source`, `source_url`, `author`, `license`, `license_url`, and `last_verified_at` on existing location/image UUIDs. It never inserts missing rows and cannot be combined with `--insert-only`. The dry-run counts show how many canonical UUIDs currently exist before the apply step.
+
+To publish reviewed permit fields without overwriting coordinates, descriptions, image rows, or location attribution, install the permit-provenance migration and use the dedicated partial scope:
+
+```bash
+pnpm data:import-production data/production/locations.json data/production/embeddings-manifest.json --dry-run --permit-only
+pnpm data:import-production data/production/locations.json data/production/embeddings-manifest.json --apply --permit-only
+```
+
+`--permit-only` updates only reviewed permit rows for existing location UUIDs, and only the `permit_type`, contact fields, `permit_note`, and four permit provenance columns. Generic `문의 필요` rows whose permit source is still the place source are skipped so this safe backfill cannot erase separately curated database contacts. It does not query or write `location_images`, never inserts a missing location, and cannot be combined with `--insert-only`.
 
 ### Reviewed expansion and safe incremental publishing
 
@@ -236,7 +247,7 @@ The command writes a deterministic report with `valid`, aggregate counts, and ev
 - non-blank names and addresses;
 - canonical category and region values;
 - finite latitude `[-90, 90]` and longitude `[-180, 180]`;
-- safe permit guidance, explicit nullable contact fields, and HTTP(S) source/image URLs;
+- safe permit guidance, valid nullable public phone numbers, and HTTP(S) source/image URLs;
 - location, permit, and parking provenance names, URLs, reference dates, and verification timestamps;
 - at least one image, non-blank alt text, a local image path, and whether that path is a regular file.
 

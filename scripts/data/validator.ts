@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { isPermitGuidance } from "./permit-information.ts";
+import { isPermitGuidance, isValidContactPhone } from "./permit-information.ts";
 import { LOCATION_CATEGORY_VALUES, REGION_VALUES } from "../../src/types/location-options.ts";
 
 const categories = new Set<string>(LOCATION_CATEGORY_VALUES);
@@ -299,13 +299,16 @@ async function validateLocation(
         "Permit contact name must be a source string or null; do not generate a fallback contact",
       ));
     }
-    if (value.permit.contactPhone !== null && !nonEmptyText(value.permit.contactPhone)) {
+    if (
+      value.permit.contactPhone !== null
+      && (!nonEmptyText(value.permit.contactPhone) || !isValidContactPhone(String(value.permit.contactPhone)))
+    ) {
       errors.push(error(
         "PERMIT_CONTACT_INVALID",
         locationIndex,
         id,
         "permit.contactPhone",
-        "Permit contact phone must be a source string or null; do not generate a fallback contact",
+        "Permit contact phone must be a valid public phone number or null; do not generate a fallback contact",
       ));
     }
     errors.push(...validateProvenance(value.permit.provenance, "permit.provenance", locationIndex, id));

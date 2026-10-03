@@ -78,6 +78,7 @@ function database(overrides: Partial<ProductionImportDatabase> = {}): Production
     upsertImages: vi.fn(async () => undefined),
     updateLocationAttribution: vi.fn(async () => undefined),
     updateImageAttribution: vi.fn(async () => undefined),
+    updatePermitMetadata: vi.fn(async () => undefined),
     ...overrides,
   };
 }
@@ -139,7 +140,62 @@ describe("production data importer", () => {
     expect(db.updateImageAttribution).not.toHaveBeenCalled();
   });
 
-  it("rejects contradictory insert-only and attribution-only modes", async () => {
+  it("updates only permit fields for existing locations and never inspects or writes images", async () => {
+    const db = database({ findLocationIds: vi.fn(async () => [locationId]) });
+    const reviewedRows = rows();
+    Object.assign(reviewedRows.locations[0], {
+      permit_type: "기관 직접 문의",
+      contact_name: "Official desk",
+      contact_phone: "02-1234-5678",
+      permit_source: "Official filming guide",
+      permit_source_url: "https://example.com/permit",
+      permit_reference_date: "2026-01-01",
+      permit_last_verified_at: "2026-10-03T00:00:00Z",
+    });
+
+    await expect(importProductionData(reviewedRows, "apply", 100, db, false, "permit-only")).resolves.toMatchObject({
+      writeScope: "permit-only",
+      locationsWritten: 1,
+      imagesWritten: 0,
+    });
+    expect(db.findExistingImages).not.toHaveBeenCalled();
+    expect(db.upsertLocations).not.toHaveBeenCalled();
+    expect(db.upsertImages).not.toHaveBeenCalled();
+    expect(db.updateLocationAttribution).not.toHaveBeenCalled();
+    expect(db.updateImageAttribution).not.toHaveBeenCalled();
+    expect(db.updatePermitMetadata).toHaveBeenCalledWith([{
+      id: locationId,
+      permit_type: "기관 직접 문의",
+      contact_name: "Official desk",
+      contact_phone: "02-1234-5678",
+      permit_note: "사전 문의",
+      permit_source: "Official filming guide",
+      permit_source_url: "https://example.com/permit",
+      permit_reference_date: "2026-01-01",
+      permit_last_verified_at: "2026-10-03T00:00:00Z",
+    }]);
+  });
+
+  it("does not overwrite an existing location with the generic unreviewed permit fallback", async () => {
+    const db = database({ findLocationIds: vi.fn(async () => [locationId]) });
+    await expect(importProductionData(rows(), "apply", 100, db, false, "permit-only")).resolves.toMatchObject({
+      locationsWritten: 0,
+    });
+    expect(db.updatePermitMetadata).not.toHaveBeenCalled();
+  });
+
+  it("reports permit-only dry-runs without querying image rows", async () => {
+    const db = database({ findLocationIds: vi.fn(async () => [locationId]) });
+    await expect(importProductionData(rows(), "dry-run", 100, db, false, "permit-only")).resolves.toMatchObject({
+      existingLocations: 1,
+      existingImages: 0,
+      locationsWritten: 0,
+      imagesWritten: 0,
+    });
+    expect(db.findExistingImages).not.toHaveBeenCalled();
+  });
+
+  it("rejects insert-only with any partial write scope", async () => {
     await expect(importProductionData(rows(), "apply", 100, database(), true, "attribution-only"))
       .rejects.toThrow("cannot be combined");
   });

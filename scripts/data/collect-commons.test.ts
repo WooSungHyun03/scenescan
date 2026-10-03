@@ -107,4 +107,51 @@ describe("Commons production data collection", () => {
       }],
     });
   });
+
+  it("preserves reviewed permit contact and provenance instead of replacing it with the fallback", () => {
+    const input = JSON.parse(JSON.stringify(manifest())) as Record<string, unknown> & {
+      locations: Array<Record<string, unknown>>;
+    };
+    input.locations[0].permit = {
+      type: "기관 직접 문의",
+      contact_name: "공식 담당 부서",
+      contact_phone: "02-1234-5678",
+      note: "시설별 조건을 확인하세요.",
+      source: "공식 촬영 안내",
+      source_url: "https://example.com/permit",
+      reference_date: "2026-01-01",
+      last_verified_at: "2026-10-03T12:00:00+09:00",
+    };
+
+    const output = buildLocationDataset(parseCollectionManifest(input));
+    expect(output.locations[0].permit).toEqual({
+      type: "기관 직접 문의",
+      contactName: "공식 담당 부서",
+      contactPhone: "02-1234-5678",
+      note: "시설별 조건을 확인하세요.",
+      provenance: {
+        source: "공식 촬영 안내",
+        sourceUrl: "https://example.com/permit",
+        referenceDate: "2026-01-01",
+        lastVerifiedAt: "2026-10-03T12:00:00+09:00",
+      },
+    });
+  });
+
+  it("rejects a reviewed permit entry with a malformed phone number", () => {
+    const input = JSON.parse(JSON.stringify(manifest())) as Record<string, unknown> & {
+      locations: Array<Record<string, unknown>>;
+    };
+    input.locations[0].permit = {
+      type: "기관 직접 문의",
+      contact_name: "공식 담당 부서",
+      contact_phone: "담당자에게 문의",
+      note: "시설별 조건을 확인하세요.",
+      source: "공식 촬영 안내",
+      source_url: "https://example.com/permit",
+      reference_date: null,
+      last_verified_at: "2026-10-03T12:00:00+09:00",
+    };
+    expect(() => parseCollectionManifest(input)).toThrow("Invalid public phone number");
+  });
 });

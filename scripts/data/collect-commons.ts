@@ -7,6 +7,7 @@ import type { NormalizedLocationOutput } from "./contracts.ts";
 import { parseNormalizedLocationOutput } from "./contracts.ts";
 import { parseManifest as parseEmbeddingManifest } from "../embeddings/contracts.ts";
 import { LOCATION_CATEGORY_VALUES, REGION_VALUES } from "../../src/types/location-options.ts";
+import { isValidContactPhone } from "./permit-information.ts";
 
 const COMMONS_API = "https://commons.wikimedia.org/w/api.php";
 const USER_AGENT = "SceneScan/0.1 (open-source location dataset; https://github.com/WooSungHyun03/scenescan)";
@@ -20,6 +21,16 @@ const imageSchema = z.object({
   filename: z.string().regex(/^[a-z0-9-]+\.jpg$/),
   alt: z.string().trim().min(1),
 }).strict();
+const permitSchema = z.object({
+  type: z.enum(["문의 필요", "정보 확인 필요", "영상위원회 문의", "기관 직접 문의"]),
+  contact_name: z.string().trim().min(1).nullable(),
+  contact_phone: z.string().trim().min(1).refine(isValidContactPhone, "Invalid public phone number").nullable(),
+  note: z.string().trim().min(1),
+  source: z.string().trim().min(1),
+  source_url: httpUrl,
+  reference_date: z.iso.date().nullable(),
+  last_verified_at: z.iso.datetime({ offset: true }),
+}).strict();
 const locationSchema = z.object({
   id: z.string().uuid(),
   slug: z.string().regex(/^[a-z0-9-]+$/),
@@ -32,6 +43,7 @@ const locationSchema = z.object({
   longitude: z.number().finite().min(-180).max(180),
   source: z.string().trim().min(1),
   source_url: httpUrl,
+  permit: permitSchema.optional(),
   images: z.array(imageSchema).min(1),
 }).strict();
 const collectionManifestSchema = z.object({
@@ -292,7 +304,18 @@ export function buildLocationDataset(manifest: CollectionManifest): NormalizedLo
       address: location.address,
       latitude: location.latitude,
       longitude: location.longitude,
-      permit: {
+      permit: location.permit ? {
+        type: location.permit.type,
+        contactName: location.permit.contact_name,
+        contactPhone: location.permit.contact_phone,
+        note: location.permit.note,
+        provenance: {
+          source: location.permit.source,
+          sourceUrl: location.permit.source_url,
+          referenceDate: location.permit.reference_date,
+          lastVerifiedAt: location.permit.last_verified_at,
+        },
+      } : {
         type: "문의 필요",
         contactName: null,
         contactPhone: null,

@@ -1,6 +1,6 @@
 import type { ProductionRows } from "./production-importer.ts";
 
-export type AttributionLinkKind = "location-source" | "image-source" | "license";
+export type AttributionLinkKind = "location-source" | "permit-source" | "image-source" | "license";
 
 export type AttributionLinkReference = {
   kind: AttributionLinkKind;
@@ -55,6 +55,11 @@ export function collectAttributionLinks(rows: ProductionRows): AttributionLink[]
     });
     addLink(links, location.license_url, {
       kind: "license",
+      recordId: location.id,
+      locationId: location.id,
+    });
+    addLink(links, location.permit_source_url, {
+      kind: "permit-source",
       recordId: location.id,
       locationId: location.id,
     });

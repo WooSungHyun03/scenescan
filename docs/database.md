@@ -30,6 +30,8 @@ Run `pnpm embeddings:audit-schema` after migration edits. It is a static audit o
 
 Mock fixture rows (`src/domains/locations/fixtures/locations.ts`) use fixed UUIDs so mock mode exercises the same uuid-shaped code paths a real row would — confirmed against the real production catalog (`data/production/locations.json`), whose `id`s are also UUIDs. `location_images.image_url` should point to an image the project has rights to publish, preferably in a public Supabase Storage bucket. Do not import external location datasets until their terms are checked.
 
+Migration `20261003000000_permit_provenance.sql` adds `permit_source`, `permit_source_url`, `permit_reference_date`, and `permit_last_verified_at` to `locations`. The general `source_url` remains the place-description source; the permit URL points to the official filming guide or official contact page used for the displayed action information. The migration accepts only HTTP(S) permit URLs and public phone-number shapes. Application mapping treats the new columns as optional so an older local database continues to return honest null metadata until the migration is installed.
+
 ## Constraints and defaults
 
 - `region`/`category` are restricted by `check` constraints to the same values as `src/types/domain.ts` (`Region`, `LocationCategory`, both derived from `src/types/location-options.ts`). Update the constraint and the TypeScript type together if this list ever changes.

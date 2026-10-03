@@ -30,7 +30,7 @@ type CliOptions = {
 export function parseProductionImportArgs(args: string[]): CliOptions {
   const [locationsPath, manifestPath, ...flags] = args;
   if (!locationsPath || !manifestPath) {
-    throw new Error("Usage: pnpm data:import-production <locations.json> <embeddings-manifest.json> [--image-licenses PATH] [--validate-only | --dry-run | --apply] [--batch-size N] [--insert-only | --attribution-only]");
+    throw new Error("Usage: pnpm data:import-production <locations.json> <embeddings-manifest.json> [--image-licenses PATH] [--validate-only | --dry-run | --apply] [--batch-size N] [--insert-only | --attribution-only | --permit-only]");
   }
   let mode: ProductionImportMode = "validate-only";
   let selectedMode = false;
@@ -48,6 +48,8 @@ export function parseProductionImportArgs(args: string[]): CliOptions {
       preserveExisting = true;
     } else if (flag === "--attribution-only") {
       writeScope = "attribution-only";
+    } else if (flag === "--permit-only") {
+      writeScope = "permit-only";
     } else if (flag === "--batch-size") {
       batchSize = Number(flags[++index]);
     } else if (flag === "--image-licenses") {
@@ -58,8 +60,8 @@ export function parseProductionImportArgs(args: string[]): CliOptions {
       throw new Error(`Unknown option: ${flag}`);
     }
   }
-  if (preserveExisting && writeScope === "attribution-only") {
-    throw new Error("--insert-only cannot be combined with --attribution-only");
+  if (preserveExisting && writeScope !== "all") {
+    throw new Error("--insert-only cannot be combined with a partial write scope");
   }
   return { locationsPath, manifestPath, imageLicensesPath, mode, batchSize, preserveExisting, writeScope };
 }
@@ -112,6 +114,9 @@ export function createProductionImportDatabase(client: SupabaseClient): Producti
     },
     async updateImageAttribution(rows) {
       await updateRows("location_images", rows);
+    },
+    async updatePermitMetadata(rows) {
+      await updateRows("locations", rows);
     },
   };
 }

@@ -1,3 +1,10 @@
+export {
+  getPermitFreshness,
+  isValidContactPhone,
+  PERMIT_INFORMATION_MAX_AGE_DAYS,
+  toPhoneHref,
+} from "../../src/domains/locations/services/permit-verification.ts";
+
 export const PERMIT_GUIDANCE_VALUES = [
   "문의 필요",
   "정보 확인 필요",

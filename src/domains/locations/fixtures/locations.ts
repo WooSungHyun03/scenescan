@@ -58,7 +58,16 @@ export const mockLocations: Location[] = seeds.map((seed) => {
       licenseUrl: "https://github.com/WooSungHyun03/scenescan/blob/main/LICENSE",
       lastVerifiedAt: null,
     }],
-    permit: { type: seed.permit, contactName: null, contactPhone: null, note: "개발용 가상 정보" },
+    permit: {
+      type: seed.permit,
+      contactName: null,
+      contactPhone: null,
+      note: "개발용 가상 정보",
+      source: "SceneScan synthetic fixture",
+      sourceUrl: null,
+      referenceDate: null,
+      lastVerifiedAt: null,
+    },
     parking: [{
       id: `${seed.id}-parking`,
       locationId: hasNearbyParking ? null : seed.id,

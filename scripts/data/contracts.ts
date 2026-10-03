@@ -30,7 +30,10 @@ export type DataProvenance = {
   lastVerifiedAt: string | null;
 };
 
-export type CanonicalPermitInfo = Location["permit"] & {
+export type CanonicalPermitInfo = Pick<
+  Location["permit"],
+  "type" | "contactName" | "contactPhone" | "note"
+> & {
   provenance: DataProvenance;
 };
 

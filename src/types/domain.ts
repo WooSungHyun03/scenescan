@@ -13,6 +13,10 @@ export interface PermitInfo {
   contactName: string | null;
   contactPhone: string | null;
   note: string | null;
+  source: string | null;
+  sourceUrl: string | null;
+  referenceDate: string | null;
+  lastVerifiedAt: string | null;
 }
 
 export interface ParkingInfo {

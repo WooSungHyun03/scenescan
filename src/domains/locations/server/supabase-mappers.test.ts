@@ -47,6 +47,33 @@ describe("toLocation", () => {
     expect(location.license).toBeNull();
     expect(location.licenseUrl).toBeNull();
     expect(location.lastVerifiedAt).toBeNull();
+    expect(location.permit).toEqual({
+      type: "정보 확인 필요",
+      contactName: null,
+      contactPhone: null,
+      note: null,
+      source: null,
+      sourceUrl: null,
+      referenceDate: null,
+      lastVerifiedAt: null,
+    });
+  });
+
+  it("maps permit-specific provenance independently from the location source", () => {
+    const { location } = toLocation(baseRow({
+      permit_source: "Official filming guide",
+      permit_source_url: "https://example.com/permit",
+      permit_reference_date: "2026-01-01",
+      permit_last_verified_at: "2026-10-03T03:00:00Z",
+      source: "Wikidata",
+      source_url: "https://www.wikidata.org/wiki/Q1",
+    }));
+    expect(location.permit).toMatchObject({
+      source: "Official filming guide",
+      sourceUrl: "https://example.com/permit",
+      referenceDate: "2026-01-01",
+      lastVerifiedAt: "2026-10-03T03:00:00Z",
+    });
   });
 
   it("returns an empty images array with no warnings when location_images is null", () => {

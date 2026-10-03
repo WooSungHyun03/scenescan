@@ -19,6 +19,10 @@ function rows(): ProductionRows {
       contact_name: null,
       contact_phone: null,
       permit_note: null,
+      permit_source: "Official permit source",
+      permit_source_url: "https://example.com/permit",
+      permit_reference_date: null,
+      permit_last_verified_at: "2026-10-02T00:00:00Z",
       noise_sources: [],
       source: "Wikidata",
       source_url: "https://www.wikidata.org/wiki/Q1",
@@ -47,7 +51,8 @@ describe("attribution link checker", () => {
     const links = collectAttributionLinks(rows());
     const shared = links.find((link) => link.url.includes("Shared.jpg"));
 
-    expect(links).toHaveLength(4);
+    expect(links).toHaveLength(5);
+    expect(links.find((link) => link.url.endsWith("/permit"))?.references[0].kind).toBe("permit-source");
     expect(shared?.references).toHaveLength(2);
     expect(shared?.references.map((reference) => reference.recordId)).toEqual(["image-a", "image-b"]);
   });

@@ -16,6 +16,16 @@
       "longitude": 127.0094,
       "source": "서울문화포털",
       "source_url": "https://culture.seoul.go.kr/culture/culture/cultureSpace/view.do?facCode=101016&menuNo=200119",
+      "permit": {
+        "type": "기관 직접 문의",
+        "contact_name": "DDP 대표전화",
+        "contact_phone": "02-2153-0000",
+        "note": "공식 사이트의 대표 문의처이며 촬영 승인 전용 번호로 확인된 연락처는 아닙니다. 촬영 구역, 장비와 인원에 따른 대관·승인 절차를 직접 확인해야 합니다.",
+        "source": "동대문디자인플라자(DDP) 공식 사이트",
+        "source_url": "https://www.ddp.or.kr/index.html",
+        "reference_date": null,
+        "last_verified_at": "2026-10-03T12:00:00+09:00"
+      },
       "images": [
         {
           "id": "457bb8df-5cf0-517b-b3bf-e86313c9ea37",
@@ -67,6 +77,16 @@
       "longitude": 126.89416666666668,
       "source": "서울 공식 관광정보",
       "source_url": "https://english.visitseoul.net/attractions/oil-reservoir-culture-park/ENP023543",
+      "permit": {
+        "type": "기관 직접 문의",
+        "contact_name": "문화마당·야외 소규모 촬영 담당",
+        "contact_phone": "02-2133-0425",
+        "note": "산책로·T0의 상업 또는 대규모 촬영은 사전 승인이 필요하고 주말 촬영이 제한됩니다. T1~T6와 T2 야외무대는 운영업체(02-508-2205)에 별도로 문의해야 합니다.",
+        "source": "서울의 공원 문화비축기지 촬영 안내",
+        "source_url": "https://parks.seoul.go.kr/content.do?key=2604300014",
+        "reference_date": "2025-04-01",
+        "last_verified_at": "2026-10-03T12:00:00+09:00"
+      },
       "images": [
         {
           "id": "52cdf352-5783-5aa2-9886-f52a35201791",
@@ -118,6 +138,16 @@
       "longitude": 126.89980555556,
       "source": "서울 공식 관광정보",
       "source_url": "https://korean.visitseoul.net/attractions/%EC%84%A0%EC%9C%A0%EB%8F%84%EA%B3%B5%EC%9B%90/KOP000378",
+      "permit": {
+        "type": "기관 직접 문의",
+        "contact_name": "서부공원여가센터",
+        "contact_phone": "02-2631-9368",
+        "note": "2026년 촬영은 신청서 심사와 승인 후 결제가 완료되어야 확정됩니다. 실내·통제구역과 대규모 촬영은 제한되며 미승인 드론 촬영은 불가합니다.",
+        "source": "서울특별시 공공서비스예약 2026 선유도공원 촬영",
+        "source_url": "https://yeyak.seoul.go.kr/web/reservation/selectReservView.do?rsv_svc_id=S241230131518763856",
+        "reference_date": "2026-01-01",
+        "last_verified_at": "2026-10-03T12:00:00+09:00"
+      },
       "images": [
         {
           "id": "a89e333c-e8b0-58d0-8355-c035a616e921",
@@ -373,6 +403,16 @@
       "longitude": 127.01020277778,
       "source": "수원문화재단",
       "source_url": "https://www.swcf.or.kr/?p=58",
+      "permit": {
+        "type": "기관 직접 문의",
+        "contact_name": "수원시 화성사업소 문화재관리팀",
+        "contact_phone": "031-228-4470",
+        "note": "2022년 공식 답변에서 드론 촬영과 허가 문의처로 안내한 연락처입니다. 오래된 안내이며 일반 촬영 조건이나 현재 담당 부서는 공식 원문과 기관을 통해 다시 확인해야 합니다.",
+        "source": "수원문화재단 수원화성 드론 비행 답변",
+        "source_url": "https://www.swcf.or.kr/?idx=26798&p=356&page=7&viewMode=view",
+        "reference_date": "2022-07-29",
+        "last_verified_at": "2026-10-03T12:00:00+09:00"
+      },
       "images": [
         {
           "id": "5fbb961f-7684-5b87-bd7d-141a47074ec6",
@@ -424,6 +464,16 @@
       "longitude": 126.864386,
       "source": "광명시 문화관광",
       "source_url": "https://www.gm.go.kr/tour/gmNine/nine01.jsp",
+      "permit": {
+        "type": "기관 직접 문의",
+        "contact_name": "광명동굴 방문자센터",
+        "contact_phone": "070-4277-8902",
+        "note": "공식 관람 안내의 방문자센터 연락처이며 촬영 승인 전용 번호로 확인된 연락처는 아닙니다. 동굴 내부 촬영, 장비 반입과 시설 사용 조건은 방문자센터에 직접 확인해야 합니다.",
+        "source": "광명동굴 공식 관람 안내",
+        "source_url": "https://www.gm.go.kr/cv/gc/CVGC_14000.jsp",
+        "reference_date": null,
+        "last_verified_at": "2026-10-03T12:00:00+09:00"
+      },
       "images": [
         {
           "id": "16a872d5-4aad-505e-8f6a-284a6ef96f97",

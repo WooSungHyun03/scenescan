@@ -152,6 +152,19 @@ describe("validateLocationDataset", () => {
     ]);
   });
 
+  it("rejects malformed permit phone numbers without inventing a replacement", async () => {
+    const location = {
+      ...validLocation(),
+      permit: { ...validLocation().permit, contactPhone: "담당자에게 문의" },
+    };
+    const report = await validateLocationDataset(dataset([location]), { inspectImagePath: async () => "ok" });
+
+    expect(report.errors).toContainEqual(expect.objectContaining({
+      code: "PERMIT_CONTACT_INVALID",
+      field: "permit.contactPhone",
+    }));
+  });
+
   it("reports missing and malformed provenance for location, permit, and parking", async () => {
     const location = {
       ...validLocation(),

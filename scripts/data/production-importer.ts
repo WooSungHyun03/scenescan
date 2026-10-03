@@ -2,7 +2,7 @@ import type { NormalizedLocationOutput } from "./contracts.ts";
 import { z } from "zod";
 
 export type ProductionImportMode = "validate-only" | "dry-run" | "apply";
-export type ProductionWriteScope = "all" | "attribution-only";
+export type ProductionWriteScope = "all" | "attribution-only" | "permit-only";
 
 export type LocationRow = {
   id: string;
@@ -17,6 +17,10 @@ export type LocationRow = {
   contact_name: string | null;
   contact_phone: string | null;
   permit_note: string | null;
+  permit_source: string;
+  permit_source_url: string;
+  permit_reference_date: string | null;
+  permit_last_verified_at: string | null;
   noise_sources: string[];
   source_url: string;
   source: string;
@@ -73,6 +77,18 @@ export type ImageAttributionRow = Pick<
   ImageMetadataRow,
   "id" | "source" | "source_url" | "author" | "license" | "license_url" | "last_verified_at"
 >;
+export type PermitMetadataRow = Pick<
+  LocationRow,
+  | "id"
+  | "permit_type"
+  | "contact_name"
+  | "contact_phone"
+  | "permit_note"
+  | "permit_source"
+  | "permit_source_url"
+  | "permit_reference_date"
+  | "permit_last_verified_at"
+>;
 
 export interface ProductionImportDatabase {
   findLocationIds(ids: string[]): Promise<string[]>;
@@ -81,6 +97,7 @@ export interface ProductionImportDatabase {
   upsertImages(rows: ImageMetadataRow[]): Promise<void>;
   updateLocationAttribution(rows: LocationAttributionRow[]): Promise<void>;
   updateImageAttribution(rows: ImageAttributionRow[]): Promise<void>;
+  updatePermitMetadata(rows: PermitMetadataRow[]): Promise<void>;
 }
 
 export type ProductionImportResult = {
@@ -116,6 +133,27 @@ export function toImageAttributionRow(row: ImageMetadataRow): ImageAttributionRo
     license_url: row.license_url,
     last_verified_at: row.last_verified_at,
   };
+}
+
+export function toPermitMetadataRow(row: LocationRow): PermitMetadataRow {
+  return {
+    id: row.id,
+    permit_type: row.permit_type,
+    contact_name: row.contact_name,
+    contact_phone: row.contact_phone,
+    permit_note: row.permit_note,
+    permit_source: row.permit_source,
+    permit_source_url: row.permit_source_url,
+    permit_reference_date: row.permit_reference_date,
+    permit_last_verified_at: row.permit_last_verified_at,
+  };
+}
+
+function hasReviewedPermitMetadata(row: LocationRow): boolean {
+  return row.permit_type !== "문의 필요"
+    || row.contact_name !== null
+    || row.contact_phone !== null
+    || row.permit_source_url !== row.source_url;
 }
 
 function requiredId(id: string | undefined, label: string): string {
@@ -226,6 +264,10 @@ export function createProductionRows(
       contact_name: location.permit.contactName,
       contact_phone: location.permit.contactPhone,
       permit_note: location.permit.note,
+      permit_source: location.permit.provenance.source,
+      permit_source_url: location.permit.provenance.sourceUrl,
+      permit_reference_date: location.permit.provenance.referenceDate,
+      permit_last_verified_at: location.permit.provenance.lastVerifiedAt,
       noise_sources: [],
       source: location.provenance.source,
       source_url: location.provenance.sourceUrl,
@@ -284,8 +326,8 @@ export async function importProductionData(
   if (!Number.isInteger(batchSize) || batchSize < 1 || batchSize > 500) {
     throw new Error("import batch size must be an integer between 1 and 500");
   }
-  if (preserveExisting && writeScope === "attribution-only") {
-    throw new Error("--insert-only cannot be combined with --attribution-only");
+  if (preserveExisting && writeScope !== "all") {
+    throw new Error("--insert-only cannot be combined with a partial write scope");
   }
   const base = {
     mode,
@@ -303,6 +345,21 @@ export async function importProductionData(
   const existingLocationIds: string[] = [];
   for (const batch of chunks(rows.locations.map((row) => row.id), batchSize)) {
     existingLocationIds.push(...await database.findLocationIds(batch));
+  }
+  if (writeScope === "permit-only") {
+    if (mode === "dry-run") {
+      return { ...base, existingLocations: existingLocationIds.length };
+    }
+    const locationIds = new Set(existingLocationIds);
+    const permitRows = rows.locations
+      .filter((row) => locationIds.has(row.id) && hasReviewedPermitMetadata(row))
+      .map(toPermitMetadataRow);
+    for (const batch of chunks(permitRows, batchSize)) await database.updatePermitMetadata(batch);
+    return {
+      ...base,
+      existingLocations: existingLocationIds.length,
+      locationsWritten: permitRows.length,
+    };
   }
   const existingImages: ExistingImageMetadata[] = [];
   for (const batch of chunks(rows.images.map((row) => row.id), batchSize)) {

@@ -42,6 +42,10 @@ export type LocationRow = {
   contact_name: string | null;
   contact_phone: string | null;
   permit_note: string | null;
+  permit_source?: unknown;
+  permit_source_url?: unknown;
+  permit_reference_date?: unknown;
+  permit_last_verified_at?: unknown;
   noise_sources: Location["noiseSources"] | null;
   source_url: string | null;
   source?: unknown;
@@ -81,6 +85,10 @@ const locationRowSchema = z.object({
   contact_name: z.string().nullable(),
   contact_phone: z.string().nullable(),
   permit_note: z.string().nullable(),
+  permit_source: z.unknown().optional(),
+  permit_source_url: z.unknown().optional(),
+  permit_reference_date: z.unknown().optional(),
+  permit_last_verified_at: z.unknown().optional(),
   noise_sources: z.unknown().nullable().optional(),
   source_url: z.string().nullable(),
   source: z.unknown().optional(),
@@ -181,7 +189,16 @@ export function toLocation(row: LocationRow): MapLocationResult {
     address: row.address,
     point: { latitude: row.latitude, longitude: row.longitude },
     images,
-    permit: { type: row.permit_type, contactName: row.contact_name, contactPhone: row.contact_phone, note: row.permit_note },
+    permit: {
+      type: row.permit_type,
+      contactName: row.contact_name,
+      contactPhone: row.contact_phone,
+      note: row.permit_note,
+      source: optionalString(row.permit_source),
+      sourceUrl: optionalString(row.permit_source_url),
+      referenceDate: optionalString(row.permit_reference_date),
+      lastVerifiedAt: optionalString(row.permit_last_verified_at),
+    },
     parking,
     noiseSources: row.noise_sources ?? [],
     source: optionalString(row.source),
