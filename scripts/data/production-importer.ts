@@ -1,8 +1,8 @@
-import type { EmbeddingManifest } from "../embeddings/contracts.ts";
 import type { NormalizedLocationOutput } from "./contracts.ts";
 import { z } from "zod";
 
 export type ProductionImportMode = "validate-only" | "dry-run" | "apply";
+export type ProductionWriteScope = "all" | "attribution-only";
 
 export type LocationRow = {
   id: string;
@@ -51,18 +51,41 @@ export type ImageLicenseCatalog = {
   }>;
 };
 
+export type ProductionEmbeddingManifest = {
+  schema_version: 1;
+  items: Array<{
+    image_id: string;
+    location_id: string;
+    image_path: string;
+    image_url: string;
+    source: string;
+    source_url: string;
+  }>;
+};
+
 export type ProductionRows = { locations: LocationRow[]; images: ImageMetadataRow[] };
 export type ExistingImageMetadata = { id: string; location_id: string };
+export type LocationAttributionRow = Pick<
+  LocationRow,
+  "id" | "source" | "source_url" | "author" | "license" | "license_url" | "last_verified_at"
+>;
+export type ImageAttributionRow = Pick<
+  ImageMetadataRow,
+  "id" | "source" | "source_url" | "author" | "license" | "license_url" | "last_verified_at"
+>;
 
 export interface ProductionImportDatabase {
   findLocationIds(ids: string[]): Promise<string[]>;
   findExistingImages(ids: string[]): Promise<ExistingImageMetadata[]>;
   upsertLocations(rows: LocationRow[]): Promise<void>;
   upsertImages(rows: ImageMetadataRow[]): Promise<void>;
+  updateLocationAttribution(rows: LocationAttributionRow[]): Promise<void>;
+  updateImageAttribution(rows: ImageAttributionRow[]): Promise<void>;
 }
 
 export type ProductionImportResult = {
   mode: ProductionImportMode;
+  writeScope: ProductionWriteScope;
   locationsValidated: number;
   imagesValidated: number;
   existingLocations: number;
@@ -71,16 +94,41 @@ export type ProductionImportResult = {
   imagesWritten: number;
 };
 
+export function toLocationAttributionRow(row: LocationRow): LocationAttributionRow {
+  return {
+    id: row.id,
+    source: row.source,
+    source_url: row.source_url,
+    author: row.author,
+    license: row.license,
+    license_url: row.license_url,
+    last_verified_at: row.last_verified_at,
+  };
+}
+
+export function toImageAttributionRow(row: ImageMetadataRow): ImageAttributionRow {
+  return {
+    id: row.id,
+    source: row.source,
+    source_url: row.source_url,
+    author: row.author,
+    license: row.license,
+    license_url: row.license_url,
+    last_verified_at: row.last_verified_at,
+  };
+}
+
 function requiredId(id: string | undefined, label: string): string {
   if (!id) throw new Error(`${label} requires a stable UUID before production import`);
   return id;
 }
 
 const optionalText = z.string().trim().min(1).nullable().optional();
-const optionalHttpUrl = z.string().trim().url().refine(
+const httpUrl = z.string().trim().url().refine(
   (value) => value.startsWith("https://") || value.startsWith("http://"),
   "URL must use http or https",
-).nullable().optional();
+);
+const optionalHttpUrl = httpUrl.nullable().optional();
 
 const imageLicenseCatalogSchema = z.object({
   schema_version: z.literal(1),
@@ -94,6 +142,28 @@ const imageLicenseCatalogSchema = z.object({
     license_url: optionalHttpUrl,
   }).passthrough()),
 }).strict();
+
+const productionEmbeddingManifestSchema = z.object({
+  schema_version: z.literal(1),
+  items: z.array(z.object({
+    image_id: z.string().uuid(),
+    location_id: z.string().uuid(),
+    image_path: z.string().trim().min(1),
+    image_url: httpUrl,
+    source: z.string().trim().min(1),
+    source_url: httpUrl,
+  }).strict()).min(1),
+}).strict();
+
+export function parseProductionEmbeddingManifest(value: unknown): ProductionEmbeddingManifest {
+  const parsed = productionEmbeddingManifestSchema.parse(value);
+  const seen = new Set<string>();
+  for (const item of parsed.items) {
+    if (seen.has(item.image_id)) throw new Error(`Embedding manifest contains duplicate image_id: ${item.image_id}`);
+    seen.add(item.image_id);
+  }
+  return parsed;
+}
 
 export function parseImageLicenseCatalog(value: unknown): ImageLicenseCatalog {
   const parsed = imageLicenseCatalogSchema.parse(value);
@@ -123,7 +193,7 @@ function sourceName(sourceUrl: string | null, fallback: string): string {
 
 export function createProductionRows(
   dataset: NormalizedLocationOutput,
-  embeddingManifest: EmbeddingManifest,
+  embeddingManifest: ProductionEmbeddingManifest,
   imageLicenses: ImageLicenseCatalog,
 ): ProductionRows {
   if (dataset.reviewQueue.length > 0) throw new Error("Production data contains unresolved review items");
@@ -209,12 +279,17 @@ export async function importProductionData(
   batchSize: number,
   database?: ProductionImportDatabase,
   preserveExisting = false,
+  writeScope: ProductionWriteScope = "all",
 ): Promise<ProductionImportResult> {
   if (!Number.isInteger(batchSize) || batchSize < 1 || batchSize > 500) {
     throw new Error("import batch size must be an integer between 1 and 500");
   }
+  if (preserveExisting && writeScope === "attribution-only") {
+    throw new Error("--insert-only cannot be combined with --attribution-only");
+  }
   const base = {
     mode,
+    writeScope,
     locationsValidated: rows.locations.length,
     imagesValidated: rows.images.length,
     existingLocations: 0,
@@ -246,6 +321,23 @@ export async function importProductionData(
   }
   const locationIds = new Set(existingLocationIds);
   const imageIds = new Set(existingImages.map((image) => image.id));
+  if (writeScope === "attribution-only") {
+    const locationAttribution = rows.locations
+      .filter((row) => locationIds.has(row.id))
+      .map(toLocationAttributionRow);
+    const imageAttribution = rows.images
+      .filter((row) => imageIds.has(row.id))
+      .map(toImageAttributionRow);
+    for (const batch of chunks(locationAttribution, batchSize)) await database.updateLocationAttribution(batch);
+    for (const batch of chunks(imageAttribution, batchSize)) await database.updateImageAttribution(batch);
+    return {
+      ...base,
+      existingLocations: existingLocationIds.length,
+      existingImages: existingImages.length,
+      locationsWritten: locationAttribution.length,
+      imagesWritten: imageAttribution.length,
+    };
+  }
   const locationsToWrite = preserveExisting ? rows.locations.filter((row) => !locationIds.has(row.id)) : rows.locations;
   const imagesToWrite = preserveExisting ? rows.images.filter((row) => !imageIds.has(row.id)) : rows.images;
   for (const batch of chunks(locationsToWrite, batchSize)) await database.upsertLocations(batch);

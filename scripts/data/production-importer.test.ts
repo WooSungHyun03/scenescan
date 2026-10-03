@@ -1,9 +1,9 @@
 import { describe, expect, it, vi } from "vitest";
-import { parseManifest } from "../embeddings/contracts.ts";
 import { parseNormalizedLocationOutput } from "./contracts.ts";
 import {
   createProductionRows,
   importProductionData,
+  parseProductionEmbeddingManifest,
   parseImageLicenseCatalog,
   type ProductionImportDatabase,
 } from "./production-importer.ts";
@@ -39,7 +39,7 @@ function inputs() {
     }],
     reviewQueue: [],
   });
-  const manifest = parseManifest({
+  const manifest = parseProductionEmbeddingManifest({
     schema_version: 1,
     items: [{
       image_id: imageId,
@@ -76,6 +76,8 @@ function database(overrides: Partial<ProductionImportDatabase> = {}): Production
     findExistingImages: vi.fn(async () => []),
     upsertLocations: vi.fn(async () => undefined),
     upsertImages: vi.fn(async () => undefined),
+    updateLocationAttribution: vi.fn(async () => undefined),
+    updateImageAttribution: vi.fn(async () => undefined),
     ...overrides,
   };
 }
@@ -94,6 +96,52 @@ describe("production data importer", () => {
     await expect(importProductionData(rows(), "apply", 100, db, true)).resolves.toMatchObject({ locationsWritten: 0, imagesWritten: 1 });
     expect(db.upsertLocations).not.toHaveBeenCalled();
     expect(db.upsertImages).toHaveBeenCalled();
+  });
+
+  it("updates only attribution fields on existing rows", async () => {
+    const db = database({
+      findLocationIds: vi.fn(async () => [locationId]),
+      findExistingImages: vi.fn(async () => [{ id: imageId, location_id: locationId }]),
+    });
+
+    await expect(importProductionData(rows(), "apply", 100, db, false, "attribution-only")).resolves.toMatchObject({
+      writeScope: "attribution-only",
+      locationsWritten: 1,
+      imagesWritten: 1,
+    });
+    expect(db.upsertLocations).not.toHaveBeenCalled();
+    expect(db.upsertImages).not.toHaveBeenCalled();
+    expect(db.updateLocationAttribution).toHaveBeenCalledWith([{
+      id: locationId,
+      source: "official",
+      source_url: "https://example.com",
+      author: null,
+      license: null,
+      license_url: null,
+      last_verified_at: null,
+    }]);
+    expect(db.updateImageAttribution).toHaveBeenCalledWith([expect.objectContaining({
+      id: imageId,
+      source_url: "https://commons.wikimedia.org/wiki/File:Test.jpg",
+      author: "Test Author",
+      license: "CC BY 4.0",
+    })]);
+  });
+
+  it("never inserts missing rows in attribution-only mode", async () => {
+    const db = database();
+
+    await expect(importProductionData(rows(), "apply", 100, db, false, "attribution-only")).resolves.toMatchObject({
+      locationsWritten: 0,
+      imagesWritten: 0,
+    });
+    expect(db.updateLocationAttribution).not.toHaveBeenCalled();
+    expect(db.updateImageAttribution).not.toHaveBeenCalled();
+  });
+
+  it("rejects contradictory insert-only and attribution-only modes", async () => {
+    await expect(importProductionData(rows(), "apply", 100, database(), true, "attribution-only"))
+      .rejects.toThrow("cannot be combined");
   });
   it("joins stable image IDs without inventing unreviewed values", () => {
     expect(rows()).toEqual({

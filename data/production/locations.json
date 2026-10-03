@@ -81,10 +81,10 @@
         "contactPhone": null,
         "note": "촬영·시설 이용 조건은 운영기관에 사전 확인이 필요합니다.",
         "provenance": {
-          "source": "서울특별시 공원 안내",
-          "sourceUrl": "https://parks.seoul.go.kr/template/sub/culturetank.do",
+          "source": "서울 공식 관광정보",
+          "sourceUrl": "https://english.visitseoul.net/attractions/oil-reservoir-culture-park/ENP023543",
           "referenceDate": null,
-          "lastVerifiedAt": "2026-10-02T13:15:30.979Z"
+          "lastVerifiedAt": "2026-10-03T00:00:00+09:00"
         }
       },
       "parking": [],
@@ -120,12 +120,12 @@
           "alt": "문화비축기지 T4의 내외부 공간"
         }
       ],
-      "sourceUrl": "https://parks.seoul.go.kr/template/sub/culturetank.do",
+      "sourceUrl": "https://english.visitseoul.net/attractions/oil-reservoir-culture-park/ENP023543",
       "provenance": {
-        "source": "서울특별시 공원 안내",
-        "sourceUrl": "https://parks.seoul.go.kr/template/sub/culturetank.do",
+        "source": "서울 공식 관광정보",
+        "sourceUrl": "https://english.visitseoul.net/attractions/oil-reservoir-culture-park/ENP023543",
         "referenceDate": null,
-        "lastVerifiedAt": "2026-10-02T13:15:30.979Z"
+        "lastVerifiedAt": "2026-10-03T00:00:00+09:00"
       }
     },
     {
@@ -143,10 +143,10 @@
         "contactPhone": null,
         "note": "촬영·시설 이용 조건은 운영기관에 사전 확인이 필요합니다.",
         "provenance": {
-          "source": "서울특별시 공원 안내",
-          "sourceUrl": "https://parks.seoul.go.kr/template/sub/seonyudo.do",
+          "source": "서울 공식 관광정보",
+          "sourceUrl": "https://korean.visitseoul.net/attractions/%EC%84%A0%EC%9C%A0%EB%8F%84%EA%B3%B5%EC%9B%90/KOP000378",
           "referenceDate": null,
-          "lastVerifiedAt": "2026-10-02T13:15:30.979Z"
+          "lastVerifiedAt": "2026-10-03T00:00:00+09:00"
         }
       },
       "parking": [],
@@ -182,12 +182,12 @@
           "alt": "선유도공원의 수목과 수경 공간"
         }
       ],
-      "sourceUrl": "https://parks.seoul.go.kr/template/sub/seonyudo.do",
+      "sourceUrl": "https://korean.visitseoul.net/attractions/%EC%84%A0%EC%9C%A0%EB%8F%84%EA%B3%B5%EC%9B%90/KOP000378",
       "provenance": {
-        "source": "서울특별시 공원 안내",
-        "sourceUrl": "https://parks.seoul.go.kr/template/sub/seonyudo.do",
+        "source": "서울 공식 관광정보",
+        "sourceUrl": "https://korean.visitseoul.net/attractions/%EC%84%A0%EC%9C%A0%EB%8F%84%EA%B3%B5%EC%9B%90/KOP000378",
         "referenceDate": null,
-        "lastVerifiedAt": "2026-10-02T13:15:30.979Z"
+        "lastVerifiedAt": "2026-10-03T00:00:00+09:00"
       }
     },
     {

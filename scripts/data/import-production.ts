@@ -1,19 +1,20 @@
 import { readFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-import { parseManifest } from "../embeddings/contracts.ts";
-import { readDatabaseEnvironment } from "../embeddings/import.ts";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import { createSupabaseAdminClient, readSupabaseAdminEnvironment } from "../shared/supabase-admin-client.ts";
 import { parseNormalizedLocationOutput } from "./contracts.ts";
 import {
   createProductionRows,
   importProductionData,
+  parseProductionEmbeddingManifest,
   parseImageLicenseCatalog,
   type ExistingImageMetadata,
   type ImageMetadataRow,
   type LocationRow,
   type ProductionImportDatabase,
   type ProductionImportMode,
+  type ProductionWriteScope,
 } from "./production-importer.ts";
 
 type CliOptions = {
@@ -23,17 +24,19 @@ type CliOptions = {
   mode: ProductionImportMode;
   batchSize: number;
   preserveExisting: boolean;
+  writeScope: ProductionWriteScope;
 };
 
 export function parseProductionImportArgs(args: string[]): CliOptions {
   const [locationsPath, manifestPath, ...flags] = args;
   if (!locationsPath || !manifestPath) {
-    throw new Error("Usage: pnpm data:import-production <locations.json> <embeddings-manifest.json> [--image-licenses PATH] [--validate-only | --dry-run | --apply] [--batch-size N] [--insert-only]");
+    throw new Error("Usage: pnpm data:import-production <locations.json> <embeddings-manifest.json> [--image-licenses PATH] [--validate-only | --dry-run | --apply] [--batch-size N] [--insert-only | --attribution-only]");
   }
   let mode: ProductionImportMode = "validate-only";
   let selectedMode = false;
   let batchSize = 100;
   let preserveExisting = false;
+  let writeScope: ProductionWriteScope = "all";
   let imageLicensesPath = resolve(dirname(locationsPath), "image-licenses.json");
   for (let index = 0; index < flags.length; index += 1) {
     const flag = flags[index];
@@ -43,6 +46,8 @@ export function parseProductionImportArgs(args: string[]): CliOptions {
       mode = flag.slice(2) as ProductionImportMode;
     } else if (flag === "--insert-only") {
       preserveExisting = true;
+    } else if (flag === "--attribution-only") {
+      writeScope = "attribution-only";
     } else if (flag === "--batch-size") {
       batchSize = Number(flags[++index]);
     } else if (flag === "--image-licenses") {
@@ -53,7 +58,10 @@ export function parseProductionImportArgs(args: string[]): CliOptions {
       throw new Error(`Unknown option: ${flag}`);
     }
   }
-  return { locationsPath, manifestPath, imageLicensesPath, mode, batchSize, preserveExisting };
+  if (preserveExisting && writeScope === "attribution-only") {
+    throw new Error("--insert-only cannot be combined with --attribution-only");
+  }
+  return { locationsPath, manifestPath, imageLicensesPath, mode, batchSize, preserveExisting, writeScope };
 }
 
 function failOnSupabaseError(error: { message: string } | null, action: string): void {
@@ -61,6 +69,25 @@ function failOnSupabaseError(error: { message: string } | null, action: string):
 }
 
 export function createProductionImportDatabase(client: SupabaseClient): ProductionImportDatabase {
+  const updateRows = async <T extends { id: string }>(
+    table: "locations" | "location_images",
+    rows: T[],
+  ): Promise<void> => {
+    const concurrency = 8;
+    for (let index = 0; index < rows.length; index += concurrency) {
+      await Promise.all(rows.slice(index, index + concurrency).map(async ({ id, ...attribution }) => {
+        const { error, count } = await client
+          .from(table)
+          .update(attribution as Record<string, unknown>, { count: "exact" })
+          .eq("id", id);
+        failOnSupabaseError(error, `Unable to update ${table} attribution for ${id}`);
+        if (count != null && count !== 1) {
+          throw new Error(`Unable to update ${table} attribution for ${id}: expected one row, updated ${count}`);
+        }
+      }));
+    }
+  };
+
   return {
     async findLocationIds(ids) {
       const { data, error } = await client.from("locations").select("id").in("id", ids);
@@ -80,6 +107,12 @@ export function createProductionImportDatabase(client: SupabaseClient): Producti
       const { error } = await client.from("location_images").upsert(rows, { onConflict: "id" });
       failOnSupabaseError(error, "Unable to upsert image metadata");
     },
+    async updateLocationAttribution(rows) {
+      await updateRows("locations", rows);
+    },
+    async updateImageAttribution(rows) {
+      await updateRows("location_images", rows);
+    },
   };
 }
 
@@ -90,20 +123,25 @@ async function readJson(path: string): Promise<unknown> {
 async function main(): Promise<void> {
   const options = parseProductionImportArgs(process.argv.slice(2));
   const dataset = parseNormalizedLocationOutput(await readJson(options.locationsPath));
-  const manifest = parseManifest(await readJson(options.manifestPath));
+  const manifest = parseProductionEmbeddingManifest(await readJson(options.manifestPath));
   const imageLicenses = parseImageLicenseCatalog(await readJson(options.imageLicensesPath));
   const rows = createProductionRows(dataset, manifest, imageLicenses);
   let database: ProductionImportDatabase | undefined;
   if (options.mode !== "validate-only") {
-    const environment = readDatabaseEnvironment(process.env);
-    const client = createClient(environment.url, environment.serviceRoleKey, {
-      auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
-    });
+    const environment = readSupabaseAdminEnvironment(process.env);
+    const client = createSupabaseAdminClient(environment);
     database = createProductionImportDatabase(client);
   }
-  const result = await importProductionData(rows, options.mode, options.batchSize, database, options.preserveExisting);
+  const result = await importProductionData(
+    rows,
+    options.mode,
+    options.batchSize,
+    database,
+    options.preserveExisting,
+    options.writeScope,
+  );
   console.log(
-    `Production data import: mode=${result.mode}, locations=${result.locationsValidated}, images=${result.imagesValidated}, existing=${result.existingLocations}/${result.existingImages}, written=${result.locationsWritten}/${result.imagesWritten}`,
+    `Production data import: mode=${result.mode}, scope=${result.writeScope}, locations=${result.locationsValidated}, images=${result.imagesValidated}, existing=${result.existingLocations}/${result.existingImages}, written=${result.locationsWritten}/${result.imagesWritten}`,
   );
 }
 

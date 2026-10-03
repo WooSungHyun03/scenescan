@@ -21,6 +21,7 @@
     "data:discover-wikidata": "node --experimental-strip-types scripts/data/discover-wikidata.ts",
     "data:upload-storage": "node --experimental-strip-types scripts/data/upload-storage.ts",
     "data:import-production": "node --experimental-strip-types scripts/data/import-production.ts",
+    "data:check-attribution-links": "node --experimental-strip-types scripts/data/check-attribution-links.ts",
     "data:normalize": "node --experimental-strip-types scripts/data/normalize.ts",
     "data:validate": "node --experimental-strip-types scripts/data/validate.ts",
     "data:import": "node --experimental-strip-types scripts/data/import.ts",
