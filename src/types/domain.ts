@@ -72,10 +72,37 @@ export interface LocationFilter {
   category?: LocationCategory;
 }
 
+// Listing-only: pagination has no meaning for search (always top 8) or
+// getSimilarLocations, so it is kept out of LocationFilter itself and only
+// added here. See LOCATION_LIST_DEFAULT_LIMIT / LOCATION_LIST_MAX_LIMIT in
+// src/types/contracts.ts for the default/cap this is validated and clamped
+// against.
+export interface LocationListQuery extends LocationFilter {
+  limit?: number;
+  offset?: number;
+}
+
 export interface LocationSearchResult {
   location: Location;
   similarity: number;
   matchedImageId: string;
+}
+
+// Tuning knobs for the pre-aggregation candidate retrieval step only (maps
+// to the match_location_images RPC's match_threshold/match_count). The
+// post-aggregation result count is a fixed product policy (always up to 8
+// locations, see docs/search-ranking.md) and is not client-configurable --
+// do not confuse `count` here with "how many locations to return".
+//
+// `count` is internal-only: POST /api/search's public request schema
+// (searchRequestSchema, src/types/contracts.ts) does not accept it: there
+// is no product need for a client to widen/narrow the server's candidate
+// window, and match_count is always SEARCH_MATCH_COUNT_DEFAULT. It remains
+// here only because repository call sites pass it as a fixed internal
+// constant, not a caller-supplied value.
+export interface SearchQueryOptions {
+  threshold?: number;
+  count?: number;
 }
 
 export interface SolarPosition {

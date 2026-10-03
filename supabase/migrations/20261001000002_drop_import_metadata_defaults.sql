@@ -1,0 +1,36 @@
+-- Backend-owned follow-up to 20261001000001_location_import_metadata.sql.
+-- Removes the temporary column default on location_images.embedding_model,
+-- keeping it not null. (locations.import_batch is nullable with no default
+-- as of the previous migration -- nothing to drop here; it was NOT NULL
+-- DEFAULT 'manual' in an earlier draft of this migration pair, but
+-- origin/main's own production pipeline, scripts/data/production-importer.ts,
+-- writes `locations` rows directly and has no concept of a scripts/data
+-- import batch, so a forced default would mislabel every one of its rows
+-- as 'manual'. See 20261001000001_location_import_metadata.sql's comment.)
+--
+-- The default existed only so the previous migration could introduce a
+-- not-null column without a backfill UPDATE statement. By the time this
+-- runs against the real deployed project, real rows already exist (159
+-- locations from origin/main's production seed, imported before this
+-- branch's migrations were ever applied anywhere -- see the merge report
+-- for how that was confirmed). That is not a problem for the backfill
+-- itself: adding a not-null column with a DEFAULT to a populated table
+-- fills every existing row with that default value as part of the ADD
+-- COLUMN statement in the previous migration, before this one runs. Those
+-- existing rows keep that already-correct value after DROP DEFAULT, since
+-- DROP DEFAULT only changes what happens on a future INSERT/UPDATE that
+-- omits the column -- it never rewrites rows that already have a value.
+--
+-- Dropping the default is deliberate, not cosmetic: neither origin/main's
+-- scripts/embeddings/import.ts nor scripts/data/production-importer.ts sets
+-- embedding_model when it upserts location_images (confirmed by reading
+-- both files during the merge analysis -- see docs/security-checklist.md's
+-- "머지 전 확인 항목" for both, flagged as a proposal for Member 1, not
+-- fixed here). With a default in place, that gap fails silently -- every
+-- newly imported row would just get today's placeholder value, which is
+-- wrong for a future model/revision upgrade. Without a default, the same
+-- insert fails loudly with a not_null violation on embedding_model until
+-- the importer is updated to pass it explicitly (see docs/data-pipeline.md
+-- for the proposed one-line diff to scripts/embeddings/import.ts, not
+-- applied here -- that file is Member 1's).
+alter table public.location_images alter column embedding_model drop default;

@@ -32,10 +32,10 @@ Production uses the WASM backend for broad browser compatibility and keeps only 
 | `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL for real data |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Public anon key; RLS restricts writes |
 | `NEXT_PUBLIC_KAKAO_MAP_KEY` | Kakao JavaScript key and registered domain for real map |
-| `SUPABASE_URL` | Server-only project URL used by the local embedding importer |
+| `SUPABASE_URL` | Server-only project URL used by the local embedding and locations/parking importers |
 | `SUPABASE_SECRET_KEY` | Server-only secret key used only for controlled local imports |
 
-Never commit `.env.local` or a Supabase secret/service-role key. Public `NEXT_PUBLIC_*` variables are visible in the browser bundle. The importer rejects either privileged key placed in a `NEXT_PUBLIC_*` variable. The legacy `SUPABASE_SERVICE_ROLE_KEY` name remains accepted for existing local setups.
+Never commit `.env.local` or a Supabase secret/service-role key. Public `NEXT_PUBLIC_*` variables are visible in the browser bundle. Both importers reject either privileged key placed in a `NEXT_PUBLIC_*` variable. The legacy `SUPABASE_SERVICE_ROLE_KEY` name remains accepted for existing local setups.
 
 ## Scripts
 
@@ -44,9 +44,12 @@ pnpm dev
 pnpm lint
 pnpm typecheck
 pnpm test
+pnpm test:integration
 pnpm build
 pnpm docker:build
 pnpm docker:up
+pnpm data:normalize data-work/raw/provider.json data-work/mappings/provider.json data-work/normalized/provider.json
+pnpm data:import data-work/normalized/provider.json data-work/reports/import.json --validate-only
 pnpm data:discover-wikidata data-work/wikidata/commons-manifest.json --base data/production/commons-manifest.json --max 400
 pnpm data:collect-commons data/production/commons-manifest.json
 pnpm data:upload-storage data/production/locations.json data/production/embeddings-manifest.json data/production --dry-run
@@ -56,6 +59,10 @@ pnpm embeddings:audit-schema
 pnpm embeddings:evaluate
 pnpm embeddings:evaluate-clip
 ```
+
+`pnpm test` needs no Supabase project or environment variables and is what CI runs on every PR. `pnpm test:integration` needs a live Supabase instance (`pnpm supabase:start` runs one locally via the Supabase CLI) and skips cleanly without one; see [testing](docs/testing.md) for what each suite covers and [integration testing](docs/integration-testing.md) for setup.
+
+`data:import` upserts the `locations` and `parking` rows described by a normalized file (no public write API exists for this -- it is the only way real location data enters the database); it does not touch `location_images` or embeddings. Run it before the embeddings importer, since `location_images.location_id` is a foreign key to `locations.id`. See [data pipeline](docs/data-pipeline.md) for upsert keys, dry-run/apply modes, and the image storage strategy.
 
 The preparation command is for licensed local images after replacing the example manifest paths, UUIDs, and provenance fields. It validates image bytes and metadata, processes configurable batches, writes an atomic resumable JSON checkpoint after every batch, and retries prior failures on the next run. Import defaults to credential-free validation; database dry-run and apply modes are documented in [offline embeddings](docs/offline-embeddings.md).
 

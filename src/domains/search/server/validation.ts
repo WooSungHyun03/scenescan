@@ -1,0 +1,25 @@
+import type { z } from "zod";
+
+// AGENTS.md: "Domain types and API request/response types live only in
+// src/types/**." So searchRequestSchema itself stays in
+// src/types/contracts.ts (reused, not duplicated here) even though the task
+// that introduced this file suggested placing the schema under
+// src/domains/search. This file holds only the route-facing glue that is
+// genuinely search-specific: turning a failed Zod parse into a short,
+// user-facing Korean sentence that never echoes Zod's internal issue text
+// (field paths, schema internals) back to the client.
+export function describeSearchRequestError(error: z.ZodError): string {
+  const path = error.issues[0]?.path ?? [];
+  const [field, subField] = path;
+
+  if (field === "embedding") {
+    return "이미지 임베딩 값이 올바르지 않습니다. 512개의 유효한 숫자로 이루어진 벡터여야 합니다.";
+  }
+  if (field === "filters") {
+    if (subField === "region") return "허용되지 않는 지역입니다.";
+    if (subField === "category") return "허용되지 않는 카테고리입니다.";
+    return "검색 필터 값이 올바르지 않습니다.";
+  }
+  if (field === "threshold") return "threshold 값은 0에서 1 사이여야 합니다.";
+  return "요청 값이 올바르지 않습니다.";
+}

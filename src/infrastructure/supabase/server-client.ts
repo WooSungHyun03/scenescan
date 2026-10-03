@@ -2,6 +2,9 @@ import "server-only";
 import { createClient } from "@supabase/supabase-js";
 import { configurationError } from "@/shared/errors/application-error";
 
+// Anon-key, RLS-scoped client for read paths (repositories). For privileged
+// service-role access use ./admin-client instead -- never widen this
+// function to accept a service role key.
 export function getSupabaseClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;

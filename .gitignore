@@ -4,10 +4,12 @@ out/
 coverage/
 .env*
 !.env.example
+!.env.integration.example
 *.tsbuildinfo
 .DS_Store
 pnpm-debug.log*
 .vercel
+.idea/
 data-work/
 data/production/storage/
 public/locations/*.jpg

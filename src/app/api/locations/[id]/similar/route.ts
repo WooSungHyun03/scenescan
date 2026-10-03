@@ -1,35 +1,32 @@
 import { NextResponse } from "next/server";
-import { getSimilarLocations } from "@/domains/locations/server/repository";
-import { badRequest } from "@/shared/errors/application-error";
+import { getLocation, getSimilarLocations } from "@/domains/locations/server/repository";
+import { notFoundError, validationError } from "@/shared/errors/application-error";
 import { apiErrorResponse } from "@/shared/http/api-error-response";
-import type { SimilarLocationsResponse } from "@/types/contracts";
+import { locationIdSchema, type SimilarLocationsResponse } from "@/types/contracts";
 
 export const dynamic = "force-dynamic";
 
-export async function GET(
-  _request: Request,
-  { params }: { params: Promise<{ id: string }> },
-) {
-  const { id: rawId } = await params;
-  const id = rawId.trim();
-
-  if (!id) {
-    return apiErrorResponse(
-      badRequest("Location ID is required"),
-      "similar-locations.validate",
-    );
+export async function GET(_request: Request, context: { params: Promise<{ id: string }> }) {
+  const { id } = await context.params;
+  const idResult = locationIdSchema.safeParse(id);
+  if (!idResult.success) {
+    return apiErrorResponse(validationError("장소 ID 형식이 올바르지 않습니다."), "locations.similar.validate");
   }
 
   try {
-    const results = (await getSimilarLocations(id))
-      .filter(({ location }) => location.id !== id)
-      .slice(0, 8);
+    // Existence check reuses getLocation (already mode-aware, already
+    // distinguishes found/not-found) rather than having
+    // getSimilarLocations itself return null vs [] -- an existing but
+    // embedding-less location must return [] (not an error, not 404); only
+    // a genuinely nonexistent location is LOCATION_NOT_FOUND.
+    const location = await getLocation(idResult.data);
+    if (!location) {
+      return apiErrorResponse(notFoundError(`Location ${idResult.data} not found`), "locations.similar.not-found");
+    }
+    const results = await getSimilarLocations(idResult.data);
     const response: SimilarLocationsResponse = { results };
-
-    return NextResponse.json(response, {
-      headers: { "Cache-Control": "no-store" },
-    });
+    return NextResponse.json(response, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
-    return apiErrorResponse(error, "similar-locations.execute");
+    return apiErrorResponse(error, "locations.similar.execute");
   }
 }

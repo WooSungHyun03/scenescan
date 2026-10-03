@@ -1,8 +1,8 @@
 export type ApplicationErrorCode =
-  | "BAD_REQUEST"
-  | "CONFIGURATION_ERROR"
-  | "DATA_ACCESS_ERROR"
-  | "INTERNAL_ERROR";
+  | "VALIDATION_ERROR"
+  | "LOCATION_NOT_FOUND"
+  | "DATA_UNAVAILABLE"
+  | "SEARCH_FAILED";
 
 type ApplicationErrorOptions = {
   code: ApplicationErrorCode;
@@ -25,37 +25,49 @@ export class ApplicationError extends Error {
   }
 }
 
-export function badRequest(message: string): ApplicationError {
+/** The request itself is malformed (bad JSON, failed Zod validation, oversized body). `message` is shown to the user, so callers must keep it free of internal detail. */
+export function validationError(message: string): ApplicationError {
   return new ApplicationError(message, {
-    code: "BAD_REQUEST",
+    code: "VALIDATION_ERROR",
     status: 400,
     publicMessage: message,
   });
 }
 
+/** A requested location does not exist. Not reachable via any HTTP route today (getLocation is called directly from a Server Component, which uses Next's notFound() instead) -- added for the shared error taxonomy ahead of a future location API route. */
+export function notFoundError(message: string): ApplicationError {
+  return new ApplicationError(message, {
+    code: "LOCATION_NOT_FOUND",
+    status: 404,
+    publicMessage: "요청한 장소를 찾을 수 없습니다.",
+  });
+}
+
+/** The server could not reach the data it needed -- missing configuration (env vars) or a live Supabase/DB failure. Both collapse to the same public code/status: the client has no use for the internal distinction, and neither message may repeat the underlying cause. */
 export function configurationError(message: string): ApplicationError {
   return new ApplicationError(message, {
-    code: "CONFIGURATION_ERROR",
+    code: "DATA_UNAVAILABLE",
     status: 503,
-    publicMessage: "Service configuration unavailable",
+    publicMessage: "서비스를 일시적으로 사용할 수 없습니다. 잠시 후 다시 시도해주세요.",
   });
 }
 
 export function dataAccessError(message: string, cause: unknown): ApplicationError {
   return new ApplicationError(message, {
-    code: "DATA_ACCESS_ERROR",
+    code: "DATA_UNAVAILABLE",
     status: 503,
-    publicMessage: "Search unavailable",
+    publicMessage: "서비스를 일시적으로 사용할 수 없습니다. 잠시 후 다시 시도해주세요.",
     cause,
   });
 }
 
+/** Catch-all for anything unexpected. Named for its one current caller (POST /api/search); revisit as a route-aware mapping if a second JSON API route starts throwing through this same path with a different public meaning. */
 export function toApplicationError(error: unknown): ApplicationError {
   if (error instanceof ApplicationError) return error;
   return new ApplicationError("Unexpected application error", {
-    code: "INTERNAL_ERROR",
+    code: "SEARCH_FAILED",
     status: 500,
-    publicMessage: "Internal server error",
+    publicMessage: "검색 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.",
     cause: error,
   });
 }
