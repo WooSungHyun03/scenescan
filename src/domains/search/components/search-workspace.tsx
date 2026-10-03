@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState, type DragEvent } from "react";
 import Image from "next/image";
 import { FileImage, ImagePlus, LoaderCircle, Search, Trash2, Upload, MapPinned, LayoutGrid, ArrowDown } from "lucide-react";
+import { publicEnv } from "@/env/public";
 import { LocationCard } from "@/domains/locations/components/location-card";
 import { SearchResultsMap } from "@/domains/locations/components/search-results-map";
 import { createImageEmbeddingService, type EmbeddingServiceStatus } from "@/lib/ai";
@@ -13,9 +14,9 @@ import { getSearchSession, setSearchSession, takeSearchImageDraft } from "./sear
 import { REGION_VALUES } from "@/types/location-options";
 import type { SearchResponse } from "@/types/contracts";
 
-const searchModeDescription = process.env.NEXT_PUBLIC_USE_MOCK_DATA === "false"
-  ? "사진은 기기에서 분석하며 서버에 저장하지 않습니다."
-  : "현재는 가상 장소로 검색을 체험하는 예시 모드입니다. 유사도는 예시 값입니다.";
+const searchModeDescription = publicEnv.useMockData
+  ? "현재는 가상 장소로 검색을 체험하는 예시 모드입니다. 유사도는 예시 값입니다."
+  : "사진은 기기에서 분석하며 서버에 저장하지 않습니다.";
 
 const regionOptions: Region[] = [...REGION_VALUES];
 const categoryOptions: { value: LocationCategory; label: string }[] = [
@@ -104,7 +105,13 @@ function getSearchError(cause: unknown, stage: "embedding" | "searching", embedd
     return { kind: "network", title: "네트워크 연결을 확인해 주세요", description: "인터넷 연결을 확인한 뒤 다시 시도해 주세요.", retryable: true };
   }
   if (stage === "embedding" || embeddingStatus.state === "error") {
-    return { kind: "model", title: "이미지 분석을 준비하지 못했습니다", description: "인터넷 연결을 확인하고 다시 검색해 주세요.", retryable: true };
+    return {
+      kind: "model",
+      title: "이미지 분석을 준비하지 못했습니다",
+      description: "인터넷 연결을 확인하고 다시 검색해 주세요.",
+      retryable: true,
+      detail: message,
+    };
   }
   return { kind: "request", title: "검색 중 오류가 발생했습니다", description: "잠시 후 다시 시도해 주세요.", retryable: true };
 }
@@ -294,7 +301,7 @@ export function SearchWorkspace({ examples }: { examples: Location[] }) {
         {aiUiState.progress !== undefined && <><div className="mt-3 flex justify-between text-xs"><span>분석 도구 다운로드</span><span className="tabular-nums">{aiUiState.progress}%</span></div><progress aria-label="분석 도구 다운로드" value={aiUiState.progress} max={100} className="mt-1 h-2 w-full accent-emerald-800" /></>}
       </div>}
       {!busy && searchStage === "complete" && <p role="status" className="mt-3 text-sm text-brand">촬영 후보 {displayedResults?.length ?? 0}곳을 찾았습니다.</p>}
-      {searchError && <div role="alert" className="mt-4 rounded-md border border-red-200 bg-red-50 p-4 text-red-900"><p className="text-sm font-semibold">{searchError.title}</p><p className="mt-2 text-sm leading-relaxed">{searchError.description}</p>{searchError.retryable && <Button type="button" variant="outline" disabled={busy} onClick={search} className="mt-3">다시 시도</Button>}</div>}
+      {searchError && <div role="alert" className="mt-4 rounded-md border border-red-200 bg-red-50 p-4 text-red-900"><p className="text-sm font-semibold">{searchError.title}</p><p className="mt-2 text-sm leading-relaxed">{searchError.description}</p>{searchError.detail && <p className="mt-2 break-words text-xs text-red-800">오류 정보: {searchError.detail}</p>}{searchError.retryable && <Button type="button" variant="outline" disabled={busy} onClick={search} className="mt-3">다시 시도</Button>}</div>}
       <p className="mt-4 text-xs leading-relaxed text-muted">{searchModeDescription}</p>
     </aside>
     <section className="min-w-0" aria-busy={busy} aria-labelledby="search-results-title">

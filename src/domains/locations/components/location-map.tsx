@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { publicEnv } from "@/env/public";
 import type { GeoPoint } from "@/types/domain";
 import {
   createKakaoMapAdapter,
@@ -18,7 +19,7 @@ export function LocationMap({
   const ref = useRef<HTMLDivElement>(null);
   const [error, setError] = useState<string | null>(null);
   const { latitude, longitude } = point;
-  const key = process.env.NEXT_PUBLIC_KAKAO_MAP_KEY?.trim();
+  const key = publicEnv.kakaoMapKey;
 
   useEffect(() => {
     const element = ref.current;

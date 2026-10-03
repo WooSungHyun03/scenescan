@@ -20,8 +20,8 @@ class FakeWorker {
     this.onmessage?.({ data: message } as MessageEvent<EmbeddingWorkerReply>);
   }
 
-  fail(): void {
-    this.onerror?.({} as ErrorEvent);
+  fail(message = "Embedding worker failed"): void {
+    this.onerror?.({ message } as ErrorEvent);
   }
 }
 

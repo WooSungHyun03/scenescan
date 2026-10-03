@@ -1,5 +1,6 @@
 import "server-only";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { serverEnv } from "@/env/server";
 import { configurationError } from "@/shared/errors/application-error";
 
 /**
@@ -20,12 +21,13 @@ import { configurationError } from "@/shared/errors/application-error";
  * client the same way (SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY).
  */
 export function getSupabaseAdminClient(): SupabaseClient {
-  const url = process.env.SUPABASE_URL;
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !serviceRoleKey) {
-    throw configurationError("SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are required for admin access");
+  const environment = serverEnv.supabaseAdmin;
+  if (!environment) {
+    throw configurationError(
+      "SUPABASE_URL and SUPABASE_SECRET_KEY (or legacy SUPABASE_SERVICE_ROLE_KEY) are required for admin access",
+    );
   }
-  return createClient(url, serviceRoleKey, {
+  return createClient(environment.url, environment.secretKey, {
     auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
   });
 }

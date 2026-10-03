@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, MapPin } from "lucide-react";
+import { publicEnv } from "@/env/public";
 import { LocationCard } from "@/domains/locations/components/location-card";
 import { getLocations } from "@/domains/locations/server/repository";
 import { ImageSearchEntry } from "@/domains/search/components/image-search-entry";
@@ -14,7 +15,7 @@ export default async function HomePage() {
     return location ? [location] : [];
   });
   const hero = examples[0];
-  const mock = process.env.NEXT_PUBLIC_USE_MOCK_DATA !== "false";
+  const mock = publicEnv.useMockData;
   return <main className="scene-container">
     <section className="grid items-center gap-8 py-9 md:grid-cols-2 md:gap-12 md:py-16">
       <div>

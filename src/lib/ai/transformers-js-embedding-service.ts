@@ -127,9 +127,9 @@ export class TransformersJsEmbeddingService implements ImageEmbeddingService {
           task.reject(error instanceof Error ? error : new Error("Invalid CLIP embedding"));
         }
       };
-      worker.onerror = () => {
+      worker.onerror = (event) => {
         if (this.worker !== worker) return;
-        this.handleWorkerFailure();
+        this.handleWorkerFailure(event.message || "Embedding worker failed");
       };
     }
     return this.worker;
@@ -161,11 +161,11 @@ export class TransformersJsEmbeddingService implements ImageEmbeddingService {
     }
   }
 
-  private handleWorkerFailure(): void {
+  private handleWorkerFailure(message: string): void {
     const interrupted = [...this.pending.values()];
     this.pending.clear();
     this.stopWorker();
-    this.setStatus({ state: "error", error: "Embedding worker failed" });
+    this.setStatus({ state: "error", error: message });
 
     for (const task of interrupted) {
       if (task.retriesRemaining > 0 && !task.signal?.aborted) {
@@ -173,7 +173,7 @@ export class TransformersJsEmbeddingService implements ImageEmbeddingService {
         this.dispatch(task);
       } else {
         this.cleanUpTask(task);
-        task.reject(new Error("Embedding worker failed"));
+        task.reject(new Error(message));
       }
     }
   }

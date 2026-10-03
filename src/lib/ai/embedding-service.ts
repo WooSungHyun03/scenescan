@@ -27,7 +27,7 @@ export function selectClipBrowserDevice(value: string | undefined): ClipBrowserD
   return value === "webgpu" ? "webgpu" : "wasm";
 }
 
-export const CLIP_BROWSER_DEVICE = selectClipBrowserDevice(process.env.NEXT_PUBLIC_CLIP_DEVICE);
+export const CLIP_BROWSER_DEVICE = selectClipBrowserDevice(publicEnv.clipDevice);
 
 export type EmbeddingPerformanceSample = {
   requestId: number;
@@ -56,3 +56,4 @@ export type EmbeddingServiceStatus = {
 };
 
 export type EmbeddingStatusListener = (status: EmbeddingServiceStatus) => void;
+import { publicEnv } from "@/env/public";

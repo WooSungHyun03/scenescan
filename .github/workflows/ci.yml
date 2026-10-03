@@ -39,6 +39,14 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+      - name: Verify patched Next.js version
+        run: |
+          installed_version="$(docker run --rm scenescan-ci:${{ github.sha }} node -p "require('next/package.json').version")"
+          test "$installed_version" = "16.3.8"
+
+      - name: Audit production dependencies
+        run: docker run --rm scenescan-ci:${{ github.sha }} pnpm audit --prod --audit-level critical
+
       - name: Lint
         run: docker run --rm scenescan-ci:${{ github.sha }} pnpm lint
 
@@ -47,6 +55,14 @@ jobs:
 
       - name: Test
         run: docker run --rm scenescan-ci:${{ github.sha }} pnpm test
+
+      - name: Verify server secrets stay out of the client bundle
+        run: |
+          docker run --rm \
+            --env SUPABASE_URL=https://boundary-test.supabase.co \
+            --env SUPABASE_SECRET_KEY=scenescan-ci-server-only-boundary-sentinel \
+            scenescan-ci:${{ github.sha }} \
+            sh -c 'pnpm build && pnpm security:client-bundle'
 
       - name: Build standalone application
         uses: docker/build-push-action@v7
@@ -74,6 +90,12 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+      - name: Verify production container boundary
+        run: |
+          test "$(docker inspect --format '{{.Config.User}}' scenescan:${{ github.sha }})" = "nextjs"
+          test "$(docker run --rm --entrypoint id scenescan:${{ github.sha }} -u)" = "1001"
+          test "$(docker inspect --format '{{if .Config.Healthcheck}}configured{{end}}' scenescan:${{ github.sha }})" = "configured"
+
       - name: Smoke test production image
         run: |
           docker run --detach --name scenescan-ci-app --publish 3000:3000 scenescan:${{ github.sha }}
@@ -89,6 +111,18 @@ jobs:
             docker logs scenescan-ci-app
             exit 1
           fi
+          healthy=0
+          for attempt in $(seq 1 45); do
+            if [ "$(docker inspect --format '{{.State.Health.Status}}' scenescan-ci-app)" = "healthy" ]; then
+              healthy=1
+              break
+            fi
+            sleep 1
+          done
+          if [ "$healthy" -ne 1 ]; then
+            docker inspect --format '{{json .State.Health}}' scenescan-ci-app
+            exit 1
+          fi
           curl --fail --silent --output /dev/null http://127.0.0.1:3000/
           curl --fail --silent --output /dev/null http://127.0.0.1:3000/search
           # Fixture id, not a literal "demo-01" string -- see
@@ -96,6 +130,17 @@ jobs:
           # data also exercises uuid-shaped code paths; "demo-01" survives
           # only as that fixture's `slug`, for its SVG filename).
           curl --fail --silent --output /dev/null http://127.0.0.1:3000/locations/00000000-0000-4000-8000-000000000001
+          response_headers="$(curl --fail --silent --dump-header - --output /dev/null http://127.0.0.1:3000/search)"
+          printf '%s\n' "$response_headers" | grep --ignore-case --quiet '^content-security-policy:.*default-src'
+          printf '%s\n' "$response_headers" | grep --ignore-case --quiet '^strict-transport-security: max-age=63072000; includeSubDomains'
+          printf '%s\n' "$response_headers" | grep --ignore-case --quiet '^x-content-type-options: nosniff'
+          printf '%s\n' "$response_headers" | grep --ignore-case --quiet '^x-frame-options: DENY'
+          printf '%s\n' "$response_headers" | grep --ignore-case --quiet '^referrer-policy: strict-origin-when-cross-origin'
+          printf '%s\n' "$response_headers" | grep --ignore-case --quiet '^permissions-policy:'
+          if printf '%s\n' "$response_headers" | grep --ignore-case --quiet '^x-powered-by:'; then
+            echo "X-Powered-By must not be exposed"
+            exit 1
+          fi
 
       - name: Clean up smoke container
         if: always()

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Check, MapPin, MapPinned } from "lucide-react";
+import { publicEnv } from "@/env/public";
 import {
   createKakaoMapAdapter,
   mockMapAdapter,
@@ -59,7 +60,7 @@ export function SearchResultsMap({
     if (!element || markers.length === 0) return;
 
     let disposed = false;
-    const key = process.env.NEXT_PUBLIC_KAKAO_MAP_KEY?.trim();
+    const key = publicEnv.kakaoMapKey;
     const adapter = key ? createKakaoMapAdapter(key) : mockMapAdapter;
 
     adapter

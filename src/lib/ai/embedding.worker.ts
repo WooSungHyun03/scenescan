@@ -1,8 +1,11 @@
-import { pipeline, RawImage } from "@huggingface/transformers";
+import { env, pipeline, RawImage } from "@huggingface/transformers";
 import { CLIP_BROWSER_DEVICE, CLIP_MODEL_ID, CLIP_MODEL_REVISION, CLIP_MODEL_DTYPE } from "./embedding-service";
 import { createEmbeddingWorkerHandler } from "./embedding-worker-runtime";
 import type { EmbeddingWorkerRequest } from "./embedding-worker-protocol";
 import { loadBrowserExtractor } from "./load-browser-extractor";
+import { configureTransformersEnvironment } from "./configure-transformers-environment";
+
+configureTransformersEnvironment(env);
 
 const handleRequest = createEmbeddingWorkerHandler({
   loadExtractor: (onProgress) => loadBrowserExtractor({
