@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { isPermitGuidance, isValidContactPhone } from "./permit-information.ts";
 import { LOCATION_CATEGORY_VALUES, REGION_VALUES } from "../../src/types/location-options.ts";
+import { isNoiseSourceVerificationStale } from "../../src/domains/locations/services/noise-source.ts";
 
 const categories = new Set<string>(LOCATION_CATEGORY_VALUES);
 const regions = new Set<string>(REGION_VALUES);
@@ -33,6 +34,9 @@ export type DataValidationErrorCode =
   | "PROVENANCE_INVALID"
   | "PARKING_INVALID"
   | "PARKING_DUPLICATE"
+  | "NOISE_SOURCE_INVALID"
+  | "NOISE_SOURCE_DUPLICATE"
+  | "NOISE_SOURCE_STALE"
   | "SOURCE_URL_INVALID"
   | "IMAGES_REQUIRED"
   | "IMAGE_INVALID"
@@ -65,6 +69,7 @@ export type DataValidationReport = {
 
 export type DataValidationOptions = {
   inspectImagePath: (imagePath: string) => Promise<ImagePathStatus>;
+  now?: Date;
 };
 
 function isObject(value: unknown): value is JsonObject {
@@ -227,6 +232,48 @@ function validateParking(
   return errors;
 }
 
+function validateNoiseSource(
+  value: unknown,
+  noiseIndex: number,
+  locationIndex: number,
+  locationId: string | null,
+  now: Date,
+): DataValidationError[] {
+  const field = `noiseSources[${noiseIndex}]`;
+  if (!isObject(value)) {
+    return [error("NOISE_SOURCE_INVALID", locationIndex, locationId, field, "Noise source must be a structured object")];
+  }
+  const errors: DataValidationError[] = [];
+  if (!["railway", "major_road", "airport", "construction"].includes(String(value.kind))) {
+    errors.push(error("NOISE_SOURCE_INVALID", locationIndex, locationId, `${field}.kind`, "Noise source kind is not supported"));
+  }
+  if (!nonEmptyText(value.description)) {
+    errors.push(error("NOISE_SOURCE_INVALID", locationIndex, locationId, `${field}.description`, "Noise source description is required"));
+  }
+  const distanceValid = value.distanceMeters === null
+    || (typeof value.distanceMeters === "number" && Number.isFinite(value.distanceMeters) && value.distanceMeters >= 0);
+  if (!distanceValid) {
+    errors.push(error("NOISE_SOURCE_INVALID", locationIndex, locationId, `${field}.distanceMeters`, "Noise source distance must be a non-negative finite number or null"));
+  }
+  const evidence = value.evidence === null ? null : nonEmptyText(value.evidence);
+  if (value.evidence !== null && !evidence) {
+    errors.push(error("NOISE_SOURCE_INVALID", locationIndex, locationId, `${field}.evidence`, "Noise source evidence must be non-empty or null"));
+  }
+  if (value.distanceMeters === null && !evidence) {
+    errors.push(error("NOISE_SOURCE_INVALID", locationIndex, locationId, field, "Noise source requires a distance or evidence"));
+  }
+  if (!nonEmptyText(value.license) || !isHttpUrl(value.licenseUrl)) {
+    errors.push(error("NOISE_SOURCE_INVALID", locationIndex, locationId, `${field}.license`, "Noise source requires an explicit license and HTTP(S) license URL"));
+  }
+  errors.push(...validateProvenance(value.provenance, `${field}.provenance`, locationIndex, locationId));
+  if (!isObject(value.provenance) || !isoDateTimeSchema.safeParse(value.provenance.lastVerifiedAt).success) {
+    errors.push(error("NOISE_SOURCE_INVALID", locationIndex, locationId, `${field}.provenance.lastVerifiedAt`, "Noise source requires a valid verification timestamp"));
+  } else if (isNoiseSourceVerificationStale(String(value.provenance.lastVerifiedAt), now)) {
+    errors.push(error("NOISE_SOURCE_STALE", locationIndex, locationId, `${field}.provenance.lastVerifiedAt`, "Noise source verification is older than 365 days"));
+  }
+  return errors;
+}
+
 async function validateImage(
   value: unknown,
   imageIndex: number,
@@ -355,6 +402,34 @@ async function validateLocation(
           id,
           `parking[${parkingIndex}]`,
           "Duplicate parking name and coordinates within one location",
+        ));
+      }
+    }
+  }
+  if (value.noiseSources === undefined) {
+    // Pre-contract canonical files omitted the field; treat them as no trusted information.
+  } else if (!Array.isArray(value.noiseSources)) {
+    errors.push(error("NOISE_SOURCE_INVALID", locationIndex, id, "noiseSources", "Noise sources must be an array"));
+  } else {
+    errors.push(...value.noiseSources.flatMap((source, index) =>
+      validateNoiseSource(source, index, locationIndex, id, options.now ?? new Date())
+    ));
+    const indexesBySourceUrl = new Map<string, number[]>();
+    value.noiseSources.forEach((source, index) => {
+      if (!isObject(source) || !isObject(source.provenance)) return;
+      const sourceUrl = nonEmptyText(source.provenance.sourceUrl);
+      if (!sourceUrl) return;
+      indexesBySourceUrl.set(sourceUrl, [...(indexesBySourceUrl.get(sourceUrl) ?? []), index]);
+    });
+    for (const indexes of indexesBySourceUrl.values()) {
+      if (indexes.length < 2) continue;
+      for (const noiseIndex of indexes) {
+        errors.push(error(
+          "NOISE_SOURCE_DUPLICATE",
+          locationIndex,
+          id,
+          `noiseSources[${noiseIndex}].provenance.sourceUrl`,
+          "Duplicate noise-source URL within one location",
         ));
       }
     }

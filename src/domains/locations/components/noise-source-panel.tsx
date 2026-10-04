@@ -1,5 +1,10 @@
-import { AudioLines, FileSearch, Info, Volume2 } from "lucide-react";
+import { AlertTriangle, AudioLines, FileSearch, Info, MapPin, Volume2 } from "lucide-react";
 import type { NoiseSource } from "@/types/domain";
+import { SourceAttribution } from "./source-attribution";
+import {
+  getNoiseSourceKindLabel,
+  isNoiseSourceVerificationStale,
+} from "@/domains/locations/services/noise-source";
 
 function getValue(value: string | null | undefined) {
   return value?.trim() || null;
@@ -36,12 +41,14 @@ export function NoiseSourcePanel({
       {noiseSources.length ? (
         <ul className="mt-5 space-y-3">
           {noiseSources.map((source, index) => {
-            const kind = getValue(source.kind);
-            const note = getValue(source.note);
+            const kind = getNoiseSourceKindLabel(source.kind);
+            const description = getValue(source.description);
+            const evidence = getValue(source.evidence);
+            const stale = isNoiseSourceVerificationStale(source.lastVerifiedAt);
 
             return (
               <li
-                key={`${source.kind}-${source.note}-${index}`}
+                key={`${source.sourceUrl ?? source.kind}-${index}`}
                 className="rounded-xl border border-amber-200 bg-amber-50/40 p-4"
               >
                 <div className="flex items-start gap-3">
@@ -60,12 +67,22 @@ export function NoiseSourcePanel({
                         kind ? "text-stone-900" : "text-stone-500"
                       }`}
                     >
-                      {kind ?? "종류 정보 없음"}
+                      {kind}
                     </h3>
+                    {source.distanceMeters !== null && (
+                      <p className="mt-1 flex items-center gap-1 text-xs text-stone-600">
+                        <MapPin size={13} aria-hidden="true" />
+                        지도상 약 {Math.round(source.distanceMeters).toLocaleString("ko-KR")}m
+                      </p>
+                    )}
                   </div>
                 </div>
 
-                <div className="mt-3 flex items-start gap-2.5 rounded-lg border border-amber-100 bg-white/80 p-3">
+                <p className="mt-3 break-words text-sm leading-relaxed text-stone-700">
+                  {description ?? "설명 정보 없음"}
+                </p>
+
+                {evidence && <div className="mt-3 flex items-start gap-2.5 rounded-lg border border-amber-100 bg-white/80 p-3">
                   <FileSearch
                     size={16}
                     className="mt-0.5 shrink-0 text-stone-500"
@@ -77,13 +94,35 @@ export function NoiseSourcePanel({
                     </p>
                     <p
                       className={`mt-1 break-words text-sm leading-relaxed ${
-                        note ? "text-stone-700" : "text-stone-500"
+                        evidence ? "text-stone-700" : "text-stone-500"
                       }`}
                     >
-                      {note ?? "근거 정보 없음"}
+                      {evidence}
                     </p>
                   </div>
+                </div>}
+
+                <div className="mt-3 border-t border-amber-200 pt-3">
+                  <SourceAttribution
+                    source={source.source}
+                    sourceUrl={source.sourceUrl}
+                    license={source.license}
+                    licenseUrl={source.licenseUrl}
+                    lastVerifiedAt={source.lastVerifiedAt}
+                    label="지도 정보 출처"
+                    compact
+                    showDetails
+                  />
+                  {source.referenceDate && (
+                    <p className="mt-1 text-xs text-stone-600">지도 기준일 {source.referenceDate}</p>
+                  )}
                 </div>
+                {stale && (
+                  <p className="mt-3 flex items-start gap-1.5 rounded-lg bg-orange-100 p-2.5 text-xs leading-relaxed text-orange-900">
+                    <AlertTriangle size={14} className="mt-0.5 shrink-0" aria-hidden="true" />
+                    확인 후 1년이 지났거나 확인일이 없어 최신 현황을 다시 확인해야 합니다.
+                  </p>
+                )}
               </li>
             );
           })}

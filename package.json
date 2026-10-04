@@ -19,6 +19,7 @@
     "docker:up": "docker compose up --build",
     "data:collect-commons": "node --experimental-strip-types scripts/data/collect-commons.ts",
     "data:collect-parking": "node --experimental-strip-types scripts/data/collect-static-parking.ts",
+    "data:collect-noise": "node --experimental-strip-types scripts/data/collect-static-noise-sources.ts",
     "data:discover-wikidata": "node --experimental-strip-types scripts/data/discover-wikidata.ts",
     "data:upload-storage": "node --experimental-strip-types scripts/data/upload-storage.ts",
     "data:import-production": "node --experimental-strip-types scripts/data/import-production.ts",

@@ -31,6 +31,7 @@ function validLocation() {
       priceInfo: null,
       provenance: { ...provenance, sourceUrl: "https://example.com/parking/1" },
     }],
+    noiseSources: [],
     images: [{
       imagePath: "images/location.jpg",
       imageUrl: "https://example.com/location.jpg",
@@ -204,5 +205,40 @@ describe("validateLocationDataset", () => {
       expect.objectContaining({ field: "parking[0]" }),
       expect.objectContaining({ field: "parking[1]" }),
     ]);
+  });
+
+  it("rejects malformed, stale, and duplicate expected noise-source metadata", async () => {
+    const source = {
+      kind: "railway",
+      description: "인근 지상 철도",
+      distanceMeters: 120,
+      evidence: "railway=rail",
+      license: "ODbL 1.0",
+      licenseUrl: "https://www.openstreetmap.org/copyright",
+      provenance: {
+        source: "© OpenStreetMap contributors",
+        sourceUrl: "https://www.openstreetmap.org/way/1",
+        referenceDate: "2024-01-01",
+        lastVerifiedAt: "2024-01-01T00:00:00Z",
+      },
+    };
+    const location = {
+      ...validLocation(),
+      noiseSources: [source, { ...source, description: "중복" }, {
+        ...source,
+        provenance: { ...source.provenance, sourceUrl: "javascript:alert(1)", lastVerifiedAt: "invalid" },
+      }],
+    };
+    const report = await validateLocationDataset(dataset([location]), {
+      inspectImagePath: async () => "ok",
+      now: new Date("2026-10-04T00:00:00Z"),
+    });
+
+    expect(report.errors.map((item) => item.code)).toEqual(expect.arrayContaining<DataValidationErrorCode>([
+      "NOISE_SOURCE_STALE",
+      "NOISE_SOURCE_DUPLICATE",
+      "NOISE_SOURCE_INVALID",
+      "PROVENANCE_INVALID",
+    ]));
   });
 });

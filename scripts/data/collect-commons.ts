@@ -7,6 +7,11 @@ import type { NormalizedLocationOutput } from "./contracts.ts";
 import { parseNormalizedLocationOutput } from "./contracts.ts";
 import { parseManifest as parseEmbeddingManifest } from "../embeddings/contracts.ts";
 import { applyStaticParkingCatalog, parseStaticParkingCatalog, type StaticParkingCatalog } from "./static-parking.ts";
+import {
+  applyStaticNoiseSourceCatalog,
+  parseStaticNoiseSourceCatalog,
+  type StaticNoiseSourceCatalog,
+} from "./static-noise-sources.ts";
 import { LOCATION_CATEGORY_VALUES, REGION_VALUES } from "../../src/types/location-options.ts";
 import { isValidContactPhone } from "./permit-information.ts";
 
@@ -294,6 +299,7 @@ async function downloadImage(url: string, outputPath: string): Promise<{ sha256:
 export function buildLocationDataset(
   manifest: CollectionManifest,
   parkingCatalog?: StaticParkingCatalog,
+  noiseSourceCatalog?: StaticNoiseSourceCatalog,
 ): NormalizedLocationOutput {
   const verifiedAt = manifest.verified_at;
   const dataset = parseNormalizedLocationOutput({
@@ -327,6 +333,7 @@ export function buildLocationDataset(
         provenance: { source: location.source, sourceUrl: location.source_url, referenceDate: null, lastVerifiedAt: verifiedAt },
       },
       parking: [],
+      noiseSources: [],
       images: location.images.map((image) => ({
         imagePath: `public/locations/${image.filename}`,
         imageUrl: `${manifest.public_base_url}/${image.filename}`,
@@ -337,7 +344,8 @@ export function buildLocationDataset(
     })),
     reviewQueue: [],
   });
-  return parkingCatalog ? applyStaticParkingCatalog(dataset, parkingCatalog) : dataset;
+  const withParking = parkingCatalog ? applyStaticParkingCatalog(dataset, parkingCatalog) : dataset;
+  return noiseSourceCatalog ? applyStaticNoiseSourceCatalog(withParking, noiseSourceCatalog) : withParking;
 }
 
 export function buildEmbeddingManifest(
@@ -416,7 +424,10 @@ export async function collectCommonsDataset(manifestPath: string, repositoryRoot
   const parkingCatalog = parseStaticParkingCatalog(
     JSON.parse(await readFile(resolve(repositoryRoot, "data/production/static-parking.json"), "utf8")) as unknown,
   );
-  const locations = buildLocationDataset(manifest, parkingCatalog);
+  const noiseSourceCatalog = parseStaticNoiseSourceCatalog(
+    JSON.parse(await readFile(resolve(repositoryRoot, "data/production/static-noise-sources.json"), "utf8")) as unknown,
+  );
+  const locations = buildLocationDataset(manifest, parkingCatalog, noiseSourceCatalog);
   const embeddings = buildEmbeddingManifest(manifest, metadata);
   const licenses = {
     schema_version: 1,

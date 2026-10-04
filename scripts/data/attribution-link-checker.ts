@@ -1,6 +1,6 @@
 import type { ProductionRows } from "./production-importer.ts";
 
-export type AttributionLinkKind = "location-source" | "permit-source" | "image-source" | "parking-source" | "license";
+export type AttributionLinkKind = "location-source" | "permit-source" | "image-source" | "parking-source" | "noise-source" | "license";
 
 export type AttributionLinkReference = {
   kind: AttributionLinkKind;
@@ -62,6 +62,18 @@ export function collectAttributionLinks(rows: ProductionRows): AttributionLink[]
       kind: "permit-source",
       recordId: location.id,
       locationId: location.id,
+    });
+    location.noise_sources.forEach((noise, index) => {
+      addLink(links, noise.sourceUrl, {
+        kind: "noise-source",
+        recordId: `${noise.kind}:${index}`,
+        locationId: location.id,
+      });
+      addLink(links, noise.licenseUrl, {
+        kind: "license",
+        recordId: `${noise.kind}:${index}`,
+        locationId: location.id,
+      });
     });
   }
   for (const image of rows.images) {

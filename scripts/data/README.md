@@ -22,7 +22,7 @@ pnpm data:normalize \
   data-work/normalized/provider.json
 ```
 
-Normalized output schema version 2 contains `name`, `description`, `category`, `region`, `address`, flattened `latitude` and `longitude`, `permit`, `parking`, `images`, `sourceUrl`, and structured `provenance`. Shared field types are derived from `src/types/domain.ts`. Map `fields.id` to a controlled location UUID and `images.localPath` to each licensed local image when preparing data for validation and import. Both fields remain optional during initial normalization so a provider extract can be reviewed before database IDs and local assets are assigned.
+Normalized output schema version 2 contains `name`, `description`, `category`, `region`, `address`, flattened `latitude` and `longitude`, `permit`, `parking`, `noiseSources`, `images`, `sourceUrl`, and structured `provenance`. Shared field types are derived from `src/types/domain.ts`. Map `fields.id` to a controlled location UUID and `images.localPath` to each licensed local image when preparing data for validation and import. Both fields remain optional during initial normalization so a provider extract can be reviewed before database IDs and local assets are assigned.
 
 ### Category mapping and review queue
 
@@ -201,9 +201,33 @@ pnpm data:import-production data/production/locations.json data/production/embed
 
 The dry-run requires server-only Supabase credentials because it checks existing location foreign keys and `(location_id, name)` conflicts, but it performs no writes. Parking remains publicly readable under the existing RLS select policy; anon/authenticated write policies are not added.
 
+### Reviewed static expected noise sources
+
+Expected noise-source metadata uses OpenStreetMap, which is open data under the [Open Data Commons Open Database License](https://www.openstreetmap.org/copyright). Every published row retains `© OpenStreetMap contributors`, the exact OSM element URL, ODbL name/link, source snapshot date, and verification time. It describes only a mapped static environmental feature; it never stores a live reading, measured or predicted dB value, or a guarantee that noise will occur.
+
+Collect a small, explicitly selected review batch with location UUIDs:
+
+```bash
+pnpm data:collect-noise <location-uuid> [additional-location-uuid ...]
+```
+
+The command writes untouched responses to `data-work/static-noise-sources/raw.json` and review candidates to `data-work/static-noise-sources/candidates.json`; neither file is promoted automatically. Candidate discovery accepts mapped airports/runways within 5 km, visible railway within 2 km, motorway/trunk/primary roads within 1 km, and explicitly tagged construction within 1.5 km. It excludes tunnelled/covered railway and tunnelled road candidates. Review the feature type, source element, description, and relevance before copying an item to `data/production/static-noise-sources.json`.
+
+The committed catalog currently provides five reviewed environmental features for four locations. All other locations deliberately keep `noiseSources: []`, which the detail page presents as unavailable information. Verification older than 365 days, malformed provenance, duplicate source URLs, unsupported kinds, or a feature farther than 5 km block validation. `data:collect-commons` merges the catalog and recalculates straight-line distance from the canonical location coordinate.
+
+After migration `20261004000001_structured_noise_sources.sql`, publish only reviewed noise metadata without overwriting other location fields:
+
+```bash
+pnpm data:import-production data/production/locations.json data/production/embeddings-manifest.json --validate-only
+pnpm data:import-production data/production/locations.json data/production/embeddings-manifest.json --dry-run --noise-only
+pnpm data:import-production data/production/locations.json data/production/embeddings-manifest.json --apply --noise-only
+```
+
+The migration converts legacy string arrays and `{ kind, note }` entries to a structured legacy form with null attribution rather than inventing provenance. Runtime mapping retains the same compatibility for pre-migration databases. Malformed structured entries and duplicate source URLs are dropped with server warnings.
+
 `data:import-production` reads `image-licenses.json` from the directory containing `locations.json` by default. Use `--image-licenses <path>` only when the reviewed catalog lives elsewhere. It joins attribution by stable `image_id`, rejects missing or duplicate license records, mismatched location ownership, and non-HTTP(S) source/license URLs. Reusing the same source image in different locations remains valid when each use has its own stable image UUID and reviewed catalog entry.
 
-`data:check-attribution-links` checks the canonical place source, permit-specific official source, each reviewed parking source, each Commons source page, and every license URL before publishing. Duplicate URLs are requested once while the JSON report retains every location/image/parking reference that uses them. HTTP 404/410 responses are reported as `broken` and make the command fail only after a range `GET` confirms the `HEAD` result. Authentication, rate-limit, server, timeout, and network failures remain `unverified` so the report does not falsely call a provider-blocked URL broken. Providers that reject or do not implement `HEAD` are retried with a one-byte range `GET`. Review both `broken` and `unverified` rows; never replace a source URL with a guessed URL.
+`data:check-attribution-links` checks the canonical place source, permit-specific official source, each reviewed parking and expected-noise source, each Commons source page, and every license URL before publishing. Duplicate URLs are requested once while the JSON report retains every location/image/parking/noise reference that uses them. HTTP 404/410 responses are reported as `broken` and make the command fail only after a range `GET` confirms the `HEAD` result. Authentication, rate-limit, server, timeout, and network failures remain `unverified` so the report does not falsely call a provider-blocked URL broken. Providers that reject or do not implement `HEAD` are retried with a one-byte range `GET`. Review both `broken` and `unverified` rows; never replace a source URL with a guessed URL.
 
 After the schema migrations are installed, use the explicit production import sequence below from a trusted local shell. The service-role key must never be placed in a `NEXT_PUBLIC_*` variable or Vercel. The first importer writes location and image metadata; the second adds the validated vectors to those image rows. Both operations are idempotent by stable UUID. Always run `--dry-run` immediately before `--apply`.
 
@@ -269,8 +293,9 @@ The command writes a deterministic report with `valid`, aggregate counts, and ev
 - canonical category and region values;
 - finite latitude `[-90, 90]` and longitude `[-180, 180]`;
 - safe permit guidance, valid nullable public phone numbers, and HTTP(S) source/image URLs;
-- location, permit, and parking provenance names, URLs, reference dates, and verification timestamps;
+- location, permit, parking, and expected-noise provenance names, URLs, reference dates, and verification timestamps;
 - explicit `on_site`/`nearby` parking relationships and duplicate parking name/coordinate pairs;
+- structured expected-noise kinds, distance/evidence, license attribution, freshness, and duplicate source URLs;
 - at least one image, non-blank alt text, a local image path, and whether that path is a regular file.
 
 Validation reads file metadata only. It does not upload, modify, or decode images, and it does not connect to Supabase. A passing report means the checked structure is safe to hand to the next import review; it does not prove data accuracy, licensing, or authorization.

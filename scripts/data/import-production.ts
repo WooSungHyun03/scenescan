@@ -31,7 +31,7 @@ type CliOptions = {
 export function parseProductionImportArgs(args: string[]): CliOptions {
   const [locationsPath, manifestPath, ...flags] = args;
   if (!locationsPath || !manifestPath) {
-    throw new Error("Usage: pnpm data:import-production <locations.json> <embeddings-manifest.json> [--image-licenses PATH] [--validate-only | --dry-run | --apply] [--batch-size N] [--insert-only | --attribution-only | --permit-only | --parking-only]");
+    throw new Error("Usage: pnpm data:import-production <locations.json> <embeddings-manifest.json> [--image-licenses PATH] [--validate-only | --dry-run | --apply] [--batch-size N] [--insert-only | --attribution-only | --permit-only | --parking-only | --noise-only]");
   }
   let mode: ProductionImportMode = "validate-only";
   let selectedMode = false;
@@ -53,6 +53,8 @@ export function parseProductionImportArgs(args: string[]): CliOptions {
       writeScope = "permit-only";
     } else if (flag === "--parking-only") {
       writeScope = "parking-only";
+    } else if (flag === "--noise-only") {
+      writeScope = "noise-only";
     } else if (flag === "--batch-size") {
       batchSize = Number(flags[++index]);
     } else if (flag === "--image-licenses") {
@@ -131,6 +133,9 @@ export function createProductionImportDatabase(client: SupabaseClient): Producti
     async updatePermitMetadata(rows) {
       await updateRows("locations", rows);
     },
+    async updateNoiseSources(rows) {
+      await updateRows("locations", rows);
+    },
   };
 }
 
@@ -159,7 +164,7 @@ async function main(): Promise<void> {
     options.writeScope,
   );
   console.log(
-    `Production data import: mode=${result.mode}, scope=${result.writeScope}, locations=${result.locationsValidated}, images=${result.imagesValidated}, parking=${result.parkingValidated}, existing=${result.existingLocations}/${result.existingImages}/${result.existingParking}, written=${result.locationsWritten}/${result.imagesWritten}/${result.parkingWritten}`,
+    `Production data import: mode=${result.mode}, scope=${result.writeScope}, locations=${result.locationsValidated}, images=${result.imagesValidated}, parking=${result.parkingValidated}, noise=${result.noiseSourcesValidated}, existing=${result.existingLocations}/${result.existingImages}/${result.existingParking}, written=${result.locationsWritten}/${result.imagesWritten}/${result.parkingWritten}`,
   );
 }
 

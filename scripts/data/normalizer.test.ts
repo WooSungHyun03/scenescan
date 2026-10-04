@@ -149,6 +149,7 @@ describe("normalizeDataset", () => {
             lastVerifiedAt: "2026-09-22T10:00:00Z",
           },
         }],
+        noiseSources: [],
         images: [
           { imagePath: "images/one.jpg", imageUrl: "https://example.com/one.jpg", alt: "Exterior" },
           { imagePath: "images/two.jpg", imageUrl: "https://example.com/two.jpg", alt: "Sample Warehouse" },

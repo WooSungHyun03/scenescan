@@ -238,6 +238,7 @@ function normalizeRecordWithCategory(
       provenance: provenanceRecord(record, mapping.provenance.permit, locationProvenance),
     },
     parking: parkingRecords(record, mapping.parking, mapping.parkingRelationshipMap, locationProvenance),
+    noiseSources: [],
     images: imageRecords(record, mapping.images, name),
     sourceUrl: locationProvenance.sourceUrl,
     provenance: locationProvenance,

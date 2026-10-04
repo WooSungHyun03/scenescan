@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { Location, LocationImage, ParkingInfo } from "../../src/types/domain.ts";
+import type { Location, LocationImage, NoiseSource, ParkingInfo } from "../../src/types/domain.ts";
 import type { CategoryReviewReason } from "./category-mapping.ts";
 import { PERMIT_GUIDANCE_VALUES } from "./permit-information.ts";
 import { LOCATION_CATEGORY_VALUES, REGION_VALUES } from "../../src/types/location-options.ts";
@@ -49,6 +49,13 @@ export type CanonicalParkingRecord = {
   provenance: DataProvenance;
 };
 
+export type CanonicalNoiseSourceRecord = Pick<
+  NoiseSource,
+  "kind" | "description" | "distanceMeters" | "evidence" | "license" | "licenseUrl"
+> & {
+  provenance: DataProvenance;
+};
+
 export type CanonicalLocationRecord = {
   id?: Location["id"];
   name: Location["name"];
@@ -60,6 +67,7 @@ export type CanonicalLocationRecord = {
   longitude: Location["point"]["longitude"];
   permit: CanonicalPermitInfo;
   parking: CanonicalParkingRecord[];
+  noiseSources: CanonicalNoiseSourceRecord[];
   images: CanonicalLocationImage[];
   sourceUrl: NonNullable<Location["sourceUrl"]>;
   provenance: DataProvenance;
@@ -108,6 +116,21 @@ export const canonicalLocationRecordSchema: z.ZodType<CanonicalLocationRecord> =
     priceInfo: nonEmptyString.nullable(),
     provenance: dataProvenanceSchema,
   }).strict()),
+  noiseSources: z.array(z.object({
+    kind: z.enum(["railway", "major_road", "airport", "construction"]),
+    description: nonEmptyString,
+    distanceMeters: z.number().finite().nonnegative().nullable(),
+    evidence: nonEmptyString.nullable(),
+    license: nonEmptyString,
+    licenseUrl: httpUrl,
+    provenance: dataProvenanceSchema.refine(
+      (value) => value.lastVerifiedAt !== null,
+      { message: "Noise-source provenance requires lastVerifiedAt", path: ["lastVerifiedAt"] },
+    ),
+  }).strict().refine(
+    (value) => value.distanceMeters !== null || value.evidence !== null,
+    "Noise source requires distanceMeters or evidence",
+  )).default([]),
   images: z.array(z.object({
     imagePath: nonEmptyString.optional(),
     imageUrl: httpUrl,

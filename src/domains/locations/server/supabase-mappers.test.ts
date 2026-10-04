@@ -126,6 +126,53 @@ describe("toLocation", () => {
     expect(location.parking[0].priceInfo).toBeNull();
     expect(location.parking[0].relationship).toBe("nearby");
   });
+
+  it("converts legacy string and kind/note arrays without inventing provenance", () => {
+    const { location, warnings } = toLocation(baseRow({
+      noise_sources: ["인근 철도", { kind: "railway", note: "기존 철도 메모" }],
+    }));
+    expect(warnings).toEqual([]);
+    expect(location.noiseSources).toEqual([
+      expect.objectContaining({ kind: "other", description: "인근 철도", sourceUrl: null, lastVerifiedAt: null }),
+      expect.objectContaining({ kind: "railway", description: "기존 철도 메모", sourceUrl: null, lastVerifiedAt: null }),
+    ]);
+  });
+
+  it("maps structured expected-noise provenance", () => {
+    const { location, warnings } = toLocation(baseRow({
+      noise_sources: [{
+        kind: "major_road",
+        description: "왕십리로 간선도로",
+        distanceMeters: 353,
+        evidence: "highway=primary",
+        source: "© OpenStreetMap contributors",
+        sourceUrl: "https://www.openstreetmap.org/way/218797187",
+        license: "ODbL 1.0",
+        licenseUrl: "https://www.openstreetmap.org/copyright",
+        referenceDate: "2026-07-15",
+        lastVerifiedAt: "2026-10-04T11:22:00+09:00",
+      }],
+    }));
+    expect(warnings).toEqual([]);
+    expect(location.noiseSources[0]).toMatchObject({ kind: "major_road", distanceMeters: 353 });
+  });
+
+  it("drops malformed provenance and duplicate source URLs with warnings", () => {
+    const valid = {
+      kind: "railway", description: "철도", distanceMeters: 100, evidence: "railway=rail",
+      source: "OSM", sourceUrl: "https://www.openstreetmap.org/way/1",
+      license: "ODbL", licenseUrl: "https://www.openstreetmap.org/copyright",
+      referenceDate: "2026-07-15", lastVerifiedAt: "2026-10-04T00:00:00Z",
+    };
+    const { location, warnings } = toLocation(baseRow({
+      noise_sources: [valid, { ...valid }, { ...valid, sourceUrl: "javascript:alert(1)" }],
+    }));
+    expect(location.noiseSources).toHaveLength(1);
+    expect(warnings.map((warning) => warning.reason)).toEqual([
+      "duplicate source URL",
+      "malformed structured noise-source provenance or evidence",
+    ]);
+  });
 });
 
 describe("parseLocationRows / parseLocationRow (locations select response validation)", () => {

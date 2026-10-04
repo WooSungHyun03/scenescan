@@ -23,7 +23,18 @@ function rows(): ProductionRows {
       permit_source_url: "https://example.com/permit",
       permit_reference_date: null,
       permit_last_verified_at: "2026-10-02T00:00:00Z",
-      noise_sources: [],
+      noise_sources: [{
+        kind: "railway",
+        description: "철도",
+        distanceMeters: 120,
+        evidence: "railway=rail",
+        source: "© OpenStreetMap contributors",
+        sourceUrl: "https://www.openstreetmap.org/way/1",
+        license: "ODbL 1.0",
+        licenseUrl: "https://www.openstreetmap.org/copyright",
+        referenceDate: "2026-07-15",
+        lastVerifiedAt: "2026-10-04T00:00:00Z",
+      }],
       source: "Wikidata",
       source_url: "https://www.wikidata.org/wiki/Q1",
       author: null,
@@ -65,9 +76,10 @@ describe("attribution link checker", () => {
     const links = collectAttributionLinks(rows());
     const shared = links.find((link) => link.url.includes("Shared.jpg"));
 
-    expect(links).toHaveLength(6);
+    expect(links).toHaveLength(8);
     expect(links.find((link) => link.url.endsWith("/permit"))?.references[0].kind).toBe("permit-source");
     expect(links.find((link) => link.url.includes("15012896"))?.references[0].kind).toBe("parking-source");
+    expect(links.find((link) => link.url.endsWith("/way/1"))?.references[0].kind).toBe("noise-source");
     expect(shared?.references).toHaveLength(2);
     expect(shared?.references.map((reference) => reference.recordId)).toEqual(["image-a", "image-b"]);
   });

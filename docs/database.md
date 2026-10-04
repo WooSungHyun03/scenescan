@@ -15,12 +15,13 @@ Migrations, applied in order:
 11. `supabase/migrations/20261002000001_match_location_images_filtered_model.sql` — adds `expected_embedding_model` to `match_location_images_filtered`, matching `match_location_images`'s own parameter/semantics (see below). Backend-owned follow-up to migration 10.
 12. `supabase/migrations/20261003000000_permit_provenance.sql` — adds permit-specific source, source URL, reference date, and verification time to `locations`.
 13. `supabase/migrations/20261004000000_static_parking_metadata.sql` — adds reviewed `on_site`/`nearby` relationship and HTTP(S) source URL columns to `parking`, while retaining the initial public-read-only RLS policy.
+14. `supabase/migrations/20261004000001_structured_noise_sources.sql` — converts legacy `noise_sources` strings and `{ kind, note }` objects to an honest structured legacy form, adds a JSONB contract check for reviewed expected-noise metadata, and retains public-read-only RLS. No dB field is introduced.
 
 Migrations 5–9 were renumbered to run after migration 4 (`20261001000000_location_attribution.sql`, from `origin/main`) when this branch was merged: they had never been applied to any real Supabase project at that point, while migration 4 already had been, so sequencing them after it (rather than main re-sequencing around this branch's then-earlier timestamps) kept a single order valid for both a fresh database and the real deployed one. See the merge report for the full analysis, including why migration 5 originally named its batch-provenance column `locations.source` and had to be renamed to `import_batch` (below) and why a since-removed `exclude_location_id` migration for `match_location_images` was dropped entirely once `match_similar_location_images` (migration 2) was adopted for similar-locations search instead.
 
 | Table | Purpose |
 | --- | --- |
-| `locations` | Identity, descriptive data, region/category, coordinates, permit contact, small noise metadata JSONB, attribution metadata, scripts/data import-batch provenance |
+| `locations` | Identity, descriptive data, region/category, coordinates, permit contact, structured static expected-noise metadata JSONB, attribution metadata, scripts/data import-batch provenance |
 | `location_images` | Multiple images per location; nullable `extensions.vector(512)` for offline backfill; embedding provenance; attribution metadata |
 | `parking` | Location-associated on-site/nearby static parking; source URL and freshness provenance |
 
