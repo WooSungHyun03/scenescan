@@ -43,7 +43,7 @@ The shortlist remains a browser-only workflow: it stores only location IDs under
 
 The browser map adapter loads the official Kakao Maps JavaScript SDK only when `NEXT_PUBLIC_KAKAO_MAP_KEY` is configured. The Kakao Developers application must register every local and production JavaScript SDK domain. Missing keys and SDK load failures preserve the no-key map preview; neither case blocks location detail or search results. The adapter receives WGS84 coordinates and display labels from the location domain and does not geocode inside the UI.
 
-The Docker build uses Next.js standalone output, installs dependencies in a dedicated stage, and runs the final image as an unprivileged user. `/api/health` is the container and deployment liveness endpoint. GitHub Actions runs lint, type checking, tests, the Next.js build, image build, and container smoke checks inside Docker. Vercel's existing Git integration remains the only production deploy trigger, avoiding a duplicate CI deployment.
+The Docker build uses Next.js standalone output, installs dependencies in a dedicated stage, and runs the final image as an unprivileged user. `/api/health` is the container and deployment liveness endpoint. GitHub Actions runs lint, type checking, tests, the Next.js build, image build, container smoke checks, and key-free browser E2E inside Docker. Real Vercel/Supabase/CLIP/Kakao smoke coverage is isolated in a weekly/manual single-query workflow so PR traffic cannot consume the free production quotas. Vercel's existing Git integration remains the only production deploy trigger, avoiding a duplicate CI deployment.
 
 ## Known scaffold limits
 

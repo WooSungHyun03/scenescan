@@ -1,17 +1,45 @@
 import { z } from "zod";
+import { basename } from "node:path";
 import { isPermitGuidance, isValidContactPhone } from "./permit-information.ts";
 import { LOCATION_CATEGORY_VALUES, REGION_VALUES } from "../../src/types/location-options.ts";
 import { isNoiseSourceVerificationStale } from "../../src/domains/locations/services/noise-source.ts";
+import {
+  parseImageLicenseCatalog,
+  type ImageLicenseCatalog,
+} from "./production-importer.ts";
 
 const categories = new Set<string>(LOCATION_CATEGORY_VALUES);
 const regions = new Set<string>(REGION_VALUES);
 const uuidSchema = z.string().uuid();
 const isoDateSchema = z.iso.date();
 const isoDateTimeSchema = z.iso.datetime({ offset: true });
+const httpUrlSchema = z.string().url().refine(
+  (value) => value.startsWith("https://") || value.startsWith("http://"),
+  "URL must use http or https",
+);
+const embeddingManifestSchema = z.object({
+  schema_version: z.literal(1),
+  items: z.array(z.object({
+    image_id: z.string().uuid(),
+    location_id: z.string().uuid(),
+    image_path: z.string().trim().min(1),
+    image_url: httpUrlSchema,
+    source: z.string().trim().min(1),
+    source_url: httpUrlSchema,
+  }).strict()).min(1),
+}).strict();
+
+type EmbeddingManifest = z.infer<typeof embeddingManifestSchema>;
 
 type JsonObject = Record<string, unknown>;
 
 export type ImagePathStatus = "ok" | "missing" | "not-file" | "unreadable";
+export type ImagePathInspection = {
+  status: ImagePathStatus;
+  bytes?: number;
+  sha256?: string;
+};
+export type DataValidationMode = "metadata-only" | "require-local-assets";
 
 export type DataValidationErrorCode =
   | "DATASET_INVALID"
@@ -45,7 +73,12 @@ export type DataValidationErrorCode =
   | "IMAGE_PATH_REQUIRED"
   | "IMAGE_PATH_NOT_FOUND"
   | "IMAGE_PATH_NOT_FILE"
-  | "IMAGE_PATH_UNREADABLE";
+  | "IMAGE_PATH_UNREADABLE"
+  | "IMAGE_SIZE_MISMATCH"
+  | "IMAGE_CHECKSUM_MISMATCH"
+  | "EMBEDDING_MANIFEST_INVALID"
+  | "LICENSE_MANIFEST_INVALID"
+  | "IMAGE_METADATA_MISMATCH";
 
 export type DataValidationError = {
   code: DataValidationErrorCode;
@@ -56,7 +89,8 @@ export type DataValidationError = {
 };
 
 export type DataValidationReport = {
-  schemaVersion: 1;
+  schemaVersion: 2;
+  mode: DataValidationMode;
   valid: boolean;
   summary: {
     totalLocations: number;
@@ -68,7 +102,10 @@ export type DataValidationReport = {
 };
 
 export type DataValidationOptions = {
-  inspectImagePath: (imagePath: string) => Promise<ImagePathStatus>;
+  mode: DataValidationMode;
+  inspectImagePath?: (imagePath: string) => Promise<ImagePathStatus | ImagePathInspection>;
+  embeddingManifest?: unknown;
+  imageLicenses?: unknown;
   now?: Date;
 };
 
@@ -89,6 +126,10 @@ function isHttpUrl(value: unknown): boolean {
   } catch {
     return false;
   }
+}
+
+function normalizeInspection(value: ImagePathStatus | ImagePathInspection): ImagePathInspection {
+  return typeof value === "string" ? { status: value } : value;
 }
 
 function error(
@@ -300,12 +341,17 @@ async function validateImage(
     return errors;
   }
 
-  const status = await options.inspectImagePath(imagePath);
-  if (status === "missing") {
+  if (options.mode === "metadata-only") return errors;
+  if (!options.inspectImagePath) {
+    throw new Error("require-local-assets validation requires an image path inspector");
+  }
+
+  const inspection = normalizeInspection(await options.inspectImagePath(imagePath));
+  if (inspection.status === "missing") {
     errors.push(error("IMAGE_PATH_NOT_FOUND", locationIndex, locationId, `${prefix}.imagePath`, `Image file does not exist: ${imagePath}`));
-  } else if (status === "not-file") {
+  } else if (inspection.status === "not-file") {
     errors.push(error("IMAGE_PATH_NOT_FILE", locationIndex, locationId, `${prefix}.imagePath`, `Image path is not a regular file: ${imagePath}`));
-  } else if (status === "unreadable") {
+  } else if (inspection.status === "unreadable") {
     errors.push(error("IMAGE_PATH_UNREADABLE", locationIndex, locationId, `${prefix}.imagePath`, `Image path could not be inspected: ${imagePath}`));
   }
   return errors;
@@ -450,7 +496,11 @@ async function validateLocation(
   return { id, errors };
 }
 
-function createReport(totalLocations: number, errors: DataValidationError[]): DataValidationReport {
+function createReport(
+  mode: DataValidationMode,
+  totalLocations: number,
+  errors: DataValidationError[],
+): DataValidationReport {
   const compareText = (left: string, right: string) => left < right ? -1 : left > right ? 1 : 0;
   errors.sort((left, right) => (
     (left.locationIndex ?? -1) - (right.locationIndex ?? -1)
@@ -461,7 +511,8 @@ function createReport(totalLocations: number, errors: DataValidationError[]): Da
     errors.flatMap((item) => item.locationIndex === null ? [] : [item.locationIndex]),
   );
   return {
-    schemaVersion: 1,
+    schemaVersion: 2,
+    mode,
     valid: errors.length === 0,
     summary: {
       totalLocations,
@@ -473,12 +524,200 @@ function createReport(totalLocations: number, errors: DataValidationError[]): Da
   };
 }
 
+async function productionMetadataErrors(
+  value: JsonObject,
+  options: DataValidationOptions,
+): Promise<DataValidationError[]> {
+  if (options.embeddingManifest === undefined && options.imageLicenses === undefined) return [];
+  if (options.embeddingManifest === undefined || options.imageLicenses === undefined) {
+    return [error(
+      "IMAGE_METADATA_MISMATCH",
+      null,
+      null,
+      "productionMetadata",
+      "Embedding manifest and image license catalog must be validated together",
+    )];
+  }
+
+  let manifest: EmbeddingManifest;
+  try {
+    manifest = embeddingManifestSchema.parse(options.embeddingManifest);
+    const imageIds = new Set<string>();
+    for (const item of manifest.items) {
+      if (imageIds.has(item.image_id)) {
+        throw new Error(`Duplicate image_id in manifest: ${item.image_id}`);
+      }
+      imageIds.add(item.image_id);
+    }
+  } catch (cause) {
+    return [error(
+      "EMBEDDING_MANIFEST_INVALID",
+      null,
+      null,
+      "embeddingManifest",
+      cause instanceof Error ? cause.message : "Embedding manifest is invalid",
+    )];
+  }
+
+  let licenses: ImageLicenseCatalog;
+  try {
+    licenses = parseImageLicenseCatalog(options.imageLicenses);
+  } catch (cause) {
+    return [error(
+      "LICENSE_MANIFEST_INVALID",
+      null,
+      null,
+      "imageLicenses",
+      cause instanceof Error ? cause.message : "Image license catalog is invalid",
+    )];
+  }
+
+  const errors: DataValidationError[] = [];
+  const locations = Array.isArray(value.locations) ? value.locations : [];
+  const locationIndexById = new Map<string, number>();
+  const datasetImageCounts = new Map<string, number>();
+  const datasetImagePaths = new Map<string, string>();
+  locations.forEach((location, locationIndex) => {
+    if (!isObject(location)) return;
+    const locationId = nonEmptyText(location.id);
+    if (!locationId) return;
+    locationIndexById.set(locationId, locationIndex);
+    if (!Array.isArray(location.images)) return;
+    for (const image of location.images) {
+      if (!isObject(image)) continue;
+      const imageUrl = nonEmptyText(image.imageUrl);
+      if (imageUrl) {
+        const key = `${locationId}\u0000${imageUrl}`;
+        datasetImageCounts.set(key, (datasetImageCounts.get(key) ?? 0) + 1);
+        const imagePath = nonEmptyText(image.imagePath);
+        if (imagePath) datasetImagePaths.set(key, imagePath);
+      }
+    }
+  });
+
+  const manifestById = new Map(manifest.items.map((item) => [item.image_id, item]));
+  const licenseById = new Map(licenses.items.map((item) => [item.imageId, item]));
+  const manifestImageCounts = new Map<string, number>();
+
+  for (const item of manifest.items) {
+    const locationIndex = locationIndexById.get(item.location_id) ?? null;
+    const key = `${item.location_id}\u0000${item.image_url}`;
+    manifestImageCounts.set(key, (manifestImageCounts.get(key) ?? 0) + 1);
+
+    const license = licenseById.get(item.image_id);
+    if (!license) {
+      errors.push(error(
+        "LICENSE_MANIFEST_INVALID",
+        locationIndex,
+        item.location_id,
+        "imageLicenses.items",
+        `Image is missing from the license catalog: ${item.image_id}`,
+      ));
+      continue;
+    }
+    if (license.locationId !== item.location_id) {
+      errors.push(error(
+        "IMAGE_METADATA_MISMATCH",
+        locationIndex,
+        item.location_id,
+        "imageLicenses.items.location_id",
+        `Image license location does not match the embedding manifest: ${item.image_id}`,
+      ));
+    }
+    if (
+      !license.sourceUrl
+      || !license.author
+      || !license.license
+      || !license.licenseUrl
+      || !license.filename
+      || !license.localSha256
+      || !license.localBytes
+    ) {
+      errors.push(error(
+        "LICENSE_MANIFEST_INVALID",
+        locationIndex,
+        item.location_id,
+        "imageLicenses.items",
+        `Image license must include source URL, author, license, license URL, filename, local SHA-256, and local byte size: ${item.image_id}`,
+      ));
+      continue;
+    }
+
+    const datasetImagePath = datasetImagePaths.get(key);
+    if (datasetImagePath && basename(datasetImagePath) !== license.filename) {
+      errors.push(error(
+        "IMAGE_METADATA_MISMATCH",
+        locationIndex,
+        item.location_id,
+        "imageLicenses.items.filename",
+        `License filename does not match the location image path: ${item.image_id}`,
+      ));
+    }
+    if (options.mode === "require-local-assets" && datasetImagePath && options.inspectImagePath) {
+      const inspection = normalizeInspection(await options.inspectImagePath(datasetImagePath));
+      if (inspection.status === "ok" && inspection.bytes !== undefined && inspection.bytes !== license.localBytes) {
+        errors.push(error(
+          "IMAGE_SIZE_MISMATCH",
+          locationIndex,
+          item.location_id,
+          "images.imagePath",
+          `Local image byte size differs from the reviewed license manifest: ${datasetImagePath}`,
+        ));
+      }
+      if (inspection.status === "ok" && inspection.sha256 && inspection.sha256 !== license.localSha256) {
+        errors.push(error(
+          "IMAGE_CHECKSUM_MISMATCH",
+          locationIndex,
+          item.location_id,
+          "images.imagePath",
+          `Local image SHA-256 differs from the reviewed license manifest: ${datasetImagePath}`,
+        ));
+      }
+    }
+  }
+
+  for (const [key, datasetCount] of datasetImageCounts) {
+    const manifestCount = manifestImageCounts.get(key) ?? 0;
+    if (datasetCount !== manifestCount) {
+      errors.push(error(
+        "IMAGE_METADATA_MISMATCH",
+        null,
+        key.split("\u0000", 1)[0] ?? null,
+        "locations.images",
+        `Location/embedding image count mismatch: dataset=${datasetCount}, manifest=${manifestCount}`,
+      ));
+    }
+  }
+  for (const [key, manifestCount] of manifestImageCounts) {
+    if (datasetImageCounts.has(key)) continue;
+    errors.push(error(
+      "IMAGE_METADATA_MISMATCH",
+      null,
+      key.split("\u0000", 1)[0] ?? null,
+      "embeddingManifest.items",
+      `Embedding image is absent from location metadata: manifest=${manifestCount}`,
+    ));
+  }
+  for (const license of licenses.items) {
+    if (!manifestById.has(license.imageId)) {
+      errors.push(error(
+        "LICENSE_MANIFEST_INVALID",
+        locationIndexById.get(license.locationId) ?? null,
+        license.locationId,
+        "imageLicenses.items",
+        `License entry is absent from the embedding manifest: ${license.imageId}`,
+      ));
+    }
+  }
+  return errors;
+}
+
 export async function validateLocationDataset(
   value: unknown,
   options: DataValidationOptions,
 ): Promise<DataValidationReport> {
   if (!isObject(value)) {
-    return createReport(0, [error("DATASET_INVALID", null, null, "$", "Dataset must be an object")]);
+    return createReport(options.mode, 0, [error("DATASET_INVALID", null, null, "$", "Dataset must be an object")]);
   }
 
   const rootErrors: DataValidationError[] = [];
@@ -501,13 +740,17 @@ export async function validateLocationDataset(
   }
   if (!Array.isArray(value.locations)) {
     rootErrors.push(error("DATASET_INVALID", null, null, "locations", "Dataset locations must be an array"));
-    return createReport(0, rootErrors);
+    return createReport(options.mode, 0, rootErrors);
   }
 
   const results = await Promise.all(
     value.locations.map((location, index) => validateLocation(location, index, options)),
   );
-  const errors = [...rootErrors, ...results.flatMap((result) => result.errors)];
+  const errors = [
+    ...rootErrors,
+    ...results.flatMap((result) => result.errors),
+    ...await productionMetadataErrors(value, options),
+  ];
   const indexesById = new Map<string, number[]>();
   results.forEach((result, index) => {
     if (!result.id) return;
@@ -526,5 +769,5 @@ export async function validateLocationDataset(
       ));
     }
   }
-  return createReport(value.locations.length, errors);
+  return createReport(options.mode, value.locations.length, errors);
 }

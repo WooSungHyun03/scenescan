@@ -142,6 +142,7 @@ function getSupabaseImagePattern(): NonNullable<NextConfig["images"]>["remotePat
 }
 
 const nextConfig: NextConfig = {
+  agentRules: false,
   output: "standalone",
   poweredByHeader: false,
   images: {

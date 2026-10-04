@@ -19,6 +19,16 @@ export type StoragePlan = {
   items: StoragePlanItem[];
 };
 
+export type LocalAssetValidationResult = {
+  files: number;
+  bytes: number;
+};
+
+export type LocalAssetExpectation = {
+  bytes: number;
+  sha256: string;
+};
+
 export function isIdenticalStoredJpeg(bytes: Buffer, stored: { size?: number; contentType?: string; etag?: string }): boolean {
   return stored.size === bytes.length && stored.contentType === "image/jpeg"
     && stored.etag?.replaceAll('"', "") === createHash("md5").update(bytes).digest("hex");
@@ -89,10 +99,56 @@ export function buildStoragePlan(
 }
 
 export async function readValidatedJpeg(path: string): Promise<Buffer> {
-  const value = await readFile(path);
+  let value: Buffer;
+  try {
+    value = await readFile(path);
+  } catch (error) {
+    if (
+      typeof error === "object"
+      && error !== null
+      && "code" in error
+      && error.code === "ENOENT"
+    ) {
+      throw new Error(
+        `Required local image is missing: ${path}. Restore it only through the reviewed license-manifest collection procedure; the uploader never downloads source images automatically.`,
+        { cause: error },
+      );
+    }
+    throw error;
+  }
   if (value.length === 0 || value.length > 5 * 1024 * 1024) throw new Error(`${path} must be between 1 byte and 5 MB`);
   if (value[0] !== 0xff || value[1] !== 0xd8 || value.at(-2) !== 0xff || value.at(-1) !== 0xd9) {
     throw new Error(`${path} is not a complete JPEG`);
   }
   return value;
+}
+
+export async function validateStoragePlanLocalAssets(
+  items: StoragePlanItem[],
+  concurrency = 4,
+  expectedByImageId?: ReadonlyMap<string, LocalAssetExpectation>,
+): Promise<LocalAssetValidationResult> {
+  if (!Number.isInteger(concurrency) || concurrency < 1 || concurrency > 8) {
+    throw new Error("asset validation concurrency must be an integer between 1 and 8");
+  }
+  let nextIndex = 0;
+  let bytes = 0;
+  await Promise.all(Array.from({ length: Math.min(concurrency, items.length) }, async () => {
+    while (nextIndex < items.length) {
+      const item = items[nextIndex++];
+      const value = await readValidatedJpeg(item.localPath);
+      const expected = expectedByImageId?.get(item.imageId);
+      if (expectedByImageId && !expected) {
+        throw new Error(`Missing reviewed local asset checksum: ${item.imageId}`);
+      }
+      if (expected && value.length !== expected.bytes) {
+        throw new Error(`Local image byte size differs from the reviewed license manifest: ${item.localPath}`);
+      }
+      if (expected && createHash("sha256").update(value).digest("hex") !== expected.sha256) {
+        throw new Error(`Local image SHA-256 differs from the reviewed license manifest: ${item.localPath}`);
+      }
+      bytes += value.length;
+    }
+  }));
+  return { files: items.length, bytes };
 }

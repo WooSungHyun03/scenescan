@@ -1,17 +1,25 @@
 import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
-import { resolve } from "node:path";
+import { dirname, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { createClient } from "@supabase/supabase-js";
 import { parseManifest } from "../embeddings/contracts.ts";
 import { readDatabaseEnvironment } from "../embeddings/import.ts";
 import { parseNormalizedLocationOutput } from "./contracts.ts";
-import { buildStoragePlan, readValidatedJpeg, isIdenticalStoredJpeg } from "./storage-uploader.ts";
+import {
+  buildStoragePlan,
+  readValidatedJpeg,
+  isIdenticalStoredJpeg,
+  validateStoragePlanLocalAssets,
+} from "./storage-uploader.ts";
+import { validateLocationDataset } from "./validator.ts";
+import { parseImageLicenseCatalog } from "./production-importer.ts";
 
 type Mode = "dry-run" | "apply";
 type CliOptions = {
   datasetPath: string;
   manifestPath: string;
   outputDirectory: string;
+  imageLicensesPath: string;
   bucket: string;
   mode: Mode;
   concurrency: number;
@@ -20,12 +28,13 @@ type CliOptions = {
 export function parseStorageUploadArgs(args: string[]): CliOptions {
   const [datasetPath, manifestPath, outputDirectory, ...flags] = args;
   if (!datasetPath || !manifestPath || !outputDirectory) {
-    throw new Error("Usage: pnpm data:upload-storage <locations.json> <embeddings-manifest.json> <output-dir> [--dry-run | --apply] [--bucket name] [--concurrency N]");
+    throw new Error("Usage: pnpm data:upload-storage <locations.json> <embeddings-manifest.json> <output-dir> [--image-licenses path] [--dry-run | --apply] [--bucket name] [--concurrency N]");
   }
   let mode: Mode = "dry-run";
   let modeSelected = false;
   let bucket = "location-images";
   let concurrency = 4;
+  let imageLicensesPath = resolve(dirname(datasetPath), "image-licenses.json");
   for (let index = 0; index < flags.length; index += 1) {
     const flag = flags[index];
     if (flag === "--dry-run" || flag === "--apply") {
@@ -34,6 +43,11 @@ export function parseStorageUploadArgs(args: string[]): CliOptions {
       mode = flag.slice(2) as Mode;
     } else if (flag === "--bucket") bucket = flags[++index] ?? "";
     else if (flag === "--concurrency") concurrency = Number(flags[++index]);
+    else if (flag === "--image-licenses") {
+      const value = flags[++index];
+      if (!value) throw new Error("--image-licenses requires a path");
+      imageLicensesPath = resolve(value);
+    }
     else throw new Error(`Unknown option: ${flag}`);
   }
   if (!Number.isInteger(concurrency) || concurrency < 1 || concurrency > 8) {
@@ -43,6 +57,7 @@ export function parseStorageUploadArgs(args: string[]): CliOptions {
     datasetPath: resolve(datasetPath),
     manifestPath: resolve(manifestPath),
     outputDirectory: resolve(outputDirectory),
+    imageLicensesPath,
     bucket,
     mode,
     concurrency,
@@ -65,8 +80,23 @@ async function mapConcurrent<T>(values: T[], concurrency: number, task: (value: 
 async function main(): Promise<void> {
   const options = parseStorageUploadArgs(process.argv.slice(2));
   const environment = readDatabaseEnvironment(process.env);
-  const dataset = parseNormalizedLocationOutput(JSON.parse(await readFile(options.datasetPath, "utf8")) as unknown);
-  const manifest = parseManifest(JSON.parse(await readFile(options.manifestPath, "utf8")) as unknown);
+  const datasetValue = JSON.parse(await readFile(options.datasetPath, "utf8")) as unknown;
+  const manifestValue = JSON.parse(await readFile(options.manifestPath, "utf8")) as unknown;
+  const imageLicenses = JSON.parse(await readFile(options.imageLicensesPath, "utf8")) as unknown;
+  const metadataReport = await validateLocationDataset(datasetValue, {
+    mode: "metadata-only",
+    embeddingManifest: manifestValue,
+    imageLicenses,
+  });
+  if (!metadataReport.valid) {
+    const first = metadataReport.errors[0];
+    throw new Error(
+      `Storage metadata validation failed with ${metadataReport.summary.errorCount} error(s): ${first?.code ?? "unknown"} ${first?.message ?? ""}`,
+    );
+  }
+  const dataset = parseNormalizedLocationOutput(datasetValue);
+  const manifest = parseManifest(manifestValue);
+  const parsedImageLicenses = parseImageLicenseCatalog(imageLicenses);
   const plan = buildStoragePlan(
     dataset,
     manifest,
@@ -75,11 +105,18 @@ async function main(): Promise<void> {
     options.bucket,
     options.outputDirectory,
   );
-  let totalBytes = 0;
-  await mapConcurrent(plan.items, options.concurrency, async (item) => {
-    const buffer = await readValidatedJpeg(item.localPath);
-    totalBytes += buffer.length;
-  });
+  const expectedLocalAssets = new Map(parsedImageLicenses.items.map((item) => {
+    if (item.localBytes === null || item.localSha256 === null) {
+      throw new Error(`Image license is missing local checksum metadata: ${item.imageId}`);
+    }
+    return [item.imageId, { bytes: item.localBytes, sha256: item.localSha256 }] as const;
+  }));
+  const localAssets = await validateStoragePlanLocalAssets(
+    plan.items,
+    options.concurrency,
+    expectedLocalAssets,
+  );
+  const totalBytes = localAssets.bytes;
 
   if (options.mode === "dry-run") {
     console.log(`Storage upload: mode=dry-run, bucket=${options.bucket}, files=${plan.items.length}, bytes=${totalBytes}`);

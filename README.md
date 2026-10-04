@@ -44,6 +44,8 @@ pnpm dev
 pnpm lint
 pnpm typecheck
 pnpm test
+pnpm test:e2e
+pnpm test:e2e:production
 pnpm test:integration
 pnpm build
 pnpm docker:build
@@ -60,7 +62,7 @@ pnpm embeddings:evaluate
 pnpm embeddings:evaluate-clip
 ```
 
-`pnpm test` needs no Supabase project or environment variables and is what CI runs on every PR. `pnpm test:integration` needs a live Supabase instance (`pnpm supabase:start` runs one locally via the Supabase CLI) and skips cleanly without one; see [testing](docs/testing.md) for what each suite covers and [integration testing](docs/integration-testing.md) for setup.
+`pnpm test` needs no Supabase project or environment variables and is what CI runs on every PR. `pnpm test:e2e` starts a key-free mock app and exercises the browser flow with the committed project-owned evaluation image; run `pnpm exec playwright install chromium` once on a new machine. CI runs the same E2E suite against the standalone production image on an isolated Docker network. `pnpm test:e2e:production` is intentionally excluded from PR CI: the separate weekly/manual workflow makes one real CLIP query against `PRODUCTION_BASE_URL` (default `https://beceleb.org`) and checks API health plus Kakao markers. `pnpm test:integration` needs a live Supabase instance (`pnpm supabase:start` runs one locally via the Supabase CLI) and skips cleanly without one; see [testing](docs/testing.md) for what each suite covers and [integration testing](docs/integration-testing.md) for setup.
 
 `data:import` upserts the `locations` and `parking` rows described by a normalized file (no public write API exists for this -- it is the only way real location data enters the database); it does not touch `location_images` or embeddings. Run it before the embeddings importer, since `location_images.location_id` is a foreign key to `locations.id`. See [data pipeline](docs/data-pipeline.md) for upsert keys, dry-run/apply modes, and the image storage strategy.
 

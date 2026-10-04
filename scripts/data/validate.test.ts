@@ -2,7 +2,11 @@ import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
-import { parseValidateCliArgs, validateLocationFile } from "./validate.ts";
+import {
+  failedReportPath,
+  parseValidateCliArgs,
+  validateLocationFile,
+} from "./validate.ts";
 
 const temporaryDirectories: string[] = [];
 
@@ -49,44 +53,121 @@ function input(imagePath: string) {
 }
 
 describe("location validation CLI", () => {
-  it("parses an optional image root and rejects unknown options", () => {
-    expect(parseValidateCliArgs(["input.json", "report.json", "--image-root", "images"]))
-      .toEqual({ inputPath: "input.json", reportPath: "report.json", imageRoot: "images" });
-    expect(() => parseValidateCliArgs(["input.json", "report.json", "--unknown"]))
-      .toThrow("Unknown option");
+  it("requires an explicit validation mode and keeps mode-specific options separate", () => {
+    expect(parseValidateCliArgs([
+      "input.json",
+      "report.json",
+      "--require-local-assets",
+      "--image-root",
+      "images",
+    ])).toEqual({
+      inputPath: "input.json",
+      reportPath: "report.json",
+      mode: "require-local-assets",
+      imageRoot: "images",
+    });
+    expect(parseValidateCliArgs([
+      "input.json",
+      "report.json",
+      "--metadata-only",
+      "--embedding-manifest",
+      "embeddings.json",
+      "--image-licenses",
+      "licenses.json",
+    ])).toEqual({
+      inputPath: "input.json",
+      reportPath: "report.json",
+      mode: "metadata-only",
+      embeddingManifestPath: "embeddings.json",
+      imageLicensesPath: "licenses.json",
+    });
+    expect(() => parseValidateCliArgs(["input.json", "report.json"]))
+      .toThrow("Validation mode is required");
+    expect(() => parseValidateCliArgs(["input.json", "report.json", "--require-local-assets"]))
+      .toThrow("--image-root");
+    expect(() => parseValidateCliArgs([
+      "input.json",
+      "report.json",
+      "--metadata-only",
+      "--image-root",
+      "images",
+    ])).toThrow("only valid");
+    expect(() => parseValidateCliArgs([
+      "input.json",
+      "report.json",
+      "--metadata-only",
+      "--image-licenses",
+      "licenses.json",
+    ])).toThrow("must be provided together");
   });
 
-  it("writes a passing report when every local image file exists", async () => {
+  it("writes a passing local-assets report with input identity and mode", async () => {
     const root = await mkdtemp(join(tmpdir(), "scenescan-validation-"));
     temporaryDirectories.push(root);
     const inputPath = join(root, "normalized", "locations.json");
     const reportPath = join(root, "reports", "locations.json");
-    const imagePath = join(root, "images", "location.jpg");
+    const imageRoot = join(root, "images");
     await mkdir(join(root, "normalized"), { recursive: true });
-    await mkdir(join(root, "images"), { recursive: true });
-    await writeFile(imagePath, "synthetic-test-image", "utf8");
+    await mkdir(imageRoot, { recursive: true });
+    await writeFile(join(imageRoot, "location.jpg"), "synthetic-test-image", "utf8");
     const inputText = JSON.stringify(input("location.jpg"));
     await writeFile(inputPath, inputText, "utf8");
 
-    const report = await validateLocationFile({ inputPath, reportPath, imageRoot: join(root, "images") });
+    const result = await validateLocationFile({
+      inputPath,
+      reportPath,
+      mode: "require-local-assets",
+      imageRoot,
+    });
 
-    expect(report.valid).toBe(true);
-    expect(JSON.parse(await readFile(reportPath, "utf8"))).toEqual(report);
+    expect(result.outputPath).toBe(reportPath);
+    expect(result.report.valid).toBe(true);
+    expect(result.report.mode).toBe("require-local-assets");
+    expect(result.report.input.locations.sha256).toMatch(/^[a-f0-9]{64}$/);
+    expect(result.report.input.imageRoot).not.toBeNull();
+    expect(JSON.parse(await readFile(reportPath, "utf8"))).toEqual(result.report);
     expect(await readFile(inputPath, "utf8")).toBe(inputText);
   });
 
-  it("writes a failure report for a missing image and refuses to overwrite input", async () => {
+  it("metadata-only succeeds when approved local bytes are absent", async () => {
     const root = await mkdtemp(join(tmpdir(), "scenescan-validation-"));
     temporaryDirectories.push(root);
     const inputPath = join(root, "locations.json");
     const reportPath = join(root, "report.json");
     await writeFile(inputPath, JSON.stringify(input("missing.jpg")), "utf8");
 
-    const report = await validateLocationFile({ inputPath, reportPath });
+    const result = await validateLocationFile({ inputPath, reportPath, mode: "metadata-only" });
 
-    expect(report.valid).toBe(false);
-    expect(report.errors.map((item) => item.code)).toContain("IMAGE_PATH_NOT_FOUND");
-    await expect(validateLocationFile({ inputPath, reportPath: inputPath }))
-      .rejects.toThrow("must not overwrite");
+    expect(result.report.valid).toBe(true);
+    expect(result.report.errors).toEqual([]);
+    expect(result.report.input.imageRoot).toBeNull();
+  });
+
+  it("writes a separate failure report and preserves the approved report", async () => {
+    const root = await mkdtemp(join(tmpdir(), "scenescan-validation-"));
+    temporaryDirectories.push(root);
+    const inputPath = join(root, "locations.json");
+    const reportPath = join(root, "validation-report.json");
+    const approved = "{\"approved\":true}\n";
+    await writeFile(inputPath, JSON.stringify(input("missing.jpg")), "utf8");
+    await writeFile(reportPath, approved, "utf8");
+
+    const result = await validateLocationFile({
+      inputPath,
+      reportPath,
+      mode: "require-local-assets",
+      imageRoot: root,
+    });
+
+    expect(result.report.valid).toBe(false);
+    expect(result.report.errors.map((item) => item.code)).toContain("IMAGE_PATH_NOT_FOUND");
+    expect(result.outputPath).toBe(failedReportPath(reportPath, "require-local-assets"));
+    expect(await readFile(reportPath, "utf8")).toBe(approved);
+    expect(JSON.parse(await readFile(result.outputPath, "utf8"))).toEqual(result.report);
+    await expect(validateLocationFile({
+      inputPath,
+      reportPath: inputPath,
+      mode: "metadata-only",
+    })).rejects.toThrow("must not overwrite");
   });
 });

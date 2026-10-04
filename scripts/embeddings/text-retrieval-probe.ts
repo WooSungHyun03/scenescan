@@ -1,7 +1,7 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { performance } from "node:perf_hooks";
 import { AutoTokenizer, CLIPTextModelWithProjection } from "@huggingface/transformers";
-import { CLIP_MODEL_ID, CLIP_MODEL_REVISION, CLIP_MODEL_DTYPE } from "../../src/lib/ai/embedding-service.ts";
+import { CLIP_MODEL_ID, CLIP_MODEL_REVISION, CLIP_MODEL_DTYPE } from "../../src/lib/ai/embedding-config.ts";
 import { toValidatedEmbedding } from "../../src/lib/ai/embedding-validation.ts";
 import { cosineSimilarity } from "../../src/lib/ai/vector-math.ts";
 import { parseOutput } from "./contracts.ts";

@@ -1,6 +1,18 @@
 # Test suite overview
 
-`pnpm test` runs every `*.test.ts` unit test (`vitest.config.ts`) -- no Supabase project, no environment variables, no network. `pnpm test:integration` runs every `*.integration.test.ts` file (`vitest.integration.config.ts`) against a live Supabase instance; see [integration testing](integration-testing.md) for setup. CI (`.github/workflows/ci.yml`) runs `pnpm lint`, `pnpm typecheck`, and `pnpm test` on every PR; it does not run `pnpm test:integration` (that needs a live Supabase instance CI doesn't provision).
+`pnpm test` runs every `*.test.ts` unit test (`vitest.config.ts`) -- no Supabase project, no environment variables, no network. `pnpm test:e2e` runs the Playwright browser regressions in key-free mock mode. `pnpm test:integration` runs every `*.integration.test.ts` file (`vitest.integration.config.ts`) against a live Supabase instance; see [integration testing](integration-testing.md) for setup. CI (`.github/workflows/ci.yml`) runs lint, type checking, unit tests, a standalone build/container smoke test, and the browser E2E suite on every PR; it does not run `pnpm test:integration` (that needs a live Supabase instance CI doesn't provision).
+
+## Browser E2E (`pnpm test:e2e` -- key-free mock mode)
+
+Install Chromium once with `pnpm exec playwright install chromium`, then run `pnpm test:e2e`. The local command starts Next.js on port 3110 with mock data, mock AI, and no Kakao key. Set `PLAYWRIGHT_BASE_URL` to reuse an already-running app instead.
+
+The suite reuses `scripts/embeddings/evaluation-images/queries/demo-01-query.png`, a project-created MIT-licensed asset. It covers home, file chooser and drag/drop upload, preview/delete/invalid image, filters, Top 8, search-result map markers, detail/no-key map fallback, solar date/time, camera heading/lighting, localStorage shortlist comparison, retryable DB error, empty results, and a 390 px mobile flow. CI builds the Docker `e2e` target and runs this same suite against the key-free standalone `runner` container; it does not download CLIP, call Supabase, or load the Kakao SDK.
+
+## Production smoke (`pnpm test:e2e:production` -- real external services)
+
+`.github/workflows/production-smoke.yml` is separate from PR/push CI and runs only on manual dispatch or once each week. Each run calls `/api/health`, performs exactly one real browser CLIP search with the same project-owned evaluation image, requires 1-8 results, and then requires a real Kakao map with at least one marker. This deliberately avoids broader crawling, repeated searches, or retries that would consume Vercel/Supabase free-tier usage.
+
+Set the optional GitHub repository variable `PRODUCTION_BASE_URL` to override `https://beceleb.org`. If Vercel Deployment Protection is enabled, store its automation bypass value only as the `VERCEL_AUTOMATION_BYPASS_SECRET` repository secret; the test sends it only to the production origin and never writes it to diagnostics. Failures are classified as `external-outage`, `model-cold-load`, `flaky-timeout`, or `product-regression`. The failed run uploads its screenshot, video, trace, HTML report, and sanitized diagnostic JSON for seven days.
 
 ## Unit tests (`pnpm test` -- no Supabase needed)
 

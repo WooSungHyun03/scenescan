@@ -38,10 +38,10 @@ pnpm data:import data-work/normalized/provider.json data-work/reports/import.jso
 - `--validate-only` (default): runs the validation gate and reports expected counts; no database connection is attempted or required.
 - `--dry-run`: connects and checks which location ids / `(location_id, name)` parking pairs already exist, so the printed `toInsert`/`existing` counts are accurate, but issues no writes.
 - `--apply`: upserts for real. Locations are written before parking (foreign key).
-- `--image-root`: same meaning as `pnpm data:validate`'s flag -- resolves each location's `images[].imagePath` for the validation gate. This importer never reads the image bytes itself; the flag exists because the shared validator checks the images described in the same file.
+- `--image-root`: resolves each location's `images[].imagePath`. Import is always a local-asset-gated operation, equivalent to the validator's explicit `--require-local-assets` mode; clean-clone production metadata checks instead use `pnpm data:validate ... --metadata-only` as documented in `scripts/data/README.md`.
 - `--batch-size`: 1–500, default 100.
 
-**A record that fails validation is skipped, not fatal to the run.** The full `DataValidationReport` (same shape `pnpm data:validate` produces) is written to the report path; every skipped location's errors are also echoed to the console. Every other, valid location in the same file is still imported. The process exits with status 1 if anything was skipped, so CI/an operator notices, but the valid subset is still written.
+**A record that fails validation is skipped, not fatal to the run.** The import report uses the shared validator's mode/summary/error fields; the standalone `data:validate` report additionally records input file identities and preserves an approved report by writing failures to a mode-specific sibling. Every skipped location's errors are also echoed to the console. Every other, valid location in the same file is still imported. The process exits with status 1 if anything was skipped, so CI/an operator notices, but the valid subset is still written.
 
 ### Upsert keys
 

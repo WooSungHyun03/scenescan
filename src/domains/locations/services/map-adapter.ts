@@ -104,7 +104,11 @@ export const mockMapAdapter: MapAdapter = {
 
     return {
       destroy() {
-        element.replaceChildren();
+        // React Strict Mode can start a replacement mount before this
+        // asynchronous mount's cleanup runs. Remove only the nodes owned by
+        // this controller so stale cleanup cannot erase the newer map.
+        backdrop.remove();
+        content.remove();
       },
     };
   },
@@ -130,6 +134,7 @@ export const mockMapAdapter: MapAdapter = {
     label.textContent = "지도 미리보기";
     label.setAttribute("aria-hidden", "true");
     element.appendChild(label);
+    const ownedNodes: HTMLElement[] = [backdrop, label];
 
     if (validMarkers.length === 0) {
       const empty = document.createElement("p");
@@ -137,12 +142,13 @@ export const mockMapAdapter: MapAdapter = {
         "absolute inset-0 flex items-center justify-center text-sm text-stone-600";
       empty.textContent = "표시할 위치가 없습니다.";
       element.appendChild(empty);
+      ownedNodes.push(empty);
       return {
         setActiveMarker() {
           // There are no markers to update.
         },
         destroy() {
-          element.replaceChildren();
+          ownedNodes.forEach((node) => node.remove());
         },
       };
     }
@@ -176,6 +182,7 @@ export const mockMapAdapter: MapAdapter = {
       updateMarkerButton(button, marker.id === options.activeMarkerId);
       buttons.set(marker.id, button);
       element.appendChild(button);
+      ownedNodes.push(button);
     }
 
     return {
@@ -190,7 +197,7 @@ export const mockMapAdapter: MapAdapter = {
           button.onfocus = null;
           button.onmouseenter = null;
         }
-        element.replaceChildren();
+        ownedNodes.forEach((node) => node.remove());
       },
     };
   },
@@ -286,6 +293,7 @@ export function createKakaoMapAdapter(key: string): MapAdapter {
 
       await loadKakao(key);
       const maps = window.kakao!.maps;
+      element.replaceChildren();
       const center = new maps.LatLng(point.latitude, point.longitude);
       const map = new maps.Map(element, { center, level: 4 });
       const marker = new maps.Marker({ position: center, map });
@@ -305,7 +313,6 @@ export function createKakaoMapAdapter(key: string): MapAdapter {
         destroy() {
           marker.setMap(null);
           overlay.setMap(null);
-          element.replaceChildren();
         },
       };
     },
@@ -326,6 +333,7 @@ export function createKakaoMapAdapter(key: string): MapAdapter {
 
       await loadKakao(key);
       const maps = window.kakao!.maps;
+      element.replaceChildren();
       const positions = validMarkers.map(
         (marker) => new maps.LatLng(marker.point.latitude, marker.point.longitude),
       );
@@ -374,7 +382,6 @@ export function createKakaoMapAdapter(key: string): MapAdapter {
             rendered.button.onmouseenter = null;
             rendered.overlay.setMap(null);
           }
-          element.replaceChildren();
         },
       };
     },

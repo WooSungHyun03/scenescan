@@ -8,7 +8,7 @@ import {
   CLIP_MODEL_ID,
   CLIP_MODEL_REVISION,
   CLIP_MODEL_DTYPE,
-} from "../../src/lib/ai/embedding-service.ts";
+} from "../../src/lib/ai/embedding-config.ts";
 import { toValidatedEmbedding } from "../../src/lib/ai/embedding-validation.ts";
 import { cosineSimilarity } from "../../src/lib/ai/vector-math.ts";
 import { decodeLocalImage } from "./pipeline.ts";

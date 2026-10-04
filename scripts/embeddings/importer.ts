@@ -1,4 +1,4 @@
-import { CLIP_EMBEDDING_DIMENSION, CLIP_MODEL_DTYPE } from "../../src/lib/ai/embedding-service.ts";
+import { CLIP_EMBEDDING_DIMENSION, CLIP_MODEL_DTYPE } from "../../src/lib/ai/embedding-config.ts";
 import { toValidatedEmbedding } from "../../src/lib/ai/embedding-validation.ts";
 import { vectorNorm } from "../../src/lib/ai/vector-math.ts";
 import type { EmbeddingOutput, EmbeddingOutputItem } from "./contracts.ts";

@@ -69,6 +69,9 @@ export type ImageLicenseCatalog = {
     author: string | null;
     license: string | null;
     licenseUrl: string | null;
+    filename: string | null;
+    localSha256: string | null;
+    localBytes: number | null;
   }>;
 };
 
@@ -208,6 +211,9 @@ const imageLicenseCatalogSchema = z.object({
     author: optionalText,
     license: optionalText,
     license_url: optionalHttpUrl,
+    filename: optionalText,
+    local_sha256: z.string().regex(/^[a-f0-9]{64}$/).nullable().optional(),
+    local_bytes: z.number().int().positive().nullable().optional(),
   }).passthrough()),
 }).strict();
 
@@ -246,6 +252,9 @@ export function parseImageLicenseCatalog(value: unknown): ImageLicenseCatalog {
       author: item.author ?? null,
       license: item.license ?? null,
       licenseUrl: item.license_url ?? null,
+      filename: item.filename ?? null,
+      localSha256: item.local_sha256 ?? null,
+      localBytes: item.local_bytes ?? null,
     };
   });
   return { verifiedAt: parsed.verified_at, items };

@@ -150,6 +150,7 @@ export async function runImport(options: ImportCliOptions): Promise<void> {
 
   const imageRoot = resolve(options.imageRoot ?? dirname(resolve(options.inputPath)));
   const report = await validateLocationDataset(input, {
+    mode: "require-local-assets",
     inspectImagePath: (imagePath) => inspectPath(resolve(imageRoot, imagePath)),
   });
   await writeJsonAtomic(options.reportPath, report);

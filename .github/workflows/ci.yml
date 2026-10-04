@@ -90,6 +90,16 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+      - name: Build browser E2E image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          target: e2e
+          load: true
+          tags: scenescan-e2e:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
       - name: Verify production container boundary
         run: |
           test "$(docker inspect --format '{{.Config.User}}' scenescan:${{ github.sha }})" = "nextjs"
@@ -98,7 +108,8 @@ jobs:
 
       - name: Smoke test production image
         run: |
-          docker run --detach --name scenescan-ci-app --publish 3000:3000 scenescan:${{ github.sha }}
+          docker network create scenescan-ci-network
+          docker run --detach --name scenescan-ci-app --network scenescan-ci-network --publish 3000:3000 scenescan:${{ github.sha }}
           ready=0
           for attempt in $(seq 1 30); do
             if curl --fail --silent http://127.0.0.1:3000/api/health; then
@@ -142,6 +153,28 @@ jobs:
             exit 1
           fi
 
+      - name: Browser E2E in key-free Docker mock mode
+        run: |
+          docker run --rm \
+            --network scenescan-ci-network \
+            --ipc=host \
+            --env CI=true \
+            --env PLAYWRIGHT_BASE_URL=http://scenescan-ci-app:3000 \
+            --volume "${{ github.workspace }}/output/playwright:/app/output/playwright" \
+            scenescan-e2e:${{ github.sha }} \
+            pnpm test:e2e
+
+      - name: Upload Playwright diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-${{ github.run_attempt }}
+          path: output/playwright
+          if-no-files-found: ignore
+          retention-days: 7
+
       - name: Clean up smoke container
         if: always()
-        run: docker rm --force scenescan-ci-app || true
+        run: |
+          docker rm --force scenescan-ci-app || true
+          docker network rm scenescan-ci-network || true

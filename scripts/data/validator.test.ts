@@ -50,9 +50,13 @@ describe("validateLocationDataset", () => {
   it("accepts an import-ready canonical dataset", async () => {
     const inspectImagePath = vi.fn(async () => "ok" as const);
 
-    await expect(validateLocationDataset(dataset([validLocation()]), { inspectImagePath }))
+    await expect(validateLocationDataset(dataset([validLocation()]), {
+      mode: "require-local-assets",
+      inspectImagePath,
+    }))
       .resolves.toEqual({
-        schemaVersion: 1,
+        schemaVersion: 2,
+        mode: "require-local-assets",
         valid: true,
         summary: { totalLocations: 1, validLocations: 1, invalidLocations: 0, errorCount: 0 },
         errors: [],
@@ -75,6 +79,7 @@ describe("validateLocationDataset", () => {
       }],
     };
     const report = await validateLocationDataset(dataset([first, second]), {
+      mode: "require-local-assets",
       inspectImagePath: async (path) => path.endsWith("directory") ? "not-file" : "missing",
     });
     const codes = report.errors.map((item) => item.code);
@@ -95,17 +100,24 @@ describe("validateLocationDataset", () => {
   it("reports missing IDs and images without trying to inspect a path", async () => {
     const inspectImagePath = vi.fn(async () => "ok" as const);
     const location = { ...validLocation(), id: undefined, images: [] };
-    const report = await validateLocationDataset(dataset([location]), { inspectImagePath });
+    const report = await validateLocationDataset(dataset([location]), {
+      mode: "require-local-assets",
+      inspectImagePath,
+    });
 
     expect(report.errors.map((item) => item.code)).toEqual(["LOCATION_ID_REQUIRED", "IMAGES_REQUIRED"]);
     expect(inspectImagePath).not.toHaveBeenCalled();
   });
 
   it("returns a deterministic root-level report for an invalid dataset", async () => {
-    const report = await validateLocationDataset([], { inspectImagePath: async () => "ok" });
+    const report = await validateLocationDataset([], {
+      mode: "require-local-assets",
+      inspectImagePath: async () => "ok",
+    });
 
     expect(report).toEqual({
-      schemaVersion: 1,
+      schemaVersion: 2,
+      mode: "require-local-assets",
       valid: false,
       summary: { totalLocations: 0, validLocations: 0, invalidLocations: 0, errorCount: 1 },
       errors: [{
@@ -123,7 +135,10 @@ describe("validateLocationDataset", () => {
       ...dataset([validLocation()]),
       reviewQueue: [{ recordIndex: 1, sourceCategory: "mixed-use", reason: "UNKNOWN_CATEGORY" }],
     };
-    const report = await validateLocationDataset(input, { inspectImagePath: async () => "ok" });
+    const report = await validateLocationDataset(input, {
+      mode: "require-local-assets",
+      inspectImagePath: async () => "ok",
+    });
 
     expect(report.valid).toBe(false);
     expect(report.errors).toContainEqual({
@@ -145,7 +160,10 @@ describe("validateLocationDataset", () => {
         contactPhone: undefined,
       },
     };
-    const report = await validateLocationDataset(dataset([location]), { inspectImagePath: async () => "ok" });
+    const report = await validateLocationDataset(dataset([location]), {
+      mode: "require-local-assets",
+      inspectImagePath: async () => "ok",
+    });
 
     expect(report.errors.map((item) => item.code)).toEqual([
       "PERMIT_CONTACT_INVALID",
@@ -159,7 +177,10 @@ describe("validateLocationDataset", () => {
       ...validLocation(),
       permit: { ...validLocation().permit, contactPhone: "담당자에게 문의" },
     };
-    const report = await validateLocationDataset(dataset([location]), { inspectImagePath: async () => "ok" });
+    const report = await validateLocationDataset(dataset([location]), {
+      mode: "require-local-assets",
+      inspectImagePath: async () => "ok",
+    });
 
     expect(report.errors).toContainEqual(expect.objectContaining({
       code: "PERMIT_CONTACT_INVALID",
@@ -182,7 +203,10 @@ describe("validateLocationDataset", () => {
         },
       }],
     };
-    const report = await validateLocationDataset(dataset([location]), { inspectImagePath: async () => "ok" });
+    const report = await validateLocationDataset(dataset([location]), {
+      mode: "require-local-assets",
+      inspectImagePath: async () => "ok",
+    });
 
     expect(report.errors.map((item) => item.field)).toEqual([
       "parking[0].provenance.lastVerifiedAt",
@@ -199,7 +223,10 @@ describe("validateLocationDataset", () => {
   it("rejects duplicate parking name and coordinates within one location", async () => {
     const location = validLocation();
     location.parking.push({ ...location.parking[0], id: "parking-2" });
-    const report = await validateLocationDataset(dataset([location]), { inspectImagePath: async () => "ok" });
+    const report = await validateLocationDataset(dataset([location]), {
+      mode: "require-local-assets",
+      inspectImagePath: async () => "ok",
+    });
 
     expect(report.errors.filter((item) => item.code === "PARKING_DUPLICATE")).toEqual([
       expect.objectContaining({ field: "parking[0]" }),
@@ -230,6 +257,7 @@ describe("validateLocationDataset", () => {
       }],
     };
     const report = await validateLocationDataset(dataset([location]), {
+      mode: "require-local-assets",
       inspectImagePath: async () => "ok",
       now: new Date("2026-10-04T00:00:00Z"),
     });
@@ -240,5 +268,78 @@ describe("validateLocationDataset", () => {
       "NOISE_SOURCE_INVALID",
       "PROVENANCE_INVALID",
     ]));
+  });
+
+  it("metadata-only validates paths as metadata without touching local files", async () => {
+    const inspectImagePath = vi.fn(async () => "missing" as const);
+
+    const report = await validateLocationDataset(dataset([validLocation()]), {
+      mode: "metadata-only",
+      inspectImagePath,
+    });
+
+    expect(report.valid).toBe(true);
+    expect(report.mode).toBe("metadata-only");
+    expect(inspectImagePath).not.toHaveBeenCalled();
+  });
+
+  it("metadata-only joins every production image to reviewed license metadata", async () => {
+    const imageId = "00000000-0000-4000-8000-000000000201";
+    const embeddingManifest = {
+      schema_version: 1,
+      items: [{
+        image_id: imageId,
+        location_id: locationId,
+        image_path: "../../public/locations/location.jpg",
+        image_url: "https://example.com/location.jpg",
+        source: "Wikimedia Commons",
+        source_url: "https://commons.wikimedia.org/wiki/File:Location.jpg",
+      }],
+    };
+    const imageLicenses = {
+      schema_version: 1,
+      verified_at: "2026-10-03T00:00:00Z",
+      items: [{
+        image_id: imageId,
+        location_id: locationId,
+        commons_page_url: "https://commons.wikimedia.org/wiki/File:Location.jpg",
+        author: "Photographer",
+        license: "CC BY 4.0",
+        license_url: "https://creativecommons.org/licenses/by/4.0",
+        filename: "location.jpg",
+        local_sha256: "a".repeat(64),
+        local_bytes: 123,
+      }],
+    };
+
+    await expect(validateLocationDataset(dataset([validLocation()]), {
+      mode: "metadata-only",
+      embeddingManifest,
+      imageLicenses,
+    })).resolves.toMatchObject({ valid: true, mode: "metadata-only", errors: [] });
+
+    const changedBytes = await validateLocationDataset(dataset([validLocation()]), {
+      mode: "require-local-assets",
+      embeddingManifest,
+      imageLicenses,
+      inspectImagePath: async () => ({
+        status: "ok",
+        bytes: 124,
+        sha256: "b".repeat(64),
+      }),
+    });
+    expect(changedBytes.errors.map((item) => item.code)).toEqual(expect.arrayContaining([
+      "IMAGE_SIZE_MISMATCH",
+      "IMAGE_CHECKSUM_MISMATCH",
+    ]));
+
+    imageLicenses.items[0].license = "";
+    const invalid = await validateLocationDataset(dataset([validLocation()]), {
+      mode: "metadata-only",
+      embeddingManifest,
+      imageLicenses,
+    });
+    expect(invalid.valid).toBe(false);
+    expect(invalid.errors.map((item) => item.code)).toContain("LICENSE_MANIFEST_INVALID");
   });
 });

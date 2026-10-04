@@ -17,6 +17,10 @@ FROM base AS ci
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+FROM ci AS e2e
+ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+RUN pnpm exec playwright install --with-deps chromium
+
 FROM ci AS builder
 ARG NEXT_PUBLIC_SUPABASE_URL=""
 ARG NEXT_PUBLIC_SUPABASE_ANON_KEY=""

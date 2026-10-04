@@ -1,8 +1,15 @@
 import { describe, expect, it } from "vitest";
 import { parseManifest } from "../embeddings/contracts.ts";
 import { parseNormalizedLocationOutput } from "./contracts.ts";
-import { buildStoragePlan, isIdenticalStoredJpeg } from "./storage-uploader.ts";
+import {
+  buildStoragePlan,
+  isIdenticalStoredJpeg,
+  validateStoragePlanLocalAssets,
+} from "./storage-uploader.ts";
 import { createHash } from "node:crypto";
+import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 
 const locationId = "00000000-0000-4000-8000-000000000001";
 const imageId = "00000000-0000-4000-8000-000000000002";
@@ -48,5 +55,45 @@ describe("Supabase Storage upload planning", () => {
     expect(plan.dataset.locations[0].images[0].imageUrl).toBe(expected);
     expect(plan.manifest.items[0].image_url).toBe(expected);
     expect(plan.manifest.items[0].image_path).toBe("../../../public/locations/test.jpg");
+  });
+
+  it("fails closed without downloading a missing local asset", async () => {
+    await expect(validateStoragePlanLocalAssets([{
+      imageId,
+      locationId,
+      localPath: "/definitely-missing/scenescan.jpg",
+      objectPath: `${locationId}/${imageId}.jpg`,
+      previousUrl: "https://example.com/old.jpg",
+      publicUrl: "https://example.com/new.jpg",
+    }])).rejects.toThrow("uploader never downloads source images automatically");
+  });
+
+  it("compares local bytes with the reviewed license checksum before upload", async () => {
+    const root = await mkdtemp(join(tmpdir(), "scenescan-storage-assets-"));
+    try {
+      const localPath = join(root, "test.jpg");
+      const bytes = Buffer.from([0xff, 0xd8, 0x01, 0x02, 0xff, 0xd9]);
+      await writeFile(localPath, bytes);
+      const item = {
+        imageId,
+        locationId,
+        localPath,
+        objectPath: `${locationId}/${imageId}.jpg`,
+        previousUrl: "https://example.com/old.jpg",
+        publicUrl: "https://example.com/new.jpg",
+      };
+      const expected = new Map([[imageId, {
+        bytes: bytes.length,
+        sha256: createHash("sha256").update(bytes).digest("hex"),
+      }]]);
+
+      await expect(validateStoragePlanLocalAssets([item], 1, expected))
+        .resolves.toEqual({ files: 1, bytes: bytes.length });
+      expected.set(imageId, { bytes: bytes.length, sha256: "0".repeat(64) });
+      await expect(validateStoragePlanLocalAssets([item], 1, expected))
+        .rejects.toThrow("SHA-256 differs");
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
   });
 });

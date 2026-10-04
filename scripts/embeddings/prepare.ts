@@ -5,7 +5,7 @@ import {
   CLIP_MODEL_ID,
   CLIP_MODEL_REVISION,
   CLIP_MODEL_DTYPE,
-} from "../../src/lib/ai/embedding-service.ts";
+} from "../../src/lib/ai/embedding-config.ts";
 import { decodeLocalImage, prepareEmbeddings } from "./pipeline.ts";
 
 type CliOptions = {

@@ -6,7 +6,7 @@ import {
   CLIP_MODEL_REVISION,
   CLIP_MODEL_DTYPE,
   MAX_IMAGE_BYTES,
-} from "../../src/lib/ai/embedding-service.ts";
+} from "../../src/lib/ai/embedding-config.ts";
 import { toValidatedEmbedding } from "../../src/lib/ai/embedding-validation.ts";
 import { validateImageBlob, validateImageDimensions } from "../../src/lib/ai/image-validation.ts";
 import {

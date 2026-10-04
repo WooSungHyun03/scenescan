@@ -11,6 +11,9 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:production": "playwright test --config playwright.production.config.ts",
     "test:integration": "vitest run --config vitest.integration.config.ts",
     "security:client-bundle": "node --experimental-strip-types scripts/security/assert-client-bundle-secrets.ts",
     "supabase:start": "npx --yes supabase@latest start",
@@ -49,6 +52,7 @@
     "zod": "^4.1.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "@tailwindcss/postcss": "^4.1.0",
     "@types/node": "^22.18.0",
     "@types/react": "^19.2.0",
