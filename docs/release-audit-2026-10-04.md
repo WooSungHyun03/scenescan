@@ -58,6 +58,15 @@ was deleted, no paid service was enabled, and no unknown-license data was scrape
   returns **HTTP 200 / Top 8** (before the fix it returned 503). The smoke then
   exposed missing `data-map-mode` on real multi-marker maps; that adapter path
   is repaired and covered by SDK lifecycle tests, not misreported as a key outage.
+- Final code commit `93b1580`: Vercel READY and GitHub CI PASS (run
+  `37191603489`). Production smoke PASS in **13.7 seconds**: real CLIP assets,
+  search HTTP 200, Top 8, **8 Kakao markers**, health 200, no external failures.
+  Production detail/gallery/solar also pass with a New York browser timezone;
+  the next similar list contains 8 places with **zero repeats**. All 8 candidate
+  images load after scrolling and the mobile page has no horizontal overflow.
+- Clean committed clone without `.env.local` or local JPG assets: frozen
+  install → metadata validation (200/zero errors) → embedding validate-only
+  (261) → schema audit (30 checks) → default build all PASS.
 - `pnpm audit --prod --audit-level high`: no known vulnerabilities;
   `pnpm security:client-bundle`: PASS. Only example environment files are tracked.
 
@@ -74,5 +83,7 @@ attempted through an unsupported method.
 
 The read-only MVP intentionally has no user Auth or transactional email flow;
 Supabase Auth/Resend are not fabricated as completed product features. A valid
-Kakao browser key/domain registration and post-deployment real-data smoke remain
-external verification requirements. Existing data/image rights are preserved.
+Kakao browser key/domain registration was verified by the final production
+smoke, not inferred from a configured variable. Existing data/image rights are
+preserved. Independent, labelled photographic reference queries are still needed
+to certify retrieval quality beyond the synthetic regression set.
