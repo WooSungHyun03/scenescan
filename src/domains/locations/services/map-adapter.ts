@@ -378,6 +378,7 @@ export function createKakaoMapAdapter(key: string): MapAdapter {
         map.setBounds(bounds, 48, 48, 48, 48);
       }
 
+      element.setAttribute("data-map-mode", "kakao");
       return {
         setActiveMarker(markerId) {
           for (const [id, rendered] of renderedMarkers) {

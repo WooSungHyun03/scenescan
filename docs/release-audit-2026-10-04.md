@@ -34,7 +34,7 @@ was deleted, no paid service was enabled, and no unknown-license data was scrape
 
 ## Verification evidence
 
-- Frozen-lockfile install; lint/typecheck; **405 unit tests / 70 files** pass.
+- Frozen-lockfile install; lint/typecheck; **407 unit tests / 71 files** pass.
 - Local migrated Supabase: **16 integration tests / 4 files** pass, including
   anonymous-write denial, Storage access, filters and model/seen-ID exclusion.
   Only isolated test fixtures were created and cleaned up locally.
@@ -53,6 +53,11 @@ was deleted, no paid service was enabled, and no unknown-license data was scrape
   These are single-host samples, not a population benchmark or real-data recall.
   One earlier cold-load attempt exceeded the timeout; retry succeeded. Timeout
   and loading/error recovery remain necessary, not evidence of universal latency.
+- Post-push Vercel deployment of `f3ca375`: READY. Public home/search/shortlist
+  and region-filter listing respond successfully. Real CLIP → production search
+  returns **HTTP 200 / Top 8** (before the fix it returned 503). The smoke then
+  exposed missing `data-map-mode` on real multi-marker maps; that adapter path
+  is repaired and covered by SDK lifecycle tests, not misreported as a key outage.
 - `pnpm audit --prod --audit-level high`: no known vulnerabilities;
   `pnpm security:client-bundle`: PASS. Only example environment files are tracked.
 
