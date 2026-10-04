@@ -27,6 +27,10 @@ export type ParkingRow = {
   opening_hours: unknown;
   price_info: unknown;
   source: unknown;
+  relationship?: unknown;
+  source_url?: unknown;
+  reference_date?: unknown;
+  last_verified_at?: unknown;
 };
 
 export type LocationRow = {
@@ -156,12 +160,16 @@ function mapParking(row: ParkingRow, locationId: string, warnings: MapperWarning
   return {
     id: row.id,
     locationId,
+    relationship: row.relationship === "on_site" ? "on_site" : "nearby",
     name: row.name,
     point: { latitude: row.latitude, longitude: row.longitude },
     capacity: isFiniteNumber(row.capacity) ? row.capacity : null,
     openingHours: optionalString(row.opening_hours),
     priceInfo: optionalString(row.price_info),
     source: optionalString(row.source),
+    sourceUrl: optionalString(row.source_url),
+    referenceDate: optionalString(row.reference_date),
+    lastVerifiedAt: optionalString(row.last_verified_at),
   };
 }
 

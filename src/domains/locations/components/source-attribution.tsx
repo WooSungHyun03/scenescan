@@ -91,6 +91,7 @@ export function SourceAttribution({
   compact = false,
   showLabel = true,
   showDetails = false,
+  showVerification = false,
 }: {
   source?: string | null;
   sourceUrl?: string | null;
@@ -102,12 +103,14 @@ export function SourceAttribution({
   compact?: boolean;
   showLabel?: boolean;
   showDetails?: boolean;
+  showVerification?: boolean;
 }) {
   const attribution = getAttributionViewModel({ source, sourceUrl, author, license, licenseUrl, lastVerifiedAt });
   const hasMetadata = Boolean(
     attribution.source
       || attribution.sourceUrl
       || attribution.sourceUrlInvalid
+      || (showVerification && attribution.lastVerifiedAt)
       || (showDetails && (
         attribution.author
         || attribution.license
@@ -166,6 +169,12 @@ export function SourceAttribution({
                   {attribution.lastVerifiedAt ?? "미확인"}
                 </p>
               </>
+            )}
+            {!showDetails && showVerification && (
+              <p className="text-stone-600">
+                <span className="font-medium text-stone-900">최근 확인</span>{" "}
+                {attribution.lastVerifiedAt ?? "미확인"}
+              </p>
             )}
           </>
         )}

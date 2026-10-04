@@ -41,6 +41,7 @@
   "parking": {
     "path": "nearby_parking",
     "id": "parking_id",
+    "relationship": "relationship",
     "name": "name",
     "latitude": "coordinates.lat",
     "longitude": "coordinates.lng",

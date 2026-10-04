@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "locations": [
+    {
+      "location_id": "16be41dd-dd84-5728-8f73-6786b85fe366",
+      "parking": [
+        {
+          "source_record_id": "101-2-000004",
+          "relationship": "nearby",
+          "name": "동대문",
+          "latitude": 37.567102,
+          "longitude": 127.012141,
+          "capacity": 1092,
+          "opening_hours": "평일+토요일+공휴일 · 평일 00:00–23:59 · 토요일 00:00–23:59 · 공휴일 00:00–23:59",
+          "price_info": "유료 · 기본 5분 360원 · 추가 5분 360원",
+          "source": "공공데이터포털 전국주차장정보표준데이터 · 서울시설공단",
+          "source_url": "https://www.data.go.kr/data/15012896/standard.do",
+          "reference_date": "2026-05-15",
+          "last_verified_at": "2026-10-04T12:00:00+09:00"
+        }
+      ]
+    },
+    {
+      "location_id": "88642f64-da5a-550b-b294-a4c7260c3f1e",
+      "parking": [
+        {
+          "source_record_id": "213-2-000006",
+          "relationship": "nearby",
+          "name": "광명동굴 제3",
+          "latitude": 37.432091,
+          "longitude": 126.878169,
+          "capacity": 162,
+          "opening_hours": "평일+토요일+공휴일 · 평일 00:00–23:59 · 토요일 00:00–23:59 · 공휴일 00:00–23:59",
+          "price_info": "유료 · 기본 30분 800원 · 1일 13,000원",
+          "source": "공공데이터포털 전국주차장정보표준데이터 · 경기도 광명시 광명도시공사",
+          "source_url": "https://www.data.go.kr/data/15012896/standard.do",
+          "reference_date": "2026-04-17",
+          "last_verified_at": "2026-10-04T12:00:00+09:00"
+        }
+      ]
+    }
+  ]
+}

@@ -43,7 +43,7 @@ describe("buildImportRows", () => {
   it("maps a canonical record with parking into locations + parking rows", () => {
     const { locationRows, parkingRows } = buildImportRows([
       record({
-        parking: [{ name: "A 주차장", latitude: 37.5, longitude: 127.0, capacity: 3, openingHours: "09-18", priceInfo: "무료", provenance: provenance() }],
+        parking: [{ relationship: "nearby", name: "A 주차장", latitude: 37.5, longitude: 127.0, capacity: 3, openingHours: "09-18", priceInfo: "무료", provenance: provenance() }],
       }),
     ]);
     expect(locationRows).toEqual([{
@@ -53,8 +53,8 @@ describe("buildImportRows", () => {
       source_url: "https://example.com/source", import_batch: "kofic", reference_date: "2026-09-01", last_verified_at: "2026-09-20T00:00:00Z",
     }]);
     expect(parkingRows).toEqual([{
-      location_id: "11111111-1111-4111-8111-111111111111", name: "A 주차장", latitude: 37.5, longitude: 127.0,
-      capacity: 3, opening_hours: "09-18", price_info: "무료", source: "kofic", reference_date: "2026-09-01", last_verified_at: "2026-09-20T00:00:00Z",
+      location_id: "11111111-1111-4111-8111-111111111111", relationship: "nearby", name: "A 주차장", latitude: 37.5, longitude: 127.0,
+      capacity: 3, opening_hours: "09-18", price_info: "무료", source: "kofic", source_url: "https://example.com/source", reference_date: "2026-09-01", last_verified_at: "2026-09-20T00:00:00Z",
     }]);
   });
 
@@ -83,7 +83,7 @@ describe("importLocationDataset", () => {
       findExistingParkingKeys: async () => [{ location_id: "11111111-1111-4111-8111-111111111111", name: "A 주차장" }],
     });
     const result = await importLocationDataset(
-      [record({ parking: [{ name: "A 주차장", latitude: 1, longitude: 1, capacity: null, openingHours: null, priceInfo: null, provenance: provenance() }] })],
+      [record({ parking: [{ relationship: "nearby", name: "A 주차장", latitude: 1, longitude: 1, capacity: null, openingHours: null, priceInfo: null, provenance: provenance() }] })],
       "dry-run",
       100,
       database,
@@ -100,7 +100,7 @@ describe("importLocationDataset", () => {
     database.upsertLocations = async (rows) => { calls.push("locations"); database.upsertLocationsMock(rows); };
     database.upsertParking = async (rows) => { calls.push("parking"); database.upsertParkingMock(rows); };
     const result = await importLocationDataset(
-      [record({ parking: [{ name: "A 주차장", latitude: 1, longitude: 1, capacity: null, openingHours: null, priceInfo: null, provenance: provenance() }] })],
+      [record({ parking: [{ relationship: "nearby", name: "A 주차장", latitude: 1, longitude: 1, capacity: null, openingHours: null, priceInfo: null, provenance: provenance() }] })],
       "apply",
       100,
       database,

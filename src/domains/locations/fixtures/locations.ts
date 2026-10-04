@@ -71,6 +71,7 @@ export const mockLocations: Location[] = seeds.map((seed) => {
     parking: [{
       id: `${seed.id}-parking`,
       locationId: hasNearbyParking ? null : seed.id,
+      relationship: hasNearbyParking ? "nearby" : "on_site",
       name: seed.parking,
       point: hasNearbyParking
         ? { latitude: seed.latitude + 0.001, longitude: seed.longitude + 0.001 }
@@ -79,6 +80,9 @@ export const mockLocations: Location[] = seeds.map((seed) => {
       openingHours: null,
       priceInfo: null,
       source: "synthetic fixture",
+      sourceUrl: null,
+      referenceDate: null,
+      lastVerifiedAt: null,
     }],
     noiseSources: [],
     source: "SceneScan synthetic fixture",

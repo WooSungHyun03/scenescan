@@ -180,9 +180,30 @@ The collector re-fetches Commons metadata and fails closed when a file is missin
 
 Running the collector is deterministic for a fixed Commons source revision except for a provider-side regenerated thumbnail. Review any checksum change before committing it. The discovery step produces candidates, not an authority to bypass the license and validation gates. `public/locations/wikidata-*.jpg` is ignored because these working files are reproducibly downloaded and production serves their uploaded Storage copies. The collector and both `--validate-only` commands do not write to Supabase.
 
+### Reviewed static parking
+
+Static parking uses the official [전국주차장정보표준데이터](https://www.data.go.kr/data/15012896/standard.do). It contains municipality-managed public/private parking coordinates, capacity, hours, fees, managing institution, and reference date, and is updated on a half-year cycle. The collection key is server-only:
+
+```bash
+export PUBLIC_DATA_PORTAL_SERVICE_KEY="<data.go.kr service key>"
+pnpm data:collect-parking
+```
+
+The command writes untouched API pages to `data-work/static-parking/raw.json` and nearby candidates to `data-work/static-parking/candidates.json`. Both paths are ignored by Git. It rejects malformed coordinates, duplicate source records, duplicate name/coordinate pairs, and names or notes marked closed/unavailable; it keeps candidates within 1.5 km and never collects live vacancy counts. Every candidate still has `relationship_requires_manual_review: true`: review whether it is `on_site` or `nearby`, confirm the official page, and then copy only accepted records to `data/production/static-parking.json`. `data:collect-commons` merges that reviewed catalog into canonical `locations.json` and rechecks proximity and duplicates.
+
+After migration `20261004000000_static_parking_metadata.sql`, publish parking without overwriting location, permit, image, or attribution rows:
+
+```bash
+pnpm data:import-production data/production/locations.json data/production/embeddings-manifest.json --validate-only
+pnpm data:import-production data/production/locations.json data/production/embeddings-manifest.json --dry-run --parking-only
+pnpm data:import-production data/production/locations.json data/production/embeddings-manifest.json --apply --parking-only
+```
+
+The dry-run requires server-only Supabase credentials because it checks existing location foreign keys and `(location_id, name)` conflicts, but it performs no writes. Parking remains publicly readable under the existing RLS select policy; anon/authenticated write policies are not added.
+
 `data:import-production` reads `image-licenses.json` from the directory containing `locations.json` by default. Use `--image-licenses <path>` only when the reviewed catalog lives elsewhere. It joins attribution by stable `image_id`, rejects missing or duplicate license records, mismatched location ownership, and non-HTTP(S) source/license URLs. Reusing the same source image in different locations remains valid when each use has its own stable image UUID and reviewed catalog entry.
 
-`data:check-attribution-links` checks the canonical place source, permit-specific official source, each Commons source page, and every license URL before publishing. Duplicate URLs are requested once while the JSON report retains every location/image reference that uses them. HTTP 404/410 responses are reported as `broken` and make the command fail only after a range `GET` confirms the `HEAD` result. Authentication, rate-limit, server, timeout, and network failures remain `unverified` so the report does not falsely call a provider-blocked URL broken. Providers that reject or do not implement `HEAD` are retried with a one-byte range `GET`. Review both `broken` and `unverified` rows; never replace a source URL with a guessed URL.
+`data:check-attribution-links` checks the canonical place source, permit-specific official source, each reviewed parking source, each Commons source page, and every license URL before publishing. Duplicate URLs are requested once while the JSON report retains every location/image/parking reference that uses them. HTTP 404/410 responses are reported as `broken` and make the command fail only after a range `GET` confirms the `HEAD` result. Authentication, rate-limit, server, timeout, and network failures remain `unverified` so the report does not falsely call a provider-blocked URL broken. Providers that reject or do not implement `HEAD` are retried with a one-byte range `GET`. Review both `broken` and `unverified` rows; never replace a source URL with a guessed URL.
 
 After the schema migrations are installed, use the explicit production import sequence below from a trusted local shell. The service-role key must never be placed in a `NEXT_PUBLIC_*` variable or Vercel. The first importer writes location and image metadata; the second adds the validated vectors to those image rows. Both operations are idempotent by stable UUID. Always run `--dry-run` immediately before `--apply`.
 
@@ -249,6 +270,7 @@ The command writes a deterministic report with `valid`, aggregate counts, and ev
 - finite latitude `[-90, 90]` and longitude `[-180, 180]`;
 - safe permit guidance, valid nullable public phone numbers, and HTTP(S) source/image URLs;
 - location, permit, and parking provenance names, URLs, reference dates, and verification timestamps;
+- explicit `on_site`/`nearby` parking relationships and duplicate parking name/coordinate pairs;
 - at least one image, non-blank alt text, a local image path, and whether that path is a regular file.
 
 Validation reads file metadata only. It does not upload, modify, or decode images, and it does not connect to Supabase. A passing report means the checked structure is safe to hand to the next import review; it does not prove data accuracy, licensing, or authorization.

@@ -22,6 +22,7 @@ function validLocation() {
     permit: { type: "문의 필요", contactName: null, contactPhone: null, note: null, provenance },
     parking: [{
       id: "parking-1",
+      relationship: "nearby",
       name: "Example parking",
       latitude: 37.551,
       longitude: 126.971,
@@ -192,5 +193,16 @@ describe("validateLocationDataset", () => {
       "provenance",
     ]);
     expect(report.errors.every((item) => item.code === "PROVENANCE_INVALID")).toBe(true);
+  });
+
+  it("rejects duplicate parking name and coordinates within one location", async () => {
+    const location = validLocation();
+    location.parking.push({ ...location.parking[0], id: "parking-2" });
+    const report = await validateLocationDataset(dataset([location]), { inspectImagePath: async () => "ok" });
+
+    expect(report.errors.filter((item) => item.code === "PARKING_DUPLICATE")).toEqual([
+      expect.objectContaining({ field: "parking[0]" }),
+      expect.objectContaining({ field: "parking[1]" }),
+    ]);
   });
 });

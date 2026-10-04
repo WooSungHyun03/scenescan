@@ -26,7 +26,11 @@ function baseRow(overrides: Partial<LocationRow> = {}): LocationRow {
     noise_sources: null,
     source_url: null,
     location_images: [{ id: "img-1", image_url: "https://example.com/a.jpg", alt: "설명" }],
-    parking: [{ id: "park-1", name: "주차장", latitude: 37.5, longitude: 127.0, capacity: 3, opening_hours: "09-18", price_info: "무료", source: "manual" }],
+    parking: [{
+      id: "park-1", name: "주차장", relationship: "on_site", latitude: 37.5, longitude: 127.0,
+      capacity: 3, opening_hours: "09-18", price_info: "무료", source: "manual",
+      source_url: "https://example.com/parking", reference_date: "2026-05-01", last_verified_at: "2026-10-04T00:00:00Z",
+    }],
     ...overrides,
   };
 }
@@ -40,6 +44,12 @@ describe("toLocation", () => {
       source: null, sourceUrl: null, author: null, license: null, licenseUrl: null, lastVerifiedAt: null,
     }]);
     expect(location.parking).toHaveLength(1);
+    expect(location.parking[0]).toMatchObject({
+      relationship: "on_site",
+      sourceUrl: "https://example.com/parking",
+      referenceDate: "2026-05-01",
+      lastVerifiedAt: "2026-10-04T00:00:00Z",
+    });
     expect(location.noiseSources).toEqual([]);
     expect(location.sourceUrl).toBeNull();
     expect(location.source).toBeNull();
@@ -114,6 +124,7 @@ describe("toLocation", () => {
     }));
     expect(location.parking[0].openingHours).toBeNull();
     expect(location.parking[0].priceInfo).toBeNull();
+    expect(location.parking[0].relationship).toBe("nearby");
   });
 });
 

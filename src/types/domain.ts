@@ -22,12 +22,16 @@ export interface PermitInfo {
 export interface ParkingInfo {
   id: string;
   locationId: string | null;
+  relationship: "on_site" | "nearby";
   name: string;
   point: GeoPoint;
   capacity: number | null;
   openingHours: string | null;
   priceInfo: string | null;
   source: string | null;
+  sourceUrl: string | null;
+  referenceDate: string | null;
+  lastVerifiedAt: string | null;
 }
 
 export interface ParkingDistanceResult {

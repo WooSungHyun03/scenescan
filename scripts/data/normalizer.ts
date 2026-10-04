@@ -147,6 +147,7 @@ function provenanceRecord(
 function parkingRecords(
   record: JsonObject,
   mapping: SourceMapping["parking"],
+  relationshipMap: SourceMapping["parkingRelationshipMap"],
   fallbackProvenance: DataProvenance,
 ): CanonicalParkingRecord[] {
   if (!mapping) return [];
@@ -158,6 +159,13 @@ function parkingRecords(
     const id = optionalText(item, mapping.id);
     return {
       ...(id ? { id } : {}),
+      relationship: mappedValue(
+        item,
+        mapping.relationship,
+        relationshipMap,
+        ["on_site", "nearby"] as const,
+        `parking[${index}].relationship`,
+      ),
       name: requiredText(item, mapping.name, `parking[${index}].name`),
       latitude: coordinate(item, mapping.latitude, `parking[${index}].latitude`),
       longitude: coordinate(item, mapping.longitude, `parking[${index}].longitude`),
@@ -229,7 +237,7 @@ function normalizeRecordWithCategory(
       note: optionalText(record, mapping.permit.note),
       provenance: provenanceRecord(record, mapping.provenance.permit, locationProvenance),
     },
-    parking: parkingRecords(record, mapping.parking, locationProvenance),
+    parking: parkingRecords(record, mapping.parking, mapping.parkingRelationshipMap, locationProvenance),
     images: imageRecords(record, mapping.images, name),
     sourceUrl: locationProvenance.sourceUrl,
     provenance: locationProvenance,

@@ -24,6 +24,7 @@ describe("environment contracts", () => {
       "NEXT_PUBLIC_SUPABASE_URL",
       "NEXT_PUBLIC_USE_MOCK_AI",
       "NEXT_PUBLIC_USE_MOCK_DATA",
+      "PUBLIC_DATA_PORTAL_SERVICE_KEY",
       "SUPABASE_SECRET_KEY",
       "SUPABASE_SERVICE_ROLE_KEY",
       "SUPABASE_URL",
@@ -108,5 +109,12 @@ describe("environment contracts", () => {
         secretKey: "preferred",
       },
     });
+  });
+
+  it("keeps the public data collection key server-only", () => {
+    expect(parseServerEnvironment({ PUBLIC_DATA_PORTAL_SERVICE_KEY: "collection-secret" }))
+      .toEqual({ publicDataPortalServiceKey: "collection-secret" });
+    expect(parsePublicEnvironment({ PUBLIC_DATA_PORTAL_SERVICE_KEY: "collection-secret" }))
+      .not.toHaveProperty("publicDataPortalServiceKey");
   });
 });

@@ -43,6 +43,20 @@ function rows(): ProductionRows {
       license_url: "https://creativecommons.org/licenses/by/4.0",
       last_verified_at: "2026-10-02T00:00:00Z",
     })),
+    parking: [{
+      location_id: locationId,
+      relationship: "nearby",
+      name: "공영주차장",
+      latitude: 37.5,
+      longitude: 127,
+      capacity: 10,
+      opening_hours: null,
+      price_info: "무료",
+      source: "공공데이터포털",
+      source_url: "https://www.data.go.kr/data/15012896/standard.do",
+      reference_date: "2026-05-15",
+      last_verified_at: "2026-10-04T00:00:00Z",
+    }],
   };
 }
 
@@ -51,8 +65,9 @@ describe("attribution link checker", () => {
     const links = collectAttributionLinks(rows());
     const shared = links.find((link) => link.url.includes("Shared.jpg"));
 
-    expect(links).toHaveLength(5);
+    expect(links).toHaveLength(6);
     expect(links.find((link) => link.url.endsWith("/permit"))?.references[0].kind).toBe("permit-source");
+    expect(links.find((link) => link.url.includes("15012896"))?.references[0].kind).toBe("parking-source");
     expect(shared?.references).toHaveLength(2);
     expect(shared?.references.map((reference) => reference.recordId)).toEqual(["image-a", "image-b"]);
   });

@@ -39,6 +39,7 @@ export type CanonicalPermitInfo = Pick<
 
 export type CanonicalParkingRecord = {
   id?: ParkingInfo["id"];
+  relationship: ParkingInfo["relationship"];
   name: ParkingInfo["name"];
   latitude: ParkingInfo["point"]["latitude"];
   longitude: ParkingInfo["point"]["longitude"];
@@ -98,6 +99,7 @@ export const canonicalLocationRecordSchema: z.ZodType<CanonicalLocationRecord> =
   }).strict(),
   parking: z.array(z.object({
     id: nonEmptyString.optional(),
+    relationship: z.enum(["on_site", "nearby"]),
     name: nonEmptyString,
     latitude: z.number().finite().min(-90).max(90),
     longitude: z.number().finite().min(-180).max(180),
@@ -155,6 +157,7 @@ export const sourceMappingSchema = z.object({
   parking: z.object({
     path: fieldPath,
     id: fieldPath.optional(),
+    relationship: fieldPath,
     name: fieldPath,
     latitude: fieldPath,
     longitude: fieldPath,
@@ -163,6 +166,7 @@ export const sourceMappingSchema = z.object({
     priceInfo: fieldPath.optional(),
     provenance: provenanceFieldMappingSchema.default({}),
   }).strict().optional(),
+  parkingRelationshipMap: z.record(z.string(), z.enum(["on_site", "nearby"])).default({}),
   images: z.object({
     path: fieldPath,
     url: fieldPath.optional(),

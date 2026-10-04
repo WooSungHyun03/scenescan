@@ -24,6 +24,12 @@ function formatDistance(distanceMeters: number | null) {
   })}km`;
 }
 
+export function getParkingRelationshipPresentation(relationship: ParkingInfo["relationship"]) {
+  return relationship === "on_site"
+    ? { isOnSite: true, label: "장소 자체 주차" }
+    : { isOnSite: false, label: "주변 공영/민영 주차" };
+}
+
 function ParkingField({
   icon,
   label,
@@ -49,11 +55,9 @@ function ParkingField({
 export function ParkingInfoPanel({
   parking,
   origin,
-  locationId,
 }: {
   parking: ParkingInfo[];
   origin: GeoPoint;
-  locationId: string;
 }) {
   const sortedParking = sortParkingByDistance(origin, parking);
 
@@ -83,7 +87,8 @@ export function ParkingInfoPanel({
       {sortedParking.length ? (
         <div className="mt-5 space-y-4">
           {sortedParking.map(({ parking: item, distanceMeters }, index) => {
-            const isOnSite = item.locationId === locationId;
+            const relationship = getParkingRelationshipPresentation(item.relationship);
+            const isOnSite = relationship.isOnSite;
             const name = getValue(item.name);
             const openingHours = getValue(item.openingHours);
             const priceInfo = getValue(item.priceInfo);
@@ -111,7 +116,7 @@ export function ParkingInfoPanel({
                     ) : (
                       <MapPin size={13} aria-hidden="true" />
                     )}
-                    {isOnSite ? "장소 자체 주차" : "주변 공영/민영 주차"}
+                    {relationship.label}
                   </span>
                   <span className="text-xs font-semibold text-stone-600">
                     {index + 1}. {formatDistance(distanceMeters)}
@@ -165,9 +170,12 @@ export function ParkingInfoPanel({
                     <ParkingField icon={<ExternalLink size={16} />} label="출처">
                       <SourceAttribution
                         source={source}
+                        sourceUrl={item.sourceUrl}
+                        lastVerifiedAt={item.lastVerifiedAt ?? item.referenceDate}
                         label="주차 정보 출처"
                         compact
                         showLabel={false}
+                        showVerification
                       />
                     </ParkingField>
                   </dl>

@@ -12,6 +12,7 @@ import {
   type ExistingImageMetadata,
   type ImageMetadataRow,
   type LocationRow,
+  type ParkingRow,
   type ProductionImportDatabase,
   type ProductionImportMode,
   type ProductionWriteScope,
@@ -30,7 +31,7 @@ type CliOptions = {
 export function parseProductionImportArgs(args: string[]): CliOptions {
   const [locationsPath, manifestPath, ...flags] = args;
   if (!locationsPath || !manifestPath) {
-    throw new Error("Usage: pnpm data:import-production <locations.json> <embeddings-manifest.json> [--image-licenses PATH] [--validate-only | --dry-run | --apply] [--batch-size N] [--insert-only | --attribution-only | --permit-only]");
+    throw new Error("Usage: pnpm data:import-production <locations.json> <embeddings-manifest.json> [--image-licenses PATH] [--validate-only | --dry-run | --apply] [--batch-size N] [--insert-only | --attribution-only | --permit-only | --parking-only]");
   }
   let mode: ProductionImportMode = "validate-only";
   let selectedMode = false;
@@ -50,6 +51,8 @@ export function parseProductionImportArgs(args: string[]): CliOptions {
       writeScope = "attribution-only";
     } else if (flag === "--permit-only") {
       writeScope = "permit-only";
+    } else if (flag === "--parking-only") {
+      writeScope = "parking-only";
     } else if (flag === "--batch-size") {
       batchSize = Number(flags[++index]);
     } else if (flag === "--image-licenses") {
@@ -101,6 +104,12 @@ export function createProductionImportDatabase(client: SupabaseClient): Producti
       failOnSupabaseError(error, "Unable to inspect location images");
       return (data ?? []) as ExistingImageMetadata[];
     },
+    async findExistingParkingKeys(locationIds) {
+      if (locationIds.length === 0) return [];
+      const { data, error } = await client.from("parking").select("location_id, name").in("location_id", locationIds);
+      failOnSupabaseError(error, "Unable to inspect parking");
+      return (data ?? []) as Array<{ location_id: string; name: string }>;
+    },
     async upsertLocations(rows: LocationRow[]) {
       const { error } = await client.from("locations").upsert(rows, { onConflict: "id" });
       failOnSupabaseError(error, "Unable to upsert locations");
@@ -108,6 +117,10 @@ export function createProductionImportDatabase(client: SupabaseClient): Producti
     async upsertImages(rows: ImageMetadataRow[]) {
       const { error } = await client.from("location_images").upsert(rows, { onConflict: "id" });
       failOnSupabaseError(error, "Unable to upsert image metadata");
+    },
+    async upsertParking(rows: ParkingRow[]) {
+      const { error } = await client.from("parking").upsert(rows, { onConflict: "location_id,name" });
+      failOnSupabaseError(error, "Unable to upsert parking");
     },
     async updateLocationAttribution(rows) {
       await updateRows("locations", rows);
@@ -146,7 +159,7 @@ async function main(): Promise<void> {
     options.writeScope,
   );
   console.log(
-    `Production data import: mode=${result.mode}, scope=${result.writeScope}, locations=${result.locationsValidated}, images=${result.imagesValidated}, existing=${result.existingLocations}/${result.existingImages}, written=${result.locationsWritten}/${result.imagesWritten}`,
+    `Production data import: mode=${result.mode}, scope=${result.writeScope}, locations=${result.locationsValidated}, images=${result.imagesValidated}, parking=${result.parkingValidated}, existing=${result.existingLocations}/${result.existingImages}/${result.existingParking}, written=${result.locationsWritten}/${result.imagesWritten}/${result.parkingWritten}`,
   );
 }
 

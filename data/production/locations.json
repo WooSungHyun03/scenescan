@@ -25,7 +25,23 @@
           "lastVerifiedAt": "2026-10-03T12:00:00+09:00"
         }
       },
-      "parking": [],
+      "parking": [
+        {
+          "relationship": "nearby",
+          "name": "동대문",
+          "latitude": 37.567102,
+          "longitude": 127.012141,
+          "capacity": 1092,
+          "openingHours": "평일+토요일+공휴일 · 평일 00:00–23:59 · 토요일 00:00–23:59 · 공휴일 00:00–23:59",
+          "priceInfo": "유료 · 기본 5분 360원 · 추가 5분 360원",
+          "provenance": {
+            "source": "공공데이터포털 전국주차장정보표준데이터 · 서울시설공단",
+            "sourceUrl": "https://www.data.go.kr/data/15012896/standard.do",
+            "referenceDate": "2026-05-15",
+            "lastVerifiedAt": "2026-10-04T12:00:00+09:00"
+          }
+        }
+      ],
       "images": [
         {
           "imagePath": "public/locations/ddp-01.jpg",
@@ -521,7 +537,23 @@
           "lastVerifiedAt": "2026-10-03T12:00:00+09:00"
         }
       },
-      "parking": [],
+      "parking": [
+        {
+          "relationship": "nearby",
+          "name": "광명동굴 제3",
+          "latitude": 37.432091,
+          "longitude": 126.878169,
+          "capacity": 162,
+          "openingHours": "평일+토요일+공휴일 · 평일 00:00–23:59 · 토요일 00:00–23:59 · 공휴일 00:00–23:59",
+          "priceInfo": "유료 · 기본 30분 800원 · 1일 13,000원",
+          "provenance": {
+            "source": "공공데이터포털 전국주차장정보표준데이터 · 경기도 광명시 광명도시공사",
+            "sourceUrl": "https://www.data.go.kr/data/15012896/standard.do",
+            "referenceDate": "2026-04-17",
+            "lastVerifiedAt": "2026-10-04T12:00:00+09:00"
+          }
+        }
+      ],
       "images": [
         {
           "imagePath": "public/locations/gwangmyeong-cave-01.jpg",

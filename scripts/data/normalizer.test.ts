@@ -42,6 +42,7 @@ const mapping = parseSourceMapping({
   parking: {
     path: "nearbyParking",
     id: "id",
+    relationship: "relationship",
     name: "name",
     latitude: "point.lat",
     longitude: "point.lon",
@@ -86,6 +87,7 @@ describe("normalizeDataset", () => {
           metadata: { referenceDate: "2026-09-01" },
           nearbyParking: [{
             id: "parking-1",
+            relationship: "nearby",
             name: "Example public parking",
             point: { lat: 37.551, lon: 126.971 },
             capacity: "24",
@@ -133,6 +135,7 @@ describe("normalizeDataset", () => {
         },
         parking: [{
           id: "parking-1",
+          relationship: "nearby",
           name: "Example public parking",
           latitude: 37.551,
           longitude: 126.971,

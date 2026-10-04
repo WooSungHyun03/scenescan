@@ -32,6 +32,7 @@ export type DataValidationErrorCode =
   | "PERMIT_CONTACT_INVALID"
   | "PROVENANCE_INVALID"
   | "PARKING_INVALID"
+  | "PARKING_DUPLICATE"
   | "SOURCE_URL_INVALID"
   | "IMAGES_REQUIRED"
   | "IMAGE_INVALID"
@@ -168,6 +169,15 @@ function validateParking(
     return [error("PARKING_INVALID", locationIndex, locationId, field, "Parking entry must be an object")];
   }
   const errors: DataValidationError[] = [];
+  if (value.relationship !== "on_site" && value.relationship !== "nearby") {
+    errors.push(error(
+      "PARKING_INVALID",
+      locationIndex,
+      locationId,
+      `${field}.relationship`,
+      "Parking relationship must be on_site or nearby",
+    ));
+  }
   if (!nonEmptyText(value.name)) {
     errors.push(error("PARKING_INVALID", locationIndex, locationId, `${field}.name`, "Parking name is required"));
   }
@@ -201,6 +211,17 @@ function validateParking(
       `${field}.capacity`,
       "Parking capacity must be a non-negative integer or null",
     ));
+  }
+  for (const key of ["openingHours", "priceInfo"] as const) {
+    if (value[key] !== null && !nonEmptyText(value[key])) {
+      errors.push(error(
+        "PARKING_INVALID",
+        locationIndex,
+        locationId,
+        `${field}.${key}`,
+        `${key} must be a non-empty source value or null`,
+      ));
+    }
   }
   errors.push(...validateProvenance(value.provenance, `${field}.provenance`, locationIndex, locationId));
   return errors;
@@ -317,6 +338,26 @@ async function validateLocation(
     errors.push(error("PARKING_INVALID", locationIndex, id, "parking", "Parking data must be an array"));
   } else {
     errors.push(...value.parking.flatMap((parking, index) => validateParking(parking, index, locationIndex, id)));
+    const indexesByParkingKey = new Map<string, number[]>();
+    value.parking.forEach((parking, index) => {
+      if (!isObject(parking)) return;
+      const name = nonEmptyText(parking.name)?.toLocaleLowerCase("ko-KR");
+      if (!name || typeof parking.latitude !== "number" || typeof parking.longitude !== "number") return;
+      const key = `${name}\u0000${parking.latitude.toFixed(6)}\u0000${parking.longitude.toFixed(6)}`;
+      indexesByParkingKey.set(key, [...(indexesByParkingKey.get(key) ?? []), index]);
+    });
+    for (const indexes of indexesByParkingKey.values()) {
+      if (indexes.length < 2) continue;
+      for (const parkingIndex of indexes) {
+        errors.push(error(
+          "PARKING_DUPLICATE",
+          locationIndex,
+          id,
+          `parking[${parkingIndex}]`,
+          "Duplicate parking name and coordinates within one location",
+        ));
+      }
+    }
   }
   if (!isHttpUrl(value.sourceUrl)) {
     errors.push(error("SOURCE_URL_INVALID", locationIndex, id, "sourceUrl", "Source URL must use HTTP or HTTPS"));

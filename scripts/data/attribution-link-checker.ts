@@ -1,6 +1,6 @@
 import type { ProductionRows } from "./production-importer.ts";
 
-export type AttributionLinkKind = "location-source" | "permit-source" | "image-source" | "license";
+export type AttributionLinkKind = "location-source" | "permit-source" | "image-source" | "parking-source" | "license";
 
 export type AttributionLinkReference = {
   kind: AttributionLinkKind;
@@ -74,6 +74,13 @@ export function collectAttributionLinks(rows: ProductionRows): AttributionLink[]
       kind: "license",
       recordId: image.id,
       locationId: image.location_id,
+    });
+  }
+  for (const parking of rows.parking) {
+    addLink(links, parking.source_url, {
+      kind: "parking-source",
+      recordId: parking.name,
+      locationId: parking.location_id,
     });
   }
   return [...links.entries()]

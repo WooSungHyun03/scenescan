@@ -6,6 +6,7 @@ import { z } from "zod";
 import type { NormalizedLocationOutput } from "./contracts.ts";
 import { parseNormalizedLocationOutput } from "./contracts.ts";
 import { parseManifest as parseEmbeddingManifest } from "../embeddings/contracts.ts";
+import { applyStaticParkingCatalog, parseStaticParkingCatalog, type StaticParkingCatalog } from "./static-parking.ts";
 import { LOCATION_CATEGORY_VALUES, REGION_VALUES } from "../../src/types/location-options.ts";
 import { isValidContactPhone } from "./permit-information.ts";
 
@@ -290,9 +291,12 @@ async function downloadImage(url: string, outputPath: string): Promise<{ sha256:
   return { sha256: createHash("sha256").update(buffer).digest("hex"), bytes: buffer.length };
 }
 
-export function buildLocationDataset(manifest: CollectionManifest): NormalizedLocationOutput {
+export function buildLocationDataset(
+  manifest: CollectionManifest,
+  parkingCatalog?: StaticParkingCatalog,
+): NormalizedLocationOutput {
   const verifiedAt = manifest.verified_at;
-  return parseNormalizedLocationOutput({
+  const dataset = parseNormalizedLocationOutput({
     schemaVersion: 2,
     source: { name: "SceneScan curated public location dataset" },
     locations: manifest.locations.map((location) => ({
@@ -333,6 +337,7 @@ export function buildLocationDataset(manifest: CollectionManifest): NormalizedLo
     })),
     reviewQueue: [],
   });
+  return parkingCatalog ? applyStaticParkingCatalog(dataset, parkingCatalog) : dataset;
 }
 
 export function buildEmbeddingManifest(
@@ -408,7 +413,10 @@ export async function collectCommonsDataset(manifestPath: string, repositoryRoot
     console.log(`${reused ? "Reused verified" : "Downloaded"} ${image.filename} (${result.bytes} bytes)`);
   });
 
-  const locations = buildLocationDataset(manifest);
+  const parkingCatalog = parseStaticParkingCatalog(
+    JSON.parse(await readFile(resolve(repositoryRoot, "data/production/static-parking.json"), "utf8")) as unknown,
+  );
+  const locations = buildLocationDataset(manifest, parkingCatalog);
   const embeddings = buildEmbeddingManifest(manifest, metadata);
   const licenses = {
     schema_version: 1,

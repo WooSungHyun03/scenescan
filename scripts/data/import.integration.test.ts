@@ -23,7 +23,7 @@ function dataset(locationId: string, parkingName: string) {
       latitude: 37.5,
       longitude: 127.0,
       permit: { type: "문의 필요", contactName: null, contactPhone: null, note: null, provenance: provenance() },
-      parking: [{ name: parkingName, latitude: 37.5, longitude: 127.0, capacity: 3, openingHours: null, priceInfo: null, provenance: provenance() }],
+      parking: [{ relationship: "nearby", name: parkingName, latitude: 37.5, longitude: 127.0, capacity: 3, openingHours: null, priceInfo: null, provenance: provenance() }],
       images: [{ imagePath: "location.jpg", imageUrl: "https://example.com/location.jpg", alt: "설명" }],
       sourceUrl: "https://example.com/source",
       provenance: provenance(),

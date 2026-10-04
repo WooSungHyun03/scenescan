@@ -1,8 +1,9 @@
 import type { NormalizedLocationOutput } from "./contracts.ts";
 import { z } from "zod";
+import { distanceMeters, MAX_NEARBY_PARKING_DISTANCE_METERS } from "./static-parking.ts";
 
 export type ProductionImportMode = "validate-only" | "dry-run" | "apply";
-export type ProductionWriteScope = "all" | "attribution-only" | "permit-only";
+export type ProductionWriteScope = "all" | "attribution-only" | "permit-only" | "parking-only";
 
 export type LocationRow = {
   id: string;
@@ -43,6 +44,21 @@ export type ImageMetadataRow = {
   last_verified_at: string | null;
 };
 
+export type ParkingRow = {
+  location_id: string;
+  relationship: "on_site" | "nearby";
+  name: string;
+  latitude: number;
+  longitude: number;
+  capacity: number | null;
+  opening_hours: string | null;
+  price_info: string | null;
+  source: string;
+  source_url: string;
+  reference_date: string | null;
+  last_verified_at: string | null;
+};
+
 export type ImageLicenseCatalog = {
   verifiedAt: string;
   items: Array<{
@@ -67,8 +83,9 @@ export type ProductionEmbeddingManifest = {
   }>;
 };
 
-export type ProductionRows = { locations: LocationRow[]; images: ImageMetadataRow[] };
+export type ProductionRows = { locations: LocationRow[]; images: ImageMetadataRow[]; parking: ParkingRow[] };
 export type ExistingImageMetadata = { id: string; location_id: string };
+export type ExistingParkingKey = { location_id: string; name: string };
 export type LocationAttributionRow = Pick<
   LocationRow,
   "id" | "source" | "source_url" | "author" | "license" | "license_url" | "last_verified_at"
@@ -93,8 +110,10 @@ export type PermitMetadataRow = Pick<
 export interface ProductionImportDatabase {
   findLocationIds(ids: string[]): Promise<string[]>;
   findExistingImages(ids: string[]): Promise<ExistingImageMetadata[]>;
+  findExistingParkingKeys(locationIds: string[]): Promise<ExistingParkingKey[]>;
   upsertLocations(rows: LocationRow[]): Promise<void>;
   upsertImages(rows: ImageMetadataRow[]): Promise<void>;
+  upsertParking(rows: ParkingRow[]): Promise<void>;
   updateLocationAttribution(rows: LocationAttributionRow[]): Promise<void>;
   updateImageAttribution(rows: ImageAttributionRow[]): Promise<void>;
   updatePermitMetadata(rows: PermitMetadataRow[]): Promise<void>;
@@ -105,10 +124,13 @@ export type ProductionImportResult = {
   writeScope: ProductionWriteScope;
   locationsValidated: number;
   imagesValidated: number;
+  parkingValidated: number;
   existingLocations: number;
   existingImages: number;
+  existingParking: number;
   locationsWritten: number;
   imagesWritten: number;
+  parkingWritten: number;
 };
 
 export function toLocationAttributionRow(row: LocationRow): LocationAttributionRow {
@@ -246,11 +268,9 @@ export function createProductionRows(
 
   const locations: LocationRow[] = [];
   const images: ImageMetadataRow[] = [];
+  const parking: ParkingRow[] = [];
   for (const location of dataset.locations) {
     const locationId = requiredId(location.id, `Location ${location.name}`);
-    if (location.parking.length > 0) {
-      throw new Error(`Production importer does not accept unreviewed parking records: ${location.name}`);
-    }
     locations.push({
       id: locationId,
       name: location.name,
@@ -276,6 +296,32 @@ export function createProductionRows(
       license_url: null,
       last_verified_at: location.provenance.lastVerifiedAt,
     });
+    for (const item of location.parking) {
+      if (!item.provenance.referenceDate && !item.provenance.lastVerifiedAt) {
+        throw new Error(`Parking record requires a reference or verification date: ${item.name}`);
+      }
+      const distance = distanceMeters(location, item);
+      const maximumDistance = item.relationship === "on_site" ? 300 : MAX_NEARBY_PARKING_DISTANCE_METERS;
+      if (distance > maximumDistance) {
+        throw new Error(
+          `${item.name} is ${Math.round(distance)}m from ${location.name}; ${item.relationship} limit is ${maximumDistance}m`,
+        );
+      }
+      parking.push({
+        location_id: locationId,
+        relationship: item.relationship,
+        name: item.name,
+        latitude: item.latitude,
+        longitude: item.longitude,
+        capacity: item.capacity,
+        opening_hours: item.openingHours,
+        price_info: item.priceInfo,
+        source: item.provenance.source,
+        source_url: item.provenance.sourceUrl,
+        reference_date: item.provenance.referenceDate,
+        last_verified_at: item.provenance.lastVerifiedAt,
+      });
+    }
     for (const image of location.images) {
       const key = manifestKey(locationId, image.imageUrl);
       const entry = embeddingsByLocationAndUrl.get(key);
@@ -306,7 +352,19 @@ export function createProductionRows(
   if (licensesByImageId.size > 0) {
     throw new Error(`Image license catalog contains ${licensesByImageId.size} image(s) absent from location data`);
   }
-  return { locations, images };
+  const parkingKeys = new Set<string>();
+  const physicalParkingKeys = new Set<string>();
+  for (const item of parking) {
+    const key = `${item.location_id}\u0000${item.name}`;
+    if (parkingKeys.has(key)) throw new Error(`Production data contains duplicate parking key: ${item.name}`);
+    parkingKeys.add(key);
+    const physicalKey = `${item.name.trim().toLocaleLowerCase("ko-KR")}\u0000${item.latitude.toFixed(6)}\u0000${item.longitude.toFixed(6)}`;
+    if (physicalParkingKeys.has(physicalKey)) {
+      throw new Error(`Production data assigns the same physical parking more than once: ${item.name}`);
+    }
+    physicalParkingKeys.add(physicalKey);
+  }
+  return { locations, images, parking };
 }
 
 function chunks<T>(values: T[], size: number): T[][] {
@@ -334,10 +392,13 @@ export async function importProductionData(
     writeScope,
     locationsValidated: rows.locations.length,
     imagesValidated: rows.images.length,
+    parkingValidated: rows.parking.length,
     existingLocations: 0,
     existingImages: 0,
+    existingParking: 0,
     locationsWritten: 0,
     imagesWritten: 0,
+    parkingWritten: 0,
   };
   if (mode === "validate-only") return base;
   if (!database) throw new Error(`Database connection is required for ${mode}`);
@@ -361,6 +422,31 @@ export async function importProductionData(
       locationsWritten: permitRows.length,
     };
   }
+  const parkingLocationIds = [...new Set(rows.parking.map((row) => row.location_id))];
+  const existingParking: ExistingParkingKey[] = [];
+  if (writeScope === "all" || writeScope === "parking-only") {
+    for (const batch of chunks(parkingLocationIds, batchSize)) {
+      existingParking.push(...await database.findExistingParkingKeys(batch));
+    }
+  }
+  const existingParkingKeys = new Set(existingParking.map((row) => `${row.location_id}\u0000${row.name}`));
+  if (writeScope === "parking-only") {
+    const existingLocationSet = new Set(existingLocationIds);
+    const missingLocationIds = parkingLocationIds.filter((id) => !existingLocationSet.has(id));
+    if (missingLocationIds.length > 0) {
+      throw new Error(`Parking import references ${missingLocationIds.length} location(s) absent from Supabase`);
+    }
+    if (mode === "dry-run") {
+      return { ...base, existingLocations: existingLocationIds.length, existingParking: existingParking.length };
+    }
+    for (const batch of chunks(rows.parking, batchSize)) await database.upsertParking(batch);
+    return {
+      ...base,
+      existingLocations: existingLocationIds.length,
+      existingParking: existingParking.length,
+      parkingWritten: rows.parking.length,
+    };
+  }
   const existingImages: ExistingImageMetadata[] = [];
   for (const batch of chunks(rows.images.map((row) => row.id), batchSize)) {
     existingImages.push(...await database.findExistingImages(batch));
@@ -374,7 +460,12 @@ export async function importProductionData(
   }
 
   if (mode === "dry-run") {
-    return { ...base, existingLocations: existingLocationIds.length, existingImages: existingImages.length };
+    return {
+      ...base,
+      existingLocations: existingLocationIds.length,
+      existingImages: existingImages.length,
+      existingParking: existingParking.length,
+    };
   }
   const locationIds = new Set(existingLocationIds);
   const imageIds = new Set(existingImages.map((image) => image.id));
@@ -397,13 +488,19 @@ export async function importProductionData(
   }
   const locationsToWrite = preserveExisting ? rows.locations.filter((row) => !locationIds.has(row.id)) : rows.locations;
   const imagesToWrite = preserveExisting ? rows.images.filter((row) => !imageIds.has(row.id)) : rows.images;
+  const parkingToWrite = preserveExisting
+    ? rows.parking.filter((row) => !existingParkingKeys.has(`${row.location_id}\u0000${row.name}`))
+    : rows.parking;
   for (const batch of chunks(locationsToWrite, batchSize)) await database.upsertLocations(batch);
+  for (const batch of chunks(parkingToWrite, batchSize)) await database.upsertParking(batch);
   for (const batch of chunks(imagesToWrite, batchSize)) await database.upsertImages(batch);
   return {
     ...base,
     existingLocations: existingLocationIds.length,
     existingImages: existingImages.length,
+    existingParking: existingParking.length,
     locationsWritten: locationsToWrite.length,
     imagesWritten: imagesToWrite.length,
+    parkingWritten: parkingToWrite.length,
   };
 }

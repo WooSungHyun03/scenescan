@@ -11,6 +11,7 @@ const serverEnvironmentSchema = z.object({
   SUPABASE_URL: optionalEnvironmentHttpUrl,
   SUPABASE_SECRET_KEY: optionalEnvironmentString,
   SUPABASE_SERVICE_ROLE_KEY: optionalEnvironmentString,
+  PUBLIC_DATA_PORTAL_SERVICE_KEY: optionalEnvironmentString,
 }).superRefine((environment, context) => {
   const hasUrl = Boolean(environment.SUPABASE_URL);
   const hasKey = Boolean(
@@ -40,6 +41,7 @@ export type ServerEnvironment = {
     url: string;
     secretKey: string;
   };
+  publicDataPortalServiceKey?: string;
 };
 
 const forbiddenPublicSecretName = /^NEXT_PUBLIC_(?=.*SUPABASE)(?=.*(?:SECRET|SERVICE_ROLE))/i;
@@ -66,12 +68,13 @@ export function parseServerEnvironment(
 
   const secretKey = result.data.SUPABASE_SECRET_KEY
     || result.data.SUPABASE_SERVICE_ROLE_KEY;
-  if (!result.data.SUPABASE_URL || !secretKey) return Object.freeze({});
-
   return Object.freeze({
-    supabaseAdmin: Object.freeze({
+    ...(result.data.SUPABASE_URL && secretKey ? { supabaseAdmin: Object.freeze({
       url: result.data.SUPABASE_URL,
       secretKey,
-    }),
+    }) } : {}),
+    ...(result.data.PUBLIC_DATA_PORTAL_SERVICE_KEY
+      ? { publicDataPortalServiceKey: result.data.PUBLIC_DATA_PORTAL_SERVICE_KEY }
+      : {}),
   });
 }

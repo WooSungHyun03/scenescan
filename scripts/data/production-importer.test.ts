@@ -74,8 +74,10 @@ function database(overrides: Partial<ProductionImportDatabase> = {}): Production
   return {
     findLocationIds: vi.fn(async () => []),
     findExistingImages: vi.fn(async () => []),
+    findExistingParkingKeys: vi.fn(async () => []),
     upsertLocations: vi.fn(async () => undefined),
     upsertImages: vi.fn(async () => undefined),
+    upsertParking: vi.fn(async () => undefined),
     updateLocationAttribution: vi.fn(async () => undefined),
     updateImageAttribution: vi.fn(async () => undefined),
     updatePermitMetadata: vi.fn(async () => undefined),
@@ -84,6 +86,49 @@ function database(overrides: Partial<ProductionImportDatabase> = {}): Production
 }
 
 describe("production data importer", () => {
+  it("maps reviewed static parking with provenance instead of rejecting it", async () => {
+    const { data, manifest, licenses } = inputs();
+    data.locations[0].parking = [{
+      relationship: "nearby",
+      name: "공영주차장",
+      latitude: 37.501,
+      longitude: 127.001,
+      capacity: 20,
+      openingHours: "평일 09:00–18:00",
+      priceInfo: "유료 · 기본 30분 1,000원",
+      provenance: {
+        source: "공공데이터포털",
+        sourceUrl: "https://www.data.go.kr/data/15012896/standard.do",
+        referenceDate: "2026-05-15",
+        lastVerifiedAt: "2026-10-04T12:00:00+09:00",
+      },
+    }];
+    const parkingRows = createProductionRows(data, manifest, licenses);
+    expect(parkingRows.parking).toEqual([{
+      location_id: locationId,
+      relationship: "nearby",
+      name: "공영주차장",
+      latitude: 37.501,
+      longitude: 127.001,
+      capacity: 20,
+      opening_hours: "평일 09:00–18:00",
+      price_info: "유료 · 기본 30분 1,000원",
+      source: "공공데이터포털",
+      source_url: "https://www.data.go.kr/data/15012896/standard.do",
+      reference_date: "2026-05-15",
+      last_verified_at: "2026-10-04T12:00:00+09:00",
+    }]);
+
+    const db = database({ findLocationIds: vi.fn(async () => [locationId]) });
+    await expect(importProductionData(parkingRows, "dry-run", 100, db, false, "parking-only"))
+      .resolves.toMatchObject({ parkingValidated: 1, existingParking: 0, parkingWritten: 0 });
+    await expect(importProductionData(parkingRows, "apply", 100, db, false, "parking-only"))
+      .resolves.toMatchObject({ parkingWritten: 1, locationsWritten: 0, imagesWritten: 0 });
+    expect(db.upsertParking).toHaveBeenCalledWith(parkingRows.parking);
+    expect(db.upsertLocations).not.toHaveBeenCalled();
+    expect(db.upsertImages).not.toHaveBeenCalled();
+  });
+
   it("preserves existing production metadata during append-only expansion", async () => {
     const db = database({ findLocationIds: vi.fn(async () => [locationId]),
       findExistingImages: vi.fn(async () => [{ id: imageId, location_id: locationId }]) });
@@ -214,6 +259,7 @@ describe("production data importer", () => {
         license_url: "https://creativecommons.org/licenses/by/4.0",
         last_verified_at: "2026-09-29T13:00:00+09:00",
       }],
+      parking: [],
     });
   });
 

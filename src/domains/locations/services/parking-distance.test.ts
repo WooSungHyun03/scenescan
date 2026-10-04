@@ -10,12 +10,16 @@ function parking(
   return {
     id,
     locationId: null,
+    relationship: "nearby",
     name: id,
     point: { latitude, longitude },
     capacity: null,
     openingHours: null,
     priceInfo: null,
     source: null,
+    sourceUrl: null,
+    referenceDate: null,
+    lastVerifiedAt: null,
   };
 }
 

@@ -45,9 +45,11 @@ const EXPECTED_EMBEDDING_MODEL = buildEmbeddingModelKey(CLIP_MODEL_ID, CLIP_MODE
 // recognizes that specific failure and every read below retries once with
 // LEGACY_LOCATION_SELECT (no attribution columns) instead of failing the
 // request outright.
-const LOCATION_SELECT = "*, location_images(id, image_url, alt, source, source_url, author, license, license_url, last_verified_at), parking(id, name, latitude, longitude, capacity, opening_hours, price_info, source)";
+const LOCATION_SELECT = "*, location_images(id, image_url, alt, source, source_url, author, license, license_url, last_verified_at), parking(id, name, relationship, latitude, longitude, capacity, opening_hours, price_info, source, source_url, reference_date, last_verified_at)";
+const PRE_PARKING_METADATA_LOCATION_SELECT = "*, location_images(id, image_url, alt, source, source_url, author, license, license_url, last_verified_at), parking(id, name, latitude, longitude, capacity, opening_hours, price_info, source)";
 const LEGACY_LOCATION_SELECT = "*, location_images(id, image_url, alt), parking(id, name, latitude, longitude, capacity, opening_hours, price_info, source)";
 const IMAGE_ATTRIBUTION_COLUMNS = ["source", "source_url", "author", "license", "license_url", "last_verified_at"];
+const PARKING_METADATA_COLUMNS = ["relationship", "source_url", "reference_date", "last_verified_at"];
 
 type SupabaseQueryError = {
   code?: string;
@@ -71,6 +73,25 @@ function isMissingImageAttributionSchema(error: unknown): boolean {
 function warnAboutLegacyAttributionSchema(error: unknown): void {
   const queryError = error as SupabaseQueryError;
   logger.warn("Image attribution columns are unavailable; using the legacy location schema", {
+    code: queryError.code ?? "unknown",
+  });
+}
+
+function isMissingParkingMetadataSchema(error: unknown): boolean {
+  if (!error || typeof error !== "object") return false;
+  const queryError = error as SupabaseQueryError;
+  if (queryError.code !== "42703" && queryError.code !== "PGRST204") return false;
+  const description = [queryError.message, queryError.details, queryError.hint]
+    .filter((value): value is string => typeof value === "string")
+    .join(" ")
+    .toLowerCase();
+  return description.includes("parking")
+    && PARKING_METADATA_COLUMNS.some((column) => description.includes(column));
+}
+
+function warnAboutLegacyParkingSchema(error: unknown): void {
+  const queryError = error as SupabaseQueryError;
+  logger.warn("Parking provenance columns are unavailable; using the pre-migration parking schema", {
     code: queryError.code ?? "unknown",
   });
 }
@@ -119,6 +140,10 @@ export async function getSupabaseLocations(query: LocationListQuery = {}): Promi
     return dbQuery;
   }
   let { data, error } = await buildQuery(LOCATION_SELECT);
+  if (isMissingParkingMetadataSchema(error)) {
+    warnAboutLegacyParkingSchema(error);
+    ({ data, error } = await buildQuery(PRE_PARKING_METADATA_LOCATION_SELECT));
+  }
   if (isMissingImageAttributionSchema(error)) {
     warnAboutLegacyAttributionSchema(error);
     ({ data, error } = await buildQuery(LEGACY_LOCATION_SELECT));
@@ -136,6 +161,10 @@ export async function getSupabaseLocations(query: LocationListQuery = {}): Promi
 export async function getSupabaseLocationsByIds(ids: readonly string[]): Promise<Location[]> {
   if (ids.length === 0) return [];
   let { data, error } = await getSupabaseClient().from("locations").select(LOCATION_SELECT).in("id", ids);
+  if (isMissingParkingMetadataSchema(error)) {
+    warnAboutLegacyParkingSchema(error);
+    ({ data, error } = await getSupabaseClient().from("locations").select(PRE_PARKING_METADATA_LOCATION_SELECT).in("id", ids));
+  }
   if (isMissingImageAttributionSchema(error)) {
     warnAboutLegacyAttributionSchema(error);
     ({ data, error } = await getSupabaseClient().from("locations").select(LEGACY_LOCATION_SELECT).in("id", ids));
@@ -148,6 +177,12 @@ export async function getSupabaseLocation(id: string): Promise<LocationDetail | 
   let { data, error } = await getSupabaseClient().from("locations")
     .select(LOCATION_SELECT)
     .eq("id", id).maybeSingle();
+  if (isMissingParkingMetadataSchema(error)) {
+    warnAboutLegacyParkingSchema(error);
+    ({ data, error } = await getSupabaseClient().from("locations")
+      .select(PRE_PARKING_METADATA_LOCATION_SELECT)
+      .eq("id", id).maybeSingle());
+  }
   if (isMissingImageAttributionSchema(error)) {
     warnAboutLegacyAttributionSchema(error);
     ({ data, error } = await getSupabaseClient().from("locations")
