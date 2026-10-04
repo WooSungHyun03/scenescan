@@ -255,23 +255,34 @@ declare global {
 let loading: Promise<void> | null = null;
 
 function loadKakao(key: string): Promise<void> {
-  if (window.kakao?.maps) {
-    return new Promise((resolve) => window.kakao!.maps.load(resolve));
-  }
-
   if (!loading) {
     const request = new Promise<void>((resolve, reject) => {
+      const timeout = setTimeout(() => {
+        script.remove();
+        reject(new Error("Kakao Maps SDK timed out"));
+      }, 15_000);
       const script = document.createElement("script");
+      const ready = () => {
+        clearTimeout(timeout);
+        resolve();
+      };
+      if (window.kakao?.maps) {
+        window.kakao.maps.load(ready);
+        return;
+      }
       script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${encodeURIComponent(key)}&autoload=false`;
       script.onload = () => {
         if (!window.kakao) {
+          clearTimeout(timeout);
+          script.remove();
           reject(new Error("Kakao Maps SDK is unavailable"));
           return;
         }
-        window.kakao.maps.load(resolve);
+        window.kakao.maps.load(ready);
       };
       script.onerror = () => {
         script.remove();
+        clearTimeout(timeout);
         reject(new Error("Kakao Maps SDK failed to load"));
       };
       document.head.appendChild(script);

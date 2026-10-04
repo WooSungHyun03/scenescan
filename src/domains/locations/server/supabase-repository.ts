@@ -6,7 +6,7 @@ import { SEARCH_MATCH_COUNT_DEFAULT, SEARCH_MATCH_THRESHOLD_DEFAULT } from "@/ty
 import type { Location, LocationDetail, LocationFilter, LocationListQuery, LocationSearchResult, SearchQueryOptions } from "@/types/domain";
 import { groupImageMatches, type ImageMatch } from "@/domains/locations/services/group-image-matches";
 import { rankSimilarLocations } from "@/domains/locations/services/similar-locations";
-import { CLIP_MODEL_ID, CLIP_MODEL_REVISION } from "@/lib/ai/embedding-service";
+import { CLIP_MODEL_KEY } from "@/lib/ai/embedding-config";
 import { resolveLocationListPagination } from "./pagination";
 import {
   parseLocationRow,
@@ -19,24 +19,11 @@ import {
   type LocationRow,
 } from "./supabase-mappers";
 
-// TODO(embedding-model-key): src/lib/ai/embedding-service.ts (Member 1's
-// module) exports CLIP_MODEL_ID and CLIP_MODEL_REVISION separately but has
-// no single exported "model@revision" key. This is the one place that joins
-// them today. scripts/embeddings/importer.ts will need to produce this exact
-// same string once it starts writing location_images.embedding_model, so the
-// join logic should end up in exactly one place shared by both -- proposed:
-// add `export const CLIP_MODEL_KEY = \`${CLIP_MODEL_ID}@${CLIP_MODEL_REVISION}\`;`
-// to src/lib/ai/embedding-service.ts and have both sides import it instead of
-// building the string themselves (see report for the full suggested diff).
-export function buildEmbeddingModelKey(modelId: string, revision: string): string {
-  return `${modelId}@${revision}`;
-}
-
 // Must match the embedding_model value written by whatever produced
 // location_images.embedding (see docs/database.md). match_location_images
 // treats a mismatch (or a missing value) as "no match" by design, so this
 // has to stay in sync with the offline importer's model/revision.
-const EXPECTED_EMBEDDING_MODEL = buildEmbeddingModelKey(CLIP_MODEL_ID, CLIP_MODEL_REVISION);
+const EXPECTED_EMBEDDING_MODEL = CLIP_MODEL_KEY;
 
 // LOCATION_SELECT includes the attribution columns added by
 // 20261001000000_location_attribution.sql (origin/main). On a project where
@@ -213,7 +200,7 @@ export async function searchSupabaseLocations(
 ): Promise<LocationSearchResult[]> {
   const client = getSupabaseClient();
   const matchThreshold = options.threshold ?? SEARCH_MATCH_THRESHOLD_DEFAULT;
-  const { data, error } = await client.rpc("match_location_images_filtered", {
+  let { data, error } = await client.rpc("match_location_images_filtered", {
     query_embedding: embedding,
     match_threshold: matchThreshold,
     match_count: 8,
@@ -221,6 +208,20 @@ export async function searchSupabaseLocations(
     filter_category: filters.category ?? null,
     expected_embedding_model: EXPECTED_EMBEDDING_MODEL,
   });
+  // The live pre-model schema has the same filtered/deduplicated RPC but
+  // only five arguments. Keep its filters intact during migration rollout;
+  // retry only PostgREST's exact missing-signature error, never a DB failure.
+  if (error?.code === "PGRST202" && error.message?.includes("expected_embedding_model")
+    && error.message.includes("match_location_images_filtered")) {
+    logger.warn("Embedding model metadata migration is pending; using pre-model filtered search");
+    ({ data, error } = await client.rpc("match_location_images_filtered", {
+      query_embedding: embedding,
+      match_threshold: matchThreshold,
+      match_count: 8,
+      filter_region: filters.region ?? null,
+      filter_category: filters.category ?? null,
+    }));
+  }
   // Rolling deployment only: match_location_images_filtered
   // (20261002000000_filtered_location_search.sql, plus its
   // expected_embedding_model follow-up) might not exist yet on a project
@@ -256,28 +257,32 @@ export async function searchSupabaseLocations(
   return toSearchResults(hits.map(toImageMatchFromHit));
 }
 
-// Embedding selection for similar-locations (the mean of all of this
-// location's non-null image embeddings, computed in SQL) and the
-// self-exclusion/grouping policy are Member 1's (match_similar_location_images,
-// supabase/migrations/20260928000000_similar_locations.sql; rankSimilarLocations,
-// src/domains/locations/services/similar-locations.ts) -- reused as-is, not
-// reimplemented here. Unlike match_location_images, this RPC has no
-// expected_embedding_model gate; if more than one CLIP model/revision's
-// embeddings ever coexist in location_images, it could silently average or
-// compare across them. Flagged as a proposal for Member 1, not fixed here.
-export async function getSupabaseSimilarLocations(locationId: string): Promise<LocationSearchResult[]> {
-  const { data, error } = await getSupabaseClient().rpc("match_similar_location_images", {
+// Representative embedding and eligibility stay in SQL; application ranking
+// remains a defensive contract guard. The legacy RPC is rollout-only.
+export async function getSupabaseSimilarLocations(locationId: string, excludedIds: readonly string[] = []): Promise<LocationSearchResult[]> {
+  const client = getSupabaseClient();
+  let { data, error } = await client.rpc("match_similar_locations_filtered", {
     source_location_id: locationId,
     match_threshold: SEARCH_MATCH_THRESHOLD_DEFAULT,
-    match_count: SEARCH_MATCH_COUNT_DEFAULT,
+    match_count: 8,
+    expected_embedding_model: EXPECTED_EMBEDDING_MODEL,
+    excluded_location_ids: [...excludedIds],
   });
+  if (error?.code === "PGRST202" && error.message?.includes("match_similar_locations_filtered")) {
+    logger.warn("Model-safe similar-search migration is pending; using legacy same-model catalog");
+    ({ data, error } = await client.rpc("match_similar_location_images", {
+      source_location_id: locationId,
+      match_threshold: SEARCH_MATCH_THRESHOLD_DEFAULT,
+      match_count: SEARCH_MATCH_COUNT_DEFAULT,
+    }));
+  }
   if (error) throw dataAccessError(`Failed to find locations similar to ${locationId}`, error);
-  const rows = (data ?? []) as Array<{ location_image_id: string; location_id: string; similarity: number }>;
-  const matches: ImageMatch[] = rows.map((row) => ({
-    locationImageId: row.location_image_id,
-    locationId: row.location_id,
-    similarity: row.similarity,
-  }));
+  let matches: ImageMatch[];
+  try {
+    matches = parseMatchLocationImageHits(data).map(toImageMatchFromHit).filter((match) => !excludedIds.includes(match.locationId));
+  } catch (parseError) {
+    throw dataAccessError("Unexpected similar-locations response shape", parseError);
+  }
   // getSupabaseLocationsByIds, not getSupabaseLocations(): the latter is now
   // paginated (LOCATION_LIST_DEFAULT_LIMIT = 20), so calling it with no
   // arguments would silently miss any location past the first page --

@@ -83,6 +83,14 @@ test("업로드부터 Top 8, 지도, 상세, 태양 정보와 shortlist 비교�
     /순광|측광|역광|분류 불가/,
   );
 
+  const similar = page.locator("#similar");
+  const previousIds = await similar.locator("article a").evaluateAll((links) => links.map((link) => link.getAttribute("href")));
+  const nextRequest = page.waitForRequest((request) => request.url().includes("/similar?"));
+  await similar.getByRole("button", { name: "다른 비슷한 장소 보기" }).click();
+  expect(new URL((await nextRequest).url()).searchParams.getAll("exclude")).toHaveLength(previousIds.length);
+  await expect(similar.getByRole("button", { name: "추가 후보 없음" })).toBeDisabled();
+  expect(await similar.locator("article a").evaluateAll((links) => links.map((link) => link.getAttribute("href")))).toEqual(previousIds);
+
   await page.getByRole("link", { name: /^관심 장소/ }).click();
   await expect(page).toHaveURL(/\/shortlist$/);
   await expect(page.getByRole("heading", { level: 1, name: "관심 장소" })).toBeVisible();

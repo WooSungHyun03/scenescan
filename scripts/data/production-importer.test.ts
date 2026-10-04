@@ -288,6 +288,7 @@ describe("production data importer", () => {
         location_id: locationId,
         image_url: imageUrl,
         alt: "대체 텍스트",
+        embedding_model: "Xenova/clip-vit-base-patch32@main",
         source: "Wikimedia Commons",
         source_url: "https://commons.wikimedia.org/wiki/File:Test.jpg",
         author: "Test Author",

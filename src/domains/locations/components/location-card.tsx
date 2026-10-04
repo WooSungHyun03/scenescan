@@ -6,6 +6,8 @@ import { ImageOff } from "lucide-react";
 import { useState } from "react";
 import { ShortlistButton } from "@/domains/locations/components/shortlist-button";
 import { getKoreanDescription } from "./location-copy";
+import { getSafeImageUrl } from "./location-image-gallery";
+import { publicEnv } from "@/env/public";
 import type { Location } from "@/types/domain";
 
 const categoryLabels: Record<Location["category"], string> = {
@@ -32,8 +34,15 @@ export function LocationCard({
   highlighted?: boolean;
   onHighlightChange?: (highlighted: boolean) => void;
 }) {
-  const [imageFailed, setImageFailed] = useState(false);
+  const [failedImageUrl, setFailedImageUrl] = useState<string | null>(null);
   const primaryImage = location.images.find((image) => image.id === matchedImageId) ?? location.images[0];
+  const imageUrl = getSafeImageUrl(primaryImage?.imageUrl) ?? "/images/placeholder.svg";
+  // Only configured Storage URLs enter Next's optimizer. Unregistered
+  // external hosts must not throw during rendering; CSP/onError can degrade
+  // them to an honest placeholder without broadening server fetch access.
+  const optimizedStorage = publicEnv.supabaseUrl
+    ? imageUrl.startsWith(`${publicEnv.supabaseUrl.replace(/\/$/, "")}/storage/v1/object/public/location-images/`)
+    : false;
   const imageAlt = primaryImage?.alt.trim() || `${location.name || "장소"} 대표 이미지`;
 
   return (
@@ -48,7 +57,7 @@ export function LocationCard({
       className="scene-card group relative min-w-0"
     >
       <div className="relative aspect-[4/3] overflow-hidden rounded-md bg-stone-200">
-        {imageFailed ? (
+        {failedImageUrl === imageUrl ? (
           <div
             role="img"
             aria-label={`${imageAlt} - 이미지를 불러올 수 없습니다`}
@@ -59,13 +68,14 @@ export function LocationCard({
           </div>
         ) : (
           <Image
-            src={primaryImage?.imageUrl.trim() || "/images/placeholder.svg"}
+            src={imageUrl}
             alt={imageAlt}
             fill
+            unoptimized={!imageUrl.startsWith("/") && !optimizedStorage}
             loading={eager ? "eager" : "lazy"}
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 40vw"
             className="object-cover"
-            onError={() => setImageFailed(true)}
+            onError={() => setFailedImageUrl(imageUrl)}
           />
         )}
         {rank !== undefined && (

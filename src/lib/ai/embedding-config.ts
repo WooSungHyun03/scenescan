@@ -7,6 +7,7 @@
 export const CLIP_MODEL_ID = "Xenova/clip-vit-base-patch32";
 export const CLIP_MODEL_REVISION = "main";
 export const CLIP_MODEL_DTYPE = "q8";
+export const CLIP_MODEL_KEY = `${CLIP_MODEL_ID}@${CLIP_MODEL_REVISION}`;
 export const CLIP_EMBEDDING_DIMENSION = 512;
 export const SUPPORTED_IMAGE_MIME_TYPES = [
   "image/jpeg",

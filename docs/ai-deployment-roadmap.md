@@ -2,7 +2,7 @@
 
 This is the progress source of truth for Member 1. A checkbox is complete only after implementation and verification. Dates use Korea Standard Time.
 
-Current environment note (2026-09-20): the default `pnpm build` Turbopack path is blocked on this host because its CSS helper cannot bind an internal port (`EPERM`). The supported `next build --webpack` production fallback completed successfully, including TypeScript, static generation, and route tracing. This is an execution-environment blocker, not a source/build error; recheck the default builder in CI or an unrestricted host.
+Current environment note (2026-10-04): the earlier host-only Turbopack `EPERM` restriction is no longer present. Default `pnpm build` and the standalone Docker build pass on Next.js 16.3.8. Release audit fixes and remote schema rollout limitations are recorded in `docs/release-audit-2026-10-04.md`; historical DAY checkboxes below do not imply that newer team migrations have been applied remotely.
 
 ## DAY 1 — Real CLIP Inference
 

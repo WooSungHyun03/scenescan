@@ -36,6 +36,18 @@ function baseRow(overrides: Partial<LocationRow> = {}): LocationRow {
 }
 
 describe("toLocation", () => {
+  it("preserves explicitly unverified noise objects produced by the migration", () => {
+    const { location, warnings } = toLocation(baseRow({ noise_sources: [{ kind: "other", description: "도로 소음 가능", distanceMeters: null, evidence: null, source: null, sourceUrl: null, license: null, licenseUrl: null, referenceDate: null, lastVerifiedAt: null }] }));
+    expect(location.noiseSources[0]).toMatchObject({ description: "도로 소음 가능", source: null });
+    expect(warnings).toEqual([]);
+  });
+  it("drops unsafe images and parking coordinates, rejecting invalid location coordinates", () => {
+    const { location, warnings } = toLocation(baseRow({ location_images: [{ id: "bad", image_url: "javascript:alert(1)", alt: null }], parking: [{ id: "bad", name: "invalid", latitude: 100, longitude: 0, capacity: null, opening_hours: null, price_info: null, source: null }] }));
+    expect(location.images).toEqual([]);
+    expect(location.parking).toEqual([]);
+    expect(warnings).toHaveLength(2);
+    expect(() => parseLocationRow(baseRow({ latitude: 100 }))).toThrow();
+  });
   it("maps a normal row with no warnings", () => {
     const { location, warnings } = toLocation(baseRow());
     expect(warnings).toHaveLength(0);

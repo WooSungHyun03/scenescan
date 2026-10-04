@@ -9,9 +9,9 @@ import { ImageSearchEntry } from "@/domains/search/components/image-search-entry
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const locations = await getLocations();
-  const examples = ["nature", "urban", "industrial", "interior"].flatMap((category) => {
-    const location = locations.find((item) => item.category === category && item.images.length > 0);
+  const pages = await Promise.all((["nature", "urban", "industrial", "interior"] as const).map((category) => getLocations({ category, limit: 4 })));
+  const examples = pages.flatMap((locations) => {
+    const location = locations.find((item) => item.images.length > 0);
     return location ? [location] : [];
   });
   const hero = examples[0];

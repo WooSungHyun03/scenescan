@@ -1,6 +1,7 @@
 import type { NormalizedLocationOutput } from "./contracts.ts";
 import { z } from "zod";
 import type { NoiseSource } from "../../src/types/domain.ts";
+import { CLIP_MODEL_KEY } from "../../src/lib/ai/embedding-config.ts";
 import { distanceMeters, MAX_NEARBY_PARKING_DISTANCE_METERS } from "./static-parking.ts";
 
 export type ProductionImportMode = "validate-only" | "dry-run" | "apply";
@@ -37,6 +38,7 @@ export type ImageMetadataRow = {
   location_id: string;
   image_url: string;
   alt: string;
+  embedding_model: string;
   source: string | null;
   source_url: string | null;
   author: string | null;
@@ -363,6 +365,7 @@ export function createProductionRows(
         location_id: locationId,
         image_url: image.imageUrl,
         alt: image.alt,
+        embedding_model: CLIP_MODEL_KEY,
         source: sourceName(attribution.sourceUrl, entry.source),
         source_url: attribution.sourceUrl,
         author: attribution.author,

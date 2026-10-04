@@ -6,13 +6,17 @@ import { locationIdSchema, type SimilarLocationsResponse } from "@/types/contrac
 
 export const dynamic = "force-dynamic";
 
-export async function GET(_request: Request, context: { params: Promise<{ id: string }> }) {
+export async function GET(request: Request, context: { params: Promise<{ id: string }> }) {
   const { id } = await context.params;
   const idResult = locationIdSchema.safeParse(id);
   if (!idResult.success) {
     return apiErrorResponse(validationError("장소 ID 형식이 올바르지 않습니다."), "locations.similar.validate");
   }
 
+  const excluded = new URL(request.url).searchParams.getAll("exclude");
+  if (excluded.length > 200 || excluded.some((value) => !locationIdSchema.safeParse(value).success)) {
+    return apiErrorResponse(validationError("제외할 장소는 올바른 ID로 최대 200개까지 지정해 주세요."), "locations.similar.validate");
+  }
   try {
     // Existence check reuses getLocation (already mode-aware, already
     // distinguishes found/not-found) rather than having
@@ -23,7 +27,7 @@ export async function GET(_request: Request, context: { params: Promise<{ id: st
     if (!location) {
       return apiErrorResponse(notFoundError(`Location ${idResult.data} not found`), "locations.similar.not-found");
     }
-    const results = await getSimilarLocations(idResult.data);
+    const results = await getSimilarLocations(idResult.data, [...new Set(excluded)]);
     const response: SimilarLocationsResponse = { results };
     return NextResponse.json(response, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {

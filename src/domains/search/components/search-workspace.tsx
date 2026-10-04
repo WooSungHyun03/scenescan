@@ -120,8 +120,9 @@ async function createSearchApiError(response: Response): Promise<SearchApiError>
   let payload: unknown;
   try { payload = await response.json(); } catch { payload = null; }
   const data = typeof payload === "object" && payload !== null ? payload as Record<string, unknown> : {};
-  const message = typeof data.error === "string" ? data.error : "검색 요청에 실패했습니다.";
-  const code = typeof data.code === "string" ? data.code : undefined;
+  const error = typeof data.error === "object" && data.error !== null ? data.error as Record<string, unknown> : data;
+  const message = typeof error.message === "string" ? error.message : typeof data.error === "string" ? data.error : "검색 요청에 실패했습니다.";
+  const code = typeof error.code === "string" ? error.code : undefined;
   return new SearchApiError(response.status, code, message);
 }
 
@@ -145,6 +146,10 @@ export function SearchWorkspace({ examples }: { examples: Location[] }) {
   const [activeLocationId, setActiveLocationId] = useState<string | null>(null);
   const [view, setView] = useState<"photos" | "map">("photos");
   const [visibleCount, setVisibleCount] = useState(12);
+  const [catalog, setCatalog] = useState({ key: "|", locations: examples, hasMore: examples.length === 20 });
+  const [catalogError, setCatalogError] = useState<string | null>(null);
+  const [catalogLoading, setCatalogLoading] = useState(false);
+  const [catalogOffset, setCatalogOffset] = useState(0);
   const resultHeadingRef = useRef<HTMLHeadingElement>(null);
   const requestRef = useRef<AbortController | null>(null);
   const [busy, setBusy] = useState(false);
@@ -155,6 +160,26 @@ export function SearchWorkspace({ examples }: { examples: Location[] }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const searchInFlightRef = useRef(false);
   const analyzedImageRef = useRef<{ file: File; embedding: number[] } | null>(null);
+  const filterKey = `${region}|${category}`;
+
+  useEffect(() => {
+    const controller = new AbortController();
+    const params = new URLSearchParams({ limit: "20", offset: String(catalogOffset) });
+    if (region) params.set("region", region);
+    if (category) params.set("category", category);
+    const frame = requestAnimationFrame(() => { setCatalogLoading(true); setCatalogError(null); });
+    void fetch(`/api/locations?${params}`, { signal: AbortSignal.any([controller.signal, AbortSignal.timeout(15_000)]) })
+      .then(async (response) => {
+        if (!response.ok) throw new Error("장소 목록을 불러오지 못했습니다.");
+        const data = await response.json();
+        if (!Array.isArray(data.locations)) throw new Error("장소 목록 응답이 올바르지 않습니다.");
+        if (controller.signal.aborted) return;
+        setCatalog((current) => ({ key: filterKey, locations: catalogOffset && current.key === filterKey ? [...current.locations, ...data.locations] : data.locations, hasMore: data.locations.length === 20 }));
+      })
+      .catch(() => { if (!controller.signal.aborted) setCatalogError("장소 목록을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요."); })
+      .finally(() => { cancelAnimationFrame(frame); if (!controller.signal.aborted) setCatalogLoading(false); });
+    return () => { cancelAnimationFrame(frame); controller.abort(); };
+  }, [region, category, catalogOffset, filterKey]);
 
   useEffect(() => {
     const url = file ? URL.createObjectURL(file) : null;
@@ -205,6 +230,7 @@ export function SearchWorkspace({ examples }: { examples: Location[] }) {
   }
 
   function resetFilters() {
+    setCatalogOffset(0);
     setRegion("");
     setCategory("");
     clearSearchResults();
@@ -224,7 +250,7 @@ export function SearchWorkspace({ examples }: { examples: Location[] }) {
     }
     // Avoid a model download for a known-empty catalog filter. Never broaden
     // the requested region/category silently or substitute invented places.
-    if (!examples.some((location) => (!region || location.region === region) && (!category || location.category === category))) {
+    if (catalog.key === filterKey && !catalogLoading && !catalogError && !catalog.hasMore && catalog.locations.length === 0) {
       setSearchError(null);
       setResults([]);
       setSearchStage("complete");
@@ -246,7 +272,7 @@ export function SearchWorkspace({ examples }: { examples: Location[] }) {
       analyzedImageRef.current = { file, embedding };
       executionStage = "searching";
       setSearchStage("searching");
-      const response = await fetch("/api/search", { method: "POST", signal: controller.signal, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ embedding, filters: { region: region || undefined, category: category || undefined } }) });
+      const response = await fetch("/api/search", { method: "POST", signal: AbortSignal.any([controller.signal, AbortSignal.timeout(20_000)]), headers: { "Content-Type": "application/json" }, body: JSON.stringify({ embedding, filters: { region: region || undefined, category: category || undefined } }) });
       if (!response.ok) throw await createSearchApiError(response);
       const data = await response.json() as SearchResponse;
       if (!Array.isArray(data.results)) throw new Error("Invalid search response");
@@ -271,7 +297,7 @@ export function SearchWorkspace({ examples }: { examples: Location[] }) {
   const displayedResults = useMemo(() => results?.slice(0, 8) ?? null, [results]);
   const hasActiveFilters = region !== "" || category !== "";
 
-  const filteredExamples = examples.filter((location) => (!region || location.region === region) && (!category || location.category === category));
+  const filteredExamples = catalog.key === filterKey ? catalog.locations : [];
   const activeResult = displayedResults?.find(({ location }) => location.id === activeLocationId);
   return <div className="grid items-start gap-8 lg:grid-cols-[320px_minmax(0,1fr)] xl:gap-10">
     <aside id="reference-image" className="scene-panel search-reference p-5">
@@ -290,10 +316,10 @@ export function SearchWorkspace({ examples }: { examples: Location[] }) {
       <div className="mt-5 border-t border-line pt-4">
         <div className="flex items-center justify-between"><h3 className="text-sm font-semibold">검색 조건 <span className="font-normal text-muted">(선택)</span></h3><button type="button" disabled={busy || !hasActiveFilters} onClick={resetFilters} className="min-h-11 px-2 text-sm font-semibold text-brand disabled:text-stone-400">초기화</button></div>
         <div className="mt-2 grid grid-cols-2 gap-3">
-          <label className="text-sm font-medium">지역<select name="region" className="scene-input mt-2" value={region} disabled={busy} onChange={(e) => { setRegion(e.target.value as Region | ""); clearSearchResults(); setVisibleCount(12); }}><option value="">전국</option>{regionOptions.map((option) => <option key={option} value={option}>{option}</option>)}</select></label>
-          <label className="text-sm font-medium">공간 종류<select name="category" className="scene-input mt-2" value={category} disabled={busy} onChange={(e) => { setCategory(e.target.value as LocationCategory | ""); clearSearchResults(); setVisibleCount(12); }}><option value="">전체</option>{categoryOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label>
+          <label className="text-sm font-medium">지역<select name="region" className="scene-input mt-2" value={region} disabled={busy} onChange={(e) => { setRegion(e.target.value as Region | ""); setCatalogOffset(0); clearSearchResults(); setVisibleCount(12); }}><option value="">전국</option>{regionOptions.map((option) => <option key={option} value={option}>{option}</option>)}</select></label>
+          <label className="text-sm font-medium">공간 종류<select name="category" className="scene-input mt-2" value={category} disabled={busy} onChange={(e) => { setCategory(e.target.value as LocationCategory | ""); setCatalogOffset(0); clearSearchResults(); setVisibleCount(12); }}><option value="">전체</option>{categoryOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label>
         </div>
-        <p className="mt-3 text-xs leading-relaxed text-muted">{region || "전국"} · {categoryOptions.find((option) => option.value === category)?.label ?? "전체 공간"}에 등록된 장소 {filteredExamples.length}곳{filteredExamples.length === 0 ? " — 조건을 넓혀보세요." : "."}</p>
+        <p className="mt-3 text-xs leading-relaxed text-muted">{region || "전국"} · {categoryOptions.find((option) => option.value === category)?.label ?? "전체 공간"}{catalogLoading || catalog.key !== filterKey ? " — 장소 목록 확인 중…" : catalogError ? " — 목록 연결을 확인해 주세요. 이미지 검색은 계속 사용할 수 있습니다." : catalog.hasMore ? ` — 장소 ${filteredExamples.length}곳을 불러왔습니다. 아래에서 더 볼 수 있어요.` : `에 등록된 장소 ${filteredExamples.length}곳.`}</p>
       </div>
       <Button onClick={search} disabled={busy} aria-busy={busy} size="lg" className="mt-5 w-full">{busy ? <LoaderCircle size={18} className="animate-spin" aria-hidden="true" /> : <Search size={18} aria-hidden="true" />}{busy ? searchButtonText : results ? "다시 검색하기" : "이 이미지로 장소 찾기"}</Button>
       {aiUiState && aiUiState.kind !== "error" && <div role="status" aria-live="polite" className="mt-4 rounded-md bg-brand-soft p-4 text-brand">
@@ -313,7 +339,7 @@ export function SearchWorkspace({ examples }: { examples: Location[] }) {
       {busy ? <SearchResultsSkeleton /> : searchError ? <div className="scene-empty"><h3 className="text-lg font-semibold">검색 결과를 표시할 수 없습니다</h3><p className="mt-2 text-sm text-muted">이미지와 연결 상태를 확인한 뒤 다시 시도해 주세요.</p></div> : displayedResults?.length === 0 ? <div className="scene-empty"><Search size={28} className="mx-auto text-muted" aria-hidden="true" /><h3 className="mt-4 text-lg font-semibold">조건에 맞는 장소가 없습니다</h3><p className="mt-2 text-sm text-muted">다른 사진을 선택하거나 지역·공간 조건을 넓혀보세요.</p>{hasActiveFilters && <Button variant="outline" onClick={resetFilters} className="mt-5">검색 조건 초기화</Button>}</div> : displayedResults ? <div className="space-y-6">
         {view === "map" ? <><SearchResultsMap results={displayedResults} activeLocationId={activeLocationId} onMarkerActivate={setActiveLocationId} />{activeResult && <div className="max-w-lg"><LocationCard location={activeResult.location} similarity={activeResult.similarity} matchedImageId={activeResult.matchedImageId} highlighted /></div>}</> :
         <div className="scene-grid grid gap-x-6 gap-y-8 sm:grid-cols-2">{displayedResults.map(({location,similarity,matchedImageId},index) => <LocationCard key={location.id} location={location} similarity={similarity} matchedImageId={matchedImageId} rank={index+1} eager={index < 2} highlighted={activeLocationId === location.id} onHighlightChange={(highlighted) => { if (highlighted) setActiveLocationId(location.id); }} />)}</div>}
-      </div> : <><div className="scene-grid grid gap-x-6 gap-y-8 sm:grid-cols-2">{filteredExamples.slice(0,visibleCount).map((location,index) => <LocationCard key={location.id} location={location} eager={index < 2} />)}</div>{!filteredExamples.length && <div className="scene-empty"><p>이 조건에 등록된 장소가 없습니다.</p><Button variant="outline" onClick={resetFilters} className="mt-4">전체 장소 보기</Button></div>}{filteredExamples.length > visibleCount && <div className="mt-8 text-center"><Button variant="outline" onClick={() => setVisibleCount((count) => count + 12)}><ArrowDown size={16} aria-hidden="true" />장소 더 보기</Button><p className="mt-2 text-xs text-muted">{Math.min(visibleCount,filteredExamples.length)} / {filteredExamples.length}곳</p></div>}</>}
+      </div> : <><div className="scene-grid grid gap-x-6 gap-y-8 sm:grid-cols-2">{filteredExamples.slice(0,visibleCount).map((location,index) => <LocationCard key={location.id} location={location} eager={index < 2} />)}</div>{catalogLoading && <p role="status" className="mt-4 text-sm text-muted">장소 목록을 불러오는 중입니다.</p>}{catalogError && <p role="alert" className="mt-4 text-sm text-red-800">{catalogError}</p>}{!filteredExamples.length && !catalogLoading && !catalogError && catalog.key === filterKey && <div className="scene-empty"><p>이 조건에 등록된 장소가 없습니다.</p><Button variant="outline" onClick={resetFilters} className="mt-4">전체 장소 보기</Button></div>}{(filteredExamples.length > visibleCount || catalog.hasMore) && <div className="mt-8 text-center"><Button variant="outline" disabled={catalogLoading} onClick={() => { setVisibleCount((count) => count + 20); if (visibleCount >= filteredExamples.length) setCatalogOffset(filteredExamples.length); }}><ArrowDown size={16} aria-hidden="true" />장소 더 보기</Button><p className="mt-2 text-xs text-muted">{Math.min(visibleCount,filteredExamples.length)}곳 표시 중</p></div>}</>}
     </section>
   </div>;
 }

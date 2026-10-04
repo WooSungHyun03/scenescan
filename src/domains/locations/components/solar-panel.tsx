@@ -5,6 +5,7 @@ import { Clock3 } from "lucide-react";
 import { CameraLightingControl } from "@/domains/locations/components/camera-lighting-control";
 import { SolarDirectionVisualization } from "@/domains/locations/components/solar-direction-visualization";
 import { getSolarPosition } from "@/domains/locations/services/solar-position";
+import { parseShootingTime, SHOOTING_TIME_ZONE } from "@/domains/locations/services/shooting-time";
 import type { GeoPoint } from "@/types/domain";
 
 type SolarCalculation =
@@ -27,10 +28,8 @@ export function SolarPanel({ point }: { point: GeoPoint }) {
   const calculation = useMemo<SolarCalculation>(() => {
     if (!shootDate || !shootTime) return { state: "idle" };
 
-    // A date-time without an explicit offset is interpreted by the browser in
-    // the user's local time zone. Offset calculation stays outside the UI.
-    const instant = new Date(`${shootDate}T${shootTime}`);
-    if (Number.isNaN(instant.getTime())) return { state: "error" };
+    const instant = parseShootingTime(shootDate, shootTime);
+    if (!instant) return { state: "error" };
 
     try {
       const position = getSolarPosition(point, instant);
@@ -87,7 +86,7 @@ export function SolarPanel({ point }: { point: GeoPoint }) {
         className="mt-3 flex items-start gap-2 text-xs leading-relaxed text-stone-500"
       >
         <Clock3 size={14} className="mt-0.5 shrink-0" aria-hidden="true" />
-        입력한 날짜와 시간은 현재 기기의 현지 시간대로 해석됩니다.
+        촬영 장소의 한국 시간(Asia/Seoul, UTC+9)을 기준으로 계산합니다.
       </p>
 
       <div aria-live="polite" className="mt-4">
@@ -122,6 +121,7 @@ export function SolarPanel({ point }: { point: GeoPoint }) {
                 {calculation.instant.toLocaleString("ko-KR", {
                   dateStyle: "medium",
                   timeStyle: "short",
+                  timeZone: SHOOTING_TIME_ZONE,
                 })}
               </p>
             </div>

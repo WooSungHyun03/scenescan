@@ -2,6 +2,7 @@ import { readFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { parseOutput } from "./contracts.ts";
+import { CLIP_MODEL_KEY } from "../../src/lib/ai/embedding-config.ts";
 import {
   importEmbeddings,
   type EmbeddingImportDatabase,
@@ -79,6 +80,7 @@ export function createSupabaseImportDatabase(client: SupabaseClient): EmbeddingI
         query_embedding: embedding,
         match_threshold: 1,
         match_count: 1,
+        expected_embedding_model: CLIP_MODEL_KEY,
       });
       failOnSupabaseError(error, "Unable to probe match_location_images RPC");
       return (data ?? []) as RpcProbeRow[];

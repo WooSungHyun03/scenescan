@@ -45,6 +45,17 @@ beforeEach(() => {
 });
 
 describe("POST /api/search", () => {
+  it("cancels an oversized streamed body instead of buffering the remainder", async () => {
+    const cancel = vi.fn();
+    const body = new ReadableStream({
+      start(controller) { controller.enqueue(new Uint8Array(33 * 1024)); },
+      cancel,
+    });
+    const streamed = new Request("http://localhost/api/search", { method: "POST", body, duplex: "half" } as RequestInit);
+    expect((await POST(streamed)).status).toBe(400);
+    expect(cancel).toHaveBeenCalledOnce();
+    expect(searchByImageMock).not.toHaveBeenCalled();
+  });
   it("returns a successful response shape unchanged: { results: LocationSearchResult[] }", async () => {
     const results = Array.from({ length: 8 }, (_, index) => fakeResult(`loc-${index}`));
     searchByImageMock.mockResolvedValue(results);

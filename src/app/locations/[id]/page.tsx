@@ -12,6 +12,8 @@ import { SolarPanel } from "@/domains/locations/components/solar-panel";
 import { SourceAttribution } from "@/domains/locations/components/source-attribution";
 import { getLocation, getSimilarLocations } from "@/domains/locations/server/repository";
 import { getKoreanDescription } from "@/domains/locations/components/location-copy";
+import { locationIdSchema } from "@/types/contracts";
+import { logger } from "@/shared/observability/logger";
 
 const categoryLabels = {
   urban: "도시",
@@ -26,9 +28,14 @@ function displayValue(value: string | null | undefined): string {
 
 export default async function LocationPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+  if (!locationIdSchema.safeParse(id).success) notFound();
   const location = await getLocation(id);
   if (!location) notFound();
-  const similar = await getSimilarLocations(id);
+  // Optional recommendations must never take down photos/map/permit detail.
+  let similar: Awaited<ReturnType<typeof getSimilarLocations>> = [];
+  let similarUnavailable = false;
+  try { similar = await getSimilarLocations(id); }
+  catch (error) { similarUnavailable = true; logger.error("Similar locations unavailable", error, { locationId: id }); }
   return <main className="scene-container py-6 sm:py-9">
     <Link href="/search" className="inline-flex min-h-11 items-center gap-2 rounded-md text-sm font-semibold text-brand hover:underline"><ArrowLeft size={16} aria-hidden="true" />촬영 장소 찾기로</Link>
     <div className="mb-6 mt-4 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
@@ -55,6 +62,6 @@ export default async function LocationPage({ params }: { params: Promise<{ id: s
       <section id="lighting" aria-labelledby="solar-title" className="min-w-0"><h2 id="solar-title" className="mb-4 text-xl font-semibold">촬영 시간과 빛의 방향</h2><div className="scene-panel p-5"><SolarPanel point={location.point} /></div></section>
     </div>
     <section id="conditions" className="scene-section" aria-labelledby="conditions-title"><h2 id="conditions-title" className="text-xl font-semibold">촬영 전 확인할 정보</h2><p className="mb-5 mt-2 text-sm text-muted">허가, 차량 이동, 주변 환경을 확인하고 현장 답사로 최종 점검하세요.</p><div className="scene-grid grid items-start gap-5 md:grid-cols-2 xl:grid-cols-3"><PermitInfoPanel permit={location.permit} /><ParkingInfoPanel parking={location.parking} origin={location.point} /><NoiseSourcePanel noiseSources={location.noiseSources} /></div></section>
-    <SimilarLocationsSection locationId={location.id} initialResults={similar} />
+    <SimilarLocationsSection key={location.id} locationId={location.id} initialResults={similar} initialUnavailable={similarUnavailable} />
   </main>;
 }

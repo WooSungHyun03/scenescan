@@ -44,6 +44,28 @@ describe.skipIf(!env)("match_location_images regressions (live Supabase)", () =>
     if (error) throw error;
   }
 
+  it("similar search rejects other-model vectors and excludes seen places before LIMIT", async () => {
+    const sourceId = await seedLocation();
+    const seenId = await seedLocation();
+    const nextId = await seedLocation();
+    const incompatibleId = await seedLocation();
+    await seedImage(sourceId, QUERY_VECTOR);
+    await seedImage(seenId, QUERY_VECTOR);
+    await seedImage(nextId, QUERY_VECTOR);
+    await seedImage(incompatibleId, QUERY_VECTOR, "incompatible@v2");
+    const response = await adminClient.rpc("match_similar_locations_filtered", {
+      source_location_id: sourceId, match_threshold: 1, match_count: 200,
+      expected_embedding_model: EXPECTED_MODEL, excluded_location_ids: [seenId],
+    });
+    expect(response.error).toBeNull();
+    const ids = response.data.map((row: { location_id: string }) => row.location_id);
+    expect(ids).toContain(nextId);
+    expect(ids).not.toContain(sourceId);
+    expect(ids).not.toContain(seenId);
+    expect(ids).not.toContain(incompatibleId);
+    expect(new Set(ids).size).toBe(ids.length);
+  });
+
   it("filter_region: a location outside a dominant cluster's raw top-N is still returned when it matches the filter", async () => {
     const dominantId = await seedLocation({ region: "서울" });
     const eligibleId = await seedLocation({ region: "부산" });

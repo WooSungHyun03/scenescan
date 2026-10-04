@@ -155,11 +155,15 @@ jobs:
 
       - name: Browser E2E in key-free Docker mock mode
         run: |
+          # Chromium exempts loopback from upgrade-insecure-requests. A plain
+          # HTTP Docker DNS hostname upgrades JS/CSS to nonexistent HTTPS and
+          # prevents hydration. Use the runner's published loopback port;
+          # keep the production CSP intact instead of disabling security.
           docker run --rm \
-            --network scenescan-ci-network \
+            --network host \
             --ipc=host \
             --env CI=true \
-            --env PLAYWRIGHT_BASE_URL=http://scenescan-ci-app:3000 \
+            --env PLAYWRIGHT_BASE_URL=http://127.0.0.1:3000 \
             --volume "${{ github.workspace }}/output/playwright:/app/output/playwright" \
             scenescan-e2e:${{ github.sha }} \
             pnpm test:e2e

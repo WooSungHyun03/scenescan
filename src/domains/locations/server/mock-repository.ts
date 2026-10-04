@@ -53,10 +53,10 @@ export function searchMockLocations(embedding: number[], filters: LocationFilter
   return groupImageMatches(matches, eligible, 8);
 }
 
-export function getMockSimilarLocations(id: string): LocationSearchResult[] {
+export function getMockSimilarLocations(id: string, excludedIds: readonly string[] = []): LocationSearchResult[] {
   const current = getMockLocation(id);
   if (!current) return [];
-  const matches = getMockLocations({ category: current.category }).map((location, index) => ({
+  const matches = getMockLocations({ category: current.category }).filter((location) => !excludedIds.includes(location.id)).map((location, index) => ({
     locationId: location.id,
     locationImageId: location.images[0].id,
     similarity: location.id === id ? 1 : 0.8 - index * 0.04,

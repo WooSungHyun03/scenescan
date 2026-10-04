@@ -47,14 +47,18 @@ function ResultSkeleton() {
 export function SimilarLocationsSection({
   locationId,
   initialResults,
+  initialUnavailable = false,
 }: {
   locationId: string;
   initialResults: LocationSearchResult[];
+  initialUnavailable?: boolean;
 }) {
   const [results, setResults] = useState(initialResults);
-  const [status, setStatus] = useState<RequestStatus>("idle");
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [status, setStatus] = useState<RequestStatus>(initialUnavailable ? "error" : "idle");
+  const [errorMessage, setErrorMessage] = useState<string | null>(initialUnavailable ? "비슷한 장소를 불러오지 못했습니다. 다시 시도해 주세요." : null);
   const requestRef = useRef<AbortController | null>(null);
+  const seenIds = useRef(new Set(initialResults.map(({ location }) => location.id)));
+  const [exhausted, setExhausted] = useState(false);
 
   useEffect(
     () => () => {
@@ -64,7 +68,7 @@ export function SimilarLocationsSection({
   );
 
   async function refreshResults() {
-    if (status === "loading") return;
+    if (requestRef.current || exhausted) return;
 
     const controller = new AbortController();
     requestRef.current = controller;
@@ -72,12 +76,14 @@ export function SimilarLocationsSection({
     setErrorMessage(null);
 
     try {
+      const query = new URLSearchParams();
+      for (const id of seenIds.current) query.append("exclude", id);
       const response = await fetch(
-        `/api/locations/${encodeURIComponent(locationId)}/similar`,
+        `/api/locations/${encodeURIComponent(locationId)}/similar?${query}`,
         {
           method: "GET",
           cache: "no-store",
-          signal: controller.signal,
+          signal: AbortSignal.any([controller.signal, AbortSignal.timeout(15_000)]),
         },
       );
       const body: unknown = await response.json().catch(() => null);
@@ -93,11 +99,12 @@ export function SimilarLocationsSection({
         throw new Error("비슷한 장소 응답 형식을 확인할 수 없습니다.");
       }
 
-      setResults(
-        body.results
-          .filter(({ location }) => location.id !== locationId)
-          .slice(0, 8),
-      );
+      const next = body.results.filter(({ location }) => location.id !== locationId && !seenIds.current.has(location.id)).slice(0, 8);
+      if (next.length) {
+        next.forEach(({ location }) => seenIds.current.add(location.id));
+        setResults(next);
+      }
+      setExhausted(!next.length || seenIds.current.size >= 200);
       setStatus("success");
     } catch (error) {
       if (error instanceof DOMException && error.name === "AbortError") return;
@@ -129,7 +136,7 @@ export function SimilarLocationsSection({
         <button
           type="button"
           onClick={refreshResults}
-          disabled={isLoading}
+          disabled={isLoading || exhausted}
           aria-controls="similar-location-results"
           className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-emerald-800 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-emerald-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-800 disabled:cursor-not-allowed disabled:bg-stone-400"
         >
@@ -142,16 +149,18 @@ export function SimilarLocationsSection({
           )}
           {isLoading
             ? "비슷한 장소 찾는 중…"
+            : exhausted
+              ? "추가 후보 없음"
             : status === "error"
               ? "다시 시도"
-              : "목록 새로고침"}
+              : "다른 비슷한 장소 보기"}
         </button>
       </div>
 
       <div aria-live="polite" aria-atomic="true" className="min-h-6">
         {status === "success" && (
           <p className="mb-4 text-sm font-semibold text-emerald-800">
-            비슷한 장소 목록을 새로 불러왔습니다.
+            {exhausted ? "현재 조건에서 새로 보여드릴 후보가 없습니다. 마지막 후보를 계속 비교할 수 있습니다." : "이미 본 장소를 제외한 새로운 후보입니다."}
           </p>
         )}
         {status === "error" && errorMessage && (
@@ -169,11 +178,12 @@ export function SimilarLocationsSection({
           <ResultSkeleton />
         ) : results.length ? (
           <div className="scene-grid grid gap-x-6 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
-            {results.map(({ location, similarity }, index) => (
+            {results.map(({ location, similarity, matchedImageId }, index) => (
               <LocationCard
                 key={location.id}
                 location={location}
                 similarity={similarity}
+                matchedImageId={matchedImageId}
                 rank={index + 1}
                 eager={index < 4}
               />

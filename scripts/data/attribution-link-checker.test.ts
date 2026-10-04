@@ -47,6 +47,7 @@ function rows(): ProductionRows {
       location_id: locationId,
       image_url: `https://cdn.example.com/${id}.jpg`,
       alt: id,
+      embedding_model: "Xenova/clip-vit-base-patch32@main",
       source: "Wikimedia Commons",
       source_url: "https://commons.wikimedia.org/wiki/File:Shared.jpg",
       author: "Author",

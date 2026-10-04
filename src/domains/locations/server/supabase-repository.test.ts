@@ -340,6 +340,22 @@ describe("SupabaseLocationRepository / MockLocationRepository contract parity", 
   });
 
   describe("similar locations", () => {
+    it("rejects malformed RPC arrays through the structured data error", async () => {
+      const { client } = fakeClient({ rpc: { data: { unexpected: true }, error: null } });
+      getSupabaseClientMock.mockReturnValue(client);
+      await expect(getSupabaseSimilarLocations("55555555-5555-4555-8555-555555555555")).rejects.toMatchObject({ code: "DATA_UNAVAILABLE" });
+    });
+    it("keeps filters when only model metadata migration is pending", async () => {
+      const { client, rpcStub } = fakeClient({ rpc: [
+        { data: null, error: { code: "PGRST202", message: "match_location_images_filtered(expected_embedding_model) missing" } },
+        { data: [], error: null },
+      ] });
+      getSupabaseClientMock.mockReturnValue(client);
+      await expect(searchSupabaseLocations(Array(512).fill(0), { region: "제주", category: "nature" })).resolves.toEqual([]);
+      const calls = rpcStub.calls.filter((call) => call.method === "rpc");
+      expect(calls).toHaveLength(2);
+      expect(calls[1].args).toEqual(["match_location_images_filtered", { query_embedding: Array(512).fill(0), match_threshold: 0, match_count: 8, filter_region: "제주", filter_category: "nature" }]);
+    });
     // getSupabaseSimilarLocations delegates embedding selection (the mean of
     // all of a location's image embeddings) and self-exclusion/grouping to
     // Member 1's match_similar_location_images RPC + rankSimilarLocations --
@@ -352,15 +368,15 @@ describe("SupabaseLocationRepository / MockLocationRepository contract parity", 
         fromByTable: {
           locations: { data: [locationRow({ id: otherId }), locationRow({ id: targetId })], error: null },
         },
-        rpc: { data: [{ location_image_id: "img-x", location_id: otherId, similarity: 0.7 }], error: null },
+        rpc: { data: [{ location_image_id: "11111111-1111-4111-8111-111111111111", location_id: otherId, similarity: 0.7 }], error: null },
       });
       getSupabaseClientMock.mockReturnValue(client);
       const results = await getSupabaseSimilarLocations(targetId);
       expect(results.every((result) => result.location.id !== targetId)).toBe(true);
       expect(results.map((result) => result.location.id)).toEqual([otherId]);
       const rpcCall = rpcStub.calls.find((call) => call.method === "rpc")?.args as [string, Record<string, unknown>];
-      expect(rpcCall[0]).toBe("match_similar_location_images");
-      expect(rpcCall[1]).toEqual({ source_location_id: targetId, match_threshold: 0, match_count: 200 });
+      expect(rpcCall[0]).toBe("match_similar_locations_filtered");
+      expect(rpcCall[1]).toEqual({ source_location_id: targetId, match_threshold: 0, match_count: 8, expected_embedding_model: "Xenova/clip-vit-base-patch32@main", excluded_location_ids: [] });
       // The metadata lookup is by the exact matched + source ids (via
       // getSupabaseLocationsByIds's .in()), never a plain/paginated
       // getSupabaseLocations() call -- see the comment in

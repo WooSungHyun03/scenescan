@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ArrowRight, Heart, ImagePlus, MapPin, Scale } from "lucide-react";
 import { LocationCard } from "@/domains/locations/components/location-card";
 import { ShortlistComparison } from "@/domains/locations/components/shortlist-comparison";
 import { useShortlist } from "@/domains/locations/components/use-shortlist";
 import type { Location } from "@/types/domain";
+import { locationIdSchema } from "@/types/contracts";
 
 function ShortlistSkeleton() {
   return (
@@ -117,8 +118,34 @@ function ShortlistReadyContent({
   );
 }
 
-export function ShortlistWorkspace({ locations }: { locations: Location[] }) {
+export function ShortlistWorkspace() {
   const { ids, count, isReady, error } = useShortlist();
+  const key = JSON.stringify(ids);
+  const [loaded, setLoaded] = useState<{ key: string; locations: Location[]; error?: string }>({ key: "", locations: [] });
+  useEffect(() => {
+    if (!isReady) return;
+    const controller = new AbortController();
+    // Legacy/deleted IDs remain in storage, but must not poison an entire
+    // valid ID batch with a 400. They are reported as unavailable below.
+    const selectedIds = (JSON.parse(key) as string[]).filter((id) => locationIdSchema.safeParse(id).success);
+    const load = async () => {
+      const locations: Location[] = [];
+      for (let index = 0; index < selectedIds.length; index += 50) {
+        const params = new URLSearchParams(selectedIds.slice(index, index + 50).map((id) => ["id", id]));
+        const response = await fetch(`/api/locations?${params}`, { signal: AbortSignal.any([controller.signal, AbortSignal.timeout(15_000)]) });
+        if (!response.ok) throw new Error("관심 장소를 불러오지 못했습니다. 잠시 후 페이지를 다시 열어 주세요.");
+        const data = await response.json();
+        if (!Array.isArray(data.locations)) throw new Error("장소 응답을 확인할 수 없습니다.");
+        locations.push(...data.locations);
+      }
+      if (!controller.signal.aborted) setLoaded({ key, locations });
+    };
+    void load().catch((cause: unknown) => {
+      if (!controller.signal.aborted) setLoaded({ key, locations: [], error: cause instanceof Error ? cause.message : "관심 장소 조회에 실패했습니다." });
+    });
+    return () => controller.abort();
+  }, [key, isReady]);
+  const locations = loaded.locations;
   const locationsById = new Map(locations.map((location) => [location.id, location]));
   const savedLocations = ids.flatMap((id) => {
     const location = locationsById.get(id);
@@ -126,7 +153,8 @@ export function ShortlistWorkspace({ locations }: { locations: Location[] }) {
   });
   const unavailableCount = count - savedLocations.length;
 
-  if (!isReady) return <ShortlistSkeleton />;
+  if (!isReady || loaded.key !== key) return <ShortlistSkeleton />;
+  if (loaded.error) return <p role="alert" className="scene-panel p-5">{loaded.error}</p>;
 
   return (
     <div>
@@ -150,6 +178,7 @@ export function ShortlistWorkspace({ locations }: { locations: Location[] }) {
             <Heart size={26} aria-hidden="true" />
           </span>
           <h2 className="mt-4 text-xl font-bold">저장한 관심 장소가 없습니다.</h2>
+          {unavailableCount > 0 && <p className="mt-3 text-sm text-amber-900">이전에 저장한 {unavailableCount}곳은 현재 장소 ID로 확인할 수 없습니다. 새로운 후보를 찾아 저장해 주세요.</p>}
           <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-stone-600">
             검색 결과나 장소 상세 화면의 하트 버튼을 눌러 촬영 후보를 저장하고
             비교해 보세요.

@@ -29,6 +29,29 @@ const validEmbedding = () => new Array(CLIP_EMBEDDING_DIMENSION).fill(0.25);
 const pngBlob = (contents = "image") => new Blob([contents], { type: "image/png" });
 
 describe("TransformersJsEmbeddingService", () => {
+  it("rejects cancellation even if posting to a broken worker throws", async () => {
+    const worker = new FakeWorker();
+    const service = new TransformersJsEmbeddingService(() => worker);
+    const controller = new AbortController();
+    const result = service.embed(pngBlob(), { signal: controller.signal });
+    worker.postMessage = () => { throw new Error("closed worker"); };
+    controller.abort();
+    await expect(result).rejects.toMatchObject({ name: "AbortError" });
+    expect(worker.terminate).toHaveBeenCalledOnce();
+  });
+  it("ignores status messages from a replaced worker", async () => {
+    const first = new FakeWorker();
+    const second = new FakeWorker();
+    const workers = [first, second];
+    const service = new TransformersJsEmbeddingService(() => workers.shift()!);
+    const result = service.embed(pngBlob());
+    first.fail();
+    second.reply({ type: "status", status: "ready" });
+    first.reply({ type: "status", status: "error", error: "stale failure" });
+    expect(service.getStatus()).toEqual({ state: "ready" });
+    second.reply({ type: "result", id: 2, embedding: validEmbedding() });
+    await expect(result).resolves.toHaveLength(512);
+  });
   it("reuses one worker and resolves concurrent requests by ID", async () => {
     const worker = new FakeWorker();
     const factory = vi.fn(() => worker);

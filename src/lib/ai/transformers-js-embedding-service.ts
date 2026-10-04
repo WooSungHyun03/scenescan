@@ -84,6 +84,7 @@ export class TransformersJsEmbeddingService implements ImageEmbeddingService {
       const worker = this.workerFactory();
       this.worker = worker;
       worker.onmessage = (event: MessageEvent<EmbeddingWorkerReply>) => {
+        if (this.worker !== worker) return;
         const reply = event.data;
         if (reply.type === "status") {
           const status: EmbeddingServiceStatus = { state: reply.status };
@@ -147,6 +148,11 @@ export class TransformersJsEmbeddingService implements ImageEmbeddingService {
     this.worker = null;
   }
 
+  private cancelInWorker(id: number): void {
+    try { this.worker?.postMessage({ type: "cancel", id }); }
+    catch { this.handleWorkerFailure("Embedding worker failed during cancellation"); }
+  }
+
   private dispatch(task: PendingTask): void {
     task.id = ++this.sequence;
     this.pending.set(task.id, task);
@@ -203,7 +209,7 @@ export class TransformersJsEmbeddingService implements ImageEmbeddingService {
         timeout: setTimeout(() => {
           this.pending.delete(task.id);
           this.cleanUpTask(task);
-          this.worker?.postMessage({ type: "cancel", id: task.id });
+          this.cancelInWorker(task.id);
           reject(new Error(`Embedding timed out after ${timeoutMs} ms`));
           if (this.pending.size === 0) {
             this.stopWorker();
@@ -216,7 +222,7 @@ export class TransformersJsEmbeddingService implements ImageEmbeddingService {
       task.abortListener = () => {
         this.pending.delete(task.id);
         this.cleanUpTask(task);
-        this.worker?.postMessage({ type: "cancel", id: task.id });
+        this.cancelInWorker(task.id);
         reject(new DOMException("Embedding cancelled", "AbortError"));
         if (this.pending.size === 0) {
           this.stopWorker();

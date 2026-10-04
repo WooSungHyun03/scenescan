@@ -1,6 +1,7 @@
 import { z } from "zod";
 import type { Location, NoiseSource, NoiseSourceKind, ParkingInfo } from "@/types/domain";
 import type { ImageMatch } from "@/domains/locations/services/group-image-matches";
+import { LOCATION_CATEGORY_VALUES, REGION_VALUES } from "@/types/location-options";
 
 // Deliberately does not import "server-only" (unlike supabase-repository.ts)
 // so it can be unit tested directly under plain Vitest -- see
@@ -80,11 +81,11 @@ const locationRowSchema = z.object({
   id: z.string(),
   name: z.string(),
   description: z.string(),
-  category: z.string(),
-  region: z.string(),
+  category: z.enum(LOCATION_CATEGORY_VALUES),
+  region: z.enum(REGION_VALUES),
   address: z.string(),
-  latitude: z.number(),
-  longitude: z.number(),
+  latitude: z.number().finite().min(-90).max(90),
+  longitude: z.number().finite().min(-180).max(180),
   permit_type: z.string(),
   contact_name: z.string().nullable(),
   contact_phone: z.string().nullable(),
@@ -191,6 +192,13 @@ function mapNoiseSources(value: unknown, warnings: MapperWarning[]): NoiseSource
     const legacyNote = optionalString(row.note);
     const description = optionalString(row.description) ?? legacyNote;
     const rawKind = optionalString(row.kind);
+    // The noise migration converts legacy strings/notes to objects with
+    // explicit null provenance; keep them as unverified, not silently gone.
+    if (description && rawKind && noiseKinds.has(rawKind as NoiseSourceKind)
+      && ["distanceMeters", "evidence", "source", "sourceUrl", "license", "licenseUrl", "referenceDate", "lastVerifiedAt"].every((key) => row[key] === null)) {
+      sources.push({ ...legacyNoiseSource(description), kind: rawKind as NoiseSourceKind });
+      continue;
+    }
     if (legacyNote && !row.description) {
       sources.push({ ...legacyNoiseSource(legacyNote), kind: rawKind && noiseKinds.has(rawKind as NoiseSourceKind) ? rawKind as NoiseSourceKind : "other" });
       continue;
@@ -238,7 +246,8 @@ function mapNoiseSources(value: unknown, warnings: MapperWarning[]): NoiseSource
 }
 
 function mapImage(row: LocationImageRow, locationId: string, fallbackAlt: string, warnings: MapperWarning[]): Location["images"][number] | null {
-  if (!isNonEmptyString(row?.id) || !isNonEmptyString(row?.image_url)) {
+  if (!isNonEmptyString(row?.id) || !isNonEmptyString(row?.image_url)
+    || !((row.image_url.startsWith("/") && !row.image_url.startsWith("//")) || isHttpUrl(row.image_url))) {
     warnings.push({ field: "location_images", reason: "missing required id or image_url", value: row });
     return null;
   }
@@ -257,7 +266,8 @@ function mapImage(row: LocationImageRow, locationId: string, fallbackAlt: string
 }
 
 function mapParking(row: ParkingRow, locationId: string, warnings: MapperWarning[]): ParkingInfo | null {
-  if (!isNonEmptyString(row?.id) || !isNonEmptyString(row?.name) || !isFiniteNumber(row?.latitude) || !isFiniteNumber(row?.longitude)) {
+  if (!isNonEmptyString(row?.id) || !isNonEmptyString(row?.name) || !isFiniteNumber(row?.latitude) || !isFiniteNumber(row?.longitude)
+    || Math.abs(row.latitude) > 90 || Math.abs(row.longitude) > 180) {
     warnings.push({ field: "parking", reason: "missing required id, name, latitude, or longitude", value: row });
     return null;
   }

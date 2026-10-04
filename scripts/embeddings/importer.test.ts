@@ -42,6 +42,7 @@ describe("embedding importer", () => {
     expect(db.findLocationIds).not.toHaveBeenCalled();
   });
   it("validates offline without database access", async () => {
+    expect(createImportRows(validOutput())[0].embedding_model).toBe("Xenova/clip-vit-base-patch32@main");
     await expect(importEmbeddings(validOutput(), "validate-only", 100)).resolves.toEqual({
       mode: "validate-only", validated: 1, existing: 0, written: 0,
     });

@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { sortParkingByDistance } from "@/domains/locations/services/parking-distance";
 import { getSolarPosition } from "@/domains/locations/services/solar-position";
+import { parseShootingTime } from "@/domains/locations/services/shooting-time";
 import type { Location, SolarPosition } from "@/types/domain";
 import { SourceAttribution } from "./source-attribution";
 
@@ -112,7 +113,7 @@ function formatDistance(distanceMeters: number | null) {
 
 function ParkingSummary({ location }: { location: Location }) {
   const nearbyParking = sortParkingByDistance(location.point, location.parking)
-    .filter(({ parking }) => parking.locationId !== location.id)
+    .filter(({ parking }) => parking.relationship === "nearby")
     .slice(0, 2);
 
   if (!nearbyParking.length) {
@@ -144,6 +145,8 @@ function ParkingSummary({ location }: { location: Location }) {
           <div className="mt-2 border-t border-sky-100 pt-2">
             <SourceAttribution
               source={parking.source}
+              sourceUrl={parking.sourceUrl}
+              lastVerifiedAt={parking.lastVerifiedAt}
               label="주차 정보 출처"
               compact
               showLabel={false}
@@ -151,7 +154,7 @@ function ParkingSummary({ location }: { location: Location }) {
           </div>
         </article>
       ))}
-      {location.parking.filter((item) => item.locationId !== location.id).length > 2 && (
+      {location.parking.filter((item) => item.relationship === "nearby").length > 2 && (
         <p className="text-xs text-stone-500">
           가까운 2곳만 표시했습니다. 상세 화면에서 전체 정보를 확인하세요.
         </p>
@@ -222,8 +225,7 @@ export function ShortlistComparison({ locations }: { locations: Location[] }) {
   const hasCompleteInput = Boolean(shootDate && shootTime);
   const instant = useMemo(() => {
     if (!hasCompleteInput) return null;
-    const value = new Date(`${shootDate}T${shootTime}`);
-    return Number.isNaN(value.getTime()) ? null : value;
+    return parseShootingTime(shootDate, shootTime);
   }, [hasCompleteInput, shootDate, shootTime]);
 
   return (
@@ -289,7 +291,7 @@ export function ShortlistComparison({ locations }: { locations: Location[] }) {
               </label>
             </div>
             <p id={timeZoneNoteId} className="mt-3 text-xs text-stone-500">
-              입력 시각은 현재 기기의 현지 시간대로 해석되며, 천문 계산은 기존 태양 위치 서비스를 사용합니다.
+              모든 후보는 한국 시간(Asia/Seoul, UTC+9)을 기준으로 계산합니다.
             </p>
           </div>
 

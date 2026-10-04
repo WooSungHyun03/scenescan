@@ -16,14 +16,11 @@ export const locationFilterSchema = z.object({
   category: z.enum(LOCATION_CATEGORY_VALUES).optional(),
 });
 
-// Not currently used by any HTTP route (getLocations is called directly from
-// Server Components today, per docs/architecture.md) -- this is the
-// validation layer a future "list locations" route should run before
-// calling getLocations, rejecting negative/non-integer/over-limit values
-// outright. The repository additionally clamps defensively (see
+// GET /api/locations validates bounded listing with this schema. The
+// repository additionally clamps defensively (see
 // resolveLocationListPagination in
 // src/domains/locations/server/pagination.ts) so a direct, non-HTTP caller
-// can't bypass the cap either.
+// can't bypass the cap either. Explicit ID reads are separately capped at 50.
 export const LOCATION_LIST_DEFAULT_LIMIT = 20;
 export const LOCATION_LIST_MAX_LIMIT = 50;
 

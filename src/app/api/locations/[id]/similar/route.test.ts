@@ -36,6 +36,15 @@ beforeEach(() => {
 });
 
 describe("GET /api/locations/[id]/similar", () => {
+  it("validates and deduplicates seen location IDs before retrieval", async () => {
+    getLocationMock.mockResolvedValue(fakeLocation(VALID_ID));
+    getSimilarLocationsMock.mockResolvedValue([]);
+    const response = await GET(new Request(`http://localhost/api/locations/${VALID_ID}/similar?exclude=${OTHER_ID}&exclude=${OTHER_ID}`), { params: Promise.resolve({ id: VALID_ID }) });
+    expect(response.status).toBe(200);
+    expect(getSimilarLocationsMock).toHaveBeenCalledWith(VALID_ID, [OTHER_ID]);
+    const invalid = await GET(new Request(`http://localhost/api/locations/${VALID_ID}/similar?exclude=bad`), { params: Promise.resolve({ id: VALID_ID }) });
+    expect(invalid.status).toBe(400);
+  });
   it("400s a non-uuid id without calling the repository", async () => {
     const response = await GET(...request("demo-01"));
     expect(response.status).toBe(400);
@@ -73,7 +82,7 @@ describe("GET /api/locations/[id]/similar", () => {
     const response = await GET(...request(VALID_ID));
     const body = await response.json();
     expect(body.results.every((result: { location: { id: string } }) => result.location.id !== VALID_ID)).toBe(true);
-    expect(getSimilarLocationsMock).toHaveBeenCalledWith(VALID_ID);
+    expect(getSimilarLocationsMock).toHaveBeenCalledWith(VALID_ID, []);
   });
 
   it("returns up to 8 results in the LocationSearchResult shape", async () => {

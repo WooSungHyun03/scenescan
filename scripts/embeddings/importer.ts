@@ -1,4 +1,4 @@
-import { CLIP_EMBEDDING_DIMENSION, CLIP_MODEL_DTYPE } from "../../src/lib/ai/embedding-config.ts";
+import { CLIP_EMBEDDING_DIMENSION, CLIP_MODEL_DTYPE, CLIP_MODEL_KEY } from "../../src/lib/ai/embedding-config.ts";
 import { toValidatedEmbedding } from "../../src/lib/ai/embedding-validation.ts";
 import { vectorNorm } from "../../src/lib/ai/vector-math.ts";
 import type { EmbeddingOutput, EmbeddingOutputItem } from "./contracts.ts";
@@ -10,6 +10,7 @@ export type ImportRow = {
   location_id: string;
   image_url: string;
   embedding: string;
+  embedding_model: string;
 };
 
 export type ExistingImage = { id: string; location_id: string };
@@ -41,6 +42,7 @@ function validateItem(item: EmbeddingOutputItem): ImportRow {
     location_id: item.location_id,
     image_url: item.image_url,
     embedding: vectorLiteral(embedding),
+    embedding_model: CLIP_MODEL_KEY,
   };
 }
 
