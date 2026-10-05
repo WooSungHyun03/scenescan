@@ -5,5 +5,16 @@ export const dynamic = "force-dynamic";
 
 export default async function SearchPage() {
   const examples = await getLocations();
-  return <main className="scene-container py-7 sm:py-10"><div className="mb-7"><h1 className="text-3xl font-bold tracking-tight sm:text-4xl">이미지로 촬영 장소 찾기</h1><p className="mt-3 text-muted">원하는 분위기의 사진을 올리고 촬영 후보를 비교해 보세요.</p></div><SearchWorkspace examples={examples} /></main>;
+  return (
+    <main className="scene-container pb-12 sm:pb-20">
+      <header className="scene-page-header">
+        <p className="scene-kicker">Visual search</p>
+        <h1 className="scene-page-title">이미지로 촬영 장소 찾기</h1>
+        <p className="scene-page-description">
+          원하는 분위기의 사진을 올리고, 지역과 공간 종류를 선택해 촬영 후보를 한눈에 비교하세요.
+        </p>
+      </header>
+      <SearchWorkspace examples={examples} />
+    </main>
+  );
 }

@@ -1,5 +1,10 @@
 import SunCalc from "suncalc";
 import type { GeoPoint, SolarPosition } from "@/types/domain";
+import {
+  DEFAULT_LOCATION_TIME_ZONE,
+  locationDateTimeToInstant,
+  type ZonedDateTimeResult,
+} from "./location-timezone";
 
 const DEGREES_PER_RADIAN = 180 / Math.PI;
 const FULL_CIRCLE_DEGREES = 360;
@@ -47,4 +52,26 @@ export function getSolarPosition(point: GeoPoint, date: Date): SolarPosition {
     altitudeDegrees,
     isAboveHorizon: position.altitude > 0,
   };
+}
+
+export type LocalSolarPositionResult =
+  | (Extract<ZonedDateTimeResult, { ok: true }> & { position: SolarPosition })
+  | Extract<ZonedDateTimeResult, { ok: false }>;
+
+/**
+ * Calculates the sun from a location's wall-clock time instead of the
+ * browser's local time. Existing Korean locations use Asia/Seoul; a future
+ * location-specific IANA zone can be supplied without changing the math.
+ */
+export function getSolarPositionAtLocationTime(
+  point: GeoPoint,
+  {
+    date,
+    time,
+    timeZone = DEFAULT_LOCATION_TIME_ZONE,
+  }: { date: string; time: string; timeZone?: string },
+): LocalSolarPositionResult {
+  const resolved = locationDateTimeToInstant({ date, time, timeZone });
+  if (!resolved.ok) return resolved;
+  return { ...resolved, position: getSolarPosition(point, resolved.instant) };
 }

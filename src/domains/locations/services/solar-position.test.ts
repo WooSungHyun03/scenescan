@@ -41,6 +41,19 @@ describe("getSolarPosition", () => {
     expect(position.isAboveHorizon).toBe(false);
   });
 
+  it("crosses the horizon around Korean sunrise and sunset", () => {
+    const seoul = { latitude: 37.5665, longitude: 126.978 };
+    const beforeSunrise = getSolarPosition(seoul, new Date("2026-06-20T19:00:00Z"));
+    const afterSunrise = getSolarPosition(seoul, new Date("2026-06-20T21:00:00Z"));
+    const beforeSunset = getSolarPosition(seoul, new Date("2026-06-21T10:00:00Z"));
+    const afterSunset = getSolarPosition(seoul, new Date("2026-06-21T12:00:00Z"));
+
+    expect(beforeSunrise.isAboveHorizon).toBe(false);
+    expect(afterSunrise.isAboveHorizon).toBe(true);
+    expect(beforeSunset.isAboveHorizon).toBe(true);
+    expect(afterSunset.isAboveHorizon).toBe(false);
+  });
+
   it.each([
     [{ latitude: 91, longitude: 127 }, new Date("2026-06-21T03:00:00Z"), "Latitude"],
     [{ latitude: 37.5, longitude: Number.NaN }, new Date("2026-06-21T03:00:00Z"), "Longitude"],

@@ -40,14 +40,12 @@ function ParkingField({
   children: ReactNode;
 }) {
   return (
-    <div className="flex items-start gap-2.5">
-      <span className="mt-0.5 shrink-0 text-stone-400" aria-hidden="true">
-        {icon}
-      </span>
-      <div className="min-w-0">
-        <dt className="text-xs font-semibold text-stone-500">{label}</dt>
-        <dd className="mt-0.5 break-words text-sm leading-relaxed">{children}</dd>
-      </div>
+    <div className="relative pl-7">
+      <dt className="text-xs font-semibold text-stone-500">
+        <span className="absolute left-0 top-0.5 text-stone-500" aria-hidden="true">{icon}</span>
+        {label}
+      </dt>
+      <dd className="mt-0.5 break-words text-sm leading-relaxed">{children}</dd>
     </div>
   );
 }

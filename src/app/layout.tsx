@@ -19,9 +19,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="ko" className={pretendard.variable}>
       <body>
         <SkipLink targetId="main-content" />
-        <header className="sticky top-0 z-40 border-b border-line bg-white">
+        <header className="scene-site-header">
           <nav
-            className="scene-container flex min-h-18 items-center justify-between gap-2 py-3"
+            className="scene-container flex min-h-[var(--header-height)] items-center justify-between gap-2"
             aria-label="주 메뉴"
           >
             <Link
@@ -37,10 +37,19 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <div id="main-content" tabIndex={-1}>
           {children}
         </div>
-        <footer className="mt-12 border-t border-line bg-white">
-          <div className="scene-container flex flex-col justify-between gap-5 py-8 sm:flex-row sm:items-center">
-            <Link href="/" aria-label="SceneScan 홈"><Brand /></Link>
-            <div className="max-w-xl text-sm text-muted"><p>장면을 찾는 시작, SceneScan.</p><p className="mt-1">촬영 허가와 이용 조건은 방문 전 운영기관에 확인해 주세요.</p></div>
+        <footer className="mt-16 border-t border-line bg-white sm:mt-24">
+          <div className="scene-container grid gap-6 py-9 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
+            <div>
+              <Link href="/" className="inline-flex min-h-11 items-center rounded-lg" aria-label="SceneScan 홈">
+                <Brand />
+              </Link>
+              <p className="mt-3 max-w-md text-sm leading-relaxed text-muted">
+                사진에서 출발해 위치, 빛, 촬영 조건을 한곳에서 비교하는 로케이션 헌팅 도구입니다.
+              </p>
+            </div>
+            <p className="max-w-md text-sm leading-relaxed text-muted sm:text-right">
+              촬영 허가와 시설 이용 조건은 방문 전에 반드시 운영기관에 확인해 주세요.
+            </p>
           </div>
         </footer>
       </body>

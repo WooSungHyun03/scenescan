@@ -4,46 +4,80 @@ import { useId, useMemo, useState } from "react";
 import { Clock3 } from "lucide-react";
 import { CameraLightingControl } from "@/domains/locations/components/camera-lighting-control";
 import { SolarDirectionVisualization } from "@/domains/locations/components/solar-direction-visualization";
-import { getSolarPosition } from "@/domains/locations/services/solar-position";
-import { parseShootingTime, SHOOTING_TIME_ZONE } from "@/domains/locations/services/shooting-time";
-import type { GeoPoint } from "@/types/domain";
+import {
+  DEFAULT_LOCATION_TIME_ZONE,
+  formatInstantInTimeZone,
+  formatTimeZoneWithOffset,
+  resolveLocationTimeZone,
+  type ZonedDateTimeErrorCode,
+} from "@/domains/locations/services/location-timezone";
+import { getSolarPositionAtLocationTime } from "@/domains/locations/services/solar-position";
+import type { GeoPoint, SolarPosition } from "@/types/domain";
 
 type SolarCalculation =
   | { state: "idle" }
-  | { state: "error" }
+  | { state: "error"; code: ZonedDateTimeErrorCode | "CALCULATION_ERROR" }
   | {
       state: "ready";
       instant: Date;
-      position: ReturnType<typeof getSolarPosition>;
+      position: SolarPosition;
+      isAmbiguous: boolean;
     };
 
-export function SolarPanel({ point }: { point: GeoPoint }) {
+function getErrorMessage(code: Extract<SolarCalculation, { state: "error" }>["code"]) {
+  if (code === "NONEXISTENT_LOCAL_TIME") {
+    return "해당 시간대의 일광절약시간 전환으로 존재하지 않는 시각입니다. 다른 시간을 선택해 주세요.";
+  }
+  if (code === "INVALID_TIME_ZONE") {
+    return "촬영지 시간대 정보를 확인할 수 없습니다.";
+  }
+  return "선택한 시각의 태양 위치를 계산하지 못했습니다. 날짜와 시간을 다시 확인해 주세요.";
+}
+
+export function SolarPanel({
+  point,
+  timeZone,
+}: {
+  point: GeoPoint;
+  timeZone?: string;
+}) {
   const dateInputId = useId();
   const timeInputId = useId();
   const timeZoneNoteId = useId();
   const [shootDate, setShootDate] = useState("");
   const [shootTime, setShootTime] = useState("");
   const [cameraHeadingDegrees, setCameraHeadingDegrees] = useState(0);
+  const locationTimeZone = resolveLocationTimeZone(timeZone);
 
   const calculation = useMemo<SolarCalculation>(() => {
     if (!shootDate || !shootTime) return { state: "idle" };
 
-    const instant = parseShootingTime(shootDate, shootTime);
-    if (!instant) return { state: "error" };
-
     try {
-      const position = getSolarPosition(point, instant);
+      const result = getSolarPositionAtLocationTime(point, {
+        date: shootDate,
+        time: shootTime,
+        timeZone: locationTimeZone,
+      });
+      if (!result.ok) return { state: "error", code: result.code };
+
+      const { instant, position, isAmbiguous } = result;
       if (
         !Number.isFinite(position.azimuthDegrees) ||
         !Number.isFinite(position.altitudeDegrees)
       ) {
-        return { state: "error" };
+        return { state: "error", code: "CALCULATION_ERROR" };
       }
-      return { state: "ready", instant, position };
+      return { state: "ready", instant, position, isAmbiguous };
     } catch {
-      return { state: "error" };
+      return { state: "error", code: "CALCULATION_ERROR" };
     }
-  }, [point, shootDate, shootTime]);
+  }, [locationTimeZone, point, shootDate, shootTime]);
+
+  const timeZoneLabel = formatTimeZoneWithOffset(
+    locationTimeZone,
+    calculation.state === "ready" ? calculation.instant : new Date(),
+  );
+  const timeZoneName = locationTimeZone === DEFAULT_LOCATION_TIME_ZONE ? "한국 표준시 · " : "";
 
   return (
     <div>
@@ -86,7 +120,10 @@ export function SolarPanel({ point }: { point: GeoPoint }) {
         className="mt-3 flex items-start gap-2 text-xs leading-relaxed text-stone-500"
       >
         <Clock3 size={14} className="mt-0.5 shrink-0" aria-hidden="true" />
-        촬영 장소의 한국 시간(Asia/Seoul, UTC+9)을 기준으로 계산합니다.
+        <span>
+          촬영지 시간대: <strong className="font-semibold text-stone-700">{timeZoneName}{timeZoneLabel}</strong>
+          <span className="block">기기의 시스템 시간대와 관계없이 이 기준으로 계산합니다.</span>
+        </span>
       </p>
 
       <div aria-live="polite" className="mt-4">
@@ -98,8 +135,7 @@ export function SolarPanel({ point }: { point: GeoPoint }) {
 
         {calculation.state === "error" && (
           <div role="alert" className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800">
-            선택한 시각의 태양 위치를 계산하지 못했습니다. 날짜와 시간을 다시
-            확인해 주세요.
+            {getErrorMessage(calculation.code)}
           </div>
         )}
 
@@ -118,12 +154,13 @@ export function SolarPanel({ point }: { point: GeoPoint }) {
                   : "태양이 지평선 아래에 있습니다"}
               </p>
               <p className="mt-1 text-xs text-stone-600">
-                {calculation.instant.toLocaleString("ko-KR", {
-                  dateStyle: "medium",
-                  timeStyle: "short",
-                  timeZone: SHOOTING_TIME_ZONE,
-                })}
+                {formatInstantInTimeZone(calculation.instant, locationTimeZone)} · 촬영지 시간
               </p>
+              {calculation.isAmbiguous && (
+                <p className="mt-2 text-xs font-medium text-amber-900">
+                  일광절약시간 전환으로 같은 시각이 두 번 있어 더 이른 시각을 적용했습니다.
+                </p>
+              )}
             </div>
             <SolarDirectionVisualization
               position={calculation.position}

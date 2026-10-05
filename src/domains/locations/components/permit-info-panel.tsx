@@ -63,14 +63,12 @@ function PermitField({
   children: ReactNode;
 }) {
   return (
-    <div className="flex items-start gap-3 border-b border-line py-3">
-      <span className="mt-0.5 shrink-0 text-stone-500" aria-hidden="true">
-        {icon}
-      </span>
-      <div className="min-w-0">
-        <dt className="text-xs font-semibold text-stone-500">{label}</dt>
-        <dd className="mt-1 break-words text-sm leading-relaxed">{children}</dd>
-      </div>
+    <div className="relative border-b border-line py-3 pl-8">
+      <dt className="text-xs font-semibold text-stone-500">
+        <span className="absolute left-0 top-3.5 text-stone-500" aria-hidden="true">{icon}</span>
+        {label}
+      </dt>
+      <dd className="mt-1 break-words text-sm leading-relaxed">{children}</dd>
     </div>
   );
 }

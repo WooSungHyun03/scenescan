@@ -14,8 +14,14 @@ import {
   Sun,
 } from "lucide-react";
 import { sortParkingByDistance } from "@/domains/locations/services/parking-distance";
+import {
+  DEFAULT_LOCATION_TIME_ZONE,
+  formatTimeZoneWithOffset,
+  locationDateTimeToInstant,
+  resolveLocationTimeZone,
+  type ZonedDateTimeResult,
+} from "@/domains/locations/services/location-timezone";
 import { getSolarPosition } from "@/domains/locations/services/solar-position";
-import { parseShootingTime } from "@/domains/locations/services/shooting-time";
 import type { Location, SolarPosition } from "@/types/domain";
 import { SourceAttribution } from "./source-attribution";
 
@@ -165,24 +171,30 @@ function ParkingSummary({ location }: { location: Location }) {
 
 function SolarSummary({
   point,
-  instant,
+  dateTimeResult,
   hasCompleteInput,
 }: {
   point: Location["point"];
-  instant: Date | null;
+  dateTimeResult: ZonedDateTimeResult | null;
   hasCompleteInput: boolean;
 }) {
   if (!hasCompleteInput) {
     return <MissingValue>위에서 촬영 날짜와 시간을 선택해 주세요.</MissingValue>;
   }
 
-  if (!instant) {
-    return <span className="text-red-700">선택한 날짜와 시간을 해석할 수 없습니다.</span>;
+  if (!dateTimeResult?.ok) {
+    return (
+      <span className="text-red-700">
+        {dateTimeResult?.code === "NONEXISTENT_LOCAL_TIME"
+          ? "시간대 전환으로 존재하지 않는 촬영 시각입니다."
+          : "선택한 날짜와 시간을 해석할 수 없습니다."}
+      </span>
+    );
   }
 
   let position: SolarPosition;
   try {
-    position = getSolarPosition(point, instant);
+    position = getSolarPosition(point, dateTimeResult.instant);
   } catch {
     return <span className="text-red-700">태양 조건을 계산하지 못했습니다.</span>;
   }
@@ -216,17 +228,33 @@ function SolarSummary({
   );
 }
 
-export function ShortlistComparison({ locations }: { locations: Location[] }) {
+export function ShortlistComparison({
+  locations,
+  timeZone,
+}: {
+  locations: Location[];
+  timeZone?: string;
+}) {
   const dateInputId = useId();
   const timeInputId = useId();
   const timeZoneNoteId = useId();
   const [shootDate, setShootDate] = useState("");
   const [shootTime, setShootTime] = useState("");
   const hasCompleteInput = Boolean(shootDate && shootTime);
-  const instant = useMemo(() => {
+  const locationTimeZone = resolveLocationTimeZone(timeZone);
+  const dateTimeResult = useMemo(() => {
     if (!hasCompleteInput) return null;
-    return parseShootingTime(shootDate, shootTime);
-  }, [hasCompleteInput, shootDate, shootTime]);
+    return locationDateTimeToInstant({
+      date: shootDate,
+      time: shootTime,
+      timeZone: locationTimeZone,
+    });
+  }, [hasCompleteInput, locationTimeZone, shootDate, shootTime]);
+  const timeZoneLabel = formatTimeZoneWithOffset(
+    locationTimeZone,
+    dateTimeResult?.ok ? dateTimeResult.instant : new Date(),
+  );
+  const timeZoneName = locationTimeZone === DEFAULT_LOCATION_TIME_ZONE ? "한국 표준시 · " : "";
 
   return (
     <section className="mt-10" aria-labelledby="comparison-title">
@@ -291,7 +319,8 @@ export function ShortlistComparison({ locations }: { locations: Location[] }) {
               </label>
             </div>
             <p id={timeZoneNoteId} className="mt-3 text-xs text-stone-500">
-              모든 후보는 한국 시간(Asia/Seoul, UTC+9)을 기준으로 계산합니다.
+              촬영지 시간대: <strong className="font-semibold text-stone-700">{timeZoneName}{timeZoneLabel}</strong>
+              <span className="mt-0.5 block">기기의 시스템 시간대와 관계없이 모든 후보에 같은 절대 시각을 적용합니다.</span>
             </p>
           </div>
 
@@ -344,7 +373,7 @@ export function ShortlistComparison({ locations }: { locations: Location[] }) {
                   {(location) => (
                     <SolarSummary
                       point={location.point}
-                      instant={instant}
+                      dateTimeResult={dateTimeResult}
                       hasCompleteInput={hasCompleteInput}
                     />
                   )}

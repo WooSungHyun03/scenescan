@@ -76,6 +76,8 @@ test("업로드부터 Top 8, 지도, 상세, 태양 정보와 shortlist 비교�
 
   await page.getByLabel("촬영 날짜", { exact: true }).fill("2026-06-21");
   await page.getByLabel("촬영 시간", { exact: true }).fill("12:00");
+  await expect(page.getByText(/촬영지 시간대:/)).toContainText("Asia/Seoul (UTC+09:00)");
+  await expect(page.getByText(/기기의 시스템 시간대와 관계없이/)).toBeVisible();
   await expect(page.getByText(/태양이 지평선 (위|아래)에 있습니다/)).toBeVisible();
   await page.getByRole("button", { name: "동", exact: true }).click();
   await expect(page.locator("output")).toHaveText("동 · 90°");
@@ -100,6 +102,10 @@ test("업로드부터 Top 8, 지도, 상세, 태양 정보와 shortlist 비교�
   await expect(
     page.getByRole("region", { name: "후보 장소 비교표, 가로로 스크롤 가능" }),
   ).toBeVisible();
+  await page.getByLabel("촬영 날짜", { exact: true }).fill("2026-06-21");
+  await page.getByLabel("촬영 시간", { exact: true }).fill("00:00");
+  await expect(page.getByText(/촬영지 시간대:/)).toContainText("Asia/Seoul (UTC+09:00)");
+  await expect(page.getByText("지평선 아래")).toHaveCount(2);
 
   expect(pageErrors).toEqual([]);
 });
