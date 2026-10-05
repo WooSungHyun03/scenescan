@@ -115,4 +115,35 @@ test("가입·확인·로그인·recovery·재인증 비밀번호 변경이 안�
   await page.getByLabel("비밀번호").fill(finalPassword);
   await page.getByRole("button", { name: "로그인", exact: true }).click();
   await expect(page).toHaveURL(/\/account$/);
+
+  await page.evaluate(() => {
+    window.localStorage.setItem(
+      "scenescan.shortlist.location-ids.v1",
+      JSON.stringify(["00000000-0000-4000-8000-000000000001"]),
+    );
+  });
+  const staleAuthCookies = (await context.cookies()).filter(({ name }) => (
+    name.startsWith("sb-") && name.includes("-auth-token")
+  ));
+  await page.getByRole("link", { name: "계정 보안" }).click();
+  await page.getByLabel("현재 비밀번호").last().fill(finalPassword);
+  await page.getByLabel(/확인을 위해/).fill("회원탈퇴");
+  await page.getByRole("button", { name: "계정 영구 삭제" }).click();
+  await expect(page).toHaveURL(/\/login\?accountDeleted=1$/);
+  await expect(page.getByRole("status")).toContainText("회원탈퇴가 완료");
+  await expect.poll(() => page.evaluate(() => (
+    window.localStorage.getItem("scenescan.shortlist.location-ids.v1")
+  ))).toBeNull();
+
+  // A copied pre-deletion JWT must not regain personal access. Access tokens
+  // may survive until expiry, so the server's fresh getUser() check is the
+  // authorization boundary after the Auth record has been removed.
+  if (staleAuthCookies.length > 0) await context.addCookies(staleAuthCookies);
+  await page.goto("/account");
+  await expect(page).toHaveURL(/\/login\?next=%2Faccount$/);
+
+  await page.getByLabel("이메일").fill(email);
+  await page.getByLabel("비밀번호").fill(finalPassword);
+  await page.getByRole("button", { name: "로그인", exact: true }).click();
+  await expect(page.locator(".scene-status[role=alert]")).toContainText("이메일 또는 비밀번호");
 });

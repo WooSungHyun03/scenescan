@@ -28,6 +28,7 @@ export default async function LoginPage({
     error?: string | string[];
     passwordChanged?: string | string[];
     sessionCleanup?: string | string[];
+    accountDeleted?: string | string[];
   }>;
 }) {
   const query = await searchParams;
@@ -35,6 +36,7 @@ export default async function LoginPage({
   const errorCode = Array.isArray(query.error) ? query.error[0] : query.error;
   const passwordChanged = (Array.isArray(query.passwordChanged) ? query.passwordChanged[0] : query.passwordChanged) === "1";
   const sessionCleanup = Array.isArray(query.sessionCleanup) ? query.sessionCleanup[0] : query.sessionCleanup;
+  const accountDeleted = (Array.isArray(query.accountDeleted) ? query.accountDeleted[0] : query.accountDeleted) === "1";
   const next = getSafeAuthRedirect(requestedNext, "/account");
   const passwordNotice: AuthNotice | undefined = passwordChanged
     ? sessionCleanup === "partial"
@@ -47,6 +49,9 @@ export default async function LoginPage({
           message: "비밀번호가 변경되어 모든 기기에서 로그아웃되었습니다. 새 비밀번호로 다시 로그인해 주세요.",
         }
     : undefined;
+  const accountDeletedNotice: AuthNotice | undefined = accountDeleted
+    ? { tone: "success", message: "회원탈퇴가 완료되어 이 브라우저의 계정 데이터와 세션을 정리했습니다." }
+    : undefined;
 
   return (
     <main className="scene-container py-10 sm:py-16">
@@ -58,7 +63,7 @@ export default async function LoginPage({
       <AuthForm
         mode="login"
         next={next}
-        initialNotice={passwordNotice ?? (errorCode ? callbackMessages[errorCode] : undefined)}
+        initialNotice={accountDeletedNotice ?? passwordNotice ?? (errorCode ? callbackMessages[errorCode] : undefined)}
       />
     </main>
   );

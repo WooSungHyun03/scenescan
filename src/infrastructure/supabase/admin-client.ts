@@ -5,9 +5,9 @@ import { configurationError } from "@/shared/errors/application-error";
 
 /**
  * Service-role Supabase client for privileged server-side operations only
- * (e.g. a future admin-only API route or maintenance task run from within
- * the Next.js app). No read path uses this today -- real-mode reads go
- * through the anon-key client in ./server-client, which is what RLS expects.
+ * (the self-service DELETE /api/account route and controlled maintenance
+ * tasks run from within the Next.js app). Public read paths still go through
+ * the publishable-key client in ./server-client, which is what RLS expects.
  *
  * The `server-only` import above makes it a build-time error for any Client
  * Component to import this module (directly or transitively), which is the

@@ -29,7 +29,7 @@ export function AuthNavigation() {
       active = false;
       data.subscription.unsubscribe();
     };
-  }, []);
+  }, [pathname]);
 
   const href = authenticated ? "/account" : "/login";
   const label = authenticated ? "계정" : "로그인";

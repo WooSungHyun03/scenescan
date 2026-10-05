@@ -52,6 +52,25 @@ test("키가 없어도 비밀번호 찾기와 recovery 보호 경계가 안전�
   await expect(page).toHaveURL(/\/forgot-password\?error=recovery_expired$/);
 });
 
+test("키가 없는 공개 모드에서 회원탈퇴 API는 admin 경계를 열지 않는다", async ({ page }) => {
+  await page.goto("/login");
+  const result = await page.evaluate(async () => {
+    const response = await fetch("/api/account", {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        "X-SceneScan-CSRF": "account-delete-v1",
+      },
+      body: JSON.stringify({ currentPassword: "test-password", confirmation: "회원탈퇴" }),
+    });
+    return { status: response.status, body: await response.json() };
+  });
+
+  expect(result.status).toBe(401);
+  expect(result.body).toMatchObject({ error: { code: "UNAUTHENTICATED" } });
+  expect(result.body).not.toHaveProperty("deleted");
+});
+
 for (const width of [320, 390, 768, 1440]) {
   test(`${width}px 회원 화면에 가로 넘침이 없고 탐색 링크 이름이 유지된다`, async ({ page }) => {
     await page.setViewportSize({ width, height: 844 });

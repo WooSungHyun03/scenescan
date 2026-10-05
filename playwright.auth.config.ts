@@ -50,6 +50,8 @@ export default defineConfig({
       NEXT_PUBLIC_USE_MOCK_DATA: "true",
       NEXT_PUBLIC_USE_MOCK_AI: "true",
       NEXT_PUBLIC_KAKAO_MAP_KEY: "",
+      SUPABASE_URL: local.SUPABASE_URL,
+      SUPABASE_SERVICE_ROLE_KEY: local.SUPABASE_SERVICE_ROLE_KEY,
     },
   },
 });

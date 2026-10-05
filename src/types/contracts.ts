@@ -11,6 +11,19 @@ import { LOCATION_CATEGORY_VALUES, REGION_VALUES } from "./location-options";
 // text length before parsing (Content-Length can be absent or wrong).
 export const MAX_SEARCH_REQUEST_BYTES = 32 * 1024;
 
+// DELETE /api/account accepts no identity selector. The authenticated user
+// is resolved server-side and this exact phrase is an intentional,
+// destructive-action confirmation rather than a generic boolean checkbox.
+export const ACCOUNT_DELETION_CONFIRMATION = "회원탈퇴";
+export const ACCOUNT_DELETION_CSRF_HEADER = "x-scenescan-csrf";
+export const ACCOUNT_DELETION_CSRF_VALUE = "account-delete-v1";
+export const MAX_ACCOUNT_DELETION_REQUEST_BYTES = 2 * 1024;
+
+export const accountDeletionRequestSchema = z.object({
+  currentPassword: z.string().min(8).max(72),
+  confirmation: z.literal(ACCOUNT_DELETION_CONFIRMATION),
+}).strict();
+
 export const locationFilterSchema = z.object({
   region: z.enum(REGION_VALUES).optional(),
   category: z.enum(LOCATION_CATEGORY_VALUES).optional(),
@@ -74,6 +87,10 @@ export const searchRequestSchema = z.object({
 export const locationIdSchema = z.string().uuid();
 
 export type SearchRequest = z.infer<typeof searchRequestSchema>;
+export type AccountDeletionRequest = z.infer<typeof accountDeletionRequestSchema>;
+export interface AccountDeletionResponse {
+  deleted: true;
+}
 export interface SearchResponse {
   results: LocationSearchResult[];
 }
