@@ -25,7 +25,7 @@ describe("client bundle secret boundary", () => {
     const directory = createBundle();
     writeFileSync(
       join(directory, "chunks", "app.js"),
-      "NEXT_PUBLIC_SUPABASE_URL NEXT_PUBLIC_SUPABASE_ANON_KEY",
+      "NEXT_PUBLIC_SUPABASE_URL NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY NEXT_PUBLIC_SUPABASE_ANON_KEY",
     );
 
     expect(findClientBundleSecretLeaks(directory, ["server-only-sentinel"]))

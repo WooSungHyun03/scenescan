@@ -21,6 +21,7 @@ describe("environment contracts", () => {
       "NEXT_PUBLIC_CLIP_DEVICE",
       "NEXT_PUBLIC_KAKAO_MAP_KEY",
       "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+      "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY",
       "NEXT_PUBLIC_SUPABASE_URL",
       "NEXT_PUBLIC_USE_MOCK_AI",
       "NEXT_PUBLIC_USE_MOCK_DATA",
@@ -36,7 +37,7 @@ describe("environment contracts", () => {
   it("defaults to keyless mock mode with the WASM CLIP device", () => {
     expect(parsePublicEnvironment({})).toEqual({
       supabaseUrl: undefined,
-      supabaseAnonKey: undefined,
+      supabasePublishableKey: undefined,
       kakaoMapKey: undefined,
       useMockData: true,
       useMockAi: true,
@@ -51,22 +52,41 @@ describe("environment contracts", () => {
     expect(() => parsePublicEnvironment({
       NEXT_PUBLIC_USE_MOCK_DATA: "false",
       NEXT_PUBLIC_SUPABASE_URL: "https://project.supabase.co",
-    })).toThrow(/NEXT_PUBLIC_SUPABASE_ANON_KEY/);
+    })).toThrow(/NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY/);
   });
 
-  it("accepts HTTPS services and localhost integration URLs", () => {
+  it("accepts the preferred publishable key and localhost integration URLs", () => {
     expect(parsePublicEnvironment({
       NEXT_PUBLIC_USE_MOCK_DATA: "false",
       NEXT_PUBLIC_SUPABASE_URL: "https://project.supabase.co",
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: "public-anon-key",
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: "sb_publishable_public-key",
       NEXT_PUBLIC_CLIP_DEVICE: "webgpu",
-    })).toMatchObject({ useMockData: false, clipDevice: "webgpu" });
+    })).toMatchObject({
+      useMockData: false,
+      clipDevice: "webgpu",
+      supabasePublishableKey: "sb_publishable_public-key",
+    });
 
     expect(parsePublicEnvironment({
       NEXT_PUBLIC_USE_MOCK_DATA: "false",
       NEXT_PUBLIC_SUPABASE_URL: "http://127.0.0.1:54321",
       NEXT_PUBLIC_SUPABASE_ANON_KEY: "local-anon-key",
     }).supabaseUrl).toBe("http://127.0.0.1:54321");
+  });
+
+  it("keeps the legacy anon key as a migration fallback and prefers a publishable key", () => {
+    expect(parsePublicEnvironment({
+      NEXT_PUBLIC_USE_MOCK_DATA: "false",
+      NEXT_PUBLIC_SUPABASE_URL: "https://project.supabase.co",
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: "legacy-anon-key",
+    }).supabasePublishableKey).toBe("legacy-anon-key");
+
+    expect(parsePublicEnvironment({
+      NEXT_PUBLIC_USE_MOCK_DATA: "false",
+      NEXT_PUBLIC_SUPABASE_URL: "https://project.supabase.co",
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: "preferred-publishable-key",
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: "legacy-anon-key",
+    }).supabasePublishableKey).toBe("preferred-publishable-key");
   });
 
   it("rejects invalid modes, devices, and non-local insecure URLs", () => {

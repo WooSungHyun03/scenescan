@@ -3,8 +3,11 @@ import {
   ApplicationError,
   configurationError,
   dataAccessError,
+  forbiddenError,
   notFoundError,
+  rateLimitedError,
   toApplicationError,
+  unauthenticatedError,
   validationError,
 } from "./application-error";
 
@@ -24,6 +27,25 @@ describe("application errors", () => {
     expect(configurationError("missing key")).toMatchObject({ code: "DATA_UNAVAILABLE", status: 503 });
     expect(dataAccessError("query failed", new Error("database detail"))).toMatchObject({ code: "DATA_UNAVAILABLE", status: 503 });
     expect(configurationError("missing key").publicMessage).toBe(dataAccessError("x", null).publicMessage);
+  });
+
+  it("defines the shared authentication, authorization, and rate-limit contract", () => {
+    expect(unauthenticatedError("missing verified claims")).toMatchObject({
+      code: "UNAUTHENTICATED",
+      status: 401,
+      publicMessage: "로그인이 필요합니다.",
+    });
+    expect(forbiddenError("not owner")).toMatchObject({
+      code: "FORBIDDEN",
+      status: 403,
+      publicMessage: "이 작업을 수행할 권한이 없습니다.",
+    });
+    expect(rateLimitedError("too many requests", 1.2)).toMatchObject({
+      code: "RATE_LIMITED",
+      status: 429,
+      retryAfterSeconds: 2,
+    });
+    expect(rateLimitedError("invalid retry delay", 0).retryAfterSeconds).toBe(1);
   });
 
   it("never leaks the underlying cause's message into the public message", () => {

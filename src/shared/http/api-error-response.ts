@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
 import { toApplicationError } from "@/shared/errors/application-error";
 import { logger } from "@/shared/observability/logger";
+import { applyPrivateResponseCacheHeaders } from "./private-cache";
 
 /**
  * `{ error: { code, message }, requestId }`. `code` is one of
- * ApplicationErrorCode (VALIDATION_ERROR/LOCATION_NOT_FOUND/
- * DATA_UNAVAILABLE/SEARCH_FAILED); `message` is always the Korean
+ * ApplicationErrorCode (including UNAUTHENTICATED/FORBIDDEN/RATE_LIMITED);
+ * `message` is always the Korean
  * user-facing publicMessage, never the raw internal error/cause. `requestId`
  * correlates the response with the structured server-side log entry.
  */
@@ -18,7 +19,7 @@ export function apiErrorResponse(error: unknown, operation: string): NextRespons
     code: applicationError.code,
     status: applicationError.status,
   });
-  return NextResponse.json(
+  const response = NextResponse.json(
     {
       error: {
         code: applicationError.code,
@@ -28,4 +29,12 @@ export function apiErrorResponse(error: unknown, operation: string): NextRespons
     },
     { status: applicationError.status },
   );
+  response.headers.set("Cache-Control", "no-store");
+  if (applicationError.status === 401 || applicationError.status === 403) {
+    applyPrivateResponseCacheHeaders(response.headers);
+  }
+  if (applicationError.retryAfterSeconds !== undefined) {
+    response.headers.set("Retry-After", String(applicationError.retryAfterSeconds));
+  }
+  return response;
 }

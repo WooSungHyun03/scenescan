@@ -32,6 +32,7 @@ const booleanString = z.preprocess(
 
 const publicEnvironmentSchema = z.object({
   NEXT_PUBLIC_SUPABASE_URL: optionalEnvironmentHttpUrl,
+  NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: optionalEnvironmentString,
   NEXT_PUBLIC_SUPABASE_ANON_KEY: optionalEnvironmentString,
   NEXT_PUBLIC_KAKAO_MAP_KEY: optionalEnvironmentString,
   NEXT_PUBLIC_USE_MOCK_DATA: booleanString,
@@ -50,18 +51,19 @@ const publicEnvironmentSchema = z.object({
       message: "is required when NEXT_PUBLIC_USE_MOCK_DATA=false",
     });
   }
-  if (!environment.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+  if (!environment.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+    && !environment.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
     context.addIssue({
       code: "custom",
-      path: ["NEXT_PUBLIC_SUPABASE_ANON_KEY"],
-      message: "is required when NEXT_PUBLIC_USE_MOCK_DATA=false",
+      path: ["NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY"],
+      message: "or legacy NEXT_PUBLIC_SUPABASE_ANON_KEY is required when NEXT_PUBLIC_USE_MOCK_DATA=false",
     });
   }
 });
 
 export type PublicEnvironment = {
   supabaseUrl?: string;
-  supabaseAnonKey?: string;
+  supabasePublishableKey?: string;
   kakaoMapKey?: string;
   useMockData: boolean;
   useMockAi: boolean;
@@ -86,7 +88,8 @@ export function parsePublicEnvironment(
 
   return Object.freeze({
     supabaseUrl: result.data.NEXT_PUBLIC_SUPABASE_URL,
-    supabaseAnonKey: result.data.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    supabasePublishableKey: result.data.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+      || result.data.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     kakaoMapKey: result.data.NEXT_PUBLIC_KAKAO_MAP_KEY,
     useMockData: result.data.NEXT_PUBLIC_USE_MOCK_DATA,
     useMockAi: result.data.NEXT_PUBLIC_USE_MOCK_AI,

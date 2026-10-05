@@ -5,7 +5,7 @@ const localBaseUrl = "http://127.0.0.1:3110";
 
 export default defineConfig({
   testDir: "./e2e",
-  testIgnore: ["production/**"],
+  testIgnore: ["production/**", "auth-local/**"],
   outputDir: "output/playwright/test-results",
   fullyParallel: true,
   forbidOnly: Boolean(process.env.CI),

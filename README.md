@@ -17,7 +17,7 @@ pnpm install
 pnpm dev
 ```
 
-Open `http://localhost:3000`, choose **이미지 업로드**, select an image, and run a mock search. No account, model download, map key, or Supabase project is needed in mock mode.
+Open `http://localhost:3000`, choose **이미지 업로드**, select an image, and run a mock search. No account, model download, map key, or Supabase project is needed for public browsing in mock mode. Login/signup stays visible but reports that Auth is not configured until the public Supabase URL and browser-safe key are supplied.
 
 Real browser AI mode accepts JPEG, PNG, and WebP images up to 15 MB, 8192 px per axis, and 20 megapixels. Its first search downloads the public CLIP model; later requests reuse the same worker and model instance.
 Production uses the WASM backend for broad browser compatibility and keeps only 20 image-free timing samples for diagnostics. Current browser results and the remaining cold-load/WebGPU matrix are in [AI performance](docs/ai-performance.md).
@@ -30,12 +30,13 @@ Production uses the WASM backend for broad browser compatibility and keeps only 
 | `NEXT_PUBLIC_USE_MOCK_AI` | Defaults to true; `false` loads browser CLIP worker |
 | `NEXT_PUBLIC_CLIP_DEVICE` | Optional `wasm` (default) or experimental `webgpu`; failed WebGPU initialization falls back to WASM |
 | `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL for real data |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Public anon key; RLS restricts writes |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Preferred browser-safe Supabase key; RLS still defines access |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Legacy public anon-key fallback during migration |
 | `NEXT_PUBLIC_KAKAO_MAP_KEY` | Kakao JavaScript key and registered domain for real map |
 | `SUPABASE_URL` | Server-only project URL used by the local embedding and locations/parking importers |
 | `SUPABASE_SECRET_KEY` | Server-only secret key used only for controlled local imports |
 
-Never commit `.env.local` or a Supabase secret/service-role key. Public `NEXT_PUBLIC_*` variables are visible in the browser bundle. Both importers reject either privileged key placed in a `NEXT_PUBLIC_*` variable. The legacy `SUPABASE_SERVICE_ROLE_KEY` name remains accepted for existing local setups.
+Never commit `.env.local` or a Supabase secret/service-role key. Public `NEXT_PUBLIC_*` variables are visible in the browser bundle. Browser/request-scoped Auth uses only the project URL and publishable (or legacy anon) key; controlled imports keep the admin client and server secret in a separate `server-only` boundary. Both importers reject either privileged key placed in a `NEXT_PUBLIC_*` variable. The legacy `SUPABASE_SERVICE_ROLE_KEY` name remains accepted for existing local setups. Key-free mock browsing remains the default.
 
 ## Scripts
 
@@ -45,6 +46,7 @@ pnpm lint
 pnpm typecheck
 pnpm test
 pnpm test:e2e
+pnpm test:e2e:auth
 pnpm test:e2e:production
 pnpm test:integration
 pnpm build
@@ -62,7 +64,7 @@ pnpm embeddings:evaluate
 pnpm embeddings:evaluate-clip
 ```
 
-`pnpm test` needs no Supabase project or environment variables and is what CI runs on every PR. `pnpm test:e2e` starts a key-free mock app and exercises the browser flow with the committed project-owned evaluation image; run `pnpm exec playwright install chromium` once on a new machine. CI runs the same E2E suite against the standalone production image on an isolated Docker network. `pnpm test:e2e:production` is intentionally excluded from PR CI: the separate weekly/manual workflow makes one real CLIP query against `PRODUCTION_BASE_URL` (default `https://beceleb.org`) and checks API health plus Kakao markers. `pnpm test:integration` needs a live Supabase instance (`pnpm supabase:start` runs one locally via the Supabase CLI) and skips cleanly without one; see [testing](docs/testing.md) for what each suite covers and [integration testing](docs/integration-testing.md) for setup.
+`pnpm test` needs no Supabase project or environment variables and is what CI runs on every PR. `pnpm test:e2e` starts a key-free mock app and exercises the public/browser boundary with the committed project-owned evaluation image; run `pnpm exec playwright install chromium` once on a new machine. CI runs the same E2E suite against the standalone production image on an isolated Docker network. `pnpm test:e2e:auth` is an explicit local integration check: start local Supabase first, then it uses the bundled Mailpit inbox to prove signup → email confirmation → recovery → changed-password login, including old-password rejection and account-security reauthentication. `pnpm test:e2e:production` is intentionally excluded from PR CI: the separate weekly/manual workflow makes one real CLIP query against `PRODUCTION_BASE_URL` (default `https://beceleb.org`) and checks API health plus Kakao markers. `pnpm test:integration` needs a live Supabase instance (`pnpm supabase:start` runs one locally via the Supabase CLI) and skips cleanly without one; see [testing](docs/testing.md), [Auth email setup](docs/auth-email-setup.md), and [integration testing](docs/integration-testing.md) for setup.
 
 `data:import` upserts the `locations` and `parking` rows described by a normalized file (no public write API exists for this -- it is the only way real location data enters the database); it does not touch `location_images` or embeddings. Run it before the embeddings importer, since `location_images.location_id` is a foreign key to `locations.id`. See [data pipeline](docs/data-pipeline.md) for upsert keys, dry-run/apply modes, and the image storage strategy.
 

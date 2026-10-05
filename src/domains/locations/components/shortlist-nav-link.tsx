@@ -13,10 +13,11 @@ export function ShortlistNavLink() {
     <Link
       href="/shortlist"
       className="scene-nav-link"
+      aria-label="관심 장소"
       aria-current={pathname === "/shortlist" ? "page" : undefined}
     >
       <Heart size={16} aria-hidden="true" />
-      관심 장소
+      <span className="hidden sm:inline">관심 장소</span>
       {isReady && count > 0 && (
         <span
           className="inline-flex min-w-5 items-center justify-center rounded-full bg-emerald-800 px-1.5 py-0.5 text-[11px] font-bold text-white"

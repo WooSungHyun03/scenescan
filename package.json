@@ -13,6 +13,7 @@
     "test": "vitest run",
     "test:e2e": "playwright test",
     "test:e2e:headed": "playwright test --headed",
+    "test:e2e:auth": "playwright test --config playwright.auth.config.ts",
     "test:e2e:production": "playwright test --config playwright.production.config.ts",
     "test:integration": "vitest run --config vitest.integration.config.ts",
     "security:client-bundle": "node --experimental-strip-types scripts/security/assert-client-bundle-secrets.ts",
@@ -39,6 +40,7 @@
   "dependencies": {
     "@huggingface/transformers": "^4.3.0",
     "@radix-ui/react-slot": "^1.2.3",
+    "@supabase/ssr": "0.12.7",
     "@supabase/supabase-js": "^2.58.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

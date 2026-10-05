@@ -1,6 +1,9 @@
 export type ApplicationErrorCode =
   | "VALIDATION_ERROR"
   | "LOCATION_NOT_FOUND"
+  | "UNAUTHENTICATED"
+  | "FORBIDDEN"
+  | "RATE_LIMITED"
   | "DATA_UNAVAILABLE"
   | "SEARCH_FAILED";
 
@@ -9,12 +12,14 @@ type ApplicationErrorOptions = {
   status: number;
   publicMessage: string;
   cause?: unknown;
+  retryAfterSeconds?: number;
 };
 
 export class ApplicationError extends Error {
   readonly code: ApplicationErrorCode;
   readonly status: number;
   readonly publicMessage: string;
+  readonly retryAfterSeconds?: number;
 
   constructor(message: string, options: ApplicationErrorOptions) {
     super(message, { cause: options.cause });
@@ -22,7 +27,36 @@ export class ApplicationError extends Error {
     this.code = options.code;
     this.status = options.status;
     this.publicMessage = options.publicMessage;
+    this.retryAfterSeconds = options.retryAfterSeconds;
   }
+}
+
+export function unauthenticatedError(message: string): ApplicationError {
+  return new ApplicationError(message, {
+    code: "UNAUTHENTICATED",
+    status: 401,
+    publicMessage: "로그인이 필요합니다.",
+  });
+}
+
+export function forbiddenError(message: string): ApplicationError {
+  return new ApplicationError(message, {
+    code: "FORBIDDEN",
+    status: 403,
+    publicMessage: "이 작업을 수행할 권한이 없습니다.",
+  });
+}
+
+export function rateLimitedError(
+  message: string,
+  retryAfterSeconds = 60,
+): ApplicationError {
+  return new ApplicationError(message, {
+    code: "RATE_LIMITED",
+    status: 429,
+    publicMessage: "요청이 너무 많습니다. 잠시 후 다시 시도해주세요.",
+    retryAfterSeconds: Math.max(1, Math.ceil(retryAfterSeconds)),
+  });
 }
 
 /** The request itself is malformed (bad JSON, failed Zod validation, oversized body). `message` is shown to the user, so callers must keep it free of internal detail. */

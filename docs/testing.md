@@ -6,7 +6,13 @@
 
 Install Chromium once with `pnpm exec playwright install chromium`, then run `pnpm test:e2e`. The local command starts Next.js on port 3110 with mock data, mock AI, and no Kakao key. Set `PLAYWRIGHT_BASE_URL` to reuse an already-running app instead.
 
-The suite reuses `scripts/embeddings/evaluation-images/queries/demo-01-query.png`, a project-created MIT-licensed asset. It covers home, file chooser and drag/drop upload, preview/delete/invalid image, filters, Top 8, search-result map markers, detail/no-key map fallback, solar date/time, camera heading/lighting, localStorage shortlist comparison, retryable DB error, empty results, and a 390 px mobile flow. CI builds the Docker `e2e` target and runs this same suite against the key-free standalone `runner` container; it does not download CLIP, call Supabase, or load the Kakao SDK.
+The suite reuses `scripts/embeddings/evaluation-images/queries/demo-01-query.png`, a project-created MIT-licensed asset. It covers home, file chooser and drag/drop upload, preview/delete/invalid image, filters, Top 8, search-result map markers, detail/no-key map fallback, solar date/time, camera heading/lighting, localStorage shortlist comparison, retryable DB error, empty results, key-free login/signup/account/recovery protection, callback open-redirect/expiry/token-stripping behavior, and responsive 320/390/768/1440 px flows. CI builds the Docker `e2e` target and runs this same suite against the key-free standalone `runner` container; it does not download CLIP, call Supabase, or load the Kakao SDK.
+
+## Local Auth E2E (`pnpm test:e2e:auth` -- local Supabase + Mailpit)
+
+Run `pnpm supabase:start` first, then `pnpm test:e2e:auth`. The dedicated Playwright config reads only the well-known loopback public values from `.env.integration.example`, starts the app on port 3111, and reads the local Mailpit preview at `http://127.0.0.1:54324`; it never needs a production project or SMTP credential. The suite creates a unique test user and verifies confirmation-required signup, pre-confirmation login rejection, resend cooldown, email-link callback, refresh persistence, shared browser-context tabs, logout/login, non-enumerating recovery, a clean token-free recovery URL, new-password login with old-password rejection, and current-password reauthentication on `/account/security`. Local users remain in the disposable local Auth database until `pnpm supabase:stop`; no cleanup uses an admin credential from the browser. Full setup and the production owner checklist are in [Auth email setup](auth-email-setup.md).
+
+This suite is intentionally not part of the key-free Docker PR job because that job does not start the full Supabase stack. Callback expiry and open-redirect blocking still run in the default key-free E2E suite and unit tests. Production email delivery is not claimed by local Mailpit: configure and verify production SMTP, templates, Site URL, and redirect URLs separately.
 
 ## Production smoke (`pnpm test:e2e:production` -- real external services)
 
@@ -31,6 +37,9 @@ Set the optional GitHub repository variable `PRODUCTION_BASE_URL` to override `h
 | `src/domains/search/server/validation.ts` -> `validation.test.ts` | Zod-error-to-Korean-message mapping for every `searchRequestSchema` field, threshold inclusive boundaries (0/1), never echoes raw Zod issue text |
 | `src/shared/errors/application-error.test.ts` | Each error constructor's code/status/public message; cause message never leaks into `publicMessage` |
 | `src/shared/http/api-error-response.test.ts` | `{ error: { code, message }, requestId }` shape; underlying cause never in the response body |
+| `src/infrastructure/supabase/{browser-auth-client,request-auth-client,auth-proxy,auth-verification}.test.ts` | keyless mock mode, per-tab browser singleton, request-scoped server clients, refresh/expiry, forged cookies, simultaneous-tab isolation, verified claims/getUser identity matching, and private cache headers |
+| `src/domains/users/services/*.test.ts`, `src/app/auth/{callback,recovery}/route.test.ts` | auth input/error mapping, timestamp-only resend/recovery cooldowns, safe internal redirects, purpose-separated PKCE/token-hash callbacks, expired/used links, token stripping, cookie forwarding, and private response caching |
+| `src/proxy.test.ts` | Next.js 16 proxy matcher covers application/API requests and skips static assets |
 | `src/types/contracts.test.ts` | Shared Zod schemas (owned jointly, see file) |
 | `scripts/shared/supabase-admin-client.test.ts` | Service-role env validation: rejects a `NEXT_PUBLIC_*`-named key, requires both vars, requires HTTPS unless localhost |
 | `scripts/data/location-importer.ts` -> `location-importer.test.ts` | locations/parking row mapping, missing-id/duplicate-id guards, validate-only/dry-run/apply counts, locations-before-parking ordering, batch-size bounds |
