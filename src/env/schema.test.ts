@@ -18,6 +18,7 @@ describe("environment contracts", () => {
     );
 
     expect(Object.keys(example).sort()).toEqual([
+      "KMA_VILLAGE_FORECAST_SERVICE_KEY",
       "NEXT_PUBLIC_CLIP_DEVICE",
       "NEXT_PUBLIC_KAKAO_MAP_KEY",
       "NEXT_PUBLIC_SUPABASE_ANON_KEY",
@@ -136,5 +137,12 @@ describe("environment contracts", () => {
       .toEqual({ publicDataPortalServiceKey: "collection-secret" });
     expect(parsePublicEnvironment({ PUBLIC_DATA_PORTAL_SERVICE_KEY: "collection-secret" }))
       .not.toHaveProperty("publicDataPortalServiceKey");
+  });
+
+  it("keeps the dedicated KMA service key server-only", () => {
+    expect(parseServerEnvironment({ KMA_VILLAGE_FORECAST_SERVICE_KEY: "kma-secret" }))
+      .toEqual({ kmaVillageForecastServiceKey: "kma-secret" });
+    expect(parsePublicEnvironment({ KMA_VILLAGE_FORECAST_SERVICE_KEY: "kma-secret" }))
+      .not.toHaveProperty("kmaVillageForecastServiceKey");
   });
 });

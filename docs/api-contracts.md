@@ -1,6 +1,6 @@
 # Shared contracts
 
-The source of truth for TypeScript shapes is `src/types/domain.ts` and `src/types/contracts.ts`. Change these and this document together.
+The source of truth for TypeScript shapes is `src/types/domain.ts`, `src/types/contracts.ts`, and `src/types/weather.ts`. Change these and this document together.
 
 | Operation | Input | Output | Owner |
 | --- | --- | --- | --- |
@@ -10,6 +10,7 @@ The source of truth for TypeScript shapes is `src/types/domain.ts` and `src/type
 | `getLocation` | string ID | `LocationDetail \| null` | Member 3 |
 | `getSimilarLocations` / `GET /api/locations/[id]/similar` | path param `id` (uuid), optional repeated `exclude` UUIDs (max 200) | `{ results: LocationSearchResult[] }`, selected and seen locations excluded, maximum 8 | Member 1 with 3 |
 | `GET /api/locations` | region/category/limit/offset, or repeated `id` (max 50) | `LocationListResponse`, bounded metadata reads | Member 3 with 2 |
+| `getLocationWeather` / `GET /api/locations/[id]/weather` | location UUID, optional offset-aware ISO 8601 `at` | `{ weather: LocationWeather }` | Member 3 |
 | `getVerifiedAuthClaims` | request-scoped Supabase auth client or `null` | verified JWT claims or `null`; never trusts `getSession()`/cookie payload alone | Member 3 with 1 |
 | `getVerifiedAuthUser` | request-scoped Supabase auth client or `null` | fresh Auth user only when verified claim subject and `getUser()` id agree, otherwise `null` | Member 3 with 1 |
 | Supabase `signUp` / `signInWithPassword` / `resend` / `signOut` | validated email and transient password in the browser; resend stores only a timestamp | Supabase Auth session/error; no application password persistence or profile row | Member 2 with 3 |
@@ -72,6 +73,19 @@ Account deletion requires an exact request `Origin` equal to the application ori
 `sortParkingByDistance` calculates straight-line distance from the location point, sorts nearest first without mutating the input, and returns `null` distance for invalid coordinates. `ParkingInfo.relationship` is the reviewed `on_site`/`nearby` classification; `locationId` is the location whose detail page owns the option and is not used to infer that classification. Each parking row carries nullable `sourceUrl`, `referenceDate`, and `lastVerifiedAt`; the UI sanitizes the URL, links the official record, and shows the verification/reference date. Nearby parking remains public/private-neutral when the official source does not distinguish it.
 
 `Location.noiseSources` contains static **expected noise sources**, never live readings, measured dB values, or a promise that noise will occur. A structured `NoiseSource` records `kind` (`railway`, `major_road`, `airport`, `construction`; `other` is reserved for legacy display), `description`, nullable straight-line `distanceMeters`, nullable `evidence`, source and license attribution, a nullable source reference date, and `lastVerifiedAt`. Reviewed new records require a distance or textual evidence plus complete HTTP(S) provenance and license fields. The Supabase mapper converts legacy string arrays and `{ kind, note }` entries to honest `other`/legacy records with null provenance; malformed structured records and duplicate source URLs are dropped with logged warnings.
+
+## `GET /api/locations/[id]/weather`
+
+Returns one KMA observation or forecast for a location. The optional `at` query parameter must be an ISO 8601 timestamp with an explicit UTC offset. Omitting it means the server's current instant. The adapter interprets every KMA base and forecast timestamp in Korea Standard Time (`UTC+09:00`) and returns ISO strings with `+09:00`.
+
+- From one hour in the past through the current instant, it selects `getUltraSrtNcst` (`purpose: "observation"`). Future requests through six hours select `getUltraSrtFcst`; later requests through four days select `getVilageFcst`. Requests outside those bounds return `VALIDATION_ERROR`.
+- The conservative publication gates are observation base `HH:00 + 10 minutes`, ultra-short base `HH:30 + 15 minutes`, and short bases `02/05/08/11/14/17/20/23:00 + 10 minutes`. Before a gate, the previous released base is used, including across Korean midnight.
+- `temperatureCelsius`, `skyCondition`, `precipitationProbabilityPercent`, `windSpeedMetersPerSecond`, and `humidityPercent` are nullable. The adapter does not derive a missing category. Observation and ultra-short responses commonly lack precipitation probability, so it remains `null` there.
+- `issuedAt` is the chosen KMA base time. Exactly one of `observedAt` and `forecastAt` is populated. `source` identifies the official 기상청 dataset, source page, and public attribution license.
+- The dedicated server-only `KMA_VILLAGE_FORECAST_SERVICE_KEY` is required. `PUBLIC_DATA_PORTAL_SERVICE_KEY` is not reused because access approval is service-specific. A missing/rejected key, upstream failure, timeout, or no-data response returns `DATA_UNAVAILABLE`; KMA quota result codes return `RATE_LIMITED` with `Retry-After`.
+- Raw provider results are cached by product, KMA grid coordinate, and base date/time only until the next publication gate. The in-memory cache is capped at 128 entries and concurrent identical misses share one request. Provider calls time out after five seconds.
+
+Successful HTTP responses use a 60-second public cache header. All failures use the shared structured error body and `no-store`. The implementation uses only server modules; mock location lookup remains key-free, while weather itself honestly returns `DATA_UNAVAILABLE` until the dedicated key is configured.
 
 `GET /api/locations/:id/similar` delegates ranking to `getSimilarLocations`, excludes the current/seen locations, returns at most eight results, and disables response caching. Mock mode filters stable synthetic category candidates before ranking; real mode uses the model-safe RPC below.
 

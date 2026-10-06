@@ -12,6 +12,7 @@ const serverEnvironmentSchema = z.object({
   SUPABASE_SECRET_KEY: optionalEnvironmentString,
   SUPABASE_SERVICE_ROLE_KEY: optionalEnvironmentString,
   PUBLIC_DATA_PORTAL_SERVICE_KEY: optionalEnvironmentString,
+  KMA_VILLAGE_FORECAST_SERVICE_KEY: optionalEnvironmentString,
 }).superRefine((environment, context) => {
   const hasUrl = Boolean(environment.SUPABASE_URL);
   const hasKey = Boolean(
@@ -42,6 +43,7 @@ export type ServerEnvironment = {
     secretKey: string;
   };
   publicDataPortalServiceKey?: string;
+  kmaVillageForecastServiceKey?: string;
 };
 
 const forbiddenPublicSecretName = /^NEXT_PUBLIC_(?=.*SUPABASE)(?=.*(?:SECRET|SERVICE_ROLE))/i;
@@ -75,6 +77,9 @@ export function parseServerEnvironment(
     }) } : {}),
     ...(result.data.PUBLIC_DATA_PORTAL_SERVICE_KEY
       ? { publicDataPortalServiceKey: result.data.PUBLIC_DATA_PORTAL_SERVICE_KEY }
+      : {}),
+    ...(result.data.KMA_VILLAGE_FORECAST_SERVICE_KEY
+      ? { kmaVillageForecastServiceKey: result.data.KMA_VILLAGE_FORECAST_SERVICE_KEY }
       : {}),
   });
 }

@@ -20,6 +20,10 @@ Offline: licensed location image → scripts/embeddings/prepare.ts
 Similar: selected location → mean of its compatible non-null image embeddings
        → cosine search excluding selected/seen locations before LIMIT → deterministic Top 8
 
+Weather: location WGS84 point → official KMA 5 km grid
+       → released observation/ultra-short/short cycle selected in Korea time
+       → bounded server cache and deduplicated KMA request → nullable weather contract
+
 Auth: signup/login UI → browser PKCE client ↔ Supabase Auth cookies
        → confirmation email → allow-listed `/auth/callback`
        → recovery email → recovery-only `/auth/recovery` → clean `/recovery`
@@ -55,6 +59,8 @@ The `users` domain owns signup/login/logout, password recovery/change, self-serv
 The shortlist remains a browser-only workflow: it stores only location IDs under a versioned `localStorage` key, synchronizes changes across cards and browser tabs, and resolves those IDs against the existing read-only location repository. It does not add authentication, server writes, or a new database contract.
 
 The browser map adapter loads the official Kakao Maps JavaScript SDK only when `NEXT_PUBLIC_KAKAO_MAP_KEY` is configured. The Kakao Developers application must register every local and production JavaScript SDK domain. Missing keys and SDK load failures preserve the no-key map preview; neither case blocks location detail or search results. The adapter receives WGS84 coordinates and display labels from the location domain and does not geocode inside the UI.
+
+The weather adapter is server-only and uses the official KMA Village Forecast service. It converts stored WGS84 coordinates with the published Lambert grid formula, evaluates base/forecast times in `Asia/Seoul`, waits for each product's publication delay, and selects observation, ultra-short, or short forecast by the requested instant. Its dedicated `KMA_VILLAGE_FORECAST_SERVICE_KEY` is optional at build time and must be approved for that exact data.go.kr service before live use. The adapter uses a five-second timeout, a capped release-bound cache, and one in-flight promise per grid/base request; it never fills missing provider categories with estimates.
 
 The Docker build uses Next.js standalone output, installs dependencies in a dedicated stage, and runs the final image as an unprivileged user. `/api/health` is the container and deployment liveness endpoint. GitHub Actions runs lint, type checking, tests, the Next.js build, image build, container smoke checks, and key-free browser E2E inside Docker. Real Vercel/Supabase/CLIP/Kakao smoke coverage is isolated in a weekly/manual single-query workflow so PR traffic cannot consume the free production quotas. Vercel's existing Git integration remains the only production deploy trigger, avoiding a duplicate CI deployment.
 
