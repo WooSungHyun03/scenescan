@@ -7,7 +7,7 @@ const DAY_MILLISECONDS = 24 * HOUR_MILLISECONDS;
 
 export const KMA_SHORT_FORECAST_BASE_HOURS = [2, 5, 8, 11, 14, 17, 20, 23] as const;
 export const KMA_PUBLICATION_DELAY_MINUTES = Object.freeze({
-  observation: 10,
+  observation: 40,
   "ultra-short-forecast": 15,
   "short-forecast": 10,
 } satisfies Record<WeatherPurpose, number>);

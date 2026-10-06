@@ -19,7 +19,7 @@ export interface WeatherSource {
   name: "기상청";
   dataset: "기상청 단기예보 조회서비스";
   sourceUrl: string;
-  license: "공공저작물 출처표시 제1유형";
+  license: "제3자 권리 포함 : 저작권 표시, 공공저작물 : 출처표시 (제 1유형)";
 }
 
 /**

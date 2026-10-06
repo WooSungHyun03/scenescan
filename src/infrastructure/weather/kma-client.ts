@@ -25,7 +25,7 @@ export const KMA_WEATHER_SOURCE: WeatherSource = Object.freeze({
   name: "기상청",
   dataset: "기상청 단기예보 조회서비스",
   sourceUrl: KMA_DATASET_URL,
-  license: "공공저작물 출처표시 제1유형",
+  license: "제3자 권리 포함 : 저작권 표시, 공공저작물 : 출처표시 (제 1유형)",
 });
 
 type KmaWeatherErrorCode =
@@ -122,6 +122,10 @@ function errorCodeFromBody(body: string): string | null {
   return xmlCode?.trim() ?? null;
 }
 
+function isSuccessfulProviderCode(code: string): boolean {
+  return code === "0" || code === "00";
+}
+
 function throwForProviderCode(code: string, message: string): never {
   if (code === "22" || code === "23") {
     throw new KmaWeatherError("QUOTA", `KMA quota rejected the request (${code}): ${message}`);
@@ -137,7 +141,9 @@ function throwForProviderCode(code: string, message: string): never {
 
 function parseItems(body: string): KmaItem[] {
   const xmlCode = errorCodeFromBody(body);
-  if (xmlCode && xmlCode !== "00") throwForProviderCode(xmlCode, "XML error response");
+  if (xmlCode && !isSuccessfulProviderCode(xmlCode)) {
+    throwForProviderCode(xmlCode, "XML error response");
+  }
 
   let parsed: unknown;
   try {
@@ -158,7 +164,7 @@ function parseItems(body: string): KmaItem[] {
   }
   const resultCode = String((header as { resultCode?: unknown }).resultCode ?? "");
   const resultMessage = String((header as { resultMsg?: unknown }).resultMsg ?? "Unknown error");
-  if (resultCode !== "00") throwForProviderCode(resultCode, resultMessage);
+  if (!isSuccessfulProviderCode(resultCode)) throwForProviderCode(resultCode, resultMessage);
 
   const bodyValue = (response as { body?: unknown }).body;
   const rawItems = bodyValue && typeof bodyValue === "object"

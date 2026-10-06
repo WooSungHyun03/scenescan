@@ -3,10 +3,10 @@ import { describe, expect, it } from "vitest";
 import { getLatestKmaBaseTime, selectWeatherPurpose } from "./kma-schedule";
 
 describe("KMA publication schedule", () => {
-  it("uses the previous observation date before the 00:00 cycle is public", () => {
-    expect(getLatestKmaBaseTime("observation", new Date("2026-10-05T15:09:59Z")))
+  it("uses the previous observation date until the official 40-minute publication delay passes", () => {
+    expect(getLatestKmaBaseTime("observation", new Date("2026-10-05T15:39:59Z")))
       .toMatchObject({ baseDate: "20261005", baseTime: "2300" });
-    expect(getLatestKmaBaseTime("observation", new Date("2026-10-05T15:10:00Z")))
+    expect(getLatestKmaBaseTime("observation", new Date("2026-10-05T15:40:00Z")))
       .toMatchObject({ baseDate: "20261006", baseTime: "0000" });
   });
 

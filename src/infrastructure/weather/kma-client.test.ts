@@ -31,7 +31,7 @@ function client(fixture: unknown, now: string, overrides: Partial<ConstructorPar
 
 describe("KmaWeatherClient", () => {
   it("maps an official observation response and leaves unavailable categories null", async () => {
-    const setup = client(observationFixture, "2026-10-06T05:20:00Z");
+    const setup = client(observationFixture, "2026-10-06T05:50:00Z");
     const weather = await setup.client.getWeather({ locationId: LOCATION_ID, point: SEOUL });
     expect(weather).toMatchObject({
       locationId: LOCATION_ID,
@@ -96,7 +96,7 @@ describe("KmaWeatherClient", () => {
     const weatherClient = new KmaWeatherClient({
       serviceKey: "key",
       fetcher: fetcher as unknown as typeof fetch,
-      now: () => new Date("2026-10-06T05:20:00Z"),
+      now: () => new Date("2026-10-06T05:50:00Z"),
       maxCacheEntries: 1,
     });
     const request = { locationId: LOCATION_ID, point: SEOUL };
@@ -117,6 +117,14 @@ describe("KmaWeatherClient", () => {
     const malformed = client({ response: { header: { resultCode: "00" } } }, "2026-10-06T05:20:00Z");
     await expect(malformed.client.getWeather({ locationId: LOCATION_ID, point: SEOUL }))
       .rejects.toMatchObject({ code: "NO_DATA" });
+  });
+
+  it("accepts both official success-code representations", async () => {
+    const numericStyle = structuredClone(observationFixture);
+    numericStyle.response.header.resultCode = "0";
+    const setup = client(numericStyle, "2026-10-06T05:50:00Z");
+    await expect(setup.client.getWeather({ locationId: LOCATION_ID, point: SEOUL }))
+      .resolves.toMatchObject({ temperatureCelsius: 21.4 });
   });
 
   it("returns explicit configuration, range, coverage and timeout errors", async () => {
