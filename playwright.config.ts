@@ -41,6 +41,7 @@ export default defineConfig({
           NEXT_PUBLIC_USE_MOCK_DATA: "true",
           NEXT_PUBLIC_USE_MOCK_AI: "true",
           NEXT_PUBLIC_KAKAO_MAP_KEY: "",
+          KMA_VILLAGE_FORECAST_SERVICE_KEY: "",
         },
       },
 });

@@ -1,6 +1,12 @@
 packages:
   - .
 
+# Pin the transitive PostCSS source-map parser above GHSA-68fv-2mgg-jv7q.
+# Keep this in the workspace config: pnpm 11 no longer reads package.json's
+# historical `pnpm.overrides` field, while pnpm 10 also supports this form.
+overrides:
+  source-map-js: 1.2.2
+
 # Single package. The only native install hook needed for offline CLIP preprocessing.
 onlyBuiltDependencies:
   - onnxruntime-node

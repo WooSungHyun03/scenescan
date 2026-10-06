@@ -11,13 +11,15 @@ if (!existsSync(bundleDirectory)) {
 const findings = findClientBundleSecretLeaks(bundleDirectory, [
   process.env.SUPABASE_SECRET_KEY ?? "",
   process.env.SUPABASE_SERVICE_ROLE_KEY ?? "",
+  process.env.KMA_VILLAGE_FORECAST_SERVICE_KEY ?? "",
+  process.env.PUBLIC_DATA_PORTAL_SERVICE_KEY ?? "",
 ]);
 
 if (findings.length > 0) {
   const summary = findings
     .map(({ file, token }) => `${file}: ${token}`)
     .join("\n");
-  throw new Error(`Server-only Supabase data found in client bundle:\n${summary}`);
+  throw new Error(`Server-only data found in client bundle:\n${summary}`);
 }
 
 console.log("Client bundle secret boundary: passed");

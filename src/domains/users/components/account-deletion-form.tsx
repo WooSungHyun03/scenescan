@@ -4,6 +4,7 @@ import { useRef, useState, useSyncExternalStore, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 
 import { Button } from "@/shared/ui/button";
+import { SHORTLIST_AUTH_RESET_EVENT } from "@/domains/locations/components/shortlist-storage";
 import {
   ACCOUNT_DELETION_CONFIRMATION,
   ACCOUNT_DELETION_CSRF_HEADER,
@@ -83,6 +84,7 @@ export function AccountDeletionForm() {
         // The response also carries Clear-Site-Data. Navigation still must
         // continue when browser storage is unavailable or blocked.
       }
+      window.dispatchEvent(new Event(SHORTLIST_AUTH_RESET_EVENT));
       router.replace("/login?accountDeleted=1");
       router.refresh();
     } catch {

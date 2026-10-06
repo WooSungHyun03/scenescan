@@ -78,6 +78,8 @@ The evaluation command compares max and top-k mean ranking at several thresholds
 
 Four path owners are defined in [team ownership](docs/team-ownership.md) and [AGENTS.md](AGENTS.md). Contribution steps are in [CONTRIBUTING.md](CONTRIBUTING.md). Production runs at [beceleb.org](https://beceleb.org) on Vercel Hobby with Cloudflare DNS; Supabase Free backs real data when enabled. The same standalone app can be built and smoke-tested with Docker. See [deployment](docs/deployment.md).
 
+배포 담당자는 migration, 환경변수, SMTP/callback, 데이터 적재, smoke, rollback을 [release checklist](docs/release-checklist.md) 순서로 확인해야 합니다. CI 성공만으로 실제 Production 배포 성공을 의미하지 않습니다.
+
 ## License
 
 Code is [MIT licensed](LICENSE). Fixture images are project-created synthetic illustrations. Third-party data and image rights are tracked separately in [DATA_LICENSES.md](DATA_LICENSES.md).

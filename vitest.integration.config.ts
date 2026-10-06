@@ -1,3 +1,4 @@
+import { fileURLToPath } from "node:url";
 import { defineConfig } from "vitest/config";
 
 // Separate from vitest.config.ts (unit) on purpose: these tests need a live
@@ -32,7 +33,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      "@": new URL("./src", import.meta.url).pathname,
+      "@": fileURLToPath(new URL("./src", import.meta.url)),
       // Every integration test that exercises the real repository layer
       // imports something that starts with `import "server-only"`
       // (src/domains/locations/server/supabase-repository.ts and
@@ -44,7 +45,7 @@ export default defineConfig({
       // exactly that: essentially every file here touches the real
       // repository, so aliasing once at the config level avoids repeating
       // the same boilerplate mock in every file.
-      "server-only": new URL("./scripts/shared/server-only-stub.ts", import.meta.url).pathname,
+      "server-only": fileURLToPath(new URL("./scripts/shared/server-only-stub.ts", import.meta.url)),
     },
   },
 });

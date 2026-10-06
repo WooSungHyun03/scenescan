@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 2,
+  "mode": "metadata-only",
+  "valid": true,
+  "summary": {
+    "totalLocations": 200,
+    "validLocations": 200,
+    "invalidLocations": 0,
+    "errorCount": 0
+  },
+  "errors": [],
+  "input": {
+    "locations": {
+      "path": "data/production/locations.json",
+      "sha256": "52a70b0c39130f8258f953356706e6cc7320968809e04b36f4e241dad9455dbc"
+    },
+    "embeddingManifest": {
+      "path": "data/production/embeddings-manifest.json",
+      "sha256": "54f5f260299d882d9ca1907e114ea9f71f1b34834e68bab7ee51544fe160ef7e"
+    },
+    "imageLicenses": {
+      "path": "data/production/image-licenses.json",
+      "sha256": "f981a9aa5efa167837af8f0f106946e66473b5a5aa45651415b3ddc179d69e51"
+    },
+    "imageRoot": null
+  }
+}

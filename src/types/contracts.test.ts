@@ -3,6 +3,8 @@ import {
   ACCOUNT_DELETION_CONFIRMATION,
   accountDeletionRequestSchema,
   searchRequestSchema,
+  shortlistMergeRequestSchema,
+  shortlistMutationRequestSchema,
 } from "./contracts";
 
 const validEmbedding = () => [1, ...new Array(511).fill(0)];
@@ -20,6 +22,21 @@ describe("searchRequestSchema", () => {
     expect(searchRequestSchema.safeParse({ embedding: nonFinite, filters: {} }).success).toBe(false);
     expect(searchRequestSchema.safeParse({ embedding: new Array(512).fill(0), filters: {} }).success)
       .toBe(false);
+  });
+});
+
+describe("shortlist request schemas", () => {
+  const locationId = "00000000-0000-4000-8000-000000000003";
+
+  it("accepts desired state and a bounded UUID merge list", () => {
+    expect(shortlistMutationRequestSchema.safeParse({ locationId, saved: true }).success).toBe(true);
+    expect(shortlistMergeRequestSchema.safeParse({ locationIds: [locationId, locationId] }).success).toBe(true);
+  });
+
+  it("rejects owner injection, malformed IDs, and oversized imports", () => {
+    expect(shortlistMutationRequestSchema.safeParse({ locationId, saved: true, userId: crypto.randomUUID() }).success).toBe(false);
+    expect(shortlistMergeRequestSchema.safeParse({ locationIds: ["deleted"] }).success).toBe(false);
+    expect(shortlistMergeRequestSchema.safeParse({ locationIds: Array.from({ length: 201 }, () => locationId) }).success).toBe(false);
   });
 });
 

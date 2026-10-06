@@ -19,7 +19,7 @@ Success is exactly `{ "deleted": true }`. The response is private/no-store, expi
 
 ## Data ownership and cascade policy
 
-SceneScan currently has no server-side user content/profile tables. The shortlist is device-local and is cleared after deletion. Public `locations`, `location_images`, and `parking` rows are catalog data, have no `auth.users` owner relationship, and are never queried or mutated by the deletion service.
+SceneScan has no profile table. The only server-side user content is `user_shortlist`, whose `user_id` references `auth.users(id) on delete cascade`; Auth deletion therefore removes those rows in the same database without a broad application cleanup query. Guest shortlist data and cooldown timestamps are cleared in the browser after confirmed deletion. Public `locations`, `location_images`, and `parking` rows are catalog data and are never queried or mutated by the deletion service.
 
 Any future user-owned table must use a non-null owner foreign key such as `owner_id uuid references auth.users(id) on delete cascade`, with RLS limiting access to `auth.uid() = owner_id`. User-owned Storage objects do not inherit Postgres cascade behavior and require a reviewed server-side cleanup step before account deletion is enabled for that feature. Do not add a broad public-table cleanup query to this endpoint.
 

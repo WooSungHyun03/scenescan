@@ -7,9 +7,10 @@ import { deleteAuthenticatedAccount } from "@/domains/users/server/account-delet
 import { getSupabaseAdminClient } from "@/infrastructure/supabase/admin-client";
 import { isSupabaseAuthCookie } from "@/infrastructure/supabase/auth-cache";
 import { createSupabaseRequestAuthClientFromCookies } from "@/infrastructure/supabase/request-auth-client";
-import { ApplicationError, dataAccessError, forbiddenError, validationError } from "@/shared/errors/application-error";
+import { ApplicationError, dataAccessError, validationError } from "@/shared/errors/application-error";
 import { apiErrorResponse } from "@/shared/http/api-error-response";
 import { applyPrivateResponseCacheHeaders } from "@/shared/http/private-cache";
+import { assertSameOriginMutation } from "@/shared/http/same-origin-mutation";
 import {
   ACCOUNT_DELETION_CSRF_HEADER,
   ACCOUNT_DELETION_CSRF_VALUE,
@@ -45,39 +46,6 @@ function applyPrivateHeaders(response: NextResponse): NextResponse {
   applyPrivateResponseCacheHeaders(response.headers);
   addVaryOrigin(response.headers);
   return response;
-}
-
-function assertSameOriginMutation(request: NextRequest): void {
-  const origin = request.headers.get("origin");
-  const fetchSite = request.headers.get("sec-fetch-site");
-  let originUrl: URL | null = null;
-  try {
-    originUrl = origin ? new URL(origin) : null;
-  } catch {
-    originUrl = null;
-  }
-  const requestHosts = [
-    request.headers.get("host"),
-    request.headers.get("x-forwarded-host")?.split(",", 1)[0]?.trim(),
-  ].filter((host): host is string => Boolean(host));
-  if (requestHosts.length === 0) requestHosts.push(request.nextUrl.host);
-  const forwardedProtocol = request.headers.get("x-forwarded-proto")?.split(",", 1)[0]?.trim();
-  const requestProtocol = forwardedProtocol === "http" || forwardedProtocol === "https"
-    ? forwardedProtocol
-    : request.nextUrl.protocol.replace(":", "");
-  if (
-    !originUrl
-    || !requestHosts.includes(originUrl.host)
-    || requestProtocol !== originUrl.protocol.replace(":", "")
-  ) {
-    throw forbiddenError("Account deletion rejected a missing or cross-origin Origin header");
-  }
-  if (fetchSite && fetchSite !== "same-origin") {
-    throw forbiddenError("Account deletion rejected a cross-site Fetch Metadata value");
-  }
-  if (request.headers.get(ACCOUNT_DELETION_CSRF_HEADER) !== ACCOUNT_DELETION_CSRF_VALUE) {
-    throw forbiddenError("Account deletion rejected a missing CSRF request header");
-  }
 }
 
 async function readDeletionRequest(request: NextRequest) {
@@ -135,7 +103,11 @@ export async function handleDeleteAccount(
   );
 
   try {
-    assertSameOriginMutation(request);
+    assertSameOriginMutation(request, {
+      csrfHeader: ACCOUNT_DELETION_CSRF_HEADER,
+      csrfValue: ACCOUNT_DELETION_CSRF_VALUE,
+      operation: "Account deletion",
+    });
     const input = await readDeletionRequest(request);
     const authClient = dependencies.createAuthClient({
       getAll: () => request.cookies.getAll(),

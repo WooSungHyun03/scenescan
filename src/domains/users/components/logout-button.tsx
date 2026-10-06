@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
+import { SHORTLIST_AUTH_RESET_EVENT } from "@/domains/locations/components/shortlist-storage";
 import { getSupabaseBrowserAuthClient } from "@/infrastructure/supabase/browser-auth-client";
 import { Button } from "@/shared/ui/button";
 import { getAuthErrorMessage } from "../services/auth-error";
@@ -27,6 +28,7 @@ export function LogoutButton() {
         setError(getAuthErrorMessage(signOutError));
         return;
       }
+      window.dispatchEvent(new Event(SHORTLIST_AUTH_RESET_EVENT));
       router.replace("/");
       router.refresh();
     } catch {

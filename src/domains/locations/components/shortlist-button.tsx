@@ -12,7 +12,7 @@ export function ShortlistButton({
   locationName: string;
   compact?: boolean;
 }) {
-  const { has, toggle, isReady, error } = useShortlist();
+  const { has, toggle, isReady, isSaving, error } = useShortlist();
   const isSaved = has(locationId);
   const actionLabel = isSaved
     ? `${locationName} 관심 장소에서 제거`
@@ -22,11 +22,11 @@ export function ShortlistButton({
     <div className={compact ? "relative z-20" : "flex flex-col items-start gap-1"}>
       <button
         type="button"
-        disabled={!isReady}
+        disabled={!isReady || isSaving}
         aria-pressed={isSaved}
         aria-label={actionLabel}
         title={actionLabel}
-        onClick={() => toggle(locationId)}
+        onClick={() => { void toggle(locationId); }}
         className={
           compact
             ? `inline-flex size-11 items-center justify-center rounded-full border shadow-sm transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-800 disabled:cursor-wait ${

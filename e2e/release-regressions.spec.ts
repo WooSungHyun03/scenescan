@@ -22,6 +22,38 @@ test("filter candidates outside the initial browse page do not short-circuit sea
   expect(errors).toEqual([]);
 });
 
+test("부산 지역 선택은 검색 요청과 결과 카드에 끝까지 유지된다", async ({ page }) => {
+  const errors = collectPageErrors(page);
+  let requestedRegion: unknown;
+  await page.route("**/api/search", async (route) => {
+    requestedRegion = route.request().postDataJSON()?.filters?.region;
+    await route.continue();
+  });
+
+  await page.goto("/search");
+  await chooseEvaluationImage(page);
+  await page.getByLabel("지역").selectOption("부산");
+  await page.getByRole("button", { name: "이 이미지로 장소 찾기" }).click();
+
+  await expect(page.getByRole("heading", { name: "추천 장소 2곳" })).toBeVisible();
+  expect(requestedRegion).toBe("부산");
+  const cards = page.locator("main article");
+  await expect(cards).toHaveCount(2);
+  for (const card of await cards.all()) await expect(card).toContainText("부산");
+  expect(errors).toEqual([]);
+});
+
+test("외부 날씨 provider 키가 없는 PR 환경은 네트워크 호출 없이 명시적으로 실패한다", async ({ request }) => {
+  const response = await request.get(
+    "/api/locations/00000000-0000-4000-8000-000000000003/weather",
+  );
+  expect(response.status()).toBe(503);
+  expect(response.headers()["cache-control"]).toContain("no-store");
+  await expect(response.json()).resolves.toMatchObject({
+    error: { code: "DATA_UNAVAILABLE" },
+  });
+});
+
 test("saved IDs are resolved explicitly and unregistered external images do not crash cards", async ({ page }) => {
   const errors = collectPageErrors(page);
   const { locations } = await (await page.request.get("/api/locations?limit=50")).json();

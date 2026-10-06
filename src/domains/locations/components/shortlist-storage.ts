@@ -1,4 +1,7 @@
 export const SHORTLIST_STORAGE_KEY = "scenescan.shortlist.location-ids.v1";
+export const SHORTLIST_CHANGE_EVENT = "scenescan:shortlist-change";
+export const SHORTLIST_ACCOUNT_SYNC_KEY = "scenescan.shortlist.account-sync.v1";
+export const SHORTLIST_AUTH_RESET_EVENT = "scenescan:shortlist-auth-reset";
 
 export function normalizeShortlistIds(value: unknown): string[] {
   if (!Array.isArray(value)) return [];

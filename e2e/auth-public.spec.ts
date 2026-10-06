@@ -15,9 +15,11 @@ test("키가 없는 공개 모드에서도 회원 화면과 보호 경계가 안
   await expect(page).toHaveURL(/\/login\?next=%2Faccount$/);
   await expect(page.getByRole("heading", { level: 1, name: "로그인" })).toBeVisible();
 
+  const loginButton = page.getByRole("button", { name: "로그인", exact: true });
+  await expect(loginButton).toBeEnabled();
   await page.getByLabel("이메일").fill("person@example.com");
   await page.getByLabel("비밀번호").fill("test-password-only");
-  await page.getByRole("button", { name: "로그인", exact: true }).click();
+  await loginButton.click();
   await expect(page.locator(".scene-status[role=alert]")).toContainText("인증 서비스가 아직 설정되지 않았습니다");
   await expect(page.getByLabel("비밀번호")).toHaveValue("");
 
@@ -26,14 +28,16 @@ test("키가 없는 공개 모드에서도 회원 화면과 보호 경계가 안
   await expect(page.getByRole("heading", { level: 1, name: "회원가입" })).toBeVisible();
 });
 
-test("callback은 외부 redirect를 허용하지 않고 만료 상태를 구분한다", async ({ page }) => {
+test("callback은 외부 redirect를 허용하지 않고 만료 상태를 구분한다", async ({ page, baseURL }) => {
   await page.goto("/auth/callback?error_code=otp_expired&next=https%3A%2F%2Fevil.example%2Fsteal");
 
   await expect(page).toHaveURL(/\/login\?error=callback_expired&next=%2Faccount%3Fconfirmed%3D1$/);
   await expect(page.locator(".scene-status[role=alert]")).toContainText("인증 링크가 만료되었거나 이미 사용되었습니다");
   const finalUrl = new URL(page.url());
-  expect(["127.0.0.1", "localhost"]).toContain(finalUrl.hostname);
-  expect(finalUrl.port).toBe("3110");
+  const expectedUrl = new URL(baseURL ?? "http://127.0.0.1:3110");
+  expect([expectedUrl.hostname, "127.0.0.1", "localhost"]).toContain(finalUrl.hostname);
+  expect(finalUrl.protocol).toBe(expectedUrl.protocol);
+  expect(finalUrl.port).toBe(expectedUrl.port);
 });
 
 test("키가 없어도 비밀번호 찾기와 recovery 보호 경계가 안전하다", async ({ page }) => {
@@ -69,6 +73,17 @@ test("키가 없는 공개 모드에서 회원탈퇴 API는 admin 경계를 열�
   expect(result.status).toBe(401);
   expect(result.body).toMatchObject({ error: { code: "UNAUTHENTICATED" } });
   expect(result.body).not.toHaveProperty("deleted");
+});
+
+test("키가 없는 공개 모드에서 관심 장소는 브라우저 저장을 유지하고 계정 API는 닫혀 있다", async ({ page }) => {
+  await page.goto("/locations/00000000-0000-4000-8000-000000000003");
+  await page.getByRole("button", { name: /물빛 산책로 관심 장소에 저장/ }).click();
+  await page.goto("/shortlist");
+  await expect(page.getByText("물빛 산책로", { exact: true })).toBeVisible();
+  await expect(page.getByText(/로그인하지 않은 관심 장소 ID는 현재 브라우저에만/)).toBeVisible();
+
+  const status = await page.evaluate(async () => (await fetch("/api/shortlist", { cache: "no-store" })).status);
+  expect(status).toBe(401);
 });
 
 for (const width of [320, 390, 768, 1440]) {

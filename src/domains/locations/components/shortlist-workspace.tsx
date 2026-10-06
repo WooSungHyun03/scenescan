@@ -31,9 +31,11 @@ function ShortlistSkeleton() {
 function ShortlistReadyContent({
   savedLocations,
   unavailableCount,
+  storageMode,
 }: {
   savedLocations: Location[];
   unavailableCount: number;
+  storageMode: "guest" | "account";
 }) {
   const [selectedIds, setSelectedIds] = useState(() =>
     savedLocations.slice(0, 4).map((location) => location.id),
@@ -60,7 +62,8 @@ function ShortlistReadyContent({
     <>
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-stone-600">
-          이 브라우저에 촬영 후보 <strong className="text-stone-900">{savedLocations.length}곳</strong>이 저장되어 있습니다.
+          {storageMode === "account" ? "내 계정에" : "이 브라우저에"} 촬영 후보{" "}
+          <strong className="text-stone-900">{savedLocations.length}곳</strong>이 저장되어 있습니다.
         </p>
         <Link
           href="/search"
@@ -119,7 +122,18 @@ function ShortlistReadyContent({
 }
 
 export function ShortlistWorkspace() {
-  const { ids, count, isReady, error } = useShortlist();
+  const {
+    ids,
+    count,
+    isReady,
+    isSaving,
+    mode,
+    pendingBrowserIds,
+    error,
+    migrationMessage,
+    importBrowserIds,
+    dismissBrowserImport,
+  } = useShortlist();
   const key = JSON.stringify(ids);
   const [loaded, setLoaded] = useState<{ key: string; locations: Location[]; error?: string }>({ key: "", locations: [] });
   useEffect(() => {
@@ -158,6 +172,40 @@ export function ShortlistWorkspace() {
 
   return (
     <div>
+      {mode === "account" && pendingBrowserIds.length > 0 && (
+        <section className="scene-panel mb-5 border-emerald-200 bg-emerald-50 p-5" aria-labelledby="shortlist-import-title">
+          <h2 id="shortlist-import-title" className="text-lg font-extrabold text-emerald-950">
+            이 브라우저의 후보를 계정에 추가할까요?
+          </h2>
+          <p className="mt-2 text-sm leading-relaxed text-emerald-950">
+            로그인 전에 저장한 후보 {pendingBrowserIds.length}곳을 계정 목록과 합칠 수 있습니다.
+            실제로 존재하는 장소만 추가하고 중복은 만들지 않습니다. 동의하기 전에는 이관하지 않습니다.
+          </p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <button
+              type="button"
+              className="inline-flex min-h-11 items-center rounded-full bg-emerald-800 px-4 py-2 text-sm font-bold text-white hover:bg-emerald-900 disabled:cursor-wait disabled:opacity-60"
+              disabled={isSaving}
+              onClick={() => { void importBrowserIds(); }}
+            >
+              {isSaving ? "계정에 추가 중…" : "계정에 추가"}
+            </button>
+            <button
+              type="button"
+              className="inline-flex min-h-11 items-center rounded-full border border-emerald-700 px-4 py-2 text-sm font-bold text-emerald-900 hover:bg-white disabled:opacity-60"
+              disabled={isSaving}
+              onClick={dismissBrowserImport}
+            >
+              나중에
+            </button>
+          </div>
+        </section>
+      )}
+
+      {migrationMessage && (
+        <p className="scene-status mb-5" data-tone="success" role="status">{migrationMessage}</p>
+      )}
+
       {error && (
         <p
           role="alert"
@@ -171,6 +219,7 @@ export function ShortlistWorkspace() {
         <ShortlistReadyContent
           savedLocations={savedLocations}
           unavailableCount={unavailableCount}
+          storageMode={mode === "account" ? "account" : "guest"}
         />
       ) : (
         <div className="scene-panel px-6 py-14 text-center">
@@ -196,8 +245,9 @@ export function ShortlistWorkspace() {
       <div className="mt-8 flex items-start gap-2 rounded-lg bg-stone-100 p-3 text-xs leading-relaxed text-stone-600">
         <MapPin size={15} className="mt-0.5 shrink-0" aria-hidden="true" />
         <p>
-          관심 장소 ID는 로그인이나 서버 저장 없이 현재 브라우저에만 보관됩니다.
-          브라우저 데이터를 삭제하면 목록도 함께 삭제됩니다.
+          {mode === "account"
+            ? "관심 장소는 현재 계정에 저장되어 다른 기기에서도 불러올 수 있습니다. 로그아웃하거나 계정이 바뀌면 이 화면의 개인 캐시는 즉시 비웁니다."
+            : "로그인하지 않은 관심 장소 ID는 현재 브라우저에만 보관됩니다. 로그인 후 동의하면 계정 목록으로 안전하게 합칠 수 있습니다."}
         </p>
       </div>
     </div>

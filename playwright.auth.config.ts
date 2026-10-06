@@ -1,5 +1,6 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { defineConfig, devices } from "@playwright/test";
 
 function readExampleEnvironment(): Record<string, string> {
@@ -19,7 +20,8 @@ const local = readExampleEnvironment();
 const baseURL = "http://127.0.0.1:3111";
 
 export default defineConfig({
-  testDir: "./e2e/auth-local",
+  testDir: fileURLToPath(new URL("./e2e/auth-local", import.meta.url)),
+  testMatch: "**/account-flow.spec.ts",
   outputDir: "output/playwright/auth-local/test-results",
   fullyParallel: false,
   retries: 0,

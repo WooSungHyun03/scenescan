@@ -4,6 +4,8 @@ import { join, relative } from "node:path";
 export const forbiddenClientBundleNames = [
   "SUPABASE_SECRET_KEY",
   "SUPABASE_SERVICE_ROLE_KEY",
+  "KMA_VILLAGE_FORECAST_SERVICE_KEY",
+  "PUBLIC_DATA_PORTAL_SERVICE_KEY",
   "NEXT_PUBLIC_SUPABASE_SECRET_KEY",
   "NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY",
 ] as const;

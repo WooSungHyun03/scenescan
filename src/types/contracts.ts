@@ -19,6 +19,14 @@ export const ACCOUNT_DELETION_CSRF_HEADER = "x-scenescan-csrf";
 export const ACCOUNT_DELETION_CSRF_VALUE = "account-delete-v1";
 export const MAX_ACCOUNT_DELETION_REQUEST_BYTES = 2 * 1024;
 
+// Authenticated shortlist writes use an idempotent desired-state contract.
+// Identity never comes from the body; the API resolves it from the verified
+// request session and RLS independently enforces the same owner boundary.
+export const SHORTLIST_WRITE_CSRF_HEADER = "x-scenescan-csrf";
+export const SHORTLIST_WRITE_CSRF_VALUE = "shortlist-write-v1";
+export const MAX_SHORTLIST_REQUEST_BYTES = 16 * 1024;
+export const SHORTLIST_IMPORT_MAX_ITEMS = 200;
+
 export const accountDeletionRequestSchema = z.object({
   currentPassword: z.string().min(8).max(72),
   confirmation: z.literal(ACCOUNT_DELETION_CONFIRMATION),
@@ -86,8 +94,30 @@ export const searchRequestSchema = z.object({
 // route.
 export const locationIdSchema = z.string().uuid();
 
+export const shortlistMutationRequestSchema = z.object({
+  locationId: locationIdSchema,
+  saved: z.boolean(),
+}).strict();
+
+export const shortlistMergeRequestSchema = z.object({
+  locationIds: z.array(locationIdSchema).max(SHORTLIST_IMPORT_MAX_ITEMS),
+}).strict();
+
+export const shortlistResponseSchema = z.object({
+  ids: z.array(locationIdSchema),
+}).strict();
+
+export const shortlistMergeResponseSchema = shortlistResponseSchema.extend({
+  mergedCount: z.number().int().nonnegative(),
+  ignoredCount: z.number().int().nonnegative(),
+}).strict();
+
 export type SearchRequest = z.infer<typeof searchRequestSchema>;
 export type AccountDeletionRequest = z.infer<typeof accountDeletionRequestSchema>;
+export type ShortlistMutationRequest = z.infer<typeof shortlistMutationRequestSchema>;
+export type ShortlistMergeRequest = z.infer<typeof shortlistMergeRequestSchema>;
+export type ShortlistResponse = z.infer<typeof shortlistResponseSchema>;
+export type ShortlistMergeResponse = z.infer<typeof shortlistMergeResponseSchema>;
 export interface AccountDeletionResponse {
   deleted: true;
 }

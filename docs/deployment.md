@@ -1,10 +1,12 @@
 # Free-tier deployment
 
+Production 적용 전에는 [release checklist](release-checklist.md)를 위에서 아래 순서대로 사용한다. 저장소 CI 성공과 실제 Vercel/Supabase/SMTP 배포 성공은 별도 판정이다.
+
 The current production topology is Vercel Hobby for the Next.js application, Supabase Free for Postgres/pgvector/Storage, and Cloudflare Free for `beceleb.org` DNS. GitHub `main` is connected directly to Vercel, so GitHub Actions validates the Docker build but does not issue a second deploy.
 
 1. Create a Supabase Free project.
 2. Enable pgvector (the migration also runs `create extension if not exists vector with schema extensions`).
-3. Apply every file in `supabase/migrations/` in timestamp order with the Supabase SQL Editor or CLI. The initial migration creates the pgvector schema and RPCs; `20260929000000_scale_location_catalog.sql` expands the nationwide region constraint and adds the partial cosine HNSW index.
+3. Apply every file in `supabase/migrations/` in timestamp order with the Supabase SQL Editor or CLI. The initial migration creates the pgvector schema and RPCs; `20260929000000_scale_location_catalog.sql` expands the nationwide region constraint and adds the partial cosine HNSW index. Account-backed shortlist writes must not be enabled until `20261006000000_user_shortlist.sql` has been applied and its owner-only RLS policies verified. Applying Production migrations remains the deployment owner's action.
 4. Run `pnpm data:upload-storage ... --dry-run` and then `--apply`. The apply command creates the public `location-images` bucket when absent, enforces a 5 MB JPEG object limit, uploads deterministic object paths, and rewrites runtime URLs. Record rights in `DATA_LICENSES.md`.
 5. Run `pnpm embeddings:audit-schema` and `pnpm data:check-attribution-links ...`, then import `data/production/locations.json` with `pnpm data:import-production ... --dry-run` and `--apply`. Use `--attribution-only` when backfilling existing rows so permit/contact and other operational columns are not replaced. Validate and import `data/production/embeddings.json` afterward. The exact commands are in `scripts/data/README.md`. Local import tools use `SUPABASE_SECRET_KEY`; production uses it only at server runtime when self-service deletion is enabled. The legacy service-role variable remains accepted during migration.
 6. Set `NEXT_PUBLIC_SUPABASE_URL` and the preferred `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (`NEXT_PUBLIC_SUPABASE_ANON_KEY` remains a temporary legacy fallback). Set both mock flags to `false` only after real data, embeddings, and keys are ready. Configure a Kakao JavaScript app key and allowed web domains for the real map.

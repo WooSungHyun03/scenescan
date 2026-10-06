@@ -50,4 +50,17 @@ describe("client bundle secret boundary", () => {
     ]);
     expect(JSON.stringify(findings)).not.toContain("server-only-sentinel");
   });
+
+  it("also rejects server-only provider key names", () => {
+    const directory = createBundle();
+    writeFileSync(
+      join(directory, "chunks", "provider.js"),
+      "KMA_VILLAGE_FORECAST_SERVICE_KEY PUBLIC_DATA_PORTAL_SERVICE_KEY",
+    );
+
+    expect(findClientBundleSecretLeaks(directory)).toEqual([
+      { file: join("chunks", "provider.js"), token: "KMA_VILLAGE_FORECAST_SERVICE_KEY" },
+      { file: join("chunks", "provider.js"), token: "PUBLIC_DATA_PORTAL_SERVICE_KEY" },
+    ]);
+  });
 });

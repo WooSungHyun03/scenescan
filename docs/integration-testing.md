@@ -34,6 +34,7 @@ Test files share one live database and run sequentially (`fileParallelism: false
 | `supabase/tests/schema-and-rls.integration.test.ts` | All three tables reachable via anon SELECT; anon INSERT rejected outright; anon UPDATE/DELETE against a real row silently no-op (row provably unchanged, read back via the service role) -- see `docs/database.md` for why these are different mechanisms; `match_location_images` executable by anon; Storage bucket RLS (anon upload denied, service upload succeeds, resulting object is publicly readable) |
 | `supabase/tests/match-location-images.integration.test.ts` | `filter_region` regression (a location outside a dominant cluster's raw top-N is still returned); `exclude_location_id` regression (a location's own dominant images don't starve its own similar-locations search); `expected_embedding_model` fail-closed (mismatched model excluded, omitted parameter matches nothing) |
 | `src/domains/locations/server/supabase-repository.integration.test.ts` | `getSupabaseLocations`/`getSupabaseLocation`/`searchSupabaseLocations`/`getSupabaseSimilarLocations` against real data, with a same-shape spot-check against the equivalent mock-repository call |
+| `supabase/tests/user-shortlist.integration.test.ts` | Two-user RLS isolation, wrong-owner rejection, duplicate/idempotent merge, deleted-location cascade, and second-device reads through the real authenticated client |
 | `scripts/data/import.integration.test.ts` | The real `runImport` CLI entry point: `--dry-run` writes nothing, `--apply` run twice with identical input does not duplicate the location or parking row |
 
 Everything above was, earlier in this project's history, verified by hand once and then discarded (ad-hoc Docker containers, curl commands, hand-signed JWTs). It's now reproducible and re-run on demand instead of trusted from memory.
@@ -42,6 +43,10 @@ Everything above was, earlier in this project's history, verified by hand once a
 
 - Full HTTP-level API tests (`POST /api/search`, `GET /api/locations/[id]/similar`) against a *running Next.js server* in real mode -- those routes were verified manually against this same kind of stack while building them (see the reports for those changes), but this suite tests at the repository layer (the boundary between this project's code and Supabase), which is the more usual integration-test scope and doesn't require booting the whole Next app inside a test run. If HTTP-level real-mode coverage becomes worth the added complexity, `supabase start`'s printed `API_URL`/keys are already exactly what a real-mode `next start` would need.
 - `scripts/embeddings/*` (Member 1's pipeline) -- out of scope for this backend-owned suite.
+
+## CI boundary
+
+`.github/workflows/ci.yml` starts this stack in the `Local Auth, Mailpit, and RLS` job for pull requests and `main` pushes. The job loads only `.env.integration.example` loopback defaults, applies all migrations, runs this integration suite, and then runs the local Auth/Mailpit browser flow. It never reads repository Production secrets, sends real email, calls the KMA provider, runs real CLIP inference, or targets a hosted Supabase project. The stack is stopped with `--no-backup` even after a failure, and browser diagnostics are uploaded only on failure.
 
 ## 마지막 확인
 

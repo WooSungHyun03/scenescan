@@ -1,6 +1,20 @@
 import { expect, test, type APIRequestContext } from "@playwright/test";
+import {
+  cleanupShortlistFixtures,
+  createConfirmedTestUser,
+  seedShortlistLocations,
+} from "./supabase-test-admin.ts";
 
 const mailpitBaseUrl = "http://127.0.0.1:54324";
+const shortlistLocationIds = [
+  "00000000-0000-4000-8000-000000000003",
+  "00000000-0000-4000-8000-000000000007",
+] as const;
+const cleanupUserIds: string[] = [];
+
+test.afterEach(async ({ request }) => {
+  await cleanupShortlistFixtures(request, shortlistLocationIds, cleanupUserIds.splice(0));
+});
 
 async function waitForLatestAuthUrl(request: APIRequestContext, email: string): Promise<string> {
   const query = encodeURIComponent(`to:${email}`);
@@ -18,11 +32,16 @@ async function waitForLatestAuthUrl(request: APIRequestContext, email: string): 
   return match[1].replaceAll("&amp;", "&");
 }
 
-test("가입·확인·로그인·recovery·재인증 비밀번호 변경이 안전하게 이어진다", async ({ page, context, request }) => {
+test("Auth 전체 흐름과 계정별 관심 장소가 안전하게 이어진다", async ({ page, context, request }) => {
   const email = `scenescan-${Date.now()}-${Math.random().toString(36).slice(2)}@example.test`;
   const password = `SceneScan-${crypto.randomUUID()}!`;
   const recoveredPassword = `Recovered-${crypto.randomUUID()}!`;
   const finalPassword = `Final-${crypto.randomUUID()}!`;
+  const secondEmail = `scenescan-second-${Date.now()}-${Math.random().toString(36).slice(2)}@example.test`;
+  const secondPassword = `Second-${crypto.randomUUID()}!`;
+
+  await seedShortlistLocations(request, shortlistLocationIds);
+  cleanupUserIds.push(await createConfirmedTestUser(request, secondEmail, secondPassword));
 
   await page.goto("/signup");
   await page.getByLabel("이메일").fill(email);
@@ -115,6 +134,48 @@ test("가입·확인·로그인·recovery·재인증 비밀번호 변경이 안�
   await page.getByLabel("비밀번호").fill(finalPassword);
   await page.getByRole("button", { name: "로그인", exact: true }).click();
   await expect(page).toHaveURL(/\/account$/);
+
+  await page.evaluate((locationId) => {
+    window.localStorage.setItem("scenescan.shortlist.location-ids.v1", JSON.stringify([locationId]));
+    window.dispatchEvent(new CustomEvent("scenescan:shortlist-change", { detail: [locationId] }));
+  }, shortlistLocationIds[0]);
+  await page.goto("/shortlist");
+  await expect(page.getByRole("heading", { name: "이 브라우저의 후보를 계정에 추가할까요?" })).toBeVisible();
+  await page.getByRole("button", { name: "계정에 추가", exact: true }).click();
+  await expect(page.getByRole("status")).toContainText("계정 관심 장소에 추가");
+  await expect(page.getByText("물빛 산책로", { exact: true })).toBeVisible();
+
+  await secondTab.goto("/shortlist");
+  await expect(secondTab.getByText("물빛 산책로", { exact: true })).toBeVisible();
+
+  await page.goto("/account");
+  await page.getByRole("button", { name: "로그아웃", exact: true }).click();
+  await page.goto("/login");
+  await page.getByLabel("이메일").fill(secondEmail);
+  await page.getByLabel("비밀번호").fill(secondPassword);
+  await page.getByRole("button", { name: "로그인", exact: true }).click();
+  await page.goto("/shortlist");
+  await expect(page.getByText("물빛 산책로", { exact: true })).toHaveCount(0);
+  await expect(page.getByRole("heading", { name: "이 브라우저의 후보를 계정에 추가할까요?" })).toHaveCount(0);
+
+  await page.goto(`/locations/${shortlistLocationIds[1]}`);
+  const saveResponse = page.waitForResponse((response) => (
+    response.url().endsWith("/api/shortlist") && response.request().method() === "PUT"
+  ));
+  await page.getByRole("button", { name: /파란 작업장 관심 장소에 저장/ }).click();
+  await expect((await saveResponse).ok()).toBe(true);
+  await page.goto("/shortlist");
+  await expect(page.getByText("파란 작업장", { exact: true })).toBeVisible();
+
+  await page.goto("/account");
+  await page.getByRole("button", { name: "로그아웃", exact: true }).click();
+  await page.goto("/login");
+  await page.getByLabel("이메일").fill(email);
+  await page.getByLabel("비밀번호").fill(finalPassword);
+  await page.getByRole("button", { name: "로그인", exact: true }).click();
+  await page.goto("/shortlist");
+  await expect(page.getByText("물빛 산책로", { exact: true })).toBeVisible();
+  await expect(page.getByText("파란 작업장", { exact: true })).toHaveCount(0);
 
   await page.evaluate(() => {
     window.localStorage.setItem(
