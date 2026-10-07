@@ -17,7 +17,10 @@ const emailOtpTypes = new Set<EmailOtpType>([
 ]);
 
 function setRedirect(response: NextResponse, request: NextRequest, destination: string): NextResponse {
-  response.headers.set("Location", new URL(destination, request.url).toString());
+  // A relative Location preserves the browser's origin even when standalone
+  // Next.js constructs request.url from its internal 0.0.0.0 listen address.
+  const target = new URL(destination, request.url);
+  response.headers.set("Location", `${target.pathname}${target.search}`);
   applyPrivateResponseCacheHeaders(response.headers);
   return response;
 }

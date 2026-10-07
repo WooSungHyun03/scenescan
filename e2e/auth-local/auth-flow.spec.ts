@@ -55,8 +55,10 @@ test("Auth 전체 흐름과 계정별 관심 장소가 안전하게 이어진다
   await expect(page.getByLabel("비밀번호 확인")).toHaveValue("");
 
   await page.getByRole("link", { name: "로그인", exact: true }).last().click();
+  await expect(page).toHaveURL(/\/login(?:\?|$)/);
+  await expect(page.getByRole("heading", { level: 1, name: "로그인", exact: true })).toBeVisible();
   await page.getByLabel("이메일").fill(email);
-  await page.getByLabel("비밀번호").fill(password);
+  await page.getByLabel("비밀번호", { exact: true }).fill(password);
   await page.getByRole("button", { name: "로그인", exact: true }).click();
   await expect(page.locator(".scene-status[role=alert]")).toContainText("이메일 확인이 필요합니다");
   await expect(page.getByRole("button", { name: /초 후 다시 보내기/ })).toBeDisabled();

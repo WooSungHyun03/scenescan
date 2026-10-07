@@ -10,7 +10,9 @@ import { applyPrivateResponseCacheHeaders } from "@/shared/http/private-cache";
 const recoveryOtpTypes = new Set<EmailOtpType>(["recovery"]);
 
 function redirect(request: NextRequest, response: NextResponse, destination: string): NextResponse {
-  response.headers.set("Location", new URL(destination, request.url).toString());
+  // Keep callbacks on the browser's origin, not the container listen address.
+  const target = new URL(destination, request.url);
+  response.headers.set("Location", `${target.pathname}${target.search}`);
   applyPrivateResponseCacheHeaders(response.headers);
   return response;
 }

@@ -35,3 +35,15 @@ For a production-like local run, copy `.env.example` to an ignored `.env.local` 
 Email/password Auth and recovery are implemented, but production delivery is deliberately not configured in source. In Supabase Auth settings, enable email signup and confirmation, set the production Site URL, allow exactly `https://<production-domain>/auth/callback` and `https://<production-domain>/auth/recovery` (plus only intentional preview URLs), configure production SMTP/templates, and keep the resend interval at least 60 seconds. Use the committed Korean templates with `{{ .ConfirmationURL }}` intact. For browser Auth, provide `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (or the legacy public anon key), redeploy, then manually verify signup, recovery, password-change notification, and new-password login on the production domain. Never add `SUPABASE_SECRET_KEY` to Vercel's browser/public variables; it may only exist as the separate server runtime variable described below. Search and location detail remain public when Auth is absent; protected account/recovery pages redirect safely. The exact callback, SMTP, DNS, session, and local Mailpit checklist is in [Auth email setup](auth-email-setup.md).
 
 Self-service account deletion additionally requires server-only `SUPABASE_URL` and `SUPABASE_SECRET_KEY` (or legacy `SUPABASE_SERVICE_ROLE_KEY`) in the Production environment. These values enable only the protected server endpoint and must never be prefixed `NEXT_PUBLIC_`. After registration and redeployment, perform the production smoke sequence in [Account deletion](account-deletion.md); the repository does not modify Vercel or Supabase Dashboard settings automatically.
+
+## CI callback regression (2026-10-07)
+
+Vercel deployment and GitHub CI are independent checks. The October 6 main
+deployment succeeded, while Docker public-Auth and local-Auth E2E failed.
+Auth callback/recovery responses now use internal relative `Location` headers:
+standalone Next.js can construct `request.url` from `0.0.0.0`, which must never
+replace the browser's public origin. Redirect allow-lists, cookies and private
+cache headers remain unchanged; forwarded host headers are not trusted.
+The local signup-to-login test waits for the destination URL and heading before
+filling its exact password label. Do not fix these regressions by allowing
+`0.0.0.0` origins, removing security assertions, or skipping Auth tests.

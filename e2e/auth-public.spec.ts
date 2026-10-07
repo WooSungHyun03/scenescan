@@ -35,9 +35,7 @@ test("callback은 외부 redirect를 허용하지 않고 만료 상태를 구분
   await expect(page.locator(".scene-status[role=alert]")).toContainText("인증 링크가 만료되었거나 이미 사용되었습니다");
   const finalUrl = new URL(page.url());
   const expectedUrl = new URL(baseURL ?? "http://127.0.0.1:3110");
-  expect([expectedUrl.hostname, "127.0.0.1", "localhost"]).toContain(finalUrl.hostname);
-  expect(finalUrl.protocol).toBe(expectedUrl.protocol);
-  expect(finalUrl.port).toBe(expectedUrl.port);
+  expect(finalUrl.origin).toBe(expectedUrl.origin);
 });
 
 test("키가 없어도 비밀번호 찾기와 recovery 보호 경계가 안전하다", async ({ page }) => {

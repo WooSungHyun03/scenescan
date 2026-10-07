@@ -23,6 +23,16 @@ describe("GET /auth/callback", () => {
     createClient.mockReset();
   });
 
+  it("keeps Docker callbacks relative and ignores spoofed forwarded hosts", async () => {
+    createClient.mockReturnValue(authClient());
+    const response = await GET(new NextRequest(
+      "http://0.0.0.0:3000/auth/callback?code=x&next=%2Fsearch",
+      { headers: { host: "localhost:3000", "x-forwarded-host": "evil.example" } },
+    ));
+    expect(response.status).toBe(307);
+    expect(response.headers.get("Location")).toBe("/search");
+  });
+
   it("exchanges a PKCE code, preserves Set-Cookie, and redirects internally", async () => {
     const client = authClient();
     createClient.mockImplementation((cookies) => {
@@ -35,7 +45,7 @@ describe("GET /auth/callback", () => {
     ));
 
     expect(client.auth.exchangeCodeForSession).toHaveBeenCalledWith("one-time-code", { flowId: "flow-a" });
-    expect(response.headers.get("Location")).toBe("https://scenescan.example/search");
+    expect(response.headers.get("Location")).toBe("/search");
     expect(response.cookies.get("sb-project-auth-token")?.value).toBe("verified");
     expect(response.headers.get("Cache-Control")).toContain("private");
     expect(response.headers.get("Vary")).toContain("Cookie");
@@ -50,7 +60,7 @@ describe("GET /auth/callback", () => {
     ));
 
     expect(client.auth.verifyOtp).toHaveBeenCalledWith({ token_hash: "hash", type: "email" });
-    expect(response.headers.get("Location")).toBe("https://scenescan.example/account?confirmed=1");
+    expect(response.headers.get("Location")).toBe("/account?confirmed=1");
   });
 
   it.each([
@@ -66,7 +76,7 @@ describe("GET /auth/callback", () => {
 
     const response = await GET(new NextRequest(url));
 
-    expect(response.headers.get("Location")).toBe("https://scenescan.example/account?confirmed=1");
+    expect(response.headers.get("Location")).toBe("/account?confirmed=1");
   });
 
   it("distinguishes an expired callback without exposing provider details", async () => {
@@ -82,7 +92,7 @@ describe("GET /auth/callback", () => {
     ));
 
     expect(response.headers.get("Location")).toBe(
-      "https://scenescan.example/login?error=callback_expired&next=%2Faccount",
+      "/login?error=callback_expired&next=%2Faccount",
     );
     expect(response.headers.get("Location")).not.toContain("sensitive");
   });
