@@ -15,7 +15,7 @@ function baseRow(overrides: Partial<LocationRow> = {}): LocationRow {
     name: "테스트 장소",
     description: "설명",
     category: "urban",
-    region: "서울",
+    region: "부산",
     address: "주소",
     latitude: 37.5,
     longitude: 127.0,
@@ -96,6 +96,26 @@ describe("toLocation", () => {
       referenceDate: "2026-01-01",
       lastVerifiedAt: "2026-10-03T03:00:00Z",
     });
+  });
+
+  it("maps a recognized district value", () => {
+    const { location, warnings } = toLocation(baseRow({ district: "busan_haeundae_gu" }));
+    expect(location.district).toBe("busan_haeundae_gu");
+    expect(warnings).toEqual([]);
+  });
+
+  it("treats a missing district column (pre-migration rollout) as null, not a warning", () => {
+    const row = baseRow();
+    delete (row as Record<string, unknown>).district;
+    const { location, warnings } = toLocation(row);
+    expect(location.district).toBeNull();
+    expect(warnings).toEqual([]);
+  });
+
+  it("drops an unrecognized district value and reports a warning instead of inventing one", () => {
+    const { location, warnings } = toLocation(baseRow({ district: "서울_중구" }));
+    expect(location.district).toBeNull();
+    expect(warnings).toEqual([{ field: "district", reason: "unrecognized district value", value: "서울_중구" }]);
   });
 
   it("returns an empty images array with no warnings when location_images is null", () => {
@@ -196,7 +216,7 @@ describe("parseLocationRows / parseLocationRow (locations select response valida
   // These schemas must accept that shape too, not just the full one.
   function legacyRow(overrides: Record<string, unknown> = {}) {
     return {
-      id: "loc-1", name: "테스트 장소", description: "설명", category: "urban", region: "서울",
+      id: "loc-1", name: "테스트 장소", description: "설명", category: "urban", region: "부산",
       address: "주소", latitude: 37.5, longitude: 127.0, permit_type: "정보 확인 필요",
       contact_name: null, contact_phone: null, permit_note: null, noise_sources: null, source_url: null,
       location_images: [{ id: "img-1", image_url: "https://example.com/a.jpg", alt: null }],

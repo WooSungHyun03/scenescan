@@ -3,14 +3,15 @@ import { resolve } from "node:path";
 import { z } from "zod";
 import { parseCollectionManifest, fetchCommonsMetadataSettled } from "./collect-commons.ts";
 import { deterministicUuid, parseReviewDecisions, selectCoverageCandidates, type ReadyCandidate } from "./discover-wikidata.ts";
-import { LOCATION_CATEGORY_VALUES, REGION_VALUES } from "../../src/types/location-options.ts";
+import { LOCATION_CATEGORY_VALUES } from "../../src/types/location-options.ts";
+import { KOREA_REGION_VALUES } from "./contracts.ts";
 
 // Promote explicit review decisions without repeating seventeen expensive
 // SPARQL queries. Coordinates and source images are rechecked with the official
 // entity API; the Commons collector remains the final license/download gate.
 const reviewSchema = z.object({ review_queue: z.array(z.object({
   qid: z.string().regex(/^Q\d+$/), name: z.string().min(1),
-  regions: z.array(z.enum(REGION_VALUES)).min(1),
+  regions: z.array(z.enum(KOREA_REGION_VALUES)).min(1),
   categories: z.array(z.enum(LOCATION_CATEGORY_VALUES)).min(1),
   addressesByRegion: z.record(z.string(), z.string()),
   latitude: z.number().finite(), longitude: z.number().finite(),

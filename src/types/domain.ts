@@ -1,7 +1,10 @@
-import type { LOCATION_CATEGORY_VALUES, REGION_VALUES } from "./location-options";
+import type { DISTRICT_VALUES, LOCATION_CATEGORY_VALUES, REGION_VALUES } from "./location-options";
 
 export type LocationCategory = (typeof LOCATION_CATEGORY_VALUES)[number];
+// DEPRECATED: see the REGION_VALUES comment in location-options.ts. Always
+// "부산" for the length of the Busan-district transition.
 export type Region = (typeof REGION_VALUES)[number];
+export type District = (typeof DISTRICT_VALUES)[number];
 
 export interface GeoPoint {
   latitude: number;
@@ -79,7 +82,16 @@ export interface Location extends SourceMetadata {
   name: string;
   description: string;
   category: LocationCategory;
+  // DEPRECATED: see the REGION_VALUES comment in location-options.ts. Always
+  // "부산" for the length of the transition; `district` is the real scope.
   region: Region;
+  // null means the location's 구/군 could not be confirmed from its address
+  // (see docs/database.md) -- it is deliberately never guessed. A null-district
+  // location is included in an unfiltered ("부산 전체") listing/search but is
+  // excluded whenever a caller filters by a specific district, the same
+  // null-means-unrestricted convention match_location_images_filtered already
+  // uses for filter_region/filter_category (docs/search-ranking.md).
+  district: District | null;
   address: string;
   point: GeoPoint;
   images: LocationImage[];
@@ -90,7 +102,10 @@ export interface Location extends SourceMetadata {
 
 export type LocationDetail = Location;
 export interface LocationFilter {
+  // DEPRECATED, kept only for the transition -- see the REGION_VALUES
+  // comment in location-options.ts. `district` is the real filter now.
   region?: Region;
+  district?: District;
   category?: LocationCategory;
 }
 

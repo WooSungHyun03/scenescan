@@ -15,7 +15,7 @@ vi.mock("@/shared/observability/logger", () => ({
   logger: { warn: (...args: unknown[]) => loggerWarnMock(...args), error: vi.fn(), info: vi.fn() },
 }));
 
-const { getSupabaseLocation, getSupabaseLocations, getSupabaseSimilarLocations, searchSupabaseLocations } = await import("./supabase-repository");
+const { getSupabaseLocation, getSupabaseLocations, getSupabaseLocationsByIds, getSupabaseSimilarLocations, searchSupabaseLocations } = await import("./supabase-repository");
 
 type QueryResult = { data: unknown; error: { message: string; code?: string } | null };
 
@@ -75,7 +75,7 @@ function fakeClient(options: { query?: QueryResult | QueryResult[]; rpc?: QueryR
 
 function locationRow(overrides: Record<string, unknown> = {}) {
   return {
-    id: "loc-1", name: "테스트 장소", description: "설명", category: "urban", region: "서울",
+    id: "loc-1", name: "테스트 장소", description: "설명", category: "urban", region: "부산",
     address: "주소", latitude: 37.5, longitude: 127.0, permit_type: "정보 확인 필요",
     contact_name: null, contact_phone: null, permit_note: null, noise_sources: null, source_url: null,
     location_images: [{ id: "img-1", image_url: "https://example.com/a.jpg", alt: null }],
@@ -119,14 +119,38 @@ describe("SupabaseLocationRepository / MockLocationRepository contract parity", 
     expect(queryStub.calls.find((call) => call.method === "range")?.args).toEqual([0, 19]);
   });
 
-  it("getLocations: region/category filters are applied via .eq(), matching LocationFilter semantics", async () => {
-    expect(getMockLocations({ region: "부산" }).every((item) => item.region === "부산")).toBe(true);
+  it("getLocations: district/category filters are applied via .eq(), matching LocationFilter semantics", async () => {
+    expect(getMockLocations({ district: "busan_haeundae_gu" }).every((item) => item.district === "busan_haeundae_gu")).toBe(true);
 
     const { client, queryStub } = fakeClient({ query: { data: [], error: null } });
     getSupabaseClientMock.mockReturnValue(client);
-    await getSupabaseLocations({ region: "부산", category: "urban" });
+    await getSupabaseLocations({ district: "busan_haeundae_gu", category: "urban" });
     const eqCalls = queryStub.calls.filter((call) => call.method === "eq").map((call) => call.args);
-    expect(eqCalls).toEqual([["region", "부산"], ["category", "urban"]]);
+    expect(eqCalls).toEqual([["region", "부산"], ["district", "busan_haeundae_gu"], ["category", "urban"]]);
+  });
+
+  it("getLocations: enforces Busan scope even when no filter is requested at all -- not just when the client happens to ask for 부산", async () => {
+    const { client, queryStub } = fakeClient({ query: { data: [], error: null } });
+    getSupabaseClientMock.mockReturnValue(client);
+    await getSupabaseLocations();
+    const eqCalls = queryStub.calls.filter((call) => call.method === "eq").map((call) => call.args);
+    expect(eqCalls).toEqual([["region", "부산"]]);
+  });
+
+  it("getLocation: enforces Busan scope -- a non-Busan id behaves exactly like a missing one (null, not an error)", async () => {
+    const { client, queryStub } = fakeClient({ query: { data: null, error: null } });
+    getSupabaseClientMock.mockReturnValue(client);
+    expect(await getSupabaseLocation("non-busan-id")).toBeNull();
+    const eqCalls = queryStub.calls.filter((call) => call.method === "eq").map((call) => call.args);
+    expect(eqCalls).toEqual([["id", "non-busan-id"], ["region", "부산"]]);
+  });
+
+  it("getLocationsByIds: enforces Busan scope on explicit ?id= lookups too", async () => {
+    const { client, queryStub } = fakeClient({ query: { data: [], error: null } });
+    getSupabaseClientMock.mockReturnValue(client);
+    await getSupabaseLocationsByIds(["some-id"]);
+    const eqCalls = queryStub.calls.filter((call) => call.method === "eq").map((call) => call.args);
+    expect(eqCalls).toEqual([["region", "부산"]]);
   });
 
   it("getLocations: clamps an oversized limit to the server max (50) and a negative offset to 0", async () => {
@@ -240,16 +264,18 @@ describe("SupabaseLocationRepository / MockLocationRepository contract parity", 
     const rpcCall = rpcStub.calls.find((call) => call.method === "rpc")?.args as [string, Record<string, unknown>];
     expect(rpcCall[1].expected_embedding_model).toBe("Xenova/clip-vit-base-patch32@main");
     // Metadata is loaded by the exact IDs the RPC returned, not by
-    // re-applying a region/category filter -- there is no app-side
-    // eligibility filter left to bypass.
+    // re-applying a category/district filter -- there is no app-side
+    // eligibility filter left to bypass. The one eq() call left is the
+    // unconditional Busan-scope safety net (BUSAN_REGION), not a client
+    // filter re-application.
     expect(queryStub.calls.find((call) => call.method === "in")?.args).toEqual(["id", [locationId]]);
-    expect(queryStub.calls.some((call) => call.method === "eq")).toBe(false);
+    expect(queryStub.calls.filter((call) => call.method === "eq").map((call) => call.args)).toEqual([["region", "부산"]]);
   });
 
-  it("search: calls match_location_images_filtered (not the raw match_location_images) with region/category/threshold/model as SQL parameters", async () => {
+  it("search: calls match_location_images_filtered (not the raw match_location_images) with region/category/threshold/model/district as SQL parameters", async () => {
     const { client, rpcStub } = fakeClient({ query: { data: [], error: null }, rpc: { data: [], error: null } });
     getSupabaseClientMock.mockReturnValue(client);
-    await searchSupabaseLocations(Array(512).fill(0), { region: "부산", category: "nature" }, { threshold: 0.4 });
+    await searchSupabaseLocations(Array(512).fill(0), { category: "nature", district: "busan_haeundae_gu" }, { threshold: 0.4 });
     const rpcCall = rpcStub.calls.find((call) => call.method === "rpc")?.args as [string, Record<string, unknown>];
     expect(rpcCall[0]).toBe("match_location_images_filtered");
     expect(rpcCall[1]).toEqual({
@@ -259,15 +285,24 @@ describe("SupabaseLocationRepository / MockLocationRepository contract parity", 
       match_threshold: 0.4,
       match_count: 8,
       expected_embedding_model: "Xenova/clip-vit-base-patch32@main",
+      filter_district: "busan_haeundae_gu",
     });
   });
 
-  it("search: an omitted filter/threshold falls back to the documented server defaults", async () => {
+  it("search: an omitted filter/threshold falls back to the documented server defaults, but always enforces Busan scope", async () => {
     const { client, rpcStub } = fakeClient({ query: { data: [], error: null }, rpc: { data: [], error: null } });
     getSupabaseClientMock.mockReturnValue(client);
     await searchSupabaseLocations(Array(512).fill(0));
     const rpcCall = rpcStub.calls.find((call) => call.method === "rpc")?.args as [string, Record<string, unknown>];
-    expect(rpcCall[1]).toMatchObject({ filter_region: null, filter_category: null, match_threshold: 0, match_count: 8 });
+    expect(rpcCall[1]).toMatchObject({ filter_region: "부산", filter_category: null, filter_district: null, match_threshold: 0, match_count: 8 });
+  });
+
+  it("search: ignores a client-supplied region filter -- Busan scope is always enforced server-side, not passed through", async () => {
+    const { client, rpcStub } = fakeClient({ query: { data: [], error: null }, rpc: { data: [], error: null } });
+    getSupabaseClientMock.mockReturnValue(client);
+    await searchSupabaseLocations(Array(512).fill(0), { region: "부산" });
+    const rpcCall = rpcStub.calls.find((call) => call.method === "rpc")?.args as [string, Record<string, unknown>];
+    expect(rpcCall[1].filter_region).toBe("부산");
   });
 
   it("search: avoids loading any location metadata for an empty result", async () => {
@@ -301,17 +336,25 @@ describe("SupabaseLocationRepository / MockLocationRepository contract parity", 
     expect(calls[0][0]).toBe("match_location_images_filtered");
     expect(calls[1]).toEqual(["match_location_images", {
       query_embedding: Array(512).fill(0), match_threshold: 0, match_count: 200,
+      filter_region: "부산",
       expected_embedding_model: "Xenova/clip-vit-base-patch32@main",
     }]);
   });
 
-  it("search: does not silently fall back to the unfiltered legacy RPC when a region/category filter was requested", async () => {
+  it("search: does not silently fall back to the unfiltered legacy RPC when a category/district filter was requested -- it can't honor either", async () => {
     const { client, rpcStub } = fakeClient({
       rpc: { data: null, error: { code: "PGRST202", message: "Could not find the function public.match_location_images_filtered" } },
     });
     getSupabaseClientMock.mockReturnValue(client);
-    await expect(searchSupabaseLocations(Array(512).fill(0), { region: "부산" })).rejects.toMatchObject({ code: "DATA_UNAVAILABLE", status: 503 });
+    await expect(searchSupabaseLocations(Array(512).fill(0), { category: "urban" })).rejects.toMatchObject({ code: "DATA_UNAVAILABLE", status: 503 });
     expect(rpcStub.calls.filter((call) => call.method === "rpc")).toHaveLength(1);
+
+    const districtAttempt = fakeClient({
+      rpc: { data: null, error: { code: "PGRST202", message: "Could not find the function public.match_location_images_filtered" } },
+    });
+    getSupabaseClientMock.mockReturnValue(districtAttempt.client);
+    await expect(searchSupabaseLocations(Array(512).fill(0), { district: "busan_haeundae_gu" })).rejects.toMatchObject({ code: "DATA_UNAVAILABLE", status: 503 });
+    expect(districtAttempt.rpcStub.calls.filter((call) => call.method === "rpc")).toHaveLength(1);
   });
 
   it("search/similar: getSupabaseLocationsByIds's row order does not affect the final result order -- similarity does", async () => {
@@ -351,10 +394,10 @@ describe("SupabaseLocationRepository / MockLocationRepository contract parity", 
         { data: [], error: null },
       ] });
       getSupabaseClientMock.mockReturnValue(client);
-      await expect(searchSupabaseLocations(Array(512).fill(0), { region: "제주", category: "nature" })).resolves.toEqual([]);
+      await expect(searchSupabaseLocations(Array(512).fill(0), { category: "nature" })).resolves.toEqual([]);
       const calls = rpcStub.calls.filter((call) => call.method === "rpc");
       expect(calls).toHaveLength(2);
-      expect(calls[1].args).toEqual(["match_location_images_filtered", { query_embedding: Array(512).fill(0), match_threshold: 0, match_count: 8, filter_region: "제주", filter_category: "nature" }]);
+      expect(calls[1].args).toEqual(["match_location_images_filtered", { query_embedding: Array(512).fill(0), match_threshold: 0, match_count: 8, filter_region: "부산", filter_category: "nature" }]);
     });
     // getSupabaseSimilarLocations delegates embedding selection (the mean of
     // all of a location's image embeddings) and self-exclusion/grouping to
@@ -376,7 +419,14 @@ describe("SupabaseLocationRepository / MockLocationRepository contract parity", 
       expect(results.map((result) => result.location.id)).toEqual([otherId]);
       const rpcCall = rpcStub.calls.find((call) => call.method === "rpc")?.args as [string, Record<string, unknown>];
       expect(rpcCall[0]).toBe("match_similar_locations_filtered");
-      expect(rpcCall[1]).toEqual({ source_location_id: targetId, match_threshold: 0, match_count: 8, expected_embedding_model: "Xenova/clip-vit-base-patch32@main", excluded_location_ids: [] });
+      expect(rpcCall[1]).toEqual({
+        source_location_id: targetId, match_threshold: 0, match_count: 8,
+        expected_embedding_model: "Xenova/clip-vit-base-patch32@main", excluded_location_ids: [],
+        // Busan scope is always enforced for similar-locations too (see
+        // BUSAN_REGION in supabase-repository.ts); no district filter is
+        // exposed on this endpoint today, so it stays unrestricted.
+        filter_region: "부산", filter_district: null,
+      });
       // The metadata lookup is by the exact matched + source ids (via
       // getSupabaseLocationsByIds's .in()), never a plain/paginated
       // getSupabaseLocations() call -- see the comment in

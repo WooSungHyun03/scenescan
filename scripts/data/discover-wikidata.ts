@@ -3,8 +3,9 @@ import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { z } from "zod";
-import type { LocationCategory, Region } from "../../src/types/domain.ts";
-import { LOCATION_CATEGORY_VALUES, REGION_VALUES } from "../../src/types/location-options.ts";
+import type { LocationCategory } from "../../src/types/domain.ts";
+import { LOCATION_CATEGORY_VALUES } from "../../src/types/location-options.ts";
+import { KOREA_REGION_VALUES, type KoreaRegion } from "./contracts.ts";
 import {
   fetchCommonsMetadataSettled,
   parseCollectionManifest,
@@ -22,7 +23,7 @@ const WIKIDATA_SPARQL = "https://query.wikidata.org/sparql";
 const USER_AGENT = "SceneScan/0.1 (open-source location dataset; https://github.com/WooSungHyun03/scenescan)";
 const DATASET_NAMESPACE = "ca26f0ab-6294-4fbf-8c7f-d758c2cb66b4";
 
-export const WIKIDATA_REGIONS: ReadonlyArray<{ id: string; region: Region }> = [
+export const WIKIDATA_REGIONS: ReadonlyArray<{ id: string; region: KoreaRegion }> = [
   { id: "Q8684", region: "서울" },
   { id: "Q16520", region: "부산" },
   { id: "Q20927", region: "대구" },
@@ -67,7 +68,7 @@ const MANUAL_REVIEW_CASES = [
   { kind: "waterfall", pattern: /(폭포|waterfall)/i },
   { kind: "trail", pattern: /(탐방로|산책로|둘레길|trail)/i },
 ] as const;
-const REGION_ADDRESS_MARKERS: Record<Region, readonly string[]> = {
+const REGION_ADDRESS_MARKERS: Record<KoreaRegion, readonly string[]> = {
   서울: ["서울", "Seoul"], 부산: ["부산", "Busan"], 대구: ["대구", "Daegu"],
   인천: ["인천", "Incheon"], 광주: ["광주", "Gwangju"], 대전: ["대전", "Daejeon"],
   울산: ["울산", "Ulsan"], 세종: ["세종", "Sejong"], 경기: ["경기", "Gyeonggi"],
@@ -107,15 +108,15 @@ export type Candidate = {
   qid: string;
   name: string;
   description: string;
-  region: Region;
+  region: KoreaRegion;
   address: string;
   latitude: number;
   longitude: number;
   categories: Set<LocationCategory>;
   imageTitles: Set<string>;
   typeLabels: Set<string>;
-  matchedRegions: Set<Region>;
-  addressesByRegion: Partial<Record<Region, string>>;
+  matchedRegions: Set<KoreaRegion>;
+  addressesByRegion: Partial<Record<KoreaRegion, string>>;
 };
 
 export type CandidateReviewReason = "MULTIPLE_CATEGORIES" | "MULTIPLE_REGIONS" | "REPRESENTATIVE_CASE";
@@ -123,8 +124,8 @@ export type CandidateReviewReason = "MULTIPLE_CATEGORIES" | "MULTIPLE_REGIONS" |
 export type CandidateReviewItem = {
   qid: string;
   name: string;
-  regions: Region[];
-  addressesByRegion: Partial<Record<Region, string>>;
+  regions: KoreaRegion[];
+  addressesByRegion: Partial<Record<KoreaRegion, string>>;
   latitude: number;
   longitude: number;
   categories: LocationCategory[];
@@ -142,7 +143,7 @@ export type ReviewDecision = {
   qid: string;
   decision: "accept" | "reject";
   category: LocationCategory | null;
-  region: Region | null;
+  region: KoreaRegion | null;
   note: string;
   reviewedBy: string;
   reviewedAt: string;
@@ -204,7 +205,7 @@ function qidFromEntity(value: string): string {
   return match[1];
 }
 
-export function collectCandidates(bindings: WikidataBinding[], region: Region): Candidate[] {
+export function collectCandidates(bindings: WikidataBinding[], region: KoreaRegion): Candidate[] {
   const candidates = new Map<string, Candidate>();
   for (const binding of bindings) {
     const item = bindingText(binding, "item");
@@ -241,7 +242,7 @@ export function collectCandidates(bindings: WikidataBinding[], region: Region): 
       categories: new Set<LocationCategory>(),
       imageTitles: new Set<string>(),
       typeLabels: new Set<string>(),
-      matchedRegions: new Set<Region>([region]),
+      matchedRegions: new Set<KoreaRegion>([region]),
       addressesByRegion: { [region]: address },
     };
     if (sourceAddress) candidate.address = sourceAddress;
@@ -314,7 +315,7 @@ async function fetchWithRetry(url: string, init: RequestInit, attempts = 4): Pro
   throw lastError instanceof Error ? lastError : new Error(`Request failed: ${url}`);
 }
 
-async function discoverRegion(regionId: string, region: Region): Promise<Candidate[]> {
+async function discoverRegion(regionId: string, region: KoreaRegion): Promise<Candidate[]> {
   const body = new URLSearchParams({ query: buildRegionQuery(regionId) });
   const response = await fetchWithRetry(WIKIDATA_SPARQL, {
     method: "POST",
@@ -349,7 +350,7 @@ const reviewDecisionFileSchema = z.object({
       qid: z.string().regex(/^Q\d+$/),
       decision: z.literal("accept"),
       category: z.enum(LOCATION_CATEGORY_VALUES),
-      region: z.enum(REGION_VALUES).optional(),
+      region: z.enum(KOREA_REGION_VALUES).optional(),
       note: z.string().trim().min(1),
       reviewed_by: z.string().trim().min(1),
       reviewed_at: z.iso.datetime({ offset: true }),
@@ -400,10 +401,10 @@ export function getCandidateReviewItem(candidate: Candidate): CandidateReviewIte
     qid: candidate.qid,
     name: candidate.name,
     regions: [...candidate.matchedRegions].sort(
-      (a, b) => REGION_VALUES.indexOf(a) - REGION_VALUES.indexOf(b),
+      (a, b) => KOREA_REGION_VALUES.indexOf(a) - KOREA_REGION_VALUES.indexOf(b),
     ),
     addressesByRegion: Object.fromEntries(
-      REGION_VALUES
+      KOREA_REGION_VALUES
         .filter((region) => candidate.addressesByRegion[region])
         .map((region) => [region, candidate.addressesByRegion[region]]),
     ),
@@ -458,7 +459,7 @@ export function prioritizeReviewQueue(
     return aMinimum - bMinimum
       || LOCATION_CATEGORY_VALUES.indexOf(a.coverageCells[0].category)
         - LOCATION_CATEGORY_VALUES.indexOf(b.coverageCells[0].category)
-      || REGION_VALUES.indexOf(a.coverageCells[0].region) - REGION_VALUES.indexOf(b.coverageCells[0].region)
+      || KOREA_REGION_VALUES.indexOf(a.coverageCells[0].region) - KOREA_REGION_VALUES.indexOf(b.coverageCells[0].region)
       || Number(a.qid.slice(1)) - Number(b.qid.slice(1));
   });
 }
@@ -468,7 +469,7 @@ export function resolveCandidateCategory(
   decisions: ReadonlyMap<string, ReviewDecision>,
 ): {
   category: LocationCategory | null;
-  region: Region | null;
+  region: KoreaRegion | null;
   address: string | null;
   reviewItem: CandidateReviewItem | null;
   rejectedByReview: boolean;
@@ -539,7 +540,7 @@ export function selectCoverageCandidates(
         const bCount = counts.get(coverageCellKey(b.candidate.region, b.candidate.category)) ?? 0;
         return aCount - bCount
           || categoryTotals[a.candidate.category] - categoryTotals[b.candidate.category]
-          || REGION_VALUES.indexOf(a.candidate.region) - REGION_VALUES.indexOf(b.candidate.region)
+          || KOREA_REGION_VALUES.indexOf(a.candidate.region) - KOREA_REGION_VALUES.indexOf(b.candidate.region)
           || LOCATION_CATEGORY_VALUES.indexOf(a.candidate.category) - LOCATION_CATEGORY_VALUES.indexOf(b.candidate.category)
           || Number(a.candidate.qid.slice(1)) - Number(b.candidate.qid.slice(1));
       });

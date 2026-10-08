@@ -1,6 +1,6 @@
 import { z } from "zod";
 import type { Location, LocationFilter, LocationListQuery, LocationSearchResult } from "./domain";
-import { LOCATION_CATEGORY_VALUES, REGION_VALUES } from "./location-options";
+import { DISTRICT_VALUES, LOCATION_CATEGORY_VALUES, REGION_VALUES } from "./location-options";
 
 // POST /api/search body size cap. 512 finite-number JSON floats run at most
 // a few KB (worst case ~20 bytes/value including a leading "-", full
@@ -33,7 +33,10 @@ export const accountDeletionRequestSchema = z.object({
 }).strict();
 
 export const locationFilterSchema = z.object({
+  // DEPRECATED: see the REGION_VALUES comment in location-options.ts. Only
+  // "부산" validates; kept so an old stored client session/URL doesn't 400.
   region: z.enum(REGION_VALUES).optional(),
+  district: z.enum(DISTRICT_VALUES).optional(),
   category: z.enum(LOCATION_CATEGORY_VALUES).optional(),
 });
 

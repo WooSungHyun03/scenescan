@@ -2,7 +2,21 @@ import { z } from "zod";
 import type { Location, LocationImage, NoiseSource, ParkingInfo } from "../../src/types/domain.ts";
 import type { CategoryReviewReason } from "./category-mapping.ts";
 import { PERMIT_GUIDANCE_VALUES } from "./permit-information.ts";
-import { LOCATION_CATEGORY_VALUES, REGION_VALUES } from "../../src/types/location-options.ts";
+import { LOCATION_CATEGORY_VALUES } from "../../src/types/location-options.ts";
+
+// Deliberately NOT src/types/location-options.ts's REGION_VALUES/Region:
+// those now fix the *live, served* catalog to "부산" only for the length of
+// the Busan-district contract transition (see docs/database.md). This
+// discovery/normalization/import pipeline still sources and validates
+// candidate locations across all of Korea -- the real
+// data/production/locations.json already spans all 17 -- independent of
+// which regions the live search API currently serves. Every scripts/data
+// file imports this (not the product Region) for exactly that reason.
+export const KOREA_REGION_VALUES = [
+  "서울", "부산", "대구", "인천", "광주", "대전", "울산", "세종",
+  "경기", "강원", "충북", "충남", "전북", "전남", "경북", "경남", "제주",
+] as const;
+export type KoreaRegion = (typeof KOREA_REGION_VALUES)[number];
 
 const unsafePathSegments = new Set(["__proto__", "prototype", "constructor"]);
 
@@ -61,7 +75,7 @@ export type CanonicalLocationRecord = {
   name: Location["name"];
   description: Location["description"];
   category: Location["category"];
-  region: Location["region"];
+  region: KoreaRegion;
   address: Location["address"];
   latitude: Location["point"]["latitude"];
   longitude: Location["point"]["longitude"];
@@ -94,7 +108,7 @@ export const canonicalLocationRecordSchema: z.ZodType<CanonicalLocationRecord> =
   name: nonEmptyString,
   description: z.string().trim(),
   category: z.enum(LOCATION_CATEGORY_VALUES),
-  region: z.enum(REGION_VALUES),
+  region: z.enum(KOREA_REGION_VALUES),
   address: nonEmptyString,
   latitude: z.number().finite().min(-90).max(90),
   longitude: z.number().finite().min(-180).max(180),
@@ -200,7 +214,7 @@ export const sourceMappingSchema = z.object({
     { message: "images.alt requires images.url", path: ["alt"] },
   ).optional(),
   categoryMap: z.record(z.string(), z.enum(LOCATION_CATEGORY_VALUES)).default({}),
-  regionMap: z.record(z.string(), z.enum(REGION_VALUES)).default({}),
+  regionMap: z.record(z.string(), z.enum(KOREA_REGION_VALUES)).default({}),
   permitTypeMap: z.record(z.string(), z.enum(PERMIT_GUIDANCE_VALUES)).default({}),
   defaults: z.object({
     description: z.string().trim().default(""),

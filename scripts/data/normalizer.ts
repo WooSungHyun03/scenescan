@@ -2,6 +2,7 @@ import {
   canonicalLocationRecordSchema,
   dataProvenanceSchema,
   normalizedLocationOutputSchema,
+  KOREA_REGION_VALUES,
   type CanonicalParkingRecord,
   type CategoryReviewItem,
   type CanonicalLocationRecord,
@@ -12,7 +13,6 @@ import {
 import { mapLocationCategory } from "./category-mapping.ts";
 import { mapPermitGuidance } from "./permit-information.ts";
 import type { LocationCategory } from "../../src/types/domain.ts";
-import { REGION_VALUES } from "../../src/types/location-options.ts";
 
 type JsonObject = Record<string, unknown>;
 
@@ -220,7 +220,7 @@ function normalizeRecordWithCategory(
       record,
       mapping.fields.region,
       mapping.regionMap,
-      REGION_VALUES,
+      KOREA_REGION_VALUES,
       "region",
     ),
     address: requiredText(record, mapping.fields.address, "address"),

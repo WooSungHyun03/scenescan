@@ -25,6 +25,17 @@ import {
 // has to stay in sync with the offline importer's model/revision.
 const EXPECTED_EMBEDDING_MODEL = CLIP_MODEL_KEY;
 
+// Fixed scope for the length of the Busan-district transition (see the
+// REGION_VALUES comment in src/types/location-options.ts and docs/database.md).
+// Every read below applies this unconditionally -- not `filters.region`,
+// which is deprecated input the app no longer trusts -- so a non-Busan row
+// already present in the shared catalog (the real production table still
+// has rows from all 17 regions; nothing here deletes them) can never be
+// listed, loaded by id, or surfaced by search/similar. This is SQL-side
+// enforcement (an .eq()/RPC parameter evaluated by Postgres), not just an
+// application-level check layered on top.
+const BUSAN_REGION = "부산";
+
 // LOCATION_SELECT includes the attribution columns added by
 // 20261001000000_location_attribution.sql (origin/main). On a project where
 // that migration hasn't been applied yet, PostgREST returns a schema error
@@ -121,8 +132,10 @@ export async function getSupabaseLocations(query: LocationListQuery = {}): Promi
   // have no guaranteed stable order, which .range()-based pagination
   // depends on to avoid skipping or repeating rows across pages.
   function buildQuery(relations: string) {
-    let dbQuery = getSupabaseClient().from("locations").select(relations).order("name").order("id").range(offset, offset + limit - 1);
-    if (query.region) dbQuery = dbQuery.eq("region", query.region);
+    // BUSAN_REGION is unconditional -- see its own comment -- `district`
+    // stays the only conditional geo filter here.
+    let dbQuery = getSupabaseClient().from("locations").select(relations).eq("region", BUSAN_REGION).order("name").order("id").range(offset, offset + limit - 1);
+    if (query.district) dbQuery = dbQuery.eq("district", query.district);
     if (query.category) dbQuery = dbQuery.eq("category", query.category);
     return dbQuery;
   }
@@ -147,34 +160,43 @@ export async function getSupabaseLocations(query: LocationListQuery = {}): Promi
 // app only loads whatever locations the RPC actually returned, by id.
 export async function getSupabaseLocationsByIds(ids: readonly string[]): Promise<Location[]> {
   if (ids.length === 0) return [];
-  let { data, error } = await getSupabaseClient().from("locations").select(LOCATION_SELECT).in("id", ids);
+  // .eq("region", BUSAN_REGION): both of this function's callers (explicit
+  // ?id= lookups via GET /api/locations, and search/similar metadata
+  // hydration for ids an already-Busan-scoped RPC returned) are each a form
+  // of "직접 ID 조회" that must not surface a non-Busan row -- see BUSAN_REGION.
+  let { data, error } = await getSupabaseClient().from("locations").select(LOCATION_SELECT).in("id", ids).eq("region", BUSAN_REGION);
   if (isMissingParkingMetadataSchema(error)) {
     warnAboutLegacyParkingSchema(error);
-    ({ data, error } = await getSupabaseClient().from("locations").select(PRE_PARKING_METADATA_LOCATION_SELECT).in("id", ids));
+    ({ data, error } = await getSupabaseClient().from("locations").select(PRE_PARKING_METADATA_LOCATION_SELECT).in("id", ids).eq("region", BUSAN_REGION));
   }
   if (isMissingImageAttributionSchema(error)) {
     warnAboutLegacyAttributionSchema(error);
-    ({ data, error } = await getSupabaseClient().from("locations").select(LEGACY_LOCATION_SELECT).in("id", ids));
+    ({ data, error } = await getSupabaseClient().from("locations").select(LEGACY_LOCATION_SELECT).in("id", ids).eq("region", BUSAN_REGION));
   }
   if (error) throw dataAccessError("Failed to load locations by id", error);
   return mapRows(data);
 }
 
 export async function getSupabaseLocation(id: string): Promise<LocationDetail | null> {
+  // .eq("region", BUSAN_REGION) makes a non-Busan id behave exactly like a
+  // missing id: .maybeSingle() finds no matching row and returns null, which
+  // GET /api/locations/[id] (Server Component notFound()) and
+  // GET /api/locations/[id]/similar (LOCATION_NOT_FOUND) already treat as
+  // 404 -- no separate "wrong region" branch needed.
   let { data, error } = await getSupabaseClient().from("locations")
     .select(LOCATION_SELECT)
-    .eq("id", id).maybeSingle();
+    .eq("id", id).eq("region", BUSAN_REGION).maybeSingle();
   if (isMissingParkingMetadataSchema(error)) {
     warnAboutLegacyParkingSchema(error);
     ({ data, error } = await getSupabaseClient().from("locations")
       .select(PRE_PARKING_METADATA_LOCATION_SELECT)
-      .eq("id", id).maybeSingle());
+      .eq("id", id).eq("region", BUSAN_REGION).maybeSingle());
   }
   if (isMissingImageAttributionSchema(error)) {
     warnAboutLegacyAttributionSchema(error);
     ({ data, error } = await getSupabaseClient().from("locations")
       .select(LEGACY_LOCATION_SELECT)
-      .eq("id", id).maybeSingle());
+      .eq("id", id).eq("region", BUSAN_REGION).maybeSingle());
   }
   if (error) throw dataAccessError(`Failed to load location ${id}`, error);
   return mapRow(data);
@@ -200,42 +222,72 @@ export async function searchSupabaseLocations(
 ): Promise<LocationSearchResult[]> {
   const client = getSupabaseClient();
   const matchThreshold = options.threshold ?? SEARCH_MATCH_THRESHOLD_DEFAULT;
+  const filterDistrict = filters.district ?? null;
   let { data, error } = await client.rpc("match_location_images_filtered", {
     query_embedding: embedding,
     match_threshold: matchThreshold,
     match_count: 8,
-    filter_region: filters.region ?? null,
+    // filter_region is always BUSAN_REGION, never filters.region (deprecated,
+    // ignored input) -- see BUSAN_REGION's comment.
+    filter_region: BUSAN_REGION,
     filter_category: filters.category ?? null,
     expected_embedding_model: EXPECTED_EMBEDDING_MODEL,
+    filter_district: filterDistrict,
   });
+  // 20261008000000_busan_district_contract.sql's own migration might not
+  // have reached this project yet (rolling deploy) even though the RPC
+  // itself exists -- PostgREST reports the specific missing named parameter.
+  // Only retry without it for an unfiltered-by-district query; a district
+  // filter can't be honored by the 6-arg signature, so silently dropping it
+  // would return wrong (unfiltered) results instead of a clear error.
+  if (error?.code === "PGRST202" && error.message?.includes("filter_district")
+    && error.message.includes("match_location_images_filtered")) {
+    if (filterDistrict !== null) {
+      throw dataAccessError("District filter requires a pending migration that has not been applied yet", error);
+    }
+    logger.warn("District filter migration is pending; using pre-district filtered search");
+    ({ data, error } = await client.rpc("match_location_images_filtered", {
+      query_embedding: embedding,
+      match_threshold: matchThreshold,
+      match_count: 8,
+      filter_region: BUSAN_REGION,
+      filter_category: filters.category ?? null,
+      expected_embedding_model: EXPECTED_EMBEDDING_MODEL,
+    }));
+  }
   // The live pre-model schema has the same filtered/deduplicated RPC but
   // only five arguments. Keep its filters intact during migration rollout;
   // retry only PostgREST's exact missing-signature error, never a DB failure.
   if (error?.code === "PGRST202" && error.message?.includes("expected_embedding_model")
     && error.message.includes("match_location_images_filtered")) {
+    if (filterDistrict !== null) {
+      throw dataAccessError("District filter requires a pending migration that has not been applied yet", error);
+    }
     logger.warn("Embedding model metadata migration is pending; using pre-model filtered search");
     ({ data, error } = await client.rpc("match_location_images_filtered", {
       query_embedding: embedding,
       match_threshold: matchThreshold,
       match_count: 8,
-      filter_region: filters.region ?? null,
+      filter_region: BUSAN_REGION,
       filter_category: filters.category ?? null,
     }));
   }
   // Rolling deployment only: match_location_images_filtered
   // (20261002000000_filtered_location_search.sql, plus its
   // expected_embedding_model follow-up) might not exist yet on a project
-  // mid-deploy. Only fall back for an unfiltered query -- the legacy RPC
-  // can't honor filter_region/filter_category, so silently using it for a
-  // filtered request would return wrong (unfiltered) results instead of a
-  // clear error.
+  // mid-deploy. Only fall back for a query with no category/district filter
+  // -- the legacy RPC can't honor filter_category/filter_district, so
+  // silently using it for a filtered request would return wrong (unfiltered)
+  // results instead of a clear error. filter_region is still always applied
+  // (BUSAN_REGION), unlike the pre-district version of this fallback.
   if (error?.code === "PGRST202" && error.message?.includes("match_location_images_filtered")
-    && !filters.region && !filters.category) {
+    && !filters.category && filterDistrict === null) {
     logger.warn("Filtered search RPC migration is pending; using legacy unfiltered search");
     const legacy = await client.rpc("match_location_images", {
       query_embedding: embedding,
       match_threshold: matchThreshold,
       match_count: SEARCH_MATCH_COUNT_DEFAULT,
+      filter_region: BUSAN_REGION,
       expected_embedding_model: EXPECTED_EMBEDDING_MODEL,
     });
     if (legacy.error) throw dataAccessError("Failed to search location images", legacy.error);
@@ -267,8 +319,37 @@ export async function getSupabaseSimilarLocations(locationId: string, excludedId
     match_count: 8,
     expected_embedding_model: EXPECTED_EMBEDDING_MODEL,
     excluded_location_ids: [...excludedIds],
+    // filter_region: BUSAN_REGION -- see BUSAN_REGION's comment. No public
+    // district filter is exposed for similar-locations today
+    // (GET /api/locations/[id]/similar has no district query param), so
+    // filter_district stays null (unrestricted) here.
+    filter_region: BUSAN_REGION,
+    filter_district: null,
   });
+  // 20261008000000_busan_district_contract.sql's region/district parameters
+  // might not have reached this project yet even though
+  // match_similar_locations_filtered itself exists (rolling deploy). Safe to
+  // retry without them: no caller can request a district filter on this
+  // endpoint, so nothing is silently dropped -- only the BUSAN_REGION safety
+  // net is briefly unavailable mid-rollout, same class of gap already
+  // documented for the plain legacy RPC fallback below.
+  if (error?.code === "PGRST202" && error.message?.includes("filter_region")
+    && error.message.includes("match_similar_locations_filtered")) {
+    logger.warn("Region/district filter migration is pending; using pre-district similar search");
+    ({ data, error } = await client.rpc("match_similar_locations_filtered", {
+      source_location_id: locationId,
+      match_threshold: SEARCH_MATCH_THRESHOLD_DEFAULT,
+      match_count: 8,
+      expected_embedding_model: EXPECTED_EMBEDDING_MODEL,
+      excluded_location_ids: [...excludedIds],
+    }));
+  }
   if (error?.code === "PGRST202" && error.message?.includes("match_similar_locations_filtered")) {
+    // Legacy match_similar_location_images has no region/category/district
+    // join at all -- a known rollout-only gap, same caveat already
+    // documented for its model-isolation limitation (docs/search-ranking.md):
+    // Busan scope for similar-locations is not guaranteed until this
+    // project's migrations are fully applied.
     logger.warn("Model-safe similar-search migration is pending; using legacy same-model catalog");
     ({ data, error } = await client.rpc("match_similar_location_images", {
       source_location_id: locationId,

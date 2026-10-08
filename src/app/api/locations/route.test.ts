@@ -5,11 +5,11 @@ import { GET } from "./route";
 beforeEach(() => { vi.resetAllMocks(); mocks.list.mockResolvedValue([]); mocks.ids.mockResolvedValue([]); });
 describe("bounded location reads", () => {
   it("passes server-side filters and pagination", async () => {
-    expect((await GET(new Request("http://localhost/api/locations?region=제주&category=nature&limit=20&offset=20"))).status).toBe(200);
-    expect(mocks.list).toHaveBeenCalledWith({ region: "제주", category: "nature", limit: 20, offset: 20 });
+    expect((await GET(new Request("http://localhost/api/locations?district=busan_haeundae_gu&category=nature&limit=20&offset=20"))).status).toBe(200);
+    expect(mocks.list).toHaveBeenCalledWith({ district: "busan_haeundae_gu", category: "nature", limit: 20, offset: 20 });
   });
   it("rejects invalid/oversized queries before DB access", async () => {
-    for (const query of ["limit=51", "offset=-1", "region=unknown", "id=broken"]) {
+    for (const query of ["limit=51", "offset=-1", "region=unknown", "region=서울", "district=unknown", "id=broken"]) {
       expect((await GET(new Request(`http://localhost/api/locations?${query}`))).status).toBe(400);
     }
     expect(mocks.list).not.toHaveBeenCalled();

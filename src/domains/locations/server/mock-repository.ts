@@ -13,6 +13,10 @@ function compareLocations(left: { name: string; id: string }, right: { name: str
 function filterLocations(query: LocationFilter) {
   return mockLocations.filter((location) =>
     (!query.region || location.region === query.region) &&
+    // query.district unset -> unrestricted; a location's own null district
+    // (unconfirmed 구/군, see docs/database.md) only ever matches an
+    // unrestricted query, mirroring the SQL filter_district convention.
+    (!query.district || location.district === query.district) &&
     (!query.category || location.category === query.category),
   );
 }

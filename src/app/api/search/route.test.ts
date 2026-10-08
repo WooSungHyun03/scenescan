@@ -67,8 +67,8 @@ describe("POST /api/search", () => {
 
   it("passes embedding, filters, and threshold through to searchByImage", async () => {
     searchByImageMock.mockResolvedValue([]);
-    await POST(request({ embedding: validEmbedding(), filters: { region: "서울" }, threshold: 0.5 }));
-    expect(searchByImageMock).toHaveBeenCalledWith(validEmbedding(), { region: "서울" }, { threshold: 0.5 });
+    await POST(request({ embedding: validEmbedding(), filters: { district: "busan_haeundae_gu" }, threshold: 0.5 }));
+    expect(searchByImageMock).toHaveBeenCalledWith(validEmbedding(), { district: "busan_haeundae_gu" }, { threshold: 0.5 });
   });
 
   it("ignores a client-supplied count -- match_count is a fixed server constant, not part of this request contract", async () => {
@@ -109,6 +109,18 @@ describe("POST /api/search", () => {
 
   it("400s a disallowed region", async () => {
     const response = await POST(request({ embedding: validEmbedding(), filters: { region: "평양" } }));
+    expect(response.status).toBe(400);
+    const body = await response.json();
+    expect(body.error.code).toBe("VALIDATION_ERROR");
+  });
+
+  it("400s a now-out-of-scope region -- only 부산 validates during the district-contract transition", async () => {
+    const response = await POST(request({ embedding: validEmbedding(), filters: { region: "서울" } }));
+    expect(response.status).toBe(400);
+  });
+
+  it("400s a disallowed district", async () => {
+    const response = await POST(request({ embedding: validEmbedding(), filters: { district: "seoul_jung_gu" } }));
     expect(response.status).toBe(400);
     const body = await response.json();
     expect(body.error.code).toBe("VALIDATION_ERROR");

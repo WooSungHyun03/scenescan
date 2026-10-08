@@ -4,7 +4,7 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { z } from "zod";
 import type { NormalizedLocationOutput } from "./contracts.ts";
-import { parseNormalizedLocationOutput } from "./contracts.ts";
+import { KOREA_REGION_VALUES, parseNormalizedLocationOutput } from "./contracts.ts";
 import { parseManifest as parseEmbeddingManifest } from "../embeddings/contracts.ts";
 import { applyStaticParkingCatalog, parseStaticParkingCatalog, type StaticParkingCatalog } from "./static-parking.ts";
 import {
@@ -12,7 +12,7 @@ import {
   parseStaticNoiseSourceCatalog,
   type StaticNoiseSourceCatalog,
 } from "./static-noise-sources.ts";
-import { LOCATION_CATEGORY_VALUES, REGION_VALUES } from "../../src/types/location-options.ts";
+import { LOCATION_CATEGORY_VALUES } from "../../src/types/location-options.ts";
 import { isValidContactPhone } from "./permit-information.ts";
 
 const COMMONS_API = "https://commons.wikimedia.org/w/api.php";
@@ -43,7 +43,7 @@ const locationSchema = z.object({
   name: z.string().trim().min(1),
   description: z.string().trim().min(1),
   category: z.enum(LOCATION_CATEGORY_VALUES),
-  region: z.enum(REGION_VALUES),
+  region: z.enum(KOREA_REGION_VALUES),
   address: z.string().trim().min(1),
   latitude: z.number().finite().min(-90).max(90),
   longitude: z.number().finite().min(-180).max(180),

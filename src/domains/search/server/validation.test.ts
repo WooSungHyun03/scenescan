@@ -32,6 +32,11 @@ describe("describeSearchRequestError", () => {
     expect(message).toBe("허용되지 않는 지역입니다.");
   });
 
+  it("describes a disallowed district without naming the field internally", () => {
+    const message = messageFor({ embedding: validEmbedding(), filters: { district: "seoul_jung_gu" } });
+    expect(message).toBe("허용되지 않는 구/군입니다.");
+  });
+
   it("describes a disallowed category", () => {
     const message = messageFor({ embedding: validEmbedding(), filters: { category: "space" } });
     expect(message).toBe("허용되지 않는 카테고리입니다.");

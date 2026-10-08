@@ -4,7 +4,9 @@ import { getMockLocation, getMockLocations, getMockSimilarLocations, searchMockL
 // Fixture ids are fixed UUIDs (src/domains/locations/fixtures/locations.ts)
 // so mock-mode data can exercise real uuid-shaped code paths (e.g.
 // GET /api/locations/[id]/similar's path-param validation). fixtureId(1)
-// corresponds to demo-01 (청록 창고, industrial/서울) and so on in seed order.
+// corresponds to demo-01 (청록 창고, industrial/busan_haeundae_gu) and so on
+// in seed order; demo-01/02/04 share busan_haeundae_gu, demo-10 has a null
+// (unconfirmed) district.
 function fixtureId(n: number): string {
   return `00000000-0000-4000-8000-${String(n).padStart(12, "0")}`;
 }
@@ -13,6 +15,10 @@ describe("mock location repository", () => {
   it("filters fixtures and returns no more than eight search results", () => {
     expect(getMockLocations()).toHaveLength(10);
     expect(getMockLocations({ region: "부산" }).every((item) => item.region === "부산")).toBe(true);
+    const haeundae = getMockLocations({ district: "busan_haeundae_gu" });
+    expect(haeundae.length).toBeGreaterThan(0);
+    expect(haeundae.length).toBeLessThan(10);
+    expect(haeundae.every((item) => item.district === "busan_haeundae_gu")).toBe(true);
     expect(getMockLocation("missing")).toBeNull();
     expect(searchMockLocations(Array(512).fill(0))).toHaveLength(8);
   });
@@ -23,20 +29,21 @@ describe("mock location repository", () => {
     expect(names).toEqual(sorted);
   });
 
-  it("search: a region filter excludes a higher-similarity out-of-region hit instead of dropping it silently after the fact", () => {
+  it("search: a district filter excludes a higher-similarity out-of-district hit instead of dropping it silently after the fact", () => {
     // phase = 8 with this embedding[0] -> the globally top-scoring fixture
-    // (fixture 3, region 부산) is deliberately NOT in region 서울. If
-    // filtering happened only via groupImageMatches's eligibleLocationIds
-    // (the pre-RPC-filter behavior this mirrors), an implementation bug
-    // could still let it leak through; filtering the candidate list before
-    // grouping (matching the SQL filter_region behavior) must not do that.
+    // (fixture 3, district busan_suyeong_gu) is deliberately NOT in district
+    // busan_haeundae_gu. If filtering happened only via
+    // groupImageMatches's eligibleLocationIds (the pre-RPC-filter behavior
+    // this mirrors), an implementation bug could still let it leak through;
+    // filtering the candidate list before grouping (matching the SQL
+    // filter_district behavior) must not do that.
     const embedding = Array(512).fill(0);
     embedding[0] = 0.008;
     const unfiltered = searchMockLocations(embedding);
-    expect(unfiltered[0]?.location.region).toBe("부산");
+    expect(unfiltered[0]?.location.district).toBe("busan_suyeong_gu");
 
-    const filtered = searchMockLocations(embedding, { region: "서울" });
-    expect(filtered.every((result) => result.location.region === "서울")).toBe(true);
+    const filtered = searchMockLocations(embedding, { district: "busan_haeundae_gu" });
+    expect(filtered.every((result) => result.location.district === "busan_haeundae_gu")).toBe(true);
     expect(filtered.some((result) => result.location.id === fixtureId(3))).toBe(false);
     expect(filtered[0]?.location.id).toBe(fixtureId(4));
   });

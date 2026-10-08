@@ -1,7 +1,9 @@
 import { z } from "zod";
-import type { Location, NoiseSource, NoiseSourceKind, ParkingInfo } from "@/types/domain";
+import type { District, Location, NoiseSource, NoiseSourceKind, ParkingInfo } from "@/types/domain";
 import type { ImageMatch } from "@/domains/locations/services/group-image-matches";
-import { LOCATION_CATEGORY_VALUES, REGION_VALUES } from "@/types/location-options";
+import { DISTRICT_VALUES, LOCATION_CATEGORY_VALUES, REGION_VALUES } from "@/types/location-options";
+
+const districtValueSet = new Set<string>(DISTRICT_VALUES);
 
 // Deliberately does not import "server-only" (unlike supabase-repository.ts)
 // so it can be unit tested directly under plain Vitest -- see
@@ -40,6 +42,12 @@ export type LocationRow = {
   description: string;
   category: Location["category"];
   region: Location["region"];
+  // unknown, not District | null: this column is part of the `locations`
+  // table's own `*` select, so a project where
+  // 20261008000000_busan_district_contract.sql has not been applied yet
+  // simply omits the key entirely (same rollout accommodation as
+  // `source`/`author`/etc. below) -- see optionalDistrict.
+  district?: unknown;
   address: string;
   latitude: number;
   longitude: number;
@@ -83,6 +91,7 @@ const locationRowSchema = z.object({
   description: z.string(),
   category: z.enum(LOCATION_CATEGORY_VALUES),
   region: z.enum(REGION_VALUES),
+  district: z.unknown().optional(),
   address: z.string(),
   latitude: z.number().finite().min(-90).max(90),
   longitude: z.number().finite().min(-180).max(180),
@@ -118,7 +127,7 @@ export function parseLocationRow(data: unknown): LocationRow | null {
   return locationRowSchema.parse(data) as unknown as LocationRow;
 }
 
-export type MapperWarning = { field: "location_images" | "parking" | "noise_sources"; reason: string; value: unknown };
+export type MapperWarning = { field: "location_images" | "parking" | "noise_sources" | "district"; reason: string; value: unknown };
 
 export type MapLocationResult = { location: Location; warnings: MapperWarning[] };
 
@@ -132,6 +141,18 @@ function isFiniteNumber(value: unknown): value is number {
 
 function optionalString(value: unknown): string | null {
   return isNonEmptyString(value) ? value : null;
+}
+
+// `district` is undefined (column/migration not yet present), null
+// (unconfirmed -- see docs/database.md), or one of DISTRICT_VALUES; any
+// other stored value is a data bug (the DB check constraint should have
+// rejected it), not a value to silently coerce, so it's dropped with a
+// warning the same way a malformed image/parking row is.
+function optionalDistrict(value: unknown, warnings: MapperWarning[]): District | null {
+  if (value === undefined || value === null) return null;
+  if (typeof value === "string" && districtValueSet.has(value)) return value as District;
+  warnings.push({ field: "district", reason: "unrecognized district value", value });
+  return null;
 }
 
 function isHttpUrl(value: unknown): value is string {
@@ -309,6 +330,7 @@ export function toLocation(row: LocationRow): MapLocationResult {
     description: row.description,
     category: row.category,
     region: row.region,
+    district: optionalDistrict(row.district, warnings),
     address: row.address,
     point: { latitude: row.latitude, longitude: row.longitude },
     images,

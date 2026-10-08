@@ -109,7 +109,8 @@ match_location_images_filtered(
   match_count integer default 8,
   filter_region text default null,
   filter_category text default null,
-  expected_embedding_model text default null
+  expected_embedding_model text default null,
+  filter_district text default null
 ) returns table (
   location_image_id uuid,
   location_id uuid,
@@ -118,9 +119,10 @@ match_location_images_filtered(
 ```
 
 - Picks the single highest-similarity image per location *inside SQL* (`distinct on (location_id)`, ties broken by `location_id` then `location_image_id`), so `match_count` caps the number of **places** returned, not a raw image pool -- unlike `match_location_images`, there is no separate app-level grouping step needed to reach a per-location result (`searchSupabaseLocations` still runs the result through `groupImageMatches` for consistency with the legacy-fallback path, but it is a no-op on an already-deduplicated list).
-- `filter_region`/`filter_category`/`expected_embedding_model` all follow the same null-means-unrestricted convention as `match_location_images` (see above) -- application code always passes `expected_embedding_model` explicitly.
+- `filter_region`/`filter_category`/`expected_embedding_model`/`filter_district` all follow the same null-means-unrestricted convention as `match_location_images` (see above) -- application code always passes `expected_embedding_model` explicitly, and always passes `filter_region` as the fixed `'부산'` (never a client-supplied region) for the length of the Busan-district contract transition -- see `docs/api-contracts.md`'s "Busan district contract" section and `docs/database.md`.
 - No `image_url` column (unlike `match_location_images`) -- the row shape is the same `{location_image_id, location_id, similarity}` triple `match_similar_location_images` returns.
-- **Rolling-deploy fallback**: if this RPC is missing (PostgREST `PGRST202`, meaning its migration hasn't reached this project yet) and the request has no `filter_region`/`filter_category`, `searchSupabaseLocations` falls back to `match_location_images` instead. A filtered request during that same window fails explicitly (`DATA_UNAVAILABLE`) rather than silently returning unfiltered results, since the legacy RPC cannot honor the filter.
+- **Rolling-deploy fallback**: if this RPC is missing (PostgREST `PGRST202`, meaning its migration hasn't reached this project yet) and the request has no `filter_category`/`filter_district`, `searchSupabaseLocations` falls back to `match_location_images` instead (still passing `filter_region = '부산'`, which that RPC also supports). A category- or district-filtered request during that same window fails explicitly (`DATA_UNAVAILABLE`) rather than silently returning unfiltered results, since the legacy RPC cannot honor either filter. A narrower rolling-deploy case -- `filter_district` itself not yet in the deployed signature while the rest of the 6-arg RPC already is -- retries without it only when no district filter was requested; a requested district filter fails explicitly the same way.
+- `filter_district` (added 2026-10-08): one of the 16 Busan 구/군 keys in `DISTRICT_VALUES` (`src/types/location-options.ts`) or `null`. A location row whose own `district` is `null` ("구/군 unconfirmed", never guessed -- see `docs/database.md`) never matches a non-null `filter_district`, so it only ever surfaces in an unfiltered-by-district search, the same SQL consequence `filter_region`/`filter_category` already produce for their own null case -- no separate code path needed.
 
 ## Similar locations (`GET /api/locations/[id]/similar`)
 

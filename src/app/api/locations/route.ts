@@ -14,6 +14,7 @@ export async function GET(request: Request) {
     ? z.array(locationIdSchema).max(50).safeParse(ids)
     : locationListQuerySchema.safeParse({
         region: params.get("region") ?? undefined,
+        district: params.get("district") ?? undefined,
         category: params.get("category") ?? undefined,
         limit: params.has("limit") ? Number(params.get("limit")) : undefined,
         offset: params.has("offset") ? Number(params.get("offset")) : undefined,
@@ -25,7 +26,7 @@ export async function GET(request: Request) {
       return NextResponse.json({ locations, filters: {} } satisfies LocationListResponse);
     }
     const locations = await getLocations(parsed.data);
-    return NextResponse.json({ locations, filters: { region: parsed.data.region, category: parsed.data.category } } satisfies LocationListResponse);
+    return NextResponse.json({ locations, filters: { region: parsed.data.region, district: parsed.data.district, category: parsed.data.category } } satisfies LocationListResponse);
   } catch (error) {
     return apiErrorResponse(error, "locations.list.execute");
   }

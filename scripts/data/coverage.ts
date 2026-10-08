@@ -1,15 +1,16 @@
-import type { LocationCategory, Region } from "../../src/types/domain.ts";
-import { LOCATION_CATEGORY_VALUES, REGION_VALUES } from "../../src/types/location-options.ts";
+import type { LocationCategory } from "../../src/types/domain.ts";
+import { LOCATION_CATEGORY_VALUES } from "../../src/types/location-options.ts";
+import { KOREA_REGION_VALUES, type KoreaRegion } from "./contracts.ts";
 
 export const MINIMUM_LOCATIONS_PER_CELL = 3;
 
 export type CoverageLocation = {
-  region: Region;
+  region: KoreaRegion;
   category: LocationCategory;
 };
 
 export type CoverageCell = {
-  region: Region;
+  region: KoreaRegion;
   category: LocationCategory;
   count: number;
   target: number;
@@ -23,7 +24,7 @@ export type CoverageReport = {
   targetMinimumLocations: number;
   totalLocations: number;
   categoryTotals: Record<LocationCategory, number>;
-  regionTotals: Record<Region, number>;
+  regionTotals: Record<KoreaRegion, number>;
   summary: {
     totalCells: number;
     cellsMeetingTarget: number;
@@ -34,7 +35,7 @@ export type CoverageReport = {
   cells: CoverageCell[];
 };
 
-export function coverageCellKey(region: Region, category: LocationCategory): string {
+export function coverageCellKey(region: KoreaRegion, category: LocationCategory): string {
   return `${region}\u0000${category}`;
 }
 
@@ -50,8 +51,8 @@ export function createCoverageReport(
     LOCATION_CATEGORY_VALUES.map((category) => [category, 0]),
   ) as Record<LocationCategory, number>;
   const regionTotals = Object.fromEntries(
-    REGION_VALUES.map((region) => [region, 0]),
-  ) as Record<Region, number>;
+    KOREA_REGION_VALUES.map((region) => [region, 0]),
+  ) as Record<KoreaRegion, number>;
   const counts = new Map<string, number>();
 
   for (const location of locations) {
@@ -61,7 +62,7 @@ export function createCoverageReport(
     counts.set(key, (counts.get(key) ?? 0) + 1);
   }
 
-  const cells = REGION_VALUES.flatMap((region) => LOCATION_CATEGORY_VALUES.map((category) => {
+  const cells = KOREA_REGION_VALUES.flatMap((region) => LOCATION_CATEGORY_VALUES.map((category) => {
     const count = counts.get(coverageCellKey(region, category)) ?? 0;
     const deficit = Math.max(0, targetMinimumPerCell - count);
     return {
@@ -77,7 +78,7 @@ export function createCoverageReport(
   return {
     schemaVersion: 1,
     targetMinimumPerCell,
-    targetMinimumLocations: REGION_VALUES.length * LOCATION_CATEGORY_VALUES.length * targetMinimumPerCell,
+    targetMinimumLocations: KOREA_REGION_VALUES.length * LOCATION_CATEGORY_VALUES.length * targetMinimumPerCell,
     totalLocations: locations.length,
     categoryTotals,
     regionTotals,

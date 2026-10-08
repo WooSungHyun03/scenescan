@@ -17,6 +17,7 @@ export function describeSearchRequestError(error: z.ZodError): string {
   }
   if (field === "filters") {
     if (subField === "region") return "허용되지 않는 지역입니다.";
+    if (subField === "district") return "허용되지 않는 구/군입니다.";
     if (subField === "category") return "허용되지 않는 카테고리입니다.";
     return "검색 필터 값이 올바르지 않습니다.";
   }
