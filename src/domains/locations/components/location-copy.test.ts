@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getKoreanDescription } from "./location-copy";
+import { getKoreanDescription, getLocationAreaLabel } from "./location-copy";
 
 describe("location description presentation", () => {
   it("preserves Korean and mixed-language source descriptions", () => {
@@ -10,5 +10,14 @@ describe("location description presentation", () => {
   });
   it("handles empty descriptions", () => {
     expect(getKoreanDescription("  ", "설명 확인 필요")).toBe("설명 확인 필요");
+  });
+});
+
+describe("getLocationAreaLabel", () => {
+  it("combines the fixed region with the district label", () => {
+    expect(getLocationAreaLabel("busan_haeundae_gu")).toBe("부산 해운대구");
+  });
+  it("falls back to the region alone for an unconfirmed district, never guessing one", () => {
+    expect(getLocationAreaLabel(null)).toBe("부산");
   });
 });

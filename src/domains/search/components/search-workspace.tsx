@@ -8,10 +8,10 @@ import { LocationCard } from "@/domains/locations/components/location-card";
 import { SearchResultsMap } from "@/domains/locations/components/search-results-map";
 import { createImageEmbeddingService, type EmbeddingServiceStatus } from "@/lib/ai";
 import { Button } from "@/shared/ui/button";
-import type { Location, LocationCategory, LocationSearchResult, Region } from "@/types/domain";
+import type { District, Location, LocationCategory, LocationSearchResult } from "@/types/domain";
 import { validateImageBlob } from "@/lib/ai/image-validation";
 import { getSearchSession, setSearchSession, takeSearchImageDraft } from "./search-image-draft";
-import { REGION_VALUES } from "@/types/location-options";
+import { DISTRICT_LABELS, DISTRICT_VALUES } from "@/types/location-options";
 import type { SearchResponse } from "@/types/contracts";
 import { useUploadReady } from "./use-upload-ready";
 
@@ -19,7 +19,15 @@ const searchModeDescription = publicEnv.useMockData
   ? "샘플 장소 카탈로그에서는 유사도를 참고용 값으로 표시합니다."
   : "사진은 기기에서 분석하며 서버에 저장하지 않습니다.";
 
-const regionOptions: Region[] = [...REGION_VALUES];
+// 부산 16개 구·군 -- src/types/location-options.ts의 단일 정의를 그대로 사용한다.
+const districtOptions: { value: District; label: string }[] = DISTRICT_VALUES.map((value) => ({ value, label: DISTRICT_LABELS[value] }));
+const districtValueSet = new Set<string>(DISTRICT_VALUES);
+// Defensive: a session object created before this change (or any other
+// stale caller) could still carry a nationwide region string in what used
+// to be the `region` field. Never trust it as a district value.
+function toValidDistrict(value: string | undefined): District | "" {
+  return value && districtValueSet.has(value) ? (value as District) : "";
+}
 const categoryOptions: { value: LocationCategory; label: string }[] = [
   { value: "urban", label: "도시" },
   { value: "nature", label: "자연" },
@@ -142,7 +150,7 @@ export function SearchWorkspace({ examples }: { examples: Location[] }) {
   const [file, setFile] = useState<File | null>(() => getSearchSession()?.file ?? null);
   const [preview, setPreview] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
-  const [region, setRegion] = useState<Region | "">(() => getSearchSession()?.region ?? "");
+  const [district, setDistrict] = useState<District | "">(() => toValidDistrict(getSearchSession()?.district));
   const [category, setCategory] = useState<LocationCategory | "">(() => getSearchSession()?.category ?? "");
   const [results, setResults] = useState<LocationSearchResult[] | null>(() => getSearchSession()?.results ?? null);
   const [activeLocationId, setActiveLocationId] = useState<string | null>(null);
@@ -162,12 +170,12 @@ export function SearchWorkspace({ examples }: { examples: Location[] }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const searchInFlightRef = useRef(false);
   const analyzedImageRef = useRef<{ file: File; embedding: number[] } | null>(null);
-  const filterKey = `${region}|${category}`;
+  const filterKey = `${district}|${category}`;
 
   useEffect(() => {
     const controller = new AbortController();
     const params = new URLSearchParams({ limit: "20", offset: String(catalogOffset) });
-    if (region) params.set("region", region);
+    if (district) params.set("district", district);
     if (category) params.set("category", category);
     const frame = requestAnimationFrame(() => { setCatalogLoading(true); setCatalogError(null); });
     void fetch(`/api/locations?${params}`, { signal: AbortSignal.any([controller.signal, AbortSignal.timeout(15_000)]) })
@@ -181,7 +189,7 @@ export function SearchWorkspace({ examples }: { examples: Location[] }) {
       .catch(() => { if (!controller.signal.aborted) setCatalogError("장소 목록을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요."); })
       .finally(() => { cancelAnimationFrame(frame); if (!controller.signal.aborted) setCatalogLoading(false); });
     return () => { cancelAnimationFrame(frame); controller.abort(); };
-  }, [region, category, catalogOffset, filterKey]);
+  }, [district, category, catalogOffset, filterKey]);
 
   useEffect(() => {
     const url = file ? URL.createObjectURL(file) : null;
@@ -192,7 +200,7 @@ export function SearchWorkspace({ examples }: { examples: Location[] }) {
     };
   }, [file]);
   useEffect(() => embeddingService.subscribe(setEmbeddingStatus), [embeddingService]);
-  useEffect(() => { setSearchSession({ file, region, category, results }); }, [file, region, category, results]);
+  useEffect(() => { setSearchSession({ file, district, category, results }); }, [file, district, category, results]);
 
   useEffect(() => {
     const draft = takeSearchImageDraft();
@@ -233,7 +241,7 @@ export function SearchWorkspace({ examples }: { examples: Location[] }) {
 
   function resetFilters() {
     setCatalogOffset(0);
-    setRegion("");
+    setDistrict("");
     setCategory("");
     clearSearchResults();
   }
@@ -251,7 +259,7 @@ export function SearchWorkspace({ examples }: { examples: Location[] }) {
       return;
     }
     // Avoid a model download for a known-empty catalog filter. Never broaden
-    // the requested region/category silently or substitute invented places.
+    // the requested district/category silently or substitute invented places.
     if (catalog.key === filterKey && !catalogLoading && !catalogError && !catalog.hasMore && catalog.locations.length === 0) {
       setSearchError(null);
       setResults([]);
@@ -274,7 +282,7 @@ export function SearchWorkspace({ examples }: { examples: Location[] }) {
       analyzedImageRef.current = { file, embedding };
       executionStage = "searching";
       setSearchStage("searching");
-      const response = await fetch("/api/search", { method: "POST", signal: AbortSignal.any([controller.signal, AbortSignal.timeout(20_000)]), headers: { "Content-Type": "application/json" }, body: JSON.stringify({ embedding, filters: { region: region || undefined, category: category || undefined } }) });
+      const response = await fetch("/api/search", { method: "POST", signal: AbortSignal.any([controller.signal, AbortSignal.timeout(20_000)]), headers: { "Content-Type": "application/json" }, body: JSON.stringify({ embedding, filters: { district: district || undefined, category: category || undefined } }) });
       if (!response.ok) throw await createSearchApiError(response);
       const data = await response.json() as SearchResponse;
       if (!Array.isArray(data.results)) throw new Error("Invalid search response");
@@ -297,7 +305,7 @@ export function SearchWorkspace({ examples }: { examples: Location[] }) {
   const aiUiState = getAiUiState(searchStage, embeddingStatus);
   const searchButtonText = searchStage === "searching" ? "장소 검색 중…" : "이미지 분석 중…";
   const displayedResults = useMemo(() => results?.slice(0, 8) ?? null, [results]);
-  const hasActiveFilters = region !== "" || category !== "";
+  const hasActiveFilters = district !== "" || category !== "";
 
   const filteredExamples = catalog.key === filterKey ? catalog.locations : [];
   const activeResult = displayedResults?.find(({ location }) => location.id === activeLocationId);
@@ -319,10 +327,10 @@ export function SearchWorkspace({ examples }: { examples: Location[] }) {
       <div className="mt-5 border-t border-line pt-4">
         <div className="flex items-center justify-between"><h3 className="text-sm font-semibold">검색 조건 <span className="font-normal text-muted">(선택)</span></h3><button type="button" disabled={busy || !hasActiveFilters} onClick={resetFilters} className="min-h-11 px-2 text-sm font-semibold text-brand disabled:text-stone-400">초기화</button></div>
         <div className="mt-2 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-2">
-          <label className="text-sm font-medium">지역<select name="region" className="scene-input mt-2" value={region} disabled={busy} onChange={(e) => { setRegion(e.target.value as Region | ""); setCatalogOffset(0); clearSearchResults(); setVisibleCount(12); }}><option value="">전국</option>{regionOptions.map((option) => <option key={option} value={option}>{option}</option>)}</select></label>
+          <label className="text-sm font-medium">지역<select name="district" className="scene-input mt-2" value={district} disabled={busy} onChange={(e) => { setDistrict(toValidDistrict(e.target.value)); setCatalogOffset(0); clearSearchResults(); setVisibleCount(12); }}><option value="">부산 전체</option>{districtOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label>
           <label className="text-sm font-medium">공간 종류<select name="category" className="scene-input mt-2" value={category} disabled={busy} onChange={(e) => { setCategory(e.target.value as LocationCategory | ""); setCatalogOffset(0); clearSearchResults(); setVisibleCount(12); }}><option value="">전체</option>{categoryOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label>
         </div>
-        <p className="mt-3 text-xs leading-relaxed text-muted">{region || "전국"} · {categoryOptions.find((option) => option.value === category)?.label ?? "전체 공간"}{catalogLoading || catalog.key !== filterKey ? " — 장소 목록 확인 중…" : catalogError ? " — 목록 연결을 확인해 주세요. 이미지 검색은 계속 사용할 수 있습니다." : catalog.hasMore ? ` — 장소 ${filteredExamples.length}곳을 불러왔습니다. 아래에서 더 볼 수 있어요.` : `에 등록된 장소 ${filteredExamples.length}곳.`}</p>
+        <p className="mt-3 text-xs leading-relaxed text-muted">{district ? DISTRICT_LABELS[district] : "부산 전체"} · {categoryOptions.find((option) => option.value === category)?.label ?? "전체 공간"}{catalogLoading || catalog.key !== filterKey ? " — 장소 목록 확인 중…" : catalogError ? " — 목록 연결을 확인해 주세요. 이미지 검색은 계속 사용할 수 있습니다." : catalog.hasMore ? ` — 장소 ${filteredExamples.length}곳을 불러왔습니다. 아래에서 더 볼 수 있어요.` : `에 등록된 장소 ${filteredExamples.length}곳.`}</p>
       </div>
       <Button onClick={search} disabled={busy} aria-busy={busy} size="lg" className="mt-5 w-full">{busy ? <LoaderCircle size={18} className="animate-spin" aria-hidden="true" /> : <Search size={18} aria-hidden="true" />}{busy ? searchButtonText : results ? "다시 검색하기" : "이 이미지로 장소 찾기"}</Button>
       {aiUiState && aiUiState.kind !== "error" && <div role="status" aria-live="polite" className="scene-status mt-4" data-tone="progress">

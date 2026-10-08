@@ -9,6 +9,7 @@ import {
   type MapMarkerController,
 } from "@/domains/locations/services/map-adapter";
 import type { LocationSearchResult } from "@/types/domain";
+import { getLocationAreaLabel } from "@/domains/locations/components/location-copy";
 
 type SearchResultsMapProps = {
   results: LocationSearchResult[];
@@ -175,7 +176,7 @@ export function SearchResultsMap({
       )}
       <p aria-live="polite" className="mt-3 min-h-5 text-sm text-stone-600">
         {activeResult
-          ? `${activeResult.location.name} · ${activeResult.location.region}`
+          ? `${activeResult.location.name} · ${getLocationAreaLabel(activeResult.location.district)}`
           : "카드 또는 마커를 선택하면 해당 장소가 강조됩니다."}
       </p>
       {error && (

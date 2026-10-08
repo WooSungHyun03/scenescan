@@ -11,7 +11,7 @@ import { ShortlistButton } from "@/domains/locations/components/shortlist-button
 import { SolarPanel } from "@/domains/locations/components/solar-panel";
 import { SourceAttribution } from "@/domains/locations/components/source-attribution";
 import { getLocation, getSimilarLocations } from "@/domains/locations/server/repository";
-import { getKoreanDescription } from "@/domains/locations/components/location-copy";
+import { getKoreanDescription, getLocationAreaLabel } from "@/domains/locations/components/location-copy";
 import { locationIdSchema } from "@/types/contracts";
 import { logger } from "@/shared/observability/logger";
 
@@ -46,7 +46,7 @@ export default async function LocationPage({ params }: { params: Promise<{ id: s
         </Link>
         <div className="mt-5 flex flex-col justify-between gap-5 border-b border-line pb-7 sm:flex-row sm:items-end sm:pb-9">
           <div className="min-w-0 max-w-4xl">
-            <p className="scene-kicker">{displayValue(location.region)} · {categoryLabels[location.category]}</p>
+            <p className="scene-kicker">{getLocationAreaLabel(location.district)} · {categoryLabels[location.category]}</p>
             <h1 className="mt-3 break-words text-4xl font-extrabold tracking-[-.055em] sm:text-5xl lg:text-6xl">
               {displayValue(location.name)}
             </h1>

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowRight, Check, MapPin } from "lucide-react";
 import { publicEnv } from "@/env/public";
 import { LocationCard } from "@/domains/locations/components/location-card";
+import { getLocationAreaLabel } from "@/domains/locations/components/location-copy";
 import { getLocations } from "@/domains/locations/server/repository";
 import { ImageSearchEntry } from "@/domains/search/components/image-search-entry";
 
@@ -70,7 +71,7 @@ export default async function HomePage() {
                     <p className="truncate text-lg font-bold">{hero.name}</p>
                     <p className="mt-1.5 flex items-center gap-1.5 text-sm text-muted">
                       <MapPin size={15} aria-hidden="true" />
-                      {hero.region} · 촬영 정보 보기
+                      {getLocationAreaLabel(hero.district)} · 촬영 정보 보기
                     </p>
                   </div>
                   <span className="inline-flex size-11 shrink-0 items-center justify-center rounded-full bg-brand-soft text-brand transition-colors group-hover:bg-brand group-hover:text-white">

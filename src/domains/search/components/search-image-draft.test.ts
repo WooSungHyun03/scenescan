@@ -10,9 +10,9 @@ describe("transient search navigation", () => {
   });
   it("retains the current search when visiting a location and can clear it", () => {
     const file = new File(["image"], "scene.png", { type: "image/png" });
-    setSearchSession({ file, region: "부산", category: "industrial", results: [] });
-    expect(getSearchSession()).toEqual({ file, region: "부산", category: "industrial", results: [] });
-    setSearchSession({ file: null, region: "", category: "", results: null });
+    setSearchSession({ file, district: "busan_haeundae_gu", category: "industrial", results: [] });
+    expect(getSearchSession()).toEqual({ file, district: "busan_haeundae_gu", category: "industrial", results: [] });
+    setSearchSession({ file: null, district: "", category: "", results: null });
     expect(getSearchSession()?.file).toBeNull();
     expect(getSearchSession()?.results).toBeNull();
   });

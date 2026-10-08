@@ -14,6 +14,7 @@ import {
   Sun,
 } from "lucide-react";
 import { sortParkingByDistance } from "@/domains/locations/services/parking-distance";
+import { getLocationAreaLabel } from "@/domains/locations/components/location-copy";
 import {
   DEFAULT_LOCATION_TIME_ZONE,
   formatTimeZoneWithOffset,
@@ -353,7 +354,7 @@ export function ShortlistComparison({
                         <ExternalLink size={13} aria-hidden="true" />
                       </Link>
                       <p className="mt-1 text-xs font-normal text-stone-500">
-                        {location.region} · {categoryLabels[location.category]}
+                        {getLocationAreaLabel(location.district)} · {categoryLabels[location.category]}
                       </p>
                     </th>
                   ))}

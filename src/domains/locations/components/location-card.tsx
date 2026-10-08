@@ -5,7 +5,7 @@ import Link from "next/link";
 import { ImageOff, MapPin } from "lucide-react";
 import { useState } from "react";
 import { ShortlistButton } from "@/domains/locations/components/shortlist-button";
-import { getKoreanDescription } from "./location-copy";
+import { getKoreanDescription, getLocationAreaLabel } from "./location-copy";
 import { getSafeImageUrl } from "./location-image-gallery";
 import { publicEnv } from "@/env/public";
 import type { Location } from "@/types/domain";
@@ -114,7 +114,7 @@ export function LocationCard({
         </div>
         <p className="mt-2 flex items-center gap-1.5 text-sm font-medium text-stone-600">
           <MapPin size={14} className="shrink-0 text-brand" aria-hidden="true" />
-          {location.region}
+          {getLocationAreaLabel(location.district)}
           <span aria-hidden="true">·</span>
           {categoryLabels[location.category]}
         </p>
