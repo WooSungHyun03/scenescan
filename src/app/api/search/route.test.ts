@@ -33,7 +33,7 @@ function fakeResult(id = "loc-1") {
     location: {
       id, name: "테스트", description: "", category: "urban" as const, region: "서울" as const, address: "",
       point: { latitude: 0, longitude: 0 }, images: [], permit: { type: "", contactName: null, contactPhone: null, note: null },
-      parking: [], noiseSources: [], sourceUrl: null,
+      parking: [], sourceUrl: null,
     },
     similarity: 0.9,
     matchedImageId: "img-1",

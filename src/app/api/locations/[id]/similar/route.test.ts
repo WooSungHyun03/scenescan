@@ -22,7 +22,7 @@ function fakeLocation(id: string) {
   return {
     id, name: "테스트", description: "", category: "urban" as const, region: "서울" as const, address: "",
     point: { latitude: 0, longitude: 0 }, images: [], permit: { type: "", contactName: null, contactPhone: null, note: null },
-    parking: [], noiseSources: [], sourceUrl: null,
+    parking: [], sourceUrl: null,
   };
 }
 

@@ -54,19 +54,6 @@ describe("production import CLI", () => {
     });
   });
 
-  it("parses noise-only as a separate safe write scope", () => {
-    expect(parseProductionImportArgs([
-      "data/production/locations.json",
-      "data/production/embeddings-manifest.json",
-      "--dry-run",
-      "--noise-only",
-    ])).toMatchObject({
-      mode: "dry-run",
-      preserveExisting: false,
-      writeScope: "noise-only",
-    });
-  });
-
   it("runs the documented validate-only command in plain Node", async () => {
     const locations = JSON.parse(await readFile("data/production/locations.json", "utf8")) as {
       locations: unknown[];

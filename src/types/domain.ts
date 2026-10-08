@@ -42,25 +42,6 @@ export interface ParkingDistanceResult {
   distanceMeters: number | null;
 }
 
-export type NoiseSourceKind = "railway" | "major_road" | "airport" | "construction" | "other";
-
-/**
- * A static environmental feature that may affect location sound recording.
- * This contract never represents a measured or predicted dB value.
- */
-export interface NoiseSource {
-  kind: NoiseSourceKind;
-  description: string;
-  distanceMeters: number | null;
-  evidence: string | null;
-  source: string | null;
-  sourceUrl: string | null;
-  license: string | null;
-  licenseUrl: string | null;
-  referenceDate: string | null;
-  lastVerifiedAt: string | null;
-}
-
 export interface SourceMetadata {
   source: string | null;
   sourceUrl: string | null;
@@ -97,7 +78,6 @@ export interface Location extends SourceMetadata {
   images: LocationImage[];
   permit: PermitInfo;
   parking: ParkingInfo[];
-  noiseSources: NoiseSource[];
 }
 
 export type LocationDetail = Location;

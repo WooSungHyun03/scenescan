@@ -81,7 +81,6 @@ function database(overrides: Partial<ProductionImportDatabase> = {}): Production
     updateLocationAttribution: vi.fn(async () => undefined),
     updateImageAttribution: vi.fn(async () => undefined),
     updatePermitMetadata: vi.fn(async () => undefined),
-    updateNoiseSources: vi.fn(async () => undefined),
     ...overrides,
   };
 }
@@ -126,41 +125,6 @@ describe("production data importer", () => {
     await expect(importProductionData(parkingRows, "apply", 100, db, false, "parking-only"))
       .resolves.toMatchObject({ parkingWritten: 1, locationsWritten: 0, imagesWritten: 0 });
     expect(db.upsertParking).toHaveBeenCalledWith(parkingRows.parking);
-    expect(db.upsertLocations).not.toHaveBeenCalled();
-    expect(db.upsertImages).not.toHaveBeenCalled();
-  });
-
-  it("maps reviewed expected noise sources and updates only existing locations", async () => {
-    const { data, manifest, licenses } = inputs();
-    data.locations[0].noiseSources = [{
-      kind: "railway",
-      description: "인근 지상 철도",
-      distanceMeters: 120,
-      evidence: "OpenStreetMap way/1의 railway=rail 태그",
-      license: "Open Data Commons Open Database License (ODbL) 1.0",
-      licenseUrl: "https://www.openstreetmap.org/copyright",
-      provenance: {
-        source: "© OpenStreetMap contributors",
-        sourceUrl: "https://www.openstreetmap.org/way/1",
-        referenceDate: "2026-07-15",
-        lastVerifiedAt: "2026-10-04T00:00:00Z",
-      },
-    }];
-    const noiseRows = createProductionRows(data, manifest, licenses);
-    expect(noiseRows.locations[0].noise_sources).toEqual([expect.objectContaining({
-      kind: "railway",
-      sourceUrl: "https://www.openstreetmap.org/way/1",
-      distanceMeters: 120,
-    })]);
-    const db = database({ findLocationIds: vi.fn(async () => [locationId]) });
-    await expect(importProductionData(noiseRows, "dry-run", 100, db, false, "noise-only"))
-      .resolves.toMatchObject({ existingLocations: 1, locationsWritten: 0 });
-    await expect(importProductionData(noiseRows, "apply", 100, db, false, "noise-only"))
-      .resolves.toMatchObject({ locationsWritten: 1, imagesWritten: 0, parkingWritten: 0 });
-    expect(db.updateNoiseSources).toHaveBeenCalledWith([{
-      id: locationId,
-      noise_sources: noiseRows.locations[0].noise_sources,
-    }]);
     expect(db.upsertLocations).not.toHaveBeenCalled();
     expect(db.upsertImages).not.toHaveBeenCalled();
   });
@@ -282,7 +246,7 @@ describe("production data importer", () => {
   });
   it("joins stable image IDs without inventing unreviewed values", () => {
     expect(rows()).toEqual({
-      locations: [expect.objectContaining({ id: locationId, permit_type: "문의 필요", noise_sources: [] })],
+      locations: [expect.objectContaining({ id: locationId, permit_type: "문의 필요" })],
       images: [{
         id: imageId,
         location_id: locationId,

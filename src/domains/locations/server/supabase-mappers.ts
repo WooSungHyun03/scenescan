@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { District, Location, NoiseSource, NoiseSourceKind, ParkingInfo } from "@/types/domain";
+import type { District, Location, ParkingInfo } from "@/types/domain";
 import type { ImageMatch } from "@/domains/locations/services/group-image-matches";
 import { DISTRICT_VALUES, LOCATION_CATEGORY_VALUES, REGION_VALUES } from "@/types/location-options";
 
@@ -59,7 +59,6 @@ export type LocationRow = {
   permit_source_url?: unknown;
   permit_reference_date?: unknown;
   permit_last_verified_at?: unknown;
-  noise_sources: unknown;
   source_url: string | null;
   source?: unknown;
   author?: unknown;
@@ -103,7 +102,6 @@ const locationRowSchema = z.object({
   permit_source_url: z.unknown().optional(),
   permit_reference_date: z.unknown().optional(),
   permit_last_verified_at: z.unknown().optional(),
-  noise_sources: z.unknown().nullable().optional(),
   source_url: z.string().nullable(),
   source: z.unknown().optional(),
   author: z.unknown().optional(),
@@ -127,7 +125,7 @@ export function parseLocationRow(data: unknown): LocationRow | null {
   return locationRowSchema.parse(data) as unknown as LocationRow;
 }
 
-export type MapperWarning = { field: "location_images" | "parking" | "noise_sources" | "district"; reason: string; value: unknown };
+export type MapperWarning = { field: "location_images" | "parking" | "district"; reason: string; value: unknown };
 
 export type MapLocationResult = { location: Location; warnings: MapperWarning[] };
 
@@ -163,107 +161,6 @@ function isHttpUrl(value: unknown): value is string {
   } catch {
     return false;
   }
-}
-
-function isIsoDate(value: unknown): value is string {
-  return typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value)
-    && Number.isFinite(new Date(`${value}T00:00:00Z`).getTime());
-}
-
-function isIsoDateTime(value: unknown): value is string {
-  return typeof value === "string" && /(?:Z|[+-]\d{2}:\d{2})$/.test(value)
-    && Number.isFinite(new Date(value).getTime());
-}
-
-const noiseKinds = new Set<NoiseSourceKind>(["railway", "major_road", "airport", "construction", "other"]);
-
-function legacyNoiseSource(description: string): NoiseSource {
-  return {
-    kind: "other",
-    description,
-    distanceMeters: null,
-    evidence: null,
-    source: null,
-    sourceUrl: null,
-    license: null,
-    licenseUrl: null,
-    referenceDate: null,
-    lastVerifiedAt: null,
-  };
-}
-
-function mapNoiseSources(value: unknown, warnings: MapperWarning[]): NoiseSource[] {
-  if (value === null || value === undefined) return [];
-  if (!Array.isArray(value)) {
-    warnings.push({ field: "noise_sources", reason: "expected a JSON array", value });
-    return [];
-  }
-  const sources: NoiseSource[] = [];
-  const seenSourceUrls = new Set<string>();
-  for (const item of value) {
-    if (isNonEmptyString(item)) {
-      sources.push(legacyNoiseSource(item.trim()));
-      continue;
-    }
-    if (typeof item !== "object" || item === null || Array.isArray(item)) {
-      warnings.push({ field: "noise_sources", reason: "entry is neither a legacy string nor an object", value: item });
-      continue;
-    }
-    const row = item as Record<string, unknown>;
-    const legacyNote = optionalString(row.note);
-    const description = optionalString(row.description) ?? legacyNote;
-    const rawKind = optionalString(row.kind);
-    // The noise migration converts legacy strings/notes to objects with
-    // explicit null provenance; keep them as unverified, not silently gone.
-    if (description && rawKind && noiseKinds.has(rawKind as NoiseSourceKind)
-      && ["distanceMeters", "evidence", "source", "sourceUrl", "license", "licenseUrl", "referenceDate", "lastVerifiedAt"].every((key) => row[key] === null)) {
-      sources.push({ ...legacyNoiseSource(description), kind: rawKind as NoiseSourceKind });
-      continue;
-    }
-    if (legacyNote && !row.description) {
-      sources.push({ ...legacyNoiseSource(legacyNote), kind: rawKind && noiseKinds.has(rawKind as NoiseSourceKind) ? rawKind as NoiseSourceKind : "other" });
-      continue;
-    }
-    const kind = rawKind as NoiseSourceKind | null;
-    const distanceMeters = row.distanceMeters === null ? null : row.distanceMeters;
-    const evidence = row.evidence === null ? null : optionalString(row.evidence);
-    const source = optionalString(row.source);
-    const sourceUrl = isHttpUrl(row.sourceUrl) ? row.sourceUrl : null;
-    const license = optionalString(row.license);
-    const licenseUrl = isHttpUrl(row.licenseUrl) ? row.licenseUrl : null;
-    const referenceDate = row.referenceDate === null ? null : isIsoDate(row.referenceDate) ? row.referenceDate : null;
-    const lastVerifiedAt = row.lastVerifiedAt === null ? null : isIsoDateTime(row.lastVerifiedAt) ? row.lastVerifiedAt : null;
-    const valid = Boolean(
-      kind && noiseKinds.has(kind)
-      && description
-      && (distanceMeters === null || (isFiniteNumber(distanceMeters) && distanceMeters >= 0))
-      && (distanceMeters !== null || evidence)
-      && source && sourceUrl && license && licenseUrl && lastVerifiedAt
-      && (row.referenceDate === null || referenceDate),
-    );
-    if (!valid) {
-      warnings.push({ field: "noise_sources", reason: "malformed structured noise-source provenance or evidence", value: item });
-      continue;
-    }
-    if (seenSourceUrls.has(sourceUrl!)) {
-      warnings.push({ field: "noise_sources", reason: "duplicate source URL", value: item });
-      continue;
-    }
-    seenSourceUrls.add(sourceUrl!);
-    sources.push({
-      kind: kind!,
-      description: description!,
-      distanceMeters: distanceMeters as number | null,
-      evidence,
-      source: source!,
-      sourceUrl: sourceUrl!,
-      license: license!,
-      licenseUrl: licenseUrl!,
-      referenceDate,
-      lastVerifiedAt: lastVerifiedAt!,
-    });
-  }
-  return sources;
 }
 
 function mapImage(row: LocationImageRow, locationId: string, fallbackAlt: string, warnings: MapperWarning[]): Location["images"][number] | null {
@@ -323,7 +220,6 @@ export function toLocation(row: LocationRow): MapLocationResult {
   const parking = (row.parking ?? [])
     .map((item) => mapParking(item, row.id, warnings))
     .filter((item): item is ParkingInfo => item !== null);
-  const noiseSources = mapNoiseSources(row.noise_sources, warnings);
   const location: Location = {
     id: row.id,
     name: row.name,
@@ -345,7 +241,6 @@ export function toLocation(row: LocationRow): MapLocationResult {
       lastVerifiedAt: optionalString(row.permit_last_verified_at),
     },
     parking,
-    noiseSources,
     source: optionalString(row.source),
     sourceUrl: row.source_url,
     author: optionalString(row.author),

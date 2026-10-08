@@ -1,11 +1,10 @@
 import type { NormalizedLocationOutput } from "./contracts.ts";
 import { z } from "zod";
-import type { NoiseSource } from "../../src/types/domain.ts";
 import { CLIP_MODEL_KEY } from "../../src/lib/ai/embedding-config.ts";
 import { distanceMeters, MAX_NEARBY_PARKING_DISTANCE_METERS } from "./static-parking.ts";
 
 export type ProductionImportMode = "validate-only" | "dry-run" | "apply";
-export type ProductionWriteScope = "all" | "attribution-only" | "permit-only" | "parking-only" | "noise-only";
+export type ProductionWriteScope = "all" | "attribution-only" | "permit-only" | "parking-only";
 
 export type LocationRow = {
   id: string;
@@ -24,7 +23,6 @@ export type LocationRow = {
   permit_source_url: string;
   permit_reference_date: string | null;
   permit_last_verified_at: string | null;
-  noise_sources: NoiseSource[];
   source_url: string;
   source: string;
   author: string | null;
@@ -112,8 +110,6 @@ export type PermitMetadataRow = Pick<
   | "permit_reference_date"
   | "permit_last_verified_at"
 >;
-export type NoiseSourceMetadataRow = Pick<LocationRow, "id" | "noise_sources">;
-
 export interface ProductionImportDatabase {
   findLocationIds(ids: string[]): Promise<string[]>;
   findExistingImages(ids: string[]): Promise<ExistingImageMetadata[]>;
@@ -124,7 +120,6 @@ export interface ProductionImportDatabase {
   updateLocationAttribution(rows: LocationAttributionRow[]): Promise<void>;
   updateImageAttribution(rows: ImageAttributionRow[]): Promise<void>;
   updatePermitMetadata(rows: PermitMetadataRow[]): Promise<void>;
-  updateNoiseSources(rows: NoiseSourceMetadataRow[]): Promise<void>;
 }
 
 export type ProductionImportResult = {
@@ -133,7 +128,6 @@ export type ProductionImportResult = {
   locationsValidated: number;
   imagesValidated: number;
   parkingValidated: number;
-  noiseSourcesValidated: number;
   existingLocations: number;
   existingImages: number;
   existingParking: number;
@@ -178,10 +172,6 @@ export function toPermitMetadataRow(row: LocationRow): PermitMetadataRow {
     permit_reference_date: row.permit_reference_date,
     permit_last_verified_at: row.permit_last_verified_at,
   };
-}
-
-export function toNoiseSourceMetadataRow(row: LocationRow): NoiseSourceMetadataRow {
-  return { id: row.id, noise_sources: row.noise_sources };
 }
 
 function hasReviewedPermitMetadata(row: LocationRow): boolean {
@@ -307,18 +297,6 @@ export function createProductionRows(
       permit_source_url: location.permit.provenance.sourceUrl,
       permit_reference_date: location.permit.provenance.referenceDate,
       permit_last_verified_at: location.permit.provenance.lastVerifiedAt,
-      noise_sources: location.noiseSources.map((source) => ({
-        kind: source.kind,
-        description: source.description,
-        distanceMeters: source.distanceMeters,
-        evidence: source.evidence,
-        source: source.provenance.source,
-        sourceUrl: source.provenance.sourceUrl,
-        license: source.license,
-        licenseUrl: source.licenseUrl,
-        referenceDate: source.provenance.referenceDate,
-        lastVerifiedAt: source.provenance.lastVerifiedAt,
-      })),
       source: location.provenance.source,
       source_url: location.provenance.sourceUrl,
       author: null,
@@ -424,7 +402,6 @@ export async function importProductionData(
     locationsValidated: rows.locations.length,
     imagesValidated: rows.images.length,
     parkingValidated: rows.parking.length,
-    noiseSourcesValidated: rows.locations.reduce((count, row) => count + row.noise_sources.length, 0),
     existingLocations: 0,
     existingImages: 0,
     existingParking: 0,
@@ -452,21 +429,6 @@ export async function importProductionData(
       ...base,
       existingLocations: existingLocationIds.length,
       locationsWritten: permitRows.length,
-    };
-  }
-  if (writeScope === "noise-only") {
-    if (mode === "dry-run") {
-      return { ...base, existingLocations: existingLocationIds.length };
-    }
-    const existingLocationSet = new Set(existingLocationIds);
-    const noiseRows = rows.locations
-      .filter((row) => existingLocationSet.has(row.id) && row.noise_sources.length > 0)
-      .map(toNoiseSourceMetadataRow);
-    for (const batch of chunks(noiseRows, batchSize)) await database.updateNoiseSources(batch);
-    return {
-      ...base,
-      existingLocations: existingLocationIds.length,
-      locationsWritten: noiseRows.length,
     };
   }
   const parkingLocationIds = [...new Set(rows.parking.map((row) => row.location_id))];

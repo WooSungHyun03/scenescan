@@ -42,7 +42,6 @@
           }
         }
       ],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/ddp-01.jpg",
@@ -105,7 +104,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/oil-tank-culture-park-01.jpg",
@@ -168,7 +166,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/seonyudo-park-01.jpg",
@@ -231,7 +228,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/incheon-chinatown-01.jpg",
@@ -294,7 +290,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/songdo-central-park-01.jpg",
@@ -357,7 +352,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/gamcheon-culture-village-01.jpg",
@@ -420,7 +414,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/busan-cinema-center-01.jpg",
@@ -483,7 +476,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/suwon-hwaseong-01.jpg",
@@ -562,7 +554,6 @@
           }
         }
       ],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/gwangmyeong-cave-01.jpg",
@@ -625,7 +616,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/starfield-library-01.jpg",
@@ -688,36 +678,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [
-        {
-          "kind": "railway",
-          "description": "경원선 지상 철도 본선이 공개 지도에서 확인됩니다. 열차 운행 시간대의 실제 소음은 현장 답사로 확인해야 합니다.",
-          "distanceMeters": 258,
-          "evidence": "OpenStreetMap way/1025048901의 railway=rail, usage=main, layer=1 태그",
-          "license": "Open Data Commons Open Database License (ODbL) 1.0",
-          "licenseUrl": "https://www.openstreetmap.org/copyright",
-          "provenance": {
-            "source": "© OpenStreetMap contributors",
-            "sourceUrl": "https://www.openstreetmap.org/way/1025048901",
-            "referenceDate": "2026-07-15",
-            "lastVerifiedAt": "2026-10-04T11:22:00+09:00"
-          }
-        },
-        {
-          "kind": "major_road",
-          "description": "왕십리로 간선도로가 공개 지도에서 확인됩니다. 차량 통행 시간대의 실제 소음은 현장 답사로 확인해야 합니다.",
-          "distanceMeters": 353,
-          "evidence": "OpenStreetMap way/218797187의 highway=primary 태그",
-          "license": "Open Data Commons Open Database License (ODbL) 1.0",
-          "licenseUrl": "https://www.openstreetmap.org/copyright",
-          "provenance": {
-            "source": "© OpenStreetMap contributors",
-            "sourceUrl": "https://www.openstreetmap.org/way/218797187",
-            "referenceDate": "2026-07-15",
-            "lastVerifiedAt": "2026-10-04T11:22:00+09:00"
-          }
-        }
-      ],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q17184-01.jpg",
@@ -755,7 +715,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q17469-01.jpg",
@@ -793,7 +752,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q59969-01.jpg",
@@ -831,7 +789,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q75330-01.jpg",
@@ -869,7 +826,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q100852-01.jpg",
@@ -907,7 +863,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q135709-01.jpg",
@@ -945,7 +900,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q212297-01.jpg",
@@ -983,7 +937,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q246645-01.jpg",
@@ -1021,22 +974,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [
-        {
-          "kind": "airport",
-          "description": "김포국제공항 공항 시설이 공개 지도에서 확인됩니다. 항공기 운항 시간대의 실제 소음은 현장 답사로 확인해야 합니다.",
-          "distanceMeters": 436,
-          "evidence": "OpenStreetMap relation/7363469의 aeroway=aerodrome 태그",
-          "license": "Open Data Commons Open Database License (ODbL) 1.0",
-          "licenseUrl": "https://www.openstreetmap.org/copyright",
-          "provenance": {
-            "source": "© OpenStreetMap contributors",
-            "sourceUrl": "https://www.openstreetmap.org/relation/7363469",
-            "referenceDate": "2026-05-06",
-            "lastVerifiedAt": "2026-10-04T11:22:00+09:00"
-          }
-        }
-      ],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q482493-01.jpg",
@@ -1074,7 +1011,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q482852-01.jpg",
@@ -1112,7 +1048,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q487804-01.jpg",
@@ -1150,7 +1085,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q488897-01.jpg",
@@ -1188,7 +1122,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q492402-01.jpg",
@@ -1226,7 +1159,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q492606-01.jpg",
@@ -1264,7 +1196,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q494577-01.jpg",
@@ -1302,7 +1233,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q494668-01.jpg",
@@ -1340,7 +1270,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q495005-01.jpg",
@@ -1378,7 +1307,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q496536-01.jpg",
@@ -1416,7 +1344,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q623908-01.jpg",
@@ -1454,7 +1381,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q624865-01.jpg",
@@ -1492,7 +1418,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q625542-01.jpg",
@@ -1530,7 +1455,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q626736-01.jpg",
@@ -1568,7 +1492,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q6431677-01.jpg",
@@ -1606,7 +1529,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q6431840-01.jpg",
@@ -1644,7 +1566,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q7990635-01.jpg",
@@ -1682,7 +1603,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q10826354-01.jpg",
@@ -1720,7 +1640,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q10855678-01.jpg",
@@ -1758,7 +1677,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q11269904-01.jpg",
@@ -1796,7 +1714,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q12586829-01.jpg",
@@ -1834,7 +1751,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q12593476-01.jpg",
@@ -1872,7 +1788,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q12600354-01.jpg",
@@ -1910,7 +1825,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q12615554-01.jpg",
@@ -1948,7 +1862,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q12618846-01.jpg",
@@ -1986,7 +1899,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q16092829-01.jpg",
@@ -2024,7 +1936,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q16093071-01.jpg",
@@ -2062,7 +1973,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q16094228-01.jpg",
@@ -2100,7 +2010,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q16094363-01.jpg",
@@ -2138,7 +2047,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q16094699-01.jpg",
@@ -2176,7 +2084,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q16630774-01.jpg",
@@ -2214,7 +2121,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q16799669-01.jpg",
@@ -2252,7 +2158,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q24856619-01.jpg",
@@ -2290,7 +2195,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q73134743-01.jpg",
@@ -2328,7 +2232,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q123676073-01.jpg",
@@ -2366,7 +2269,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q482589-01.jpg",
@@ -2404,7 +2306,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q482737-01.jpg",
@@ -2442,7 +2343,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q487170-01.jpg",
@@ -2480,7 +2380,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q623798-01.jpg",
@@ -2518,7 +2417,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q626783-01.jpg",
@@ -2556,7 +2454,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q113493764-01.jpg",
@@ -2594,7 +2491,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q483402-01.jpg",
@@ -2632,7 +2528,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q31177147-01.jpg",
@@ -2670,7 +2565,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q59556849-01.jpg",
@@ -2708,22 +2602,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [
-        {
-          "kind": "airport",
-          "description": "인천국제공항 공항 시설이 공개 지도에서 확인됩니다. 항공기 운항 시간대의 실제 소음은 현장 답사로 확인해야 합니다.",
-          "distanceMeters": 141,
-          "evidence": "OpenStreetMap way/316419197의 aeroway=aerodrome 태그",
-          "license": "Open Data Commons Open Database License (ODbL) 1.0",
-          "licenseUrl": "https://www.openstreetmap.org/copyright",
-          "provenance": {
-            "source": "© OpenStreetMap contributors",
-            "sourceUrl": "https://www.openstreetmap.org/way/316419197",
-            "referenceDate": "2026-07-15",
-            "lastVerifiedAt": "2026-10-04T11:22:00+09:00"
-          }
-        }
-      ],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q20932-01.jpg",
@@ -2761,7 +2639,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q12601867-01.jpg",
@@ -2799,7 +2676,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q22973965-01.jpg",
@@ -2837,7 +2713,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q65288006-01.jpg",
@@ -2875,7 +2750,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q623623-01.jpg",
@@ -2913,7 +2787,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q12585329-01.jpg",
@@ -2951,7 +2824,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q12609075-01.jpg",
@@ -2989,7 +2861,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q12585765-01.jpg",
@@ -3027,7 +2898,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q17226-01.jpg",
@@ -3065,7 +2935,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q31038-01.jpg",
@@ -3103,7 +2972,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q46193-01.jpg",
@@ -3141,7 +3009,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q46203-01.jpg",
@@ -3179,7 +3046,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q56147-01.jpg",
@@ -3217,7 +3083,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q60007-01.jpg",
@@ -3255,7 +3120,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q483295-01.jpg",
@@ -3293,7 +3157,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q486846-01.jpg",
@@ -3331,7 +3194,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q490258-01.jpg",
@@ -3369,7 +3231,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q494673-01.jpg",
@@ -3407,7 +3268,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q5208233-01.jpg",
@@ -3445,7 +3305,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q6656875-01.jpg",
@@ -3483,7 +3342,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q12608241-01.jpg",
@@ -3521,7 +3379,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q12608267-01.jpg",
@@ -3559,7 +3416,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q12614438-01.jpg",
@@ -3597,7 +3453,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q12621501-01.jpg",
@@ -3635,7 +3490,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q14947137-01.jpg",
@@ -3673,7 +3527,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q16095974-01.jpg",
@@ -3711,7 +3564,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q18328963-01.jpg",
@@ -3749,7 +3601,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q19940341-01.jpg",
@@ -3787,7 +3638,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q21025128-01.jpg",
@@ -3825,7 +3675,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q21025129-01.jpg",
@@ -3863,7 +3712,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q21025130-01.jpg",
@@ -3901,7 +3749,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q21025131-01.jpg",
@@ -3939,7 +3786,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q21025132-01.jpg",
@@ -3977,7 +3823,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q24700199-01.jpg",
@@ -4015,7 +3860,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q25842401-01.jpg",
@@ -4053,7 +3897,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q626458-01.jpg",
@@ -4091,7 +3934,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q4734818-01.jpg",
@@ -4129,7 +3971,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q5521164-01.jpg",
@@ -4167,22 +4008,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [
-        {
-          "kind": "airport",
-          "description": "청주국제공항 공항 시설이 공개 지도에서 확인됩니다. 항공기 운항 시간대의 실제 소음은 현장 답사로 확인해야 합니다.",
-          "distanceMeters": 87,
-          "evidence": "OpenStreetMap way/377997683의 aeroway=aerodrome 태그",
-          "license": "Open Data Commons Open Database License (ODbL) 1.0",
-          "licenseUrl": "https://www.openstreetmap.org/copyright",
-          "provenance": {
-            "source": "© OpenStreetMap contributors",
-            "sourceUrl": "https://www.openstreetmap.org/way/377997683",
-            "referenceDate": "2026-07-15",
-            "lastVerifiedAt": "2026-10-04T11:22:00+09:00"
-          }
-        }
-      ],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q483675-01.jpg",
@@ -4220,7 +4045,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q484090-01.jpg",
@@ -4258,7 +4082,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q16095714-01.jpg",
@@ -4296,7 +4119,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q19940563-01.jpg",
@@ -4334,7 +4156,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q22975133-01.jpg",
@@ -4372,7 +4193,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q28698707-01.jpg",
@@ -4410,7 +4230,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q61093095-01.jpg",
@@ -4448,7 +4267,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q623817-01.jpg",
@@ -4486,7 +4304,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q12582562-01.jpg",
@@ -4524,7 +4341,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q16094598-01.jpg",
@@ -4562,7 +4378,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q16095200-01.jpg",
@@ -4600,7 +4415,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q16979132-01.jpg",
@@ -4638,7 +4452,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q17095114-01.jpg",
@@ -4676,7 +4489,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q29939356-01.jpg",
@@ -4714,7 +4526,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q109458459-01.jpg",
@@ -4752,7 +4563,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q12584431-01.jpg",
@@ -4790,7 +4600,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q12584448-01.jpg",
@@ -4828,7 +4637,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q12588611-01.jpg",
@@ -4866,7 +4674,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q12595609-01.jpg",
@@ -4904,7 +4711,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q12611766-01.jpg",
@@ -4942,7 +4748,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q12615292-01.jpg",
@@ -4980,7 +4785,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q17095057-01.jpg",
@@ -5018,7 +4822,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q491213-01.jpg",
@@ -5056,7 +4859,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q12585325-01.jpg",
@@ -5094,7 +4896,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q12589628-01.jpg",
@@ -5132,7 +4933,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q12589630-01.jpg",
@@ -5170,7 +4970,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q12589647-01.jpg",
@@ -5208,7 +5007,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q12591051-01.jpg",
@@ -5246,7 +5044,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q12598376-01.jpg",
@@ -5284,7 +5081,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q12614512-01.jpg",
@@ -5322,7 +5118,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q16092277-01.jpg",
@@ -5360,7 +5155,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q19941496-01.jpg",
@@ -5398,7 +5192,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q21057473-01.jpg",
@@ -5436,7 +5229,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q390124-01.jpg",
@@ -5474,7 +5266,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q489708-01.jpg",
@@ -5512,7 +5303,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q623604-01.jpg",
@@ -5550,7 +5340,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q624306-01.jpg",
@@ -5588,7 +5377,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q6680259-01.jpg",
@@ -5626,7 +5414,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q12583868-01.jpg",
@@ -5664,7 +5451,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q12605595-01.jpg",
@@ -5702,7 +5488,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q12609080-01.jpg",
@@ -5740,7 +5525,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q12621212-01.jpg",
@@ -5778,7 +5562,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q16094464-01.jpg",
@@ -5816,7 +5599,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q16095406-01.jpg",
@@ -5854,7 +5636,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q16096110-01.jpg",
@@ -5892,7 +5673,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q31179255-01.jpg",
@@ -5930,7 +5710,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q109455925-01.jpg",
@@ -5968,7 +5747,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q6202570-01.jpg",
@@ -6006,7 +5784,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q12618340-01.jpg",
@@ -6044,7 +5821,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q12624438-01.jpg",
@@ -6082,7 +5858,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q16096002-01.jpg",
@@ -6120,7 +5895,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q16100741-01.jpg",
@@ -6158,7 +5932,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q18492946-01.jpg",
@@ -6196,7 +5969,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q18605797-01.jpg",
@@ -6234,7 +6006,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q19794650-01.jpg",
@@ -6272,7 +6043,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q24856539-01.jpg",
@@ -6310,7 +6080,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q65234888-01.jpg",
@@ -6348,7 +6117,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q65236011-01.jpg",
@@ -6386,7 +6154,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q7410332-01.jpg",
@@ -6424,7 +6191,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q12438381-01.jpg",
@@ -6462,7 +6228,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q12584496-01.jpg",
@@ -6500,7 +6265,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q12616503-01.jpg",
@@ -6538,7 +6302,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q490572-01.jpg",
@@ -6576,7 +6339,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q16161579-01.jpg",
@@ -6614,7 +6376,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q624528-01.jpg",
@@ -6652,7 +6413,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q64506499-01.jpg",
@@ -6700,7 +6460,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q12583924-01.jpg",
@@ -6738,7 +6497,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q277173-01.jpg",
@@ -6776,7 +6534,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q12591871-01.jpg",
@@ -6824,7 +6581,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q562938-01.jpg",
@@ -6862,7 +6618,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q122225-01.jpg",
@@ -6905,7 +6660,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q16099490-01.jpg",
@@ -6943,7 +6697,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q484880-01.jpg",
@@ -6981,7 +6734,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q491203-01.jpg",
@@ -7029,7 +6781,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q16094197-01.jpg",
@@ -7067,7 +6818,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q16172014-01.jpg",
@@ -7105,7 +6855,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q16182443-01.jpg",
@@ -7153,7 +6902,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q7082647-01.jpg",
@@ -7191,7 +6939,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q30156824-01.jpg",
@@ -7229,7 +6976,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q12594774-01.jpg",
@@ -7267,7 +7013,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q482741-01.jpg",
@@ -7305,7 +7050,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q625993-01.jpg",
@@ -7353,7 +7097,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q24861751-01.jpg",
@@ -7391,7 +7134,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q12613619-01.jpg",
@@ -7429,7 +7171,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q66175402-01.jpg",
@@ -7467,7 +7208,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q64769089-01.jpg",
@@ -7505,7 +7245,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q12595938-01.jpg",
@@ -7543,7 +7282,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q24565460-01.jpg",
@@ -7581,7 +7319,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q12598904-01.jpg",
@@ -7619,7 +7356,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q16092652-01.jpg",
@@ -7657,7 +7393,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q491088-01.jpg",
@@ -7695,7 +7430,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q626162-01.jpg",
@@ -7733,7 +7467,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q16178122-01.jpg",
@@ -7771,7 +7504,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q108914532-01.jpg",
@@ -7809,7 +7541,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q12597864-01.jpg",
@@ -7847,7 +7578,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q49316331-01.jpg",
@@ -7885,7 +7615,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q85989821-01.jpg",
@@ -7923,7 +7652,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q5952045-01.jpg",
@@ -7961,7 +7689,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q12600001-01.jpg",
@@ -7999,7 +7726,6 @@
         }
       },
       "parking": [],
-      "noiseSources": [],
       "images": [
         {
           "imagePath": "public/locations/wikidata-q105061220-01.jpg",

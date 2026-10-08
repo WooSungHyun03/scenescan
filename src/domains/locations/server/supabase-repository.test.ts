@@ -77,7 +77,7 @@ function locationRow(overrides: Record<string, unknown> = {}) {
   return {
     id: "loc-1", name: "테스트 장소", description: "설명", category: "urban", region: "부산",
     address: "주소", latitude: 37.5, longitude: 127.0, permit_type: "정보 확인 필요",
-    contact_name: null, contact_phone: null, permit_note: null, noise_sources: null, source_url: null,
+    contact_name: null, contact_phone: null, permit_note: null, source_url: null,
     location_images: [{ id: "img-1", image_url: "https://example.com/a.jpg", alt: null }],
     parking: [],
     ...overrides,

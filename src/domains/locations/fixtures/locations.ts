@@ -93,7 +93,6 @@ export const mockLocations: Location[] = seeds.map((seed) => {
       referenceDate: null,
       lastVerifiedAt: null,
     }],
-    noiseSources: [],
     source: "SceneScan synthetic fixture",
     sourceUrl: null,
     author: "SceneScan",

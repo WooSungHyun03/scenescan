@@ -23,7 +23,6 @@ function baseRow(overrides: Partial<LocationRow> = {}): LocationRow {
     contact_name: null,
     contact_phone: null,
     permit_note: null,
-    noise_sources: null,
     source_url: null,
     location_images: [{ id: "img-1", image_url: "https://example.com/a.jpg", alt: "설명" }],
     parking: [{
@@ -36,11 +35,6 @@ function baseRow(overrides: Partial<LocationRow> = {}): LocationRow {
 }
 
 describe("toLocation", () => {
-  it("preserves explicitly unverified noise objects produced by the migration", () => {
-    const { location, warnings } = toLocation(baseRow({ noise_sources: [{ kind: "other", description: "도로 소음 가능", distanceMeters: null, evidence: null, source: null, sourceUrl: null, license: null, licenseUrl: null, referenceDate: null, lastVerifiedAt: null }] }));
-    expect(location.noiseSources[0]).toMatchObject({ description: "도로 소음 가능", source: null });
-    expect(warnings).toEqual([]);
-  });
   it("drops unsafe images and parking coordinates, rejecting invalid location coordinates", () => {
     const { location, warnings } = toLocation(baseRow({ location_images: [{ id: "bad", image_url: "javascript:alert(1)", alt: null }], parking: [{ id: "bad", name: "invalid", latitude: 100, longitude: 0, capacity: null, opening_hours: null, price_info: null, source: null }] }));
     expect(location.images).toEqual([]);
@@ -62,7 +56,6 @@ describe("toLocation", () => {
       referenceDate: "2026-05-01",
       lastVerifiedAt: "2026-10-04T00:00:00Z",
     });
-    expect(location.noiseSources).toEqual([]);
     expect(location.sourceUrl).toBeNull();
     expect(location.source).toBeNull();
     expect(location.author).toBeNull();
@@ -159,52 +152,6 @@ describe("toLocation", () => {
     expect(location.parking[0].relationship).toBe("nearby");
   });
 
-  it("converts legacy string and kind/note arrays without inventing provenance", () => {
-    const { location, warnings } = toLocation(baseRow({
-      noise_sources: ["인근 철도", { kind: "railway", note: "기존 철도 메모" }],
-    }));
-    expect(warnings).toEqual([]);
-    expect(location.noiseSources).toEqual([
-      expect.objectContaining({ kind: "other", description: "인근 철도", sourceUrl: null, lastVerifiedAt: null }),
-      expect.objectContaining({ kind: "railway", description: "기존 철도 메모", sourceUrl: null, lastVerifiedAt: null }),
-    ]);
-  });
-
-  it("maps structured expected-noise provenance", () => {
-    const { location, warnings } = toLocation(baseRow({
-      noise_sources: [{
-        kind: "major_road",
-        description: "왕십리로 간선도로",
-        distanceMeters: 353,
-        evidence: "highway=primary",
-        source: "© OpenStreetMap contributors",
-        sourceUrl: "https://www.openstreetmap.org/way/218797187",
-        license: "ODbL 1.0",
-        licenseUrl: "https://www.openstreetmap.org/copyright",
-        referenceDate: "2026-07-15",
-        lastVerifiedAt: "2026-10-04T11:22:00+09:00",
-      }],
-    }));
-    expect(warnings).toEqual([]);
-    expect(location.noiseSources[0]).toMatchObject({ kind: "major_road", distanceMeters: 353 });
-  });
-
-  it("drops malformed provenance and duplicate source URLs with warnings", () => {
-    const valid = {
-      kind: "railway", description: "철도", distanceMeters: 100, evidence: "railway=rail",
-      source: "OSM", sourceUrl: "https://www.openstreetmap.org/way/1",
-      license: "ODbL", licenseUrl: "https://www.openstreetmap.org/copyright",
-      referenceDate: "2026-07-15", lastVerifiedAt: "2026-10-04T00:00:00Z",
-    };
-    const { location, warnings } = toLocation(baseRow({
-      noise_sources: [valid, { ...valid }, { ...valid, sourceUrl: "javascript:alert(1)" }],
-    }));
-    expect(location.noiseSources).toHaveLength(1);
-    expect(warnings.map((warning) => warning.reason)).toEqual([
-      "duplicate source URL",
-      "malformed structured noise-source provenance or evidence",
-    ]);
-  });
 });
 
 describe("parseLocationRows / parseLocationRow (locations select response validation)", () => {
@@ -218,7 +165,7 @@ describe("parseLocationRows / parseLocationRow (locations select response valida
     return {
       id: "loc-1", name: "테스트 장소", description: "설명", category: "urban", region: "부산",
       address: "주소", latitude: 37.5, longitude: 127.0, permit_type: "정보 확인 필요",
-      contact_name: null, contact_phone: null, permit_note: null, noise_sources: null, source_url: null,
+      contact_name: null, contact_phone: null, permit_note: null, source_url: null,
       location_images: [{ id: "img-1", image_url: "https://example.com/a.jpg", alt: null }],
       parking: [],
       ...overrides,

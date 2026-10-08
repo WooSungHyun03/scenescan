@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, MapPin } from "lucide-react";
 import { LocationImageGallery } from "@/domains/locations/components/location-image-gallery";
 import { LocationMap } from "@/domains/locations/components/location-map";
-import { NoiseSourcePanel } from "@/domains/locations/components/noise-source-panel";
 import { ParkingInfoPanel } from "@/domains/locations/components/parking-info-panel";
 import { PermitInfoPanel } from "@/domains/locations/components/permit-info-panel";
 import { SimilarLocationsSection } from "@/domains/locations/components/similar-locations-section";
@@ -118,7 +117,6 @@ export default async function LocationPage({ params }: { params: Promise<{ id: s
         <div className="scene-grid grid items-start gap-5 md:grid-cols-2 xl:grid-cols-3">
           <PermitInfoPanel permit={location.permit} />
           <ParkingInfoPanel parking={location.parking} origin={location.point} />
-          <NoiseSourcePanel noiseSources={location.noiseSources} />
         </div>
       </section>
 

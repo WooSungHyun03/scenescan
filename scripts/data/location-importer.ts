@@ -1,5 +1,4 @@
 import type { CanonicalLocationRecord } from "./contracts.ts";
-import type { NoiseSource } from "../../src/types/domain.ts";
 
 export type ImportMode = "validate-only" | "dry-run" | "apply";
 
@@ -20,7 +19,6 @@ export type LocationRow = {
   permit_source_url: string;
   permit_reference_date: string | null;
   permit_last_verified_at: string | null;
-  noise_sources: NoiseSource[];
   source_url: string;
   import_batch: string;
   reference_date: string | null;
@@ -83,18 +81,6 @@ function toLocationRow(record: CanonicalLocationRecord): LocationRow {
     permit_source_url: record.permit.provenance.sourceUrl,
     permit_reference_date: record.permit.provenance.referenceDate,
     permit_last_verified_at: record.permit.provenance.lastVerifiedAt,
-    noise_sources: (record.noiseSources ?? []).map((source) => ({
-      kind: source.kind,
-      description: source.description,
-      distanceMeters: source.distanceMeters,
-      evidence: source.evidence,
-      source: source.provenance.source,
-      sourceUrl: source.provenance.sourceUrl,
-      license: source.license,
-      licenseUrl: source.licenseUrl,
-      referenceDate: source.provenance.referenceDate,
-      lastVerifiedAt: source.provenance.lastVerifiedAt,
-    })),
     source_url: record.sourceUrl,
     import_batch: record.provenance.source,
     reference_date: record.provenance.referenceDate,
