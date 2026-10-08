@@ -24,9 +24,9 @@ test("업로드부터 Top 8, 지도, 상세, 태양 정보와 shortlist 비교�
   await expect(page.getByAltText("선택한 참고 이미지")).toBeVisible();
   await expect(page.getByText("demo-01-query.png", { exact: true })).toBeVisible();
 
-  await page.getByLabel("지역").selectOption("서울");
+  await page.getByLabel("지역").selectOption("busan_suyeong_gu");
   await page.getByLabel("공간 종류").selectOption("nature");
-  await expect(page.getByText(/서울 · 자연에 등록된 장소 1곳/)).toBeVisible();
+  await expect(page.getByText(/수영구 · 자연에 등록된 장소 1곳/)).toBeVisible();
   await page.getByRole("button", { name: "초기화" }).click();
   await expect(page.getByLabel("지역")).toHaveValue("");
   await expect(page.getByLabel("공간 종류")).toHaveValue("");

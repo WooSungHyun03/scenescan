@@ -58,7 +58,7 @@ test("잘못된 이미지와 빈 검색 결과를 구분해서 안내한다", as
 
   await page.getByLabel("참고 이미지 파일 선택").setInputFiles(evaluationImagePath);
   await expect(page.getByAltText("선택한 참고 이미지")).toBeVisible();
-  await page.getByLabel("지역").selectOption("제주");
+  await page.getByLabel("지역").selectOption("busan_jung_gu");
   await page.getByRole("button", { name: "이 이미지로 장소 찾기" }).click();
 
   await expect(page.getByRole("heading", { name: "추천 장소 0곳" })).toBeVisible();

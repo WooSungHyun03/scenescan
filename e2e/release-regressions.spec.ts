@@ -5,8 +5,8 @@ test("filter candidates outside the initial browse page do not short-circuit sea
   const errors = collectPageErrors(page);
   const response = await page.request.get("/api/locations?limit=50");
   const { locations } = await response.json();
-  const candidate = { ...locations[0], name: "페이지 밖 제주 후보", region: "제주" };
-  await page.route("**/api/locations?**", (route) => route.fulfill({ json: { locations: [candidate], filters: { region: "제주" } } }));
+  const candidate = { ...locations[0], name: "페이지 밖 기장군 후보", district: "busan_gijang_gun" };
+  await page.route("**/api/locations?**", (route) => route.fulfill({ json: { locations: [candidate], filters: { district: "busan_gijang_gun" } } }));
   let apiCalls = 0;
   await page.route("**/api/search", (route) => {
     apiCalls++;
@@ -14,32 +14,32 @@ test("filter candidates outside the initial browse page do not short-circuit sea
   });
   await page.goto("/search");
   await chooseEvaluationImage(page);
-  await page.getByLabel("지역").selectOption("제주");
-  await expect(page.getByText(/제주 · 전체 공간에 등록된 장소 1곳/)).toBeVisible();
+  await page.getByLabel("지역").selectOption("busan_gijang_gun");
+  await expect(page.getByText(/기장군 · 전체 공간에 등록된 장소 1곳/)).toBeVisible();
   await page.getByRole("button", { name: "이 이미지로 장소 찾기" }).click();
   await expect(page.getByRole("heading", { name: "추천 장소 1곳" })).toBeVisible();
   expect(apiCalls).toBe(1);
   expect(errors).toEqual([]);
 });
 
-test("부산 지역 선택은 검색 요청과 결과 카드에 끝까지 유지된다", async ({ page }) => {
+test("구/군 선택은 검색 요청과 결과 카드에 끝까지 유지된다", async ({ page }) => {
   const errors = collectPageErrors(page);
-  let requestedRegion: unknown;
+  let requestedDistrict: unknown;
   await page.route("**/api/search", async (route) => {
-    requestedRegion = route.request().postDataJSON()?.filters?.region;
+    requestedDistrict = route.request().postDataJSON()?.filters?.district;
     await route.continue();
   });
 
   await page.goto("/search");
   await chooseEvaluationImage(page);
-  await page.getByLabel("지역").selectOption("부산");
+  await page.getByLabel("지역").selectOption("busan_yeongdo_gu");
   await page.getByRole("button", { name: "이 이미지로 장소 찾기" }).click();
 
   await expect(page.getByRole("heading", { name: "추천 장소 2곳" })).toBeVisible();
-  expect(requestedRegion).toBe("부산");
+  expect(requestedDistrict).toBe("busan_yeongdo_gu");
   const cards = page.locator("main article");
   await expect(cards).toHaveCount(2);
-  for (const card of await cards.all()) await expect(card).toContainText("부산");
+  for (const card of await cards.all()) await expect(card).toContainText("부산 영도구");
   expect(errors).toEqual([]);
 });
 
