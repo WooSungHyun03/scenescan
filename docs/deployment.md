@@ -47,3 +47,9 @@ cache headers remain unchanged; forwarded host headers are not trusted.
 The local signup-to-login test waits for the destination URL and heading before
 filling its exact password label. Do not fix these regressions by allowing
 `0.0.0.0` origins, removing security assertions, or skipping Auth tests.
+
+Follow-up (2026-10-08): pin Sharp 0.35.5 in pnpm overrides to patch
+[GHSA-wq5f-xc86-pv6w](https://github.com/advisories/GHSA-wq5f-xc86-pv6w).
+Account password changes explicitly reauthenticate the fresh user's email and
+check its ID before updating: older/default Auth configurations can ignore
+`current_password`. Recovery sessions keep their existing dedicated flow.

@@ -51,6 +51,13 @@ Every error response is `{ error: { code, message }, requestId }`. `message` is 
 
 ## Supabase Auth and cache contract
 
+Account password updates first call fresh `getUser()` and explicitly
+`signInWithPassword` using that verified user's email and the current password.
+Only a matching returned user ID permits `updateUser`; wrong credentials or a
+missing/mismatched identity leave the password unchanged. Passing
+`current_password` alone is insufficient on provider configurations that do
+not enforce it. Recovery updates retain the verified recovery-session path.
+
 `NEXT_PUBLIC_SUPABASE_URL` plus `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` enables browser/request Auth. `NEXT_PUBLIC_SUPABASE_ANON_KEY` remains a browser-safe legacy fallback; a publishable key wins when both are set. Neither key is an admin credential. `SUPABASE_SECRET_KEY` and the legacy service-role key remain server-only and are rejected under any `NEXT_PUBLIC_*` name.
 
 The browser client uses PKCE, durable cookie-backed sessions, and one singleton within a browser tab. Every server request creates a fresh `@supabase/ssr` server client. `proxy.ts` refreshes cookies and calls `getClaims()` early, but the proxy is not an authorization boundary: protected server operations must call `getVerifiedAuthClaims`/`requireVerifiedAuthClaims`, and operations needing the latest user record use `getVerifiedAuthUser`. Direct cookie parsing and `getSession()` user data are not accepted as identity evidence. Auth cookie names, verified identities, and auth `Set-Cookie` responses trigger `Cache-Control: private, no-cache, no-store, must-revalidate, max-age=0`, `Pragma: no-cache`, `Expires: 0`, and `Vary: Cookie`.

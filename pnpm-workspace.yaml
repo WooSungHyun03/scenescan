@@ -6,6 +6,8 @@ packages:
 # historical `pnpm.overrides` field, while pnpm 10 also supports this form.
 overrides:
   source-map-js: 1.2.2
+  # Transformers.js pins an older Sharp; 0.35.5 patches GHSA-wq5f-xc86-pv6w.
+  sharp: 0.35.5
 
 # Single package. The only native install hook needed for offline CLIP preprocessing.
 onlyBuiltDependencies:

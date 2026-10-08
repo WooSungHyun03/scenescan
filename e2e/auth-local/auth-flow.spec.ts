@@ -60,21 +60,21 @@ test("Auth 전체 흐름과 계정별 관심 장소가 안전하게 이어진다
   await page.getByLabel("이메일").fill(email);
   await page.getByLabel("비밀번호", { exact: true }).fill(password);
   await page.getByRole("button", { name: "로그인", exact: true }).click();
-  await expect(page.locator(".scene-status[role=alert]")).toContainText("이메일 확인이 필요합니다");
+  await expect(page.locator(".scene-status[role=alert]")).toContainText("이메일 확인이 아직 완료되지 않았습니다");
   await expect(page.getByRole("button", { name: /초 후 다시 보내기/ })).toBeDisabled();
 
   const confirmationUrl = await waitForLatestAuthUrl(request, email);
   await page.goto(confirmationUrl);
   await expect(page).toHaveURL(/\/account\?confirmed=1$/);
   await expect(page.getByRole("heading", { level: 1, name: "계정 설정" })).toBeVisible();
-  await expect(page.getByText(email, { exact: true })).toBeVisible();
+  await expect(page.getByRole("region", { name: "계정 정보" }).getByText(email, { exact: true })).toBeVisible();
 
   await page.reload();
   await expect(page.getByRole("heading", { level: 1, name: "계정 설정" })).toBeVisible();
 
   const secondTab = await context.newPage();
   await secondTab.goto("/account");
-  await expect(secondTab.getByText(email, { exact: true })).toBeVisible();
+  await expect(secondTab.getByRole("region", { name: "계정 정보" }).getByText(email, { exact: true })).toBeVisible();
 
   await page.getByRole("button", { name: "로그아웃", exact: true }).click();
   await expect(page).toHaveURL("/");
@@ -86,7 +86,7 @@ test("Auth 전체 흐름과 계정별 관심 장소가 안전하게 이어진다
   await page.getByLabel("비밀번호").fill(password);
   await page.getByRole("button", { name: "로그인", exact: true }).click();
   await expect(page).toHaveURL(/\/account$/);
-  await expect(page.getByText(email, { exact: true })).toBeVisible();
+  await expect(page.getByRole("region", { name: "계정 정보" }).getByText(email, { exact: true })).toBeVisible();
 
   await page.goto("/forgot-password");
   await page.getByLabel("가입 이메일").fill(email);
@@ -116,13 +116,13 @@ test("Auth 전체 흐름과 계정별 관심 장소가 안전하게 이어진다
   await expect(page).toHaveURL(/\/account$/);
 
   await page.getByRole("link", { name: "계정 보안" }).click();
-  await page.getByLabel("현재 비밀번호").fill("definitely-wrong-password");
+  await page.getByRole("region", { name: "비밀번호 변경" }).getByLabel("현재 비밀번호").fill("definitely-wrong-password");
   await page.getByLabel("새 비밀번호", { exact: true }).fill(finalPassword);
   await page.getByLabel("새 비밀번호 확인").fill(finalPassword);
   await page.getByRole("button", { name: "비밀번호 변경" }).click();
   await expect(page.locator(".scene-status[role=alert]")).toContainText("현재 비밀번호");
 
-  await page.getByLabel("현재 비밀번호").fill(recoveredPassword);
+  await page.getByRole("region", { name: "비밀번호 변경" }).getByLabel("현재 비밀번호").fill(recoveredPassword);
   await page.getByLabel("새 비밀번호", { exact: true }).fill(finalPassword);
   await page.getByLabel("새 비밀번호 확인").fill(finalPassword);
   await page.getByRole("button", { name: "비밀번호 변경" }).click();
@@ -156,6 +156,7 @@ test("Auth 전체 흐름과 계정별 관심 장소가 안전하게 이어진다
   await page.getByLabel("이메일").fill(secondEmail);
   await page.getByLabel("비밀번호").fill(secondPassword);
   await page.getByRole("button", { name: "로그인", exact: true }).click();
+  await expect(page).toHaveURL(/\/account$/);
   await page.goto("/shortlist");
   await expect(page.getByText("물빛 산책로", { exact: true })).toHaveCount(0);
   await expect(page.getByRole("heading", { name: "이 브라우저의 후보를 계정에 추가할까요?" })).toHaveCount(0);
@@ -175,6 +176,7 @@ test("Auth 전체 흐름과 계정별 관심 장소가 안전하게 이어진다
   await page.getByLabel("이메일").fill(email);
   await page.getByLabel("비밀번호").fill(finalPassword);
   await page.getByRole("button", { name: "로그인", exact: true }).click();
+  await expect(page).toHaveURL(/\/account$/);
   await page.goto("/shortlist");
   await expect(page.getByText("물빛 산책로", { exact: true })).toBeVisible();
   await expect(page.getByText("파란 작업장", { exact: true })).toHaveCount(0);
@@ -188,8 +190,10 @@ test("Auth 전체 흐름과 계정별 관심 장소가 안전하게 이어진다
   const staleAuthCookies = (await context.cookies()).filter(({ name }) => (
     name.startsWith("sb-") && name.includes("-auth-token")
   ));
-  await page.getByRole("link", { name: "계정 보안" }).click();
-  await page.getByLabel("현재 비밀번호").last().fill(finalPassword);
+  // We are on /shortlist, which has no account-security link.
+  await page.goto("/account/security");
+  await expect(page.getByRole("heading", { level: 1, name: "계정 보안" })).toBeVisible();
+  await page.getByRole("region", { name: "회원탈퇴" }).getByLabel("현재 비밀번호").fill(finalPassword);
   await page.getByLabel(/확인을 위해/).fill("회원탈퇴");
   await page.getByRole("button", { name: "계정 영구 삭제" }).click();
   await expect(page).toHaveURL(/\/login\?accountDeleted=1$/);

@@ -26,7 +26,9 @@ export default defineConfig({
   fullyParallel: false,
   retries: 0,
   workers: 1,
-  timeout: 60_000,
+  // Full signup/mail/recovery/two-account/shortlist/deletion flow includes
+  // cold dev compilation. Individual assertions retain the 10-second limit.
+  timeout: 120_000,
   expect: { timeout: 10_000 },
   reporter: [
     ["list"],
@@ -34,6 +36,7 @@ export default defineConfig({
   ],
   use: {
     ...devices["Desktop Chrome"],
+    actionTimeout: 10_000,
     baseURL,
     locale: "ko-KR",
     timezoneId: "Asia/Seoul",

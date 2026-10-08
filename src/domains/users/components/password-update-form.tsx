@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { getSupabaseBrowserAuthClient } from "@/infrastructure/supabase/browser-auth-client";
 import { Button } from "@/shared/ui/button";
 import { getAuthErrorMessage } from "../services/auth-error";
+import { reauthenticatePassword } from "../services/password-reauthentication";
 import {
   accountPasswordInputSchema,
   getAuthInputError,
@@ -60,6 +61,19 @@ export function PasswordUpdateForm({ mode }: { mode: PasswordUpdateMode }) {
     setIsSubmitting(true);
     setNotice({ tone: "progress", message: "비밀번호를 안전하게 변경하고 있습니다." });
     try {
+      if (mode === "account") {
+        const error = await reauthenticatePassword(client, input.currentPassword);
+        if (error) {
+          clearPasswordFields(form);
+          setNotice({
+            tone: "error",
+            message: error.code === "invalid_credentials"
+              ? "현재 비밀번호가 올바르지 않습니다."
+              : getAuthErrorMessage(error),
+          });
+          return;
+        }
+      }
       const attributes = mode === "account"
         ? { password: parsed.data.password, current_password: input.currentPassword }
         : { password: parsed.data.password };
