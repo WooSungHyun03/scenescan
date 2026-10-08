@@ -156,3 +156,31 @@ from match_location_images(a_query_embedding, 0, 3, null, null, expected_embeddi
 Both outcomes were confirmed exactly as shown. Also verified: a pre-existing named-parameter call omitting `exclude_location_id` entirely (`match_threshold => 0, match_count => 10, expected_embedding_model => ...`) still returns all matching rows (6, both locations) -- unaffected by the new parameter, and `anon` can execute the new 7-parameter signature.
 
 The equivalent mock-mode regression (self exclusion holding even when same-category "candidates" would otherwise crowd it out) is covered by a Vitest test in `src/domains/locations/server/mock-repository.test.ts`.
+
+## `search_locations_by_text` RPC contract (2026-10-09)
+
+Added by `supabase/migrations/20261009000000_text_search.sql` for `POST /api/search/text` -- see `docs/api-contracts.md` for the full HTTP contract. Keyword text search, not vector search: there is no `query_embedding` here, and its `score` (a keyword-match count) is never comparable to image search's cosine `similarity`.
+
+```sql
+search_locations_by_text(
+  keywords text[] default '{}'::text[],
+  filter_region text default null,
+  filter_district text default null,
+  filter_category text default null,
+  match_count integer default 8
+) returns table (
+  location_id uuid,
+  score integer
+)
+```
+
+- **score**: the count of distinct elements of `keywords` that match at least one of `name`, `description`, any element of `aliases`, or any element of `tags` via case-insensitive `ILIKE '%...%'` -- a keyword matching more than one of those fields for the same location still counts once, not once per field.
+- **`keywords` empty**: matches every row in scope (`filter_region`/`filter_district`/`filter_category` alone decide eligibility) rather than zero rows -- this is what lets a query like "해운대" (district only, no leftover keyword) still return results.
+- **Filters**: `filter_region`/`filter_district`/`filter_category` all follow the same null-means-unrestricted convention as `match_location_images_filtered`'s own filters (see above), applied in the same `where` clause the `distinct`-equivalent scoring subquery runs under, i.e. before `match_count`/`limit` -- a filter can never starve a match the way a post-hoc application-side filter could.
+- **Ordering**: `score desc, location_id asc` -- deterministic, matching this document's "Location tie-break: ascending `location_id`" convention for image search.
+- **ILIKE pattern escaping**: every keyword is passed through `public.escape_ilike_pattern(text)` (same migration) before being wrapped in `'%' || ... || '%'`. That helper escapes `\` to `\\` and `%`/`_` to `\%`/`\_`, so a keyword containing those characters matches the literal character rather than acting as an ILIKE wildcard. This is a correctness concern distinct from SQL injection -- `keywords` is already a bound RPC parameter, never string-concatenated into the query text, regardless of escaping.
+- **RLS/grants**: `security invoker`, `set search_path = public, extensions`, `execute` granted to `anon` and `authenticated` -- identical posture to every other search RPC in this project. No new RLS policy was needed: the existing public-read `select` policy on `locations` already covers the migration's new `aliases`/`tags` columns (RLS is row-level, not column-level).
+
+### Regression: filtering before `match_count` must not starve an eligible row
+
+Same class of bug this document's other RPCs already guard against. Seed 5 locations sharing a tag in `busan_jung_gu` and 1 more sharing the same tag in `busan_haeundae_gu`; call with `filter_district = 'busan_haeundae_gu'` and `match_count = 3`. The single `busan_haeundae_gu` row must still be returned even though it would not survive an unfiltered top-3 dominated by the 5 `busan_jung_gu` rows. Covered by `supabase/tests/text-search.integration.test.ts` (gated on a live Supabase instance, same as this file's other regression tests).

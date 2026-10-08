@@ -138,6 +138,55 @@ Returns locations similar to the given location. The server computes the represe
 
 Server pages still compose repositories directly. Client browse and shortlist use `GET /api/locations`: list mode validates `locationListQuerySchema` (default 20, max 50, deterministic name/id ordering); explicit-ID mode validates up to 50 UUIDs and deduplicates them before lookup, ignoring list filters. Missing IDs are omitted, while backend failures return 503, not a fake empty catalog.
 
+## `POST /api/search/text` (2026-10-09)
+
+Basic rule-based natural-language search over the reviewed Busan catalog's name/aliases/description/tags. No external AI call is involved -- see "Rule-based parsing" below. This is a separate endpoint from `POST /api/search` (image search): the request/response shapes, scoring, and error contract are all independent, and nothing about image search changed to add this.
+
+```ts
+// Request
+{ query: string }                 // textSearchRequestSchema, src/types/contracts.ts
+
+// Response (always 200 for a well-formed request -- see "Errors" below)
+{
+  results: TextSearchResult[];    // max 8, deterministic order
+  parsedQuery: {
+    district: District | null;
+    category: LocationCategory | null;
+    keywords: string[];
+    districtConflict: boolean;
+  };
+  unsupportedConditions: string[];
+  notice: { code: "OUT_OF_SCOPE_REGION"; message: string } | null;
+}
+
+// TextSearchResult (src/types/text-search.ts)
+{
+  location: Location;
+  score: number;                  // count of distinct matched keywords -- NOT a
+                                   // cosine similarity; never compared across the
+                                   // two search endpoints
+  matchedOn: Array<{ field: "name" | "alias" | "description" | "tag"; keyword: string }>;
+}
+```
+
+**Validation** (`textSearchRequestSchema`): `query` is `.trim().min(1).max(200)` inside a `.strict()` object (an unknown top-level field 400s, matching `searchRequestSchema`'s own strictness elsewhere in this file). Blank/whitespace-only and over-length both 400 `VALIDATION_ERROR`, with distinct Korean messages (`describeTextSearchRequestError`, `src/domains/search/server/validation.ts`, keyed off the zod issue code -- `"too_small"` vs `"too_big"` -- since both failures share the same `["query"]` field path). The request body is capped at `MAX_TEXT_SEARCH_REQUEST_BYTES` (2KB) the same streamed-read way `POST /api/search` enforces its own 32KB cap, duplicated rather than shared so neither route can accidentally change the other's behavior.
+
+**Rule-based parsing** (`parseTextSearchQuery`, `src/domains/search/server/text-query-parser.ts`): extracts `district`, `category`, and free-text `keywords` from the raw string using a curated alias dictionary (`src/domains/search/server/text-search-aliases.ts`) -- no model call, no guessing. In order: (1) a non-Busan region mention (서울, 대구, ...) short-circuits the whole request -- see "Out-of-Busan requests" below; (2) known unsupported-condition phrases (조용한, 촬영 가능, ...) are stripped and recorded in `unsupportedConditions`, never used as a keyword; (3) district aliases are matched and stripped (longest alias first, so e.g. "해운대구" is consumed whole before the shorter "해운대" would otherwise leave a stray "구"); naming two different districts sets `districtConflict: true` and `district: null` rather than guessing one; (4) category aliases (literal labels plus a small curated synonym list) are matched the same way; (5) whatever text remains is split into `keywords`, with Korean particle stopwords (은/는/이/가/...) dropped.
+
+**Scope**: enforced the same way as image search (`BUSAN_REGION`, `src/domains/locations/server/supabase-repository.ts`) -- `filter_region` is always `'부산'`, never client input, for both the SQL and mock backends.
+
+**Out-of-Busan requests**: a non-Busan region mention (e.g. "서울 카페") returns `{ results: [], parsedQuery: { district: null, category: null, keywords: [], districtConflict: false }, unsupportedConditions: [], notice: { code: "OUT_OF_SCOPE_REGION", message: "..." } }` with HTTP 200, not an error -- the request was well-formed, it's just outside the catalog's current scope. A query naming both a non-Busan region and a Busan district (e.g. "서울에서 해운대 느낌 나는 곳") is also treated as out-of-scope, rather than guessing which half of the query to honor.
+
+**Unsupported conditions**: a phrase describing something the catalog has no verified data for (조용함, 촬영 가능, ...) is reported in `unsupportedConditions` but never used to filter, score, or otherwise imply that a returned result satisfies it -- a result appearing in the response never means "confirmed quiet," only "matched on the other given keywords/filters."
+
+**SQL**: `search_locations_by_text(keywords text[], filter_region text, filter_district text, filter_category text, match_count integer)` (see `supabase/migrations/20261009000000_text_search.sql` and `docs/search-ranking.md`). `keywords` and the filters are plain bound RPC parameters -- never string-concatenated into SQL -- and the RPC's own `escape_ilike_pattern()` helper escapes `%`, `_`, and `\` before building each ILIKE pattern, so a keyword containing those characters matches literally instead of acting as a wildcard. `filter_region`/`filter_district`/`filter_category` follow the same null-means-unrestricted convention as `match_location_images_filtered`. An empty `keywords` array matches every row in scope (filters alone decide eligibility) rather than zero rows. `security invoker` + fixed `search_path`, same as every other RPC in this project; the existing public-read RLS `select` policy on `locations` already covers the new `aliases`/`tags` columns with no separate policy needed.
+
+**Ranking**: deterministic score-descending-then-`location_id`-ascending (`rankTextSearchHits`, `src/domains/locations/services/text-search-ranking.ts`), re-applied in application code rather than trusted from the RPC's row order -- the same defensive stance `groupImageMatches`/`rankSimilarLocations` already take for image search. `matchedOn` is re-derived in application code (case-insensitive substring check against the already-hydrated location's own fields) rather than returned by the RPC, since it only needs to run over the final ≤8 results.
+
+**Alias dictionary**: `src/domains/search/server/text-search-aliases.ts` is the single place to add a district/category alias, an unsupported-condition phrase, or a keyword stopword -- see that file's own header comment for exactly how. District aliases include every district's full label and "-구"/"-군"-stripped short form (auto-generated from `DISTRICT_LABELS`, never hand-duplicated), plus a small hand-curated list of well-known neighborhood/landmark names (e.g. "광안리" -> `busan_suyeong_gu`) that don't literally match a district label. A short-form alias is never registered below 2 characters -- 중구/서구/동구/남구/북구 match only by their full label, since their stripped forms (중/서/동/남/북) are common enough to false-positive-match almost any unrelated text (caught by exercising the route manually, not by a unit test).
+
+**Mock mode**: `searchMockLocationsByText` (`src/domains/locations/server/mock-repository.ts`) mirrors the same filter -> score -> `rankTextSearchHits` division of labor as the Supabase path, against fixture `aliases`/`tags` added for this feature (`src/domains/locations/fixtures/locations.ts`).
+
 ## Release audit contract updates (2026-10-04)
 
 - The historical RPC descriptions above document the legacy rollout path. Current search calls `match_location_images_filtered` with model key `CLIP_MODEL_KEY` from `src/lib/ai/embedding-config.ts`; the pre-model five-argument filtered signature is retried only for its exact PGRST202 missing-signature error. This preserves region/category filtering on the existing production schema, but does not establish model isolation until migrations are applied.

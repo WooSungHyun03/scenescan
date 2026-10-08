@@ -15,7 +15,7 @@ vi.mock("@/shared/observability/logger", () => ({
   logger: { warn: (...args: unknown[]) => loggerWarnMock(...args), error: vi.fn(), info: vi.fn() },
 }));
 
-const { getSupabaseLocation, getSupabaseLocations, getSupabaseLocationsByIds, getSupabaseSimilarLocations, searchSupabaseLocations } = await import("./supabase-repository");
+const { getSupabaseLocation, getSupabaseLocations, getSupabaseLocationsByIds, getSupabaseSimilarLocations, searchSupabaseLocations, searchSupabaseLocationsByText } = await import("./supabase-repository");
 
 type QueryResult = { data: unknown; error: { message: string; code?: string } | null };
 
@@ -471,6 +471,79 @@ describe("SupabaseLocationRepository / MockLocationRepository contract parity", 
       });
       getSupabaseClientMock.mockReturnValue(client);
       await expect(getSupabaseSimilarLocations(targetId)).rejects.toMatchObject({ code: "DATA_UNAVAILABLE", status: 503 });
+    });
+  });
+
+  describe("text search", () => {
+    function parsedQuery(overrides: Record<string, unknown> = {}) {
+      return {
+        district: null, category: null, keywords: ["광안리"],
+        districtConflict: false, conflictingDistricts: [], outOfScope: false, unsupportedConditions: [],
+        ...overrides,
+      };
+    }
+
+    it("calls search_locations_by_text with keywords and Busan-enforced filters as plain bound RPC parameters", async () => {
+      const { client, rpcStub } = fakeClient({ query: { data: [], error: null }, rpc: { data: [], error: null } });
+      getSupabaseClientMock.mockReturnValue(client);
+      await searchSupabaseLocationsByText(parsedQuery({ district: "busan_suyeong_gu", category: "nature", keywords: ["바다", "산책"] }));
+      const rpcCall = rpcStub.calls.find((call) => call.method === "rpc")?.args as [string, Record<string, unknown>];
+      expect(rpcCall[0]).toBe("search_locations_by_text");
+      expect(rpcCall[1]).toEqual({
+        keywords: ["바다", "산책"],
+        filter_region: "부산",
+        filter_district: "busan_suyeong_gu",
+        filter_category: "nature",
+        match_count: 8,
+      });
+    });
+
+    it("ignores a client-supplied region -- Busan scope is always enforced server-side, same as image search", async () => {
+      const { client, rpcStub } = fakeClient({ rpc: { data: [], error: null } });
+      getSupabaseClientMock.mockReturnValue(client);
+      await searchSupabaseLocationsByText(parsedQuery());
+      const rpcCall = rpcStub.calls.find((call) => call.method === "rpc")?.args as [string, Record<string, unknown>];
+      expect(rpcCall[1].filter_region).toBe("부산");
+    });
+
+    it("hydrates locations by the exact ids the RPC returned and ranks deterministically", async () => {
+      const lowId = "33333333-3333-4333-8333-333333333333";
+      const highId = "44444444-4444-4444-8444-444444444444";
+      const { client } = fakeClient({
+        fromByTable: {
+          locations: { data: [locationRow({ id: lowId, name: "낮은 점수" }), locationRow({ id: highId, name: "높은 점수" })], error: null },
+        },
+        rpc: {
+          data: [
+            { location_id: lowId, score: 1 },
+            { location_id: highId, score: 2 },
+          ],
+          error: null,
+        },
+      });
+      getSupabaseClientMock.mockReturnValue(client);
+      const results = await searchSupabaseLocationsByText(parsedQuery());
+      expect(results.map((result) => result.location.id)).toEqual([highId, lowId]);
+      expect(results[0].score).toBe(2);
+    });
+
+    it("avoids loading any location metadata for an empty result", async () => {
+      const { client, fromCalls } = fakeClient({ rpc: { data: [], error: null } });
+      getSupabaseClientMock.mockReturnValue(client);
+      await expect(searchSupabaseLocationsByText(parsedQuery())).resolves.toEqual([]);
+      expect(fromCalls).toHaveLength(0);
+    });
+
+    it("an unexpected RPC response shape throws a clear error instead of crashing the ranker", async () => {
+      const { client } = fakeClient({ rpc: { data: [{ score: "not-a-number" }], error: null } });
+      getSupabaseClientMock.mockReturnValue(client);
+      await expect(searchSupabaseLocationsByText(parsedQuery())).rejects.toThrow();
+    });
+
+    it("maps an RPC failure to the shared data-access error contract", async () => {
+      const { client } = fakeClient({ rpc: { data: null, error: { message: "RPC unavailable" } } });
+      getSupabaseClientMock.mockReturnValue(client);
+      await expect(searchSupabaseLocationsByText(parsedQuery())).rejects.toMatchObject({ code: "DATA_UNAVAILABLE", status: 503 });
     });
   });
 });

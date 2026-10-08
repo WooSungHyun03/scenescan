@@ -85,6 +85,26 @@ export const searchRequestSchema = z.object({
   threshold: z.number().min(0).max(1).optional(),
 });
 
+// POST /api/search/text body size cap. A single natural-language query
+// capped at TEXT_SEARCH_QUERY_MAX_LENGTH UTF-16 code units, plus the
+// trivial `{"query":"..."}` JSON wrapper, stays well under 2KB even at
+// worst-case 4-byte astral emoji. Enforced the same streamed-read way as
+// MAX_SEARCH_REQUEST_BYTES -- see src/app/api/search/text/route.ts.
+export const MAX_TEXT_SEARCH_REQUEST_BYTES = 2 * 1024;
+export const TEXT_SEARCH_QUERY_MAX_LENGTH = 200;
+
+// `.trim()` before `.min()`/`.max()` so a whitespace-only query 400s as
+// blank (zod issue code "too_small") rather than passing length checks and
+// silently becoming an empty keyword list -- see describeTextSearchRequestError
+// (src/domains/search/server/validation.ts), which maps "too_small"/"too_big"
+// to distinct Korean messages. Same `.trim().min(1)` idiom scripts/data/contracts.ts
+// already uses for `nonEmptyString`.
+export const textSearchRequestSchema = z.object({
+  query: z.string().trim().min(1).max(TEXT_SEARCH_QUERY_MAX_LENGTH),
+}).strict();
+
+export type TextSearchRequest = z.infer<typeof textSearchRequestSchema>;
+
 // A real locations.id path/route param (uuid primary key -- see
 // supabase/migrations/20260920000000_initial_schema.sql). Used by
 // GET /api/locations/[id]/similar. Mock fixture ids

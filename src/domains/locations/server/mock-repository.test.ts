@@ -1,5 +1,19 @@
 import { describe, expect, it } from "vitest";
-import { getMockLocation, getMockLocations, getMockSimilarLocations, searchMockLocations } from "./mock-repository";
+import type { ParsedTextSearchQuery } from "@/types/text-search";
+import { getMockLocation, getMockLocations, getMockSimilarLocations, searchMockLocations, searchMockLocationsByText } from "./mock-repository";
+
+function parsedQuery(overrides: Partial<ParsedTextSearchQuery> = {}): ParsedTextSearchQuery {
+  return {
+    district: null,
+    category: null,
+    keywords: [],
+    districtConflict: false,
+    conflictingDistricts: [],
+    outOfScope: false,
+    unsupportedConditions: [],
+    ...overrides,
+  };
+}
 
 // Fixture ids are fixed UUIDs (src/domains/locations/fixtures/locations.ts)
 // so mock-mode data can exercise real uuid-shaped code paths (e.g.
@@ -71,6 +85,46 @@ describe("mock location repository", () => {
 
   it("similar locations: a nonexistent location returns an empty array, not an error", () => {
     expect(getMockSimilarLocations("missing")).toEqual([]);
+  });
+
+  it("text search: matches a keyword against a tag, with an accurate matchedOn reason", () => {
+    const results = searchMockLocationsByText(parsedQuery({ keywords: ["바다"] }));
+    expect(results).toHaveLength(1);
+    expect(results[0].location.id).toBe(fixtureId(3));
+    expect(results[0].score).toBe(1);
+    expect(results[0].matchedOn).toEqual([{ field: "tag", keyword: "바다" }]);
+  });
+
+  it("text search: matches a keyword against a name (and its alias, since both fixture strings contain it)", () => {
+    const results = searchMockLocationsByText(parsedQuery({ keywords: ["은빛"] }));
+    expect(results.map((result) => result.location.id)).toEqual([fixtureId(4)]);
+    expect(results[0].matchedOn).toEqual(expect.arrayContaining([
+      { field: "name", keyword: "은빛" },
+      { field: "alias", keyword: "은빛" },
+    ]));
+  });
+
+  it("text search: a no-such-place query returns an empty result, not an error", () => {
+    expect(searchMockLocationsByText(parsedQuery({ keywords: ["존재하지않는장소이름"] }))).toEqual([]);
+  });
+
+  it("text search: district + category filters apply before keyword scoring", () => {
+    const results = searchMockLocationsByText(parsedQuery({ district: "busan_yeongdo_gu", category: "interior", keywords: [] }));
+    expect(results.map((result) => result.location.id)).toEqual([fixtureId(8)]);
+  });
+
+  it("text search: an empty keyword list returns every eligible location, deterministically ordered by location id", () => {
+    const results = searchMockLocationsByText(parsedQuery({ district: "busan_haeundae_gu" }));
+    expect(results.map((result) => result.location.id)).toEqual([fixtureId(1), fixtureId(2), fixtureId(4)]);
+    expect(results.every((result) => result.score === 0 && result.matchedOn.length === 0)).toBe(true);
+  });
+
+  it("text search: deterministic ranking sorts by score descending, then location id ascending", () => {
+    // "실내" matches fixture 4's tag and fixture 8's tag; "스튜디오" additionally
+    // matches fixture 4's name and tag, so fixture 4 scores higher.
+    const results = searchMockLocationsByText(parsedQuery({ keywords: ["실내", "스튜디오"] }));
+    expect(results.map((result) => result.location.id)).toEqual([fixtureId(4), fixtureId(8)]);
+    expect(results[0].score).toBeGreaterThan(results[1].score);
   });
 
   it("distinguishes on-site parking from nearby parking fixtures", () => {

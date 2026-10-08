@@ -78,6 +78,12 @@ export interface Location extends SourceMetadata {
   images: LocationImage[];
   permit: PermitInfo;
   parking: ParkingInfo[];
+  // Reviewed alternate names (e.g. "광안리" for a 수영구 location) and short
+  // descriptive tags. Both default to an empty array, never null, and exist
+  // primarily so POST /api/search/text has curated text to match against --
+  // see docs/api-contracts.md's text-search contract.
+  aliases: string[];
+  tags: string[];
 }
 
 export type LocationDetail = Location;

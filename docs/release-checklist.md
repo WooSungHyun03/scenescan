@@ -44,6 +44,7 @@ pnpm test:integration
 16. `20261006000000_user_shortlist.sql`
 17. `20261008000000_busan_district_contract.sql`
 18. `20261008000001_remove_noise_sources.sql`
+19. `20261009000000_text_search.sql`
 
 - [ ] `npx supabase migration list`의 Local/Remote 항목이 일치한다.
 - [ ] `user_shortlist`는 `(user_id, location_id)` unique/PK, 두 FK cascade, RLS enabled 상태다.

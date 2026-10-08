@@ -1,7 +1,8 @@
 import type { LocationFilter, LocationListQuery, SearchQueryOptions } from "@/types/domain";
+import type { ParsedTextSearchQuery } from "@/types/text-search";
 import { publicEnv } from "@/env/public";
-import { getMockLocation, getMockLocations, getMockSimilarLocations, searchMockLocations } from "./mock-repository";
-import { getSupabaseLocation, getSupabaseLocations, getSupabaseLocationsByIds, getSupabaseSimilarLocations, searchSupabaseLocations } from "./supabase-repository";
+import { getMockLocation, getMockLocations, getMockSimilarLocations, searchMockLocations, searchMockLocationsByText } from "./mock-repository";
+import { getSupabaseLocation, getSupabaseLocations, getSupabaseLocationsByIds, getSupabaseSimilarLocations, searchSupabaseLocations, searchSupabaseLocationsByText } from "./supabase-repository";
 
 const useMock = publicEnv.useMockData;
 
@@ -21,3 +22,6 @@ export const searchByImage = (embedding: number[], filters: LocationFilter = {},
 
 export const getSimilarLocations = (id: string, excludedIds: readonly string[] = []) =>
   useMock ? Promise.resolve(getMockSimilarLocations(id, excludedIds)) : getSupabaseSimilarLocations(id, excludedIds);
+
+export const searchByText = (parsed: ParsedTextSearchQuery) =>
+  useMock ? Promise.resolve(searchMockLocationsByText(parsed)) : searchSupabaseLocationsByText(parsed);

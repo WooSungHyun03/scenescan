@@ -1,6 +1,7 @@
 import { z } from "zod";
 import type { District, Location, ParkingInfo } from "@/types/domain";
 import type { ImageMatch } from "@/domains/locations/services/group-image-matches";
+import type { TextSearchHit } from "@/types/text-search";
 import { DISTRICT_VALUES, LOCATION_CATEGORY_VALUES, REGION_VALUES } from "@/types/location-options";
 
 const districtValueSet = new Set<string>(DISTRICT_VALUES);
@@ -48,6 +49,11 @@ export type LocationRow = {
   // simply omits the key entirely (same rollout accommodation as
   // `source`/`author`/etc. below) -- see optionalDistrict.
   district?: unknown;
+  // unknown, not string[]: same rollout accommodation as `district` -- a
+  // project where 20261009000000_text_search.sql hasn't landed yet simply
+  // omits these keys from the `*` select entirely. See optionalStringArray.
+  aliases?: unknown;
+  tags?: unknown;
   address: string;
   latitude: number;
   longitude: number;
@@ -91,6 +97,8 @@ const locationRowSchema = z.object({
   category: z.enum(LOCATION_CATEGORY_VALUES),
   region: z.enum(REGION_VALUES),
   district: z.unknown().optional(),
+  aliases: z.unknown().optional(),
+  tags: z.unknown().optional(),
   address: z.string(),
   latitude: z.number().finite().min(-90).max(90),
   longitude: z.number().finite().min(-180).max(180),
@@ -151,6 +159,15 @@ function optionalDistrict(value: unknown, warnings: MapperWarning[]): District |
   if (typeof value === "string" && districtValueSet.has(value)) return value as District;
   warnings.push({ field: "district", reason: "unrecognized district value", value });
   return null;
+}
+
+// Missing (pre-migration), null, or non-array becomes []; non-string or
+// blank elements are silently dropped rather than warned on -- aliases/tags
+// are reviewed search metadata, not safety-critical display data like an
+// image URL, so a stray malformed element isn't worth a logged warning.
+function optionalStringArray(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  return value.filter((item): item is string => isNonEmptyString(item));
 }
 
 function isHttpUrl(value: unknown): value is string {
@@ -227,6 +244,8 @@ export function toLocation(row: LocationRow): MapLocationResult {
     category: row.category,
     region: row.region,
     district: optionalDistrict(row.district, warnings),
+    aliases: optionalStringArray(row.aliases),
+    tags: optionalStringArray(row.tags),
     address: row.address,
     point: { latitude: row.latitude, longitude: row.longitude },
     images,
@@ -301,4 +320,27 @@ export function toImageMatchFromHit(hit: MatchLocationImageHit): ImageMatch {
 /** Throws a ZodError on an unexpected shape; the caller wraps it into a dataAccessError. */
 export function parseMatchLocationImageHits(data: unknown): MatchLocationImageHit[] {
   return matchLocationImageHitsSchema.parse(data ?? []);
+}
+
+// search_locations_by_text RPC response shape (see
+// supabase/migrations/20261009000000_text_search.sql). `score` is a
+// deterministic non-negative keyword-match count, never a similarity
+// value -- validated as a non-negative integer so a schema drift can't
+// silently become a negative/fractional "score".
+export const searchLocationsByTextRowSchema = z.object({
+  location_id: z.string().uuid(),
+  score: z.number().int().nonnegative(),
+});
+
+export const searchLocationsByTextRowsSchema = z.array(searchLocationsByTextRowSchema);
+
+export type SearchLocationsByTextRow = z.infer<typeof searchLocationsByTextRowSchema>;
+
+export function toTextSearchHit(row: SearchLocationsByTextRow): TextSearchHit {
+  return { locationId: row.location_id, score: row.score };
+}
+
+/** Throws a ZodError on an unexpected shape; the caller wraps it into a dataAccessError. */
+export function parseSearchLocationsByTextRows(data: unknown): SearchLocationsByTextRow[] {
+  return searchLocationsByTextRowsSchema.parse(data ?? []);
 }

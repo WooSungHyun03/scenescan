@@ -24,3 +24,16 @@ export function describeSearchRequestError(error: z.ZodError): string {
   if (field === "threshold") return "threshold 값은 0에서 1 사이여야 합니다.";
   return "요청 값이 올바르지 않습니다.";
 }
+
+// POST /api/search/text's textSearchRequestSchema (src/types/contracts.ts)
+// uses `.trim().min(1).max(...)` on the same `query` field, so a "too_small"
+// zod issue code means blank/whitespace-only and "too_big" means over the
+// length cap -- the field path alone can't distinguish them (both are
+// ["query"]), unlike describeSearchRequestError's region/category/embedding
+// fields above.
+export function describeTextSearchRequestError(error: z.ZodError): string {
+  const issue = error.issues[0];
+  if (issue?.code === "too_small") return "검색어를 입력해 주세요.";
+  if (issue?.code === "too_big") return "검색어가 너무 깁니다. 200자 이하로 입력해 주세요.";
+  return "검색어 형식이 올바르지 않습니다.";
+}

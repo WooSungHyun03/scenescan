@@ -6,16 +6,20 @@ import { SEARCH_MATCH_COUNT_DEFAULT, SEARCH_MATCH_THRESHOLD_DEFAULT } from "@/ty
 import type { Location, LocationDetail, LocationFilter, LocationListQuery, LocationSearchResult, SearchQueryOptions } from "@/types/domain";
 import { groupImageMatches, type ImageMatch } from "@/domains/locations/services/group-image-matches";
 import { rankSimilarLocations } from "@/domains/locations/services/similar-locations";
+import { rankTextSearchHits } from "@/domains/locations/services/text-search-ranking";
 import { CLIP_MODEL_KEY } from "@/lib/ai/embedding-config";
+import type { ParsedTextSearchQuery, TextSearchResult } from "@/types/text-search";
 import { resolveLocationListPagination } from "./pagination";
 import {
   parseLocationRow,
   parseLocationRows,
   parseMatchLocationImageHits,
   parseMatchLocationImagesRows,
+  parseSearchLocationsByTextRows,
   toImageMatch,
   toImageMatchFromHit,
   toLocation,
+  toTextSearchHit,
   type LocationRow,
 } from "./supabase-mappers";
 
@@ -376,4 +380,34 @@ export async function getSupabaseSimilarLocations(locationId: string, excludedId
   const locationIds = [...new Set([...matches.map((match) => match.locationId), locationId])];
   const locations = await getSupabaseLocationsByIds(locationIds);
   return rankSimilarLocations(locationId, matches, locations, 8);
+}
+
+// POST /api/search/text. Keywords/filters are plain RPC parameters (bound,
+// never string-concatenated); ILIKE pattern escaping happens entirely
+// inside search_locations_by_text/escape_ilike_pattern (see
+// supabase/migrations/20261009000000_text_search.sql) so no caller can
+// forget it. This is a brand-new RPC with no prior deployed signature, so
+// -- unlike searchSupabaseLocations above -- there is no rolling-deploy
+// PGRST202 fallback to maintain: a missing RPC is a genuine
+// DATA_UNAVAILABLE, not a "retry with an older signature" situation.
+export async function searchSupabaseLocationsByText(parsed: ParsedTextSearchQuery): Promise<TextSearchResult[]> {
+  const client = getSupabaseClient();
+  const { data, error } = await client.rpc("search_locations_by_text", {
+    keywords: parsed.keywords,
+    filter_region: BUSAN_REGION,
+    filter_district: parsed.district,
+    filter_category: parsed.category,
+    match_count: 8,
+  });
+  if (error) throw dataAccessError("Failed to search locations by text", error);
+  let hits;
+  try {
+    hits = parseSearchLocationsByTextRows(data).map(toTextSearchHit);
+  } catch (parseError) {
+    throw dataAccessError("Unexpected search_locations_by_text response shape", parseError);
+  }
+  if (hits.length === 0) return [];
+  const locationIds = [...new Set(hits.map((hit) => hit.locationId))];
+  const locations = await getSupabaseLocationsByIds(locationIds);
+  return rankTextSearchHits(hits, locations, parsed.keywords, 8);
 }
