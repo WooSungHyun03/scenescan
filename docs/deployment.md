@@ -53,3 +53,9 @@ Follow-up (2026-10-08): pin Sharp 0.35.5 in pnpm overrides to patch
 Account password changes explicitly reauthenticate the fresh user's email and
 check its ID before updating: older/default Auth configurations can ignore
 `current_password`. Recovery sessions keep their existing dedicated flow.
+
+Production smoke tests use the same visible upload button/file chooser as users,
+via `chooseEvaluationImage`. Directly setting an SSR file input before hydration
+can discard its change event and report a false CLIP failure without downloading
+any model. The real CLIP search/API/Kakao marker smoke passed on October 8;
+this does not replace separate production email-delivery verification.

@@ -1,6 +1,6 @@
 import { writeFile } from "node:fs/promises";
 import { expect, test, type Page, type TestInfo } from "@playwright/test";
-import { evaluationImagePath } from "../helpers";
+import { chooseEvaluationImage } from "../helpers";
 
 type FailureClassification =
   | "external-outage"
@@ -219,10 +219,9 @@ test("real CLIP 검색, Kakao marker, API health가 정상이다", async ({
         "Production is not exposing the real-data search mode",
       );
     }
-    await page
-      .getByLabel("참고 이미지 파일 선택")
-      .setInputFiles(evaluationImagePath);
-    await expect(page.getByAltText("선택한 참고 이미지")).toBeVisible();
+    // Use the real upload control so a cold SSR page cannot lose a file
+    // change event dispatched before React attaches its handlers.
+    await chooseEvaluationImage(page);
     await page.getByRole("button", { name: "이 이미지로 장소 찾기" }).click();
 
     const loadingModel = page.getByText("이미지 분석 준비 중…", { exact: true });
