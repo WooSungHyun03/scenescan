@@ -4,8 +4,10 @@ import { useRouter } from "next/navigation";
 import { ImagePlus, ArrowRight, ShieldCheck } from "lucide-react";
 import { validateImageBlob } from "@/lib/ai/image-validation";
 import { setSearchImageDraft } from "./search-image-draft";
+import { useUploadReady } from "./use-upload-ready";
 
 export function ImageSearchEntry() {
+  const uploadReady = useUploadReady();
   const router = useRouter();
   const input = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
@@ -36,10 +38,12 @@ export function ImageSearchEntry() {
         aria-label="참고 이미지 파일 선택"
         aria-describedby="home-upload-help"
         className="sr-only"
+        disabled={!uploadReady}
         onChange={(event) => { select(event.target.files?.[0]); event.currentTarget.value = ""; }}
       />
       <button
         type="button"
+        disabled={!uploadReady}
         className="flex min-h-14 w-full items-center justify-between gap-3 rounded-[var(--radius-control)] bg-brand px-5 py-3.5 font-bold text-white transition-colors hover:bg-brand-hover"
         onClick={() => input.current?.click()}
       >

@@ -13,6 +13,7 @@ import { validateImageBlob } from "@/lib/ai/image-validation";
 import { getSearchSession, setSearchSession, takeSearchImageDraft } from "./search-image-draft";
 import { REGION_VALUES } from "@/types/location-options";
 import type { SearchResponse } from "@/types/contracts";
+import { useUploadReady } from "./use-upload-ready";
 
 const searchModeDescription = publicEnv.useMockData
   ? "샘플 장소 카탈로그에서는 유사도를 참고용 값으로 표시합니다."
@@ -137,6 +138,7 @@ function SearchResultsSkeleton() {
 }
 
 export function SearchWorkspace({ examples }: { examples: Location[] }) {
+  const uploadReady = useUploadReady();
   const [file, setFile] = useState<File | null>(() => getSearchSession()?.file ?? null);
   const [preview, setPreview] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -304,13 +306,13 @@ export function SearchWorkspace({ examples }: { examples: Location[] }) {
       <p className="scene-kicker">Search input</p>
       <h2 id="reference-image-title" className="mt-2 text-xl font-bold">참고 이미지</h2>
       <p className="mt-1 text-sm text-muted">찾고 싶은 장면의 사진과 검색 조건을 준비하세요.</p>
-      <input ref={fileInputRef} type="file" name="reference-image" accept="image/jpeg,image/png,image/webp" aria-label="참고 이미지 파일 선택" className="sr-only" disabled={busy} onChange={(event) => { selectFile(event.target.files?.[0] ?? null); event.currentTarget.value = ""; }} />
+      <input ref={fileInputRef} type="file" name="reference-image" accept="image/jpeg,image/png,image/webp" aria-label="참고 이미지 파일 선택" className="sr-only" disabled={!uploadReady || busy} onChange={(event) => { selectFile(event.target.files?.[0] ?? null); event.currentTarget.value = ""; }} />
       {preview && file ? <div className="mt-4">
         <div className="overflow-hidden rounded-[var(--radius-media)] border border-line bg-stone-100"><Image src={preview} alt="선택한 참고 이미지" width={520} height={360} unoptimized className="h-48 w-full object-contain lg:h-56" /></div>
         <div className="mt-3 flex min-w-0 items-center gap-2 text-sm text-muted"><FileImage size={16} className="shrink-0" aria-hidden="true" /><span className="truncate" title={file.name}>{file.name}</span><span className="ml-auto shrink-0 text-xs">{file.size < 1024 * 1024 ? `${Math.max(1, Math.round(file.size / 1024))} KB` : `${(file.size / 1024 / 1024).toLocaleString("ko-KR", { maximumFractionDigits: 1 })} MB`}</span></div>
         <div className="mt-3 flex gap-2"><Button type="button" variant="outline" className="flex-1" disabled={busy} onClick={() => fileInputRef.current?.click()}><ImagePlus size={16} aria-hidden="true" />다른 사진 선택</Button><Button type="button" variant="outline" disabled={busy} aria-label="선택한 이미지 삭제" onClick={removeFile}><Trash2 size={16} aria-hidden="true" /></Button></div>
       </div> : <div onDragEnter={(event) => { event.preventDefault(); if (!busy) setIsDragging(true); }} onDragOver={(event) => event.preventDefault()} onDragLeave={() => setIsDragging(false)} onDrop={handleDrop}>
-        <button type="button" disabled={busy} onClick={() => fileInputRef.current?.click()} className={`mt-4 flex min-h-52 w-full flex-col items-center justify-center rounded-[var(--radius-media)] border border-dashed p-5 text-center transition-colors ${isDragging ? "border-brand bg-brand-soft" : "border-stone-300 bg-stone-50 hover:border-brand hover:bg-brand-soft"}`}>
+        <button type="button" disabled={!uploadReady || busy} onClick={() => fileInputRef.current?.click()} className={`mt-4 flex min-h-52 w-full flex-col items-center justify-center rounded-[var(--radius-media)] border border-dashed p-5 text-center transition-colors ${isDragging ? "border-brand bg-brand-soft" : "border-stone-300 bg-stone-50 hover:border-brand hover:bg-brand-soft"}`}>
           <span className="flex size-12 items-center justify-center rounded-full bg-brand-soft text-brand"><Upload size={24} aria-hidden="true" /></span><span className="mt-3 font-bold">참고 이미지 업로드</span><span className="mt-2 text-xs text-muted">선택하거나 끌어놓기 · JPEG, PNG, WebP · 최대 15MB</span>
         </button>
       </div>}

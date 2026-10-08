@@ -6,6 +6,27 @@ import {
   evaluationImagePath,
 } from "./helpers";
 
+test("초기 스크립트가 늦어도 업로드는 준비된 뒤 활성화된다", async ({ page }) => {
+  let releaseScripts!: () => void;
+  const scriptsReady = new Promise<void>((resolve) => { releaseScripts = resolve; });
+  await page.route("**/_next/static/**", async (route) => {
+    if (route.request().resourceType() === "script") await scriptsReady;
+    await route.continue();
+  });
+  try {
+    await page.goto("/search", { waitUntil: "commit" });
+    const upload = page.getByRole("button", { name: "참고 이미지 업로드" });
+    await expect(upload).toBeVisible();
+    await expect(upload).toBeDisabled();
+    await expect(page.getByLabel("참고 이미지 파일 선택")).toBeDisabled();
+    releaseScripts();
+    await expect(upload).toBeEnabled();
+    await chooseEvaluationImage(page);
+  } finally {
+    releaseScripts();
+  }
+});
+
 test("drag and drop 미리보기와 삭제가 동작한다", async ({ page }) => {
   const pageErrors = collectPageErrors(page);
   await page.goto("/search");
@@ -23,6 +44,7 @@ test("잘못된 이미지와 빈 검색 결과를 구분해서 안내한다", as
   const pageErrors = collectPageErrors(page);
   await page.goto("/search");
 
+  await expect(page.getByLabel("참고 이미지 파일 선택")).toBeEnabled();
   await page.getByLabel("참고 이미지 파일 선택").setInputFiles({
     name: "empty.png",
     mimeType: "image/png",

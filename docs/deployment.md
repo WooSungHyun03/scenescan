@@ -57,5 +57,7 @@ check its ID before updating: older/default Auth configurations can ignore
 Production smoke tests use the same visible upload button/file chooser as users,
 via `chooseEvaluationImage`. Directly setting an SSR file input before hydration
 can discard its change event and report a false CLIP failure without downloading
-any model. The real CLIP search/API/Kakao marker smoke passed on October 8;
+any model. Home/search upload controls are also disabled in SSR until React
+attaches their handlers, preventing early clicks from being silently lost.
+The real CLIP search/API/Kakao marker smoke passed on October 8;
 this does not replace separate production email-delivery verification.
