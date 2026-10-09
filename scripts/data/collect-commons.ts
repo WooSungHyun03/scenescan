@@ -45,6 +45,11 @@ const locationSchema = z.object({
   // buildLocationDataset's own check below, which mirrors the DB's
   // locations_district_requires_busan_region constraint.
   district: z.enum(DISTRICT_VALUES).nullable().optional(),
+  // Optional, reviewed-evidence-only (requirement 5 of the Busan
+  // collection-pipeline ticket) -- e.g. a Wikidata type label used
+  // verbatim as a tag is evidence; nothing is invented to fill these in.
+  aliases: z.array(z.string().trim().min(1)).optional(),
+  tags: z.array(z.string().trim().min(1)).optional(),
   address: z.string().trim().min(1),
   latitude: z.number().finite().min(-90).max(90),
   longitude: z.number().finite().min(-180).max(180),
@@ -315,6 +320,8 @@ export function buildLocationDataset(
       category: location.category,
       region: location.region,
       district: location.district ?? null,
+      aliases: location.aliases ?? [],
+      tags: location.tags ?? [],
       address: location.address,
       latitude: location.latitude,
       longitude: location.longitude,

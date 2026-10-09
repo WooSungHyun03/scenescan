@@ -10,6 +10,8 @@ function record(overrides: Partial<CanonicalLocationRecord> = {}): CanonicalLoca
     category: "urban",
     region: "서울",
     district: null,
+    aliases: [],
+    tags: [],
     address: "주소",
     latitude: 37.5,
     longitude: 127.0,

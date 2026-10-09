@@ -13,6 +13,8 @@ export type LocationRow = {
   category: string;
   region: string;
   district: string | null;
+  aliases: string[];
+  tags: string[];
   address: string;
   latitude: number;
   longitude: number;
@@ -288,6 +290,8 @@ export function createProductionRows(
       category: location.category,
       region: location.region,
       district: location.district,
+      aliases: location.aliases,
+      tags: location.tags,
       address: location.address,
       latitude: location.latitude,
       longitude: location.longitude,

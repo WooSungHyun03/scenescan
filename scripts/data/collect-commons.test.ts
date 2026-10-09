@@ -118,6 +118,16 @@ describe("Commons production data collection", () => {
     expect(output.locations[0].district).toBe("busan_haeundae_gu");
   });
 
+  it("passes evidence-backed aliases/tags through, and defaults to empty arrays when omitted", () => {
+    const input = JSON.parse(JSON.stringify(manifest())) as Record<string, unknown> & {
+      locations: Array<Record<string, unknown>>;
+    };
+    input.locations[0].tags = ["박물관"];
+    const output = buildLocationDataset(parseCollectionManifest(input));
+    expect(output.locations[0].tags).toEqual(["박물관"]);
+    expect(output.locations[0].aliases).toEqual([]);
+  });
+
   it("defaults district to null when the manifest omits it", () => {
     const output = buildLocationDataset(parseCollectionManifest(manifest()));
     expect(output.locations[0].district).toBeNull();

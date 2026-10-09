@@ -119,6 +119,8 @@ describe("normalizeDataset", () => {
         category: "industrial",
         region: "서울",
         district: null,
+        aliases: [],
+        tags: [],
         address: "1 Example-ro",
         latitude: 37.55,
         longitude: 126.97,

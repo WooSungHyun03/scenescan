@@ -266,7 +266,25 @@ The live product now serves Busan only (`docs/database.md`'s Busan-district cont
 
 Any ambiguity -- no district named, two districts named, or a coordinate outside the city bounds -- returns `district: null` with a specific reason instead of assigning one. A `null` district is a normal, valid state (same convention as the live product: "구/군 unconfirmed from its source address, never guessed") and routes the candidate to manual review rather than blocking it from the catalog entirely.
 
-The canonical pipeline (`contracts.ts`'s `CanonicalLocationRecord`, the Commons collection manifest, and `production-importer.ts`'s `LocationRow`) all carry this same `district: District | null` field through to the database column added by the Busan-district migration. It is optional on input (defaults to `null`) and, like the DB's own check constraint, can only be non-null when `region` is `부산`.
+The canonical pipeline (`contracts.ts`'s `CanonicalLocationRecord`, the Commons collection manifest, and `production-importer.ts`'s `LocationRow`) all carry this same `district: District | null` field through to the database column added by the Busan-district migration. It is optional on input (defaults to `null`) and, like the DB's own check constraint, can only be non-null when `region` is `부산`. The same two files also carry an optional `aliases`/`tags: string[]` pair (defaults to `[]`) for the text-search columns -- only ever filled from a verified source (e.g. a Wikidata type label used verbatim), never invented to pad a record.
+
+### Coordinate + official boundary district judgement
+
+For a location whose address has no usable 구/군 text at all (common for Wikidata's admin-area fallback addresses), `scripts/data/busan-boundary.ts` + `scripts/data/resolve-busan-districts.ts` judge the district from the coordinate against the real administrative-dong boundary polygons in `data/production/boundaries/` (source, license, and reference date in `DATA_LICENSES.md`):
+
+```bash
+pnpm data:resolve-busan-districts \
+  data/production/commons-manifest.json \
+  data/production/boundaries/busan-admdong-2026-07-01.geojson \
+  data-work/reviews/round-NN/district-boundary-judgement.json
+```
+
+A district is only ever confirmed when **both** checks pass -- otherwise it stays `null` and the report's `judgements` array records the specific reason instead:
+
+- The coordinate falls inside exactly one district's polygon, and is at least 100m from that polygon's own boundary (`NOT_IN_ANY_DISTRICT_BOUNDARY` / `NEAR_DISTRICT_BOUNDARY` otherwise -- a point over water or right on a shared edge is never assigned to the "closest" district by guesswork).
+- The location's own name/description does not name a *different* district than the boundary judgement (`NAME_MISMATCH` otherwise -- the coordinate could be the wrong one, not the text).
+
+Both checks reuse the same longest-alias-first, 2-char-minimum short-form matching (never matching 중/서/동/남/북구's ambiguous 1-character forms, and never matching "기장" either -- that short form is also the tail of "경기장"/stadium, a real false positive found on round-1 data). The script mutates the manifest's `district` field for confirmed locations only and writes a full before/after report; always re-run `pnpm data:collect-commons` afterward to propagate the confirmed districts into `locations.json`.
 
 ### Review rounds
 

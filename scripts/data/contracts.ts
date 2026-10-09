@@ -75,6 +75,13 @@ export type CanonicalLocationRecord = {
   // not yet confirmed -- never guessed (requirement 2 of the Busan
   // collection-pipeline ticket; see scripts/data/busan-district.ts).
   district: District | null;
+  // Reviewed alternate names / short descriptive tags (text search's
+  // locations.aliases/locations.tags columns, 20261009000000_text_search.sql)
+  // -- empty unless backed by a verified source (e.g. a Wikidata type
+  // label), never invented to "fill in" a record. See requirement 5 of
+  // the Busan collection-pipeline ticket.
+  aliases: string[];
+  tags: string[];
   address: Location["address"];
   latitude: Location["point"]["latitude"];
   longitude: Location["point"]["longitude"];
@@ -108,6 +115,8 @@ export const canonicalLocationRecordSchema: z.ZodType<CanonicalLocationRecord> =
   category: z.enum(LOCATION_CATEGORY_VALUES),
   region: z.enum(KOREA_REGION_VALUES),
   district: z.enum(DISTRICT_VALUES).nullable().default(null),
+  aliases: z.array(nonEmptyString).default([]),
+  tags: z.array(nonEmptyString).default([]),
   address: nonEmptyString,
   latitude: z.number().finite().min(-90).max(90),
   longitude: z.number().finite().min(-180).max(180),

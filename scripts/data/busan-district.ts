@@ -58,10 +58,19 @@ export type BusanDistrictInput = {
   longitude: number;
 };
 
+// Short forms excluded even at 2+ characters because they collide with an
+// unrelated, common Korean word rather than a different district's name --
+// "기장" (기장군's short form) is also the tail of "경기장" (stadium/sports
+// ground), a word that recurs constantly in facility names/descriptions
+// (e.g. "부산아시아드주경기장" wrongly matched 기장군 this way before this
+// exclusion was added). Found empirically while judging real round-1 data,
+// not a hypothetical case.
+const AMBIGUOUS_SHORT_FORMS = new Set(["기장"]);
+
 function districtAliasesFor(district: District): string[] {
   const label = DISTRICT_LABELS[district];
   const shortForm = label.replace(/(구|군)$/u, "");
-  return shortForm.length >= 2 ? [label, shortForm] : [label];
+  return shortForm.length >= 2 && !AMBIGUOUS_SHORT_FORMS.has(shortForm) ? [label, shortForm] : [label];
 }
 
 function isWithinBusanBounds(latitude: number, longitude: number): boolean {

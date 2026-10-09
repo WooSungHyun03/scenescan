@@ -227,6 +227,8 @@ function normalizeRecordWithCategory(
     // district is only ever assigned by the dedicated Busan collection
     // pipeline (scripts/data/busan-district.ts), never guessed here.
     district: null,
+    aliases: [],
+    tags: [],
     address: requiredText(record, mapping.fields.address, "address"),
     latitude: coordinate(record, mapping.fields.latitude, "latitude"),
     longitude: coordinate(record, mapping.fields.longitude, "longitude"),

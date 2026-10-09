@@ -59,4 +59,9 @@ describe("resolveBusanDistrict", () => {
       expect(resolveBusanDistrict({ address, ...SUYEONG_POINT }).district).toBe(district);
     }
   });
+
+  it("never treats '경기장' (stadium) as naming 기장군, even though 기장 is otherwise a valid short form", () => {
+    const result = resolveBusanDistrict({ address: "부산 수영구 주경기장 인근", ...SUYEONG_POINT });
+    expect(result.district).toBe("busan_suyeong_gu");
+  });
 });
