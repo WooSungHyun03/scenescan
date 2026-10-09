@@ -12,7 +12,7 @@
   "input": {
     "locations": {
       "path": "data/production/locations.json",
-      "sha256": "cc3dcb1f7f647ee8eaae4dce83a12e16f7fbebfcf985702b93cd8e473f2f2cb3"
+      "sha256": "440f602a8b15bacd70469057b1a7b23f4f73e15351dbdf76a4b09a7025bb95fb"
     },
     "embeddingManifest": {
       "path": "data/production/embeddings-manifest.json",

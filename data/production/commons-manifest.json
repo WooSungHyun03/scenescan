@@ -296,6 +296,7 @@
       "description": "산비탈을 따라 다채로운 주택과 좁은 골목이 층층이 이어지는 부산의 마을 경관입니다.",
       "category": "urban",
       "region": "부산",
+      "district": "busan_saha_gu",
       "address": "부산광역시 사하구 감내2로 203",
       "latitude": 35.0975,
       "longitude": 129.00916667,
@@ -347,6 +348,7 @@
       "description": "대형 지붕과 열린 광장, 공연·상영 공간이 결합된 부산의 영화문화 복합공간입니다.",
       "category": "interior",
       "region": "부산",
+      "district": "busan_haeundae_gu",
       "address": "부산광역시 해운대구 수영강변대로 120",
       "latitude": 35.171163888889,
       "longitude": 129.12718888889,
@@ -1474,6 +1476,7 @@
       "description": "대한민국 부산광역시에 있는 스포츠 시설",
       "category": "urban",
       "region": "부산",
+      "district": "busan_yeonje_gu",
       "address": "대한민국 부산광역시 연제구 월드컵대로 344",
       "latitude": 35.190103,
       "longitude": 129.058361,
@@ -1486,6 +1489,9 @@
           "filename": "wikidata-q482589-01.jpg",
           "alt": "부산아시아드주경기장 전경"
         }
+      ],
+      "tags": [
+        "경기장"
       ]
     },
     {
@@ -1495,6 +1501,7 @@
       "description": "대한민국 부산광역시와 충청남도의 사립 대학",
       "category": "urban",
       "region": "부산",
+      "district": "busan_yeongdo_gu",
       "address": "194 Wachi-ro, Yeongdo-gu, Busan 49104",
       "latitude": 35.07961111,
       "longitude": 129.063,
@@ -1507,6 +1514,9 @@
           "filename": "wikidata-q482737-01.jpg",
           "alt": "고신대학교 전경"
         }
+      ],
+      "tags": [
+        "사립 대학"
       ]
     },
     {
@@ -1516,6 +1526,7 @@
       "description": "대한민국 부산광역시의 사립 종합대학",
       "category": "urban",
       "region": "부산",
+      "district": "busan_geumjeong_gu",
       "address": "65 Geumsaem-ro 485beon-gil, Geumjeong-gu, Busan 46234",
       "latitude": 35.267621265,
       "longitude": 129.079267424,
@@ -1528,6 +1539,9 @@
           "filename": "wikidata-q487170-01.jpg",
           "alt": "부산외국어대학교 전경"
         }
+      ],
+      "tags": [
+        "사립 대학"
       ]
     },
     {
@@ -1537,6 +1551,7 @@
       "description": "대한민국 부산광역시의 사립 종합대학",
       "category": "urban",
       "region": "부산",
+      "district": "busan_busanjin_gu",
       "address": "176 Eomgwang-ro, Busanjin-gu, Busan 47340",
       "latitude": 35.13944444,
       "longitude": 129.03336111,
@@ -1549,6 +1564,9 @@
           "filename": "wikidata-q623798-01.jpg",
           "alt": "동의대학교 전경"
         }
+      ],
+      "tags": [
+        "사립 대학"
       ]
     },
     {
@@ -1558,6 +1576,7 @@
       "description": "대한민국 부산광역시의 사립 종합대학",
       "category": "urban",
       "region": "부산",
+      "district": "busan_saha_gu",
       "address": "37 Nakdong-daero 550beon-gil, Saha-gu, Busan 49315",
       "latitude": 35.11586111,
       "longitude": 128.96725,
@@ -1570,6 +1589,9 @@
           "filename": "wikidata-q626783-01.jpg",
           "alt": "동아대학교 전경"
         }
+      ],
+      "tags": [
+        "사립 대학"
       ]
     },
     {
@@ -1579,6 +1601,7 @@
       "description": "Buddhist temple in Busan, South Korea",
       "category": "urban",
       "region": "부산",
+      "district": "busan_buk_gu",
       "address": "부산 북구 만덕고개길143-96",
       "latitude": 35.221545,
       "longitude": 129.0488107,
@@ -1591,6 +1614,9 @@
           "filename": "wikidata-q113493764-01.jpg",
           "alt": "석불사 전경"
         }
+      ],
+      "tags": [
+        "한국의 사찰"
       ]
     },
     {
@@ -3712,6 +3738,10 @@
           "filename": "wikidata-q12438381-01.jpg",
           "alt": "부산항 사진 1"
         }
+      ],
+      "tags": [
+        "해항",
+        "항구"
       ]
     },
     {
@@ -3775,6 +3805,9 @@
           "filename": "wikidata-q490572-01.jpg",
           "alt": "태종대 사진 1"
         }
+      ],
+      "tags": [
+        "도시 공원"
       ]
     },
     {
@@ -4048,6 +4081,10 @@
           "filename": "wikidata-q491203-03.jpg",
           "alt": "해운대해수욕장의 다른 시점"
         }
+      ],
+      "tags": [
+        "해수욕장",
+        "해변"
       ]
     },
     {
@@ -4282,6 +4319,10 @@
           "filename": "wikidata-q12613619-01.jpg",
           "alt": "일광해수욕장 사진 1"
         }
+      ],
+      "tags": [
+        "해변",
+        "해수욕장"
       ]
     },
     {
@@ -4471,6 +4512,9 @@
           "filename": "wikidata-q16178122-01.jpg",
           "alt": "송도해수욕장 사진 1"
         }
+      ],
+      "tags": [
+        "해변"
       ]
     },
     {
@@ -4639,6 +4683,10 @@
           "filename": "wikidata-q130628-01.jpg",
           "alt": "국립해양박물관 전경"
         }
+      ],
+      "tags": [
+        "국립박물관",
+        "해양박물관"
       ]
     },
     {
@@ -4648,6 +4696,7 @@
       "description": "automotive museum in Busan, South Korea",
       "category": "interior",
       "region": "부산",
+      "district": "busan_gangseo_gu",
       "address": "부산 부산광역시",
       "latitude": 35.094,
       "longitude": 128.881,
@@ -4660,6 +4709,9 @@
           "filename": "wikidata-q5366736-01.jpg",
           "alt": "르노코리아 갤러리 전경"
         }
+      ],
+      "tags": [
+        "박물관"
       ]
     },
     {
@@ -4669,6 +4721,7 @@
       "description": "부산광역시의 시립 박물관",
       "category": "interior",
       "region": "부산",
+      "district": "busan_nam_gu",
       "address": "부산 남구",
       "latitude": 35.12959,
       "longitude": 129.09405,
@@ -4682,7 +4735,9 @@
           "alt": "부산광역시립박물관 전경"
         }
       ],
-      "district": "busan_nam_gu"
+      "tags": [
+        "박물관"
+      ]
     },
     {
       "id": "293189c5-d2f2-5866-894c-36cce6a01b31",
@@ -4691,6 +4746,7 @@
       "description": "부산광역시 서구에 위치한 박물관",
       "category": "interior",
       "region": "부산",
+      "district": "busan_seo_gu",
       "address": "부산 부민동",
       "latitude": 35.1034,
       "longitude": 129.0174,
@@ -4703,6 +4759,9 @@
           "filename": "wikidata-q18191755-01.jpg",
           "alt": "임시수도기념관 전경"
         }
+      ],
+      "tags": [
+        "박물관"
       ]
     },
     {
@@ -4712,6 +4771,7 @@
       "description": "부산광역시의 산, 국립공원",
       "category": "nature",
       "region": "부산",
+      "district": "busan_geumjeong_gu",
       "address": "부산 부산광역시",
       "latitude": 35.283055555,
       "longitude": 129.055555555,
@@ -4724,6 +4784,9 @@
           "filename": "wikidata-q482647-01.jpg",
           "alt": "금정산 전경"
         }
+      ],
+      "tags": [
+        "산"
       ]
     },
     {
@@ -4733,6 +4796,7 @@
       "description": "한국전쟁에 참전한 유엔군을 기리는 부산시 소재의 기념묘역",
       "category": "nature",
       "region": "부산",
+      "district": "busan_nam_gu",
       "address": "부산 부산광역시",
       "latitude": 35.12845,
       "longitude": 129.09623,
@@ -4745,7 +4809,8 @@
           "filename": "wikidata-q15465499-01.jpg",
           "alt": "유엔기념공원 전경"
         }
-      ]
+      ],
+      "tags": []
     },
     {
       "id": "a3d91aba-78b5-5a48-93f3-c2d47629c74c",
@@ -4754,6 +4819,7 @@
       "description": "island in Haeundae, Busan, South Korea",
       "category": "nature",
       "region": "부산",
+      "district": "busan_haeundae_gu",
       "address": "부산 부산광역시",
       "latitude": 35.153844,
       "longitude": 129.152097,
@@ -4766,6 +4832,9 @@
           "filename": "wikidata-q18999434-01.jpg",
           "alt": "동백섬 전경"
         }
+      ],
+      "tags": [
+        "섬"
       ]
     },
     {
@@ -4787,6 +4856,10 @@
           "filename": "wikidata-q53118-01.jpg",
           "alt": "부산역 전경"
         }
+      ],
+      "tags": [
+        "철도역",
+        "지상역"
       ]
     },
     {
@@ -4796,6 +4869,7 @@
       "description": "부산시 금정구의 사찰",
       "category": "urban",
       "region": "부산",
+      "district": "busan_geumjeong_gu",
       "address": "부산 부산광역시",
       "latitude": 35.2839135,
       "longitude": 129.068992,
@@ -4808,6 +4882,9 @@
           "filename": "wikidata-q487662-01.jpg",
           "alt": "범어사 전경"
         }
+      ],
+      "tags": [
+        "한국의 사찰"
       ]
     },
     {
@@ -4817,6 +4894,7 @@
       "description": "부산광역시 동래구의 야구장",
       "category": "urban",
       "region": "부산",
+      "district": "busan_dongnae_gu",
       "address": "부산 부산광역시",
       "latitude": 35.194278,
       "longitude": 129.061306,
@@ -4829,6 +4907,9 @@
           "filename": "wikidata-q489909-01.jpg",
           "alt": "사직야구장 전경"
         }
+      ],
+      "tags": [
+        "스타디움"
       ]
     },
     {
@@ -4850,6 +4931,9 @@
           "filename": "wikidata-q490741-01.jpg",
           "alt": "거가대교 전경"
         }
+      ],
+      "tags": [
+        "교량터널"
       ]
     },
     {
@@ -4859,6 +4943,7 @@
       "description": "대한민국 부산광역시의 국립 종합대학",
       "category": "urban",
       "region": "부산",
+      "district": "busan_yeongdo_gu",
       "address": "부산 부산광역시",
       "latitude": 35.074472,
       "longitude": 129.087489,
@@ -4871,6 +4956,9 @@
           "filename": "wikidata-q490746-01.jpg",
           "alt": "국립한국해양대학교 전경"
         }
+      ],
+      "tags": [
+        "공립 대학"
       ]
     },
     {
@@ -4892,6 +4980,9 @@
           "filename": "wikidata-q490777-01.jpg",
           "alt": "부산타워 전경"
         }
+      ],
+      "tags": [
+        "건축물"
       ]
     },
     {
@@ -4913,6 +5004,9 @@
           "filename": "wikidata-q496078-01.jpg",
           "alt": "사직실내체육관 전경"
         }
+      ],
+      "tags": [
+        "아레나"
       ]
     },
     {
@@ -4934,6 +5028,9 @@
           "filename": "wikidata-q496218-01.jpg",
           "alt": "롯데타운타워 전경"
         }
+      ],
+      "tags": [
+        "마천루"
       ]
     },
     {
@@ -4943,6 +5040,7 @@
       "description": "building in Busan, South Korea",
       "category": "urban",
       "region": "부산",
+      "district": "busan_haeundae_gu",
       "address": "부산 부산광역시",
       "latitude": 35.169135,
       "longitude": 129.136288,
@@ -4955,6 +5053,10 @@
           "filename": "wikidata-q626126-01.jpg",
           "alt": "벡스코 전경"
         }
+      ],
+      "tags": [
+        "행사 장소",
+        "컨벤션 센터"
       ]
     },
     {
@@ -4976,6 +5078,9 @@
           "filename": "wikidata-q2071950-01.jpg",
           "alt": "APEC house 전경"
         }
+      ],
+      "tags": [
+        "건물"
       ]
     },
     {
@@ -4985,6 +5090,7 @@
       "description": "부산 기장군 기장읍 시랑리에 있는 절",
       "category": "urban",
       "region": "부산",
+      "district": "busan_gijang_gun",
       "address": "부산 기장군",
       "latitude": 35.188333333,
       "longitude": 129.223333333,
@@ -4998,7 +5104,9 @@
           "alt": "해동용궁사 전경"
         }
       ],
-      "district": "busan_gijang_gun"
+      "tags": [
+        "한국의 사찰"
+      ]
     },
     {
       "id": "cd3ed178-63e2-534f-9e9e-ddfa9688a76a",
@@ -5019,6 +5127,9 @@
           "filename": "wikidata-q3033579-01.jpg",
           "alt": "40계단 전경"
         }
+      ],
+      "tags": [
+        "계단"
       ]
     },
     {
@@ -5028,6 +5139,7 @@
       "description": "fortress in Busan, South Korea",
       "category": "urban",
       "region": "부산",
+      "district": "busan_gijang_gun",
       "address": "부산 기장읍",
       "latitude": 35.242,
       "longitude": 129.241638888,
@@ -5041,7 +5153,10 @@
           "alt": "기장 죽성리왜성 전경"
         }
       ],
-      "district": "busan_gijang_gun"
+      "tags": [
+        "왜성",
+        "요새"
+      ]
     }
   ]
 }

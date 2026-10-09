@@ -1,0 +1,137 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-10-09T07:34:57.262Z",
+  "boundaryDataSource": "data/production/boundaries/busan-admdong-2026-07-01.geojson",
+  "evaluated": 14,
+  "confirmed": 1,
+  "needsReview": 13,
+  "judgements": [
+    {
+      "id": "f3fd4fa4-efa2-5b60-a17c-9cf350accdac",
+      "name": "부산아시아드주경기장",
+      "status": "confirmed",
+      "district": "busan_yeonje_gu",
+      "admName": "부산광역시 연제구 거제2동",
+      "distanceToBoundaryMeters": 169.17490005189904
+    },
+    {
+      "id": "b452d2b3-2b35-59e1-b812-8e761f3df0cc",
+      "name": "부산항",
+      "status": "needs-review",
+      "reason": "NEAR_DISTRICT_BOUNDARY",
+      "nearestDistricts": [
+        "busan_nam_gu"
+      ],
+      "distanceToBoundaryMeters": 34.23519112675384
+    },
+    {
+      "id": "20a1df36-854f-5280-8a70-fbd88a47a42b",
+      "name": "태종대",
+      "status": "needs-review",
+      "reason": "NOT_IN_ANY_DISTRICT_BOUNDARY"
+    },
+    {
+      "id": "687c5d31-e572-55c8-bdf4-4de745fff604",
+      "name": "해운대해수욕장",
+      "status": "needs-review",
+      "reason": "NEAR_DISTRICT_BOUNDARY",
+      "nearestDistricts": [
+        "busan_haeundae_gu"
+      ],
+      "distanceToBoundaryMeters": 0.3195263903082756
+    },
+    {
+      "id": "08d5793f-8b36-549b-8383-e569de9c2091",
+      "name": "일광해수욕장",
+      "status": "needs-review",
+      "reason": "NEAR_DISTRICT_BOUNDARY",
+      "nearestDistricts": [
+        "busan_gijang_gun"
+      ],
+      "distanceToBoundaryMeters": 26.129301588220148
+    },
+    {
+      "id": "9655eba5-5ee0-5651-a7cf-4e7ac4ed722f",
+      "name": "송도해수욕장",
+      "status": "needs-review",
+      "reason": "NOT_IN_ANY_DISTRICT_BOUNDARY"
+    },
+    {
+      "id": "1ab083cd-8265-5087-8a11-e3dbd2b64a77",
+      "name": "국립해양박물관",
+      "status": "needs-review",
+      "reason": "NEAR_DISTRICT_BOUNDARY",
+      "nearestDistricts": [
+        "busan_yeongdo_gu"
+      ],
+      "distanceToBoundaryMeters": 85.52816441576304
+    },
+    {
+      "id": "0ad72df7-c92f-5db4-92d9-af77f9265ffd",
+      "name": "부산역",
+      "status": "needs-review",
+      "reason": "NEAR_DISTRICT_BOUNDARY",
+      "nearestDistricts": [
+        "busan_dong_gu"
+      ],
+      "distanceToBoundaryMeters": 97.67532793022832
+    },
+    {
+      "id": "8939408d-0989-5ae3-81fe-a1e0c0c5d40a",
+      "name": "거가대교",
+      "status": "needs-review",
+      "reason": "NOT_IN_ANY_DISTRICT_BOUNDARY"
+    },
+    {
+      "id": "dbb9dfff-b2af-5343-a66a-b95d6849ed65",
+      "name": "부산타워",
+      "status": "needs-review",
+      "reason": "NEAR_DISTRICT_BOUNDARY",
+      "nearestDistricts": [
+        "busan_jung_gu"
+      ],
+      "distanceToBoundaryMeters": 81.43383398749204
+    },
+    {
+      "id": "9de37386-6a26-5963-861a-699e09eed9ce",
+      "name": "사직실내체육관",
+      "status": "needs-review",
+      "reason": "NEAR_DISTRICT_BOUNDARY",
+      "nearestDistricts": [
+        "busan_dongnae_gu",
+        "busan_yeonje_gu"
+      ],
+      "distanceToBoundaryMeters": 96.01632991902244
+    },
+    {
+      "id": "c6bce548-9d12-57a8-9369-71f6b70c438a",
+      "name": "롯데타운타워",
+      "status": "needs-review",
+      "reason": "NEAR_DISTRICT_BOUNDARY",
+      "nearestDistricts": [
+        "busan_jung_gu"
+      ],
+      "distanceToBoundaryMeters": 78.81539317751187
+    },
+    {
+      "id": "d8fd2181-ac75-5d7c-92c5-2107d33d9084",
+      "name": "APEC house",
+      "status": "needs-review",
+      "reason": "NEAR_DISTRICT_BOUNDARY",
+      "nearestDistricts": [
+        "busan_haeundae_gu"
+      ],
+      "distanceToBoundaryMeters": 56.28758737446383
+    },
+    {
+      "id": "cd3ed178-63e2-534f-9e9e-ddfa9688a76a",
+      "name": "40계단",
+      "status": "needs-review",
+      "reason": "NEAR_DISTRICT_BOUNDARY",
+      "nearestDistricts": [
+        "busan_jung_gu"
+      ],
+      "distanceToBoundaryMeters": 6.119348266429684
+    }
+  ]
+}
