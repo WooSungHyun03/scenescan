@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { searchByText } from "@/domains/locations/server/repository";
+import { enrichWithNvidiaIntent } from "@/domains/search/server/nvidia-intent-adapter";
 import { resolveTextSearchFilters } from "@/domains/search/server/text-search-filter-resolution";
 import { parseTextSearchQuery } from "@/domains/search/server/text-query-parser";
 import { describeTextSearchRequestError } from "@/domains/search/server/validation";
@@ -78,23 +79,34 @@ export async function POST(request: Request) {
     return NextResponse.json(response, { headers: { "Cache-Control": "no-store" } });
   }
 
+  // Optional P1 enrichment: NVIDIA only ever restructures district/
+  // category/keywords/unsupportedConditions on top of the base rule-based
+  // parse above -- it never decides outOfScope (already handled) and never
+  // performs the actual search itself (still searchByText below, same as
+  // without it). A no-op (returns `parsedQuery` unchanged) whenever the
+  // feature flag is off, no API key is configured, the call budget is
+  // exhausted, or the call fails for any reason -- see
+  // enrichWithNvidiaIntent's own doc comment.
+  const enrichedQuery = await enrichWithNvidiaIntent(parsed.data.query, parsedQuery);
+
   // Explicit `filters.district`/`filters.category` (if given) always win
-  // over whatever the query text itself named -- resolveTextSearchFilters
-  // reports a FILTER_OVERRIDES_QUERY notice when they disagree, so the UI
-  // never silently drops a condition the query text asked for.
-  const { district, category, notice: filterNotice } = resolveTextSearchFilters(parsedQuery, parsed.data.filters ?? {});
+  // over whatever district/category ended up on `enrichedQuery` (from the
+  // query text itself, or from NVIDIA) -- resolveTextSearchFilters reports
+  // a FILTER_OVERRIDES_QUERY notice when they disagree, so the UI never
+  // silently drops a condition the query text asked for.
+  const { district, category, notice: filterNotice } = resolveTextSearchFilters(enrichedQuery, parsed.data.filters ?? {});
 
   try {
-    const results = await searchByText({ ...parsedQuery, district, category });
+    const results = await searchByText({ ...enrichedQuery, district, category });
     const response: TextSearchResponse = {
       results,
       parsedQuery: {
         district,
         category,
-        keywords: parsedQuery.keywords,
-        districtConflict: parsedQuery.districtConflict,
+        keywords: enrichedQuery.keywords,
+        districtConflict: enrichedQuery.districtConflict,
       },
-      unsupportedConditions: parsedQuery.unsupportedConditions,
+      unsupportedConditions: enrichedQuery.unsupportedConditions,
       notice: filterNotice,
     };
     return NextResponse.json(response, { headers: { "Cache-Control": "no-store" } });

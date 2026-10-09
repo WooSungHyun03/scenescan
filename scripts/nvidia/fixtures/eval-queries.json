@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "queries": [
+    { "id": "haeundae-night-cafe", "text": "해운대 야경 카페", "note": "district + category both named in the query text" },
+    { "id": "gwangalli-walk", "text": "광안리 산책", "note": "neighborhood alias (수영구) + a keyword" },
+    { "id": "quiet-walk", "text": "조용한 산책", "note": "unsupported condition (조용한) must be reported, never silently matched" },
+    { "id": "two-districts", "text": "해운대 수영 사진", "note": "in-query district conflict (해운대구 + 수영구) -- district should stay null" },
+    { "id": "out-of-scope-seoul", "text": "서울 카페", "note": "non-Busan region -- must short-circuit before any NVIDIA call" },
+    { "id": "no-match", "text": "존재하지않는가상의장소이름이다", "note": "no fixture location should match this" },
+    { "id": "category-only", "text": "실내 공간", "note": "category alias only, no district" },
+    { "id": "plain-keyword", "text": "창고", "note": "a tag/keyword with no district or category alias" }
+  ]
+}

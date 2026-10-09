@@ -26,6 +26,9 @@ describe("environment contracts", () => {
       "NEXT_PUBLIC_SUPABASE_URL",
       "NEXT_PUBLIC_USE_MOCK_AI",
       "NEXT_PUBLIC_USE_MOCK_DATA",
+      "NVIDIA_API_KEY",
+      "NVIDIA_INTENT_ENABLED",
+      "NVIDIA_INTENT_MODEL",
       "PUBLIC_DATA_PORTAL_SERVICE_KEY",
       "SUPABASE_SECRET_KEY",
       "SUPABASE_SERVICE_ROLE_KEY",
@@ -144,5 +147,46 @@ describe("environment contracts", () => {
       .toEqual({ kmaVillageForecastServiceKey: "kma-secret" });
     expect(parsePublicEnvironment({ KMA_VILLAGE_FORECAST_SERVICE_KEY: "kma-secret" }))
       .not.toHaveProperty("kmaVillageForecastServiceKey");
+  });
+
+  it("defaults the NVIDIA intent feature to fully off and omits it entirely when unconfigured", () => {
+    expect(parseServerEnvironment({})).not.toHaveProperty("nvidiaIntent");
+  });
+
+  it("rejects a NEXT_PUBLIC_ variant of the NVIDIA API key immediately", () => {
+    expect(() => parseServerEnvironment({
+      NEXT_PUBLIC_NVIDIA_API_KEY: "must-not-ship",
+    })).toThrow(/NEXT_PUBLIC_NVIDIA_API_KEY/);
+  });
+
+  it("rejects an NVIDIA model outside the allowlist", () => {
+    expect(() => parseServerEnvironment({
+      NVIDIA_INTENT_MODEL: "not-an-allowed-model",
+    })).toThrow(/NVIDIA_INTENT_MODEL/);
+  });
+
+  it("keeps NVIDIA_INTENT_ENABLED=false even with a key configured (independent gates)", () => {
+    expect(parseServerEnvironment({
+      NVIDIA_API_KEY: "nvidia-secret",
+      NVIDIA_INTENT_ENABLED: "false",
+    })).toEqual({
+      nvidiaIntent: { enabled: false, model: "meta/llama-3.1-8b-instruct", apiKey: "nvidia-secret" },
+    });
+  });
+
+  it("enables NVIDIA intent only when the flag is explicitly true, and keeps the key server-only", () => {
+    expect(parseServerEnvironment({
+      NVIDIA_API_KEY: "nvidia-secret",
+      NVIDIA_INTENT_ENABLED: "true",
+    })).toEqual({
+      nvidiaIntent: { enabled: true, model: "meta/llama-3.1-8b-instruct", apiKey: "nvidia-secret" },
+    });
+    expect(parsePublicEnvironment({ NVIDIA_API_KEY: "nvidia-secret", NVIDIA_INTENT_ENABLED: "true" }))
+      .not.toHaveProperty("nvidiaIntent");
+  });
+
+  it("accepts an allowlisted NVIDIA model override", () => {
+    expect(parseServerEnvironment({ NVIDIA_INTENT_MODEL: "meta/llama-3.1-8b-instruct" }))
+      .toEqual({ nvidiaIntent: { enabled: false, model: "meta/llama-3.1-8b-instruct" } });
   });
 });

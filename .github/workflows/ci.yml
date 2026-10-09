@@ -75,6 +75,7 @@ jobs:
             --env SUPABASE_SERVICE_ROLE_KEY=scenescan-ci-legacy-role-boundary-sentinel \
             --env KMA_VILLAGE_FORECAST_SERVICE_KEY=scenescan-ci-kma-boundary-sentinel \
             --env PUBLIC_DATA_PORTAL_SERVICE_KEY=scenescan-ci-data-provider-boundary-sentinel \
+            --env NVIDIA_API_KEY=scenescan-ci-nvidia-boundary-sentinel \
             scenescan-ci:${{ github.sha }} \
             sh -c 'pnpm build && pnpm security:client-bundle'
 
@@ -86,6 +87,7 @@ jobs:
             'SUPABASE_SERVICE_ROLE_KEY=scenescan-ci-legacy-role-canary' \
             'KMA_VILLAGE_FORECAST_SERVICE_KEY=scenescan-ci-kma-provider-canary' \
             'PUBLIC_DATA_PORTAL_SERVICE_KEY=scenescan-ci-data-provider-canary' \
+            'NVIDIA_API_KEY=scenescan-ci-nvidia-provider-canary' \
             > .env.production.local
 
       - name: Build standalone application
@@ -132,7 +134,7 @@ jobs:
 
       - name: Verify fake server secrets stay out of the production image
         env:
-          SCENESCAN_SECRET_CANARIES: '["scenescan-ci-supabase-secret-canary","scenescan-ci-legacy-role-canary","scenescan-ci-kma-provider-canary","scenescan-ci-data-provider-canary"]'
+          SCENESCAN_SECRET_CANARIES: '["scenescan-ci-supabase-secret-canary","scenescan-ci-legacy-role-canary","scenescan-ci-kma-provider-canary","scenescan-ci-data-provider-canary","scenescan-ci-nvidia-provider-canary"]'
         run: node scripts/security/assert-docker-image-secrets.mjs scenescan:${{ github.sha }}
 
       - name: Smoke test production image

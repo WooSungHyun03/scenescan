@@ -35,7 +35,8 @@
     "embeddings:import": "node --experimental-strip-types scripts/embeddings/import.ts",
     "embeddings:audit-schema": "node --experimental-strip-types scripts/embeddings/audit-schema.ts",
     "embeddings:evaluate": "node --experimental-strip-types scripts/embeddings/evaluation.ts",
-    "embeddings:evaluate-clip": "node --experimental-strip-types scripts/embeddings/clip-evaluate.ts"
+    "embeddings:evaluate-clip": "node --experimental-strip-types scripts/embeddings/clip-evaluate.ts",
+    "nvidia:evaluate-intent": "node --experimental-strip-types scripts/nvidia/evaluate-intent.ts"
   },
   "dependencies": {
     "@huggingface/transformers": "^4.3.0",

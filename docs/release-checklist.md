@@ -78,9 +78,13 @@ pnpm test:integration
 | `SUPABASE_SERVICE_ROLE_KEY` | 이전 프로젝트의 임시 fallback; 새 설정은 secret key 우선 |
 | `KMA_VILLAGE_FORECAST_SERVICE_KEY` | 승인된 기상청 단기예보 서비스 전용 키 |
 | `PUBLIC_DATA_PORTAL_SERVICE_KEY` | 오프라인 주차 수집 도구 전용; 일반 Vercel runtime에는 불필요 |
+| `NVIDIA_API_KEY` | 텍스트 검색 의도 구조화(P1, 기본 OFF) 전용. 비어 있거나 `NVIDIA_INTENT_ENABLED=false`면 외부 호출이 전혀 없다 |
+| `NVIDIA_INTENT_ENABLED` | 위 기능의 kill switch. Production 기본값은 `false` |
+| `NVIDIA_INTENT_MODEL` | 선택: allowlist(`src/infrastructure/nvidia/intent-models.ts`) 외 값은 시작 시 검증 실패 |
 
 - [ ] `.env.local`, SMTP password, server secret은 Git에 없다.
 - [ ] Vercel Preview에 Production server secret을 자동 복제하지 않았다.
+- [ ] `NVIDIA_API_KEY`도 다른 server secret과 동일하게 다룬다 -- Preview에 자동 복제하지 않고, 사용 약관·요금 확인 전에는 `NVIDIA_INTENT_ENABLED=true`로 켜지 않는다.
 - [ ] 환경변수 변경 뒤 새 deployment를 만들었다. `NEXT_PUBLIC_*`는 기존 build를 재시작하는 것만으로 바뀌지 않는다.
 - [ ] CI의 client-bundle 검사와 Docker image canary 검사가 통과했다.
 

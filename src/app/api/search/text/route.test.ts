@@ -7,6 +7,19 @@ vi.mock("@/domains/locations/server/repository", () => ({
   searchByText: (...args: unknown[]) => searchByTextMock(...args),
 }));
 
+// Proves requirement 4 end-to-end at the route level, not just inside the
+// adapter's own unit tests: if this route ever reached the real NVIDIA
+// client factory, these mocks would throw. This test suite never sets
+// NVIDIA_API_KEY/NVIDIA_INTENT_ENABLED, so serverEnv.nvidiaIntent is
+// undefined and enrichWithNvidiaIntent's own flag check already
+// short-circuits before either of these would be reached.
+const getNvidiaIntentClientMock = vi.fn(() => { throw new Error("must never be called when NVIDIA is disabled"); });
+const getNvidiaCallBudgetMock = vi.fn(() => { throw new Error("must never be called when NVIDIA is disabled"); });
+vi.mock("@/infrastructure/nvidia/intent-client-factory", () => ({
+  getNvidiaIntentClient: () => getNvidiaIntentClientMock(),
+  getNvidiaCallBudget: () => getNvidiaCallBudgetMock(),
+}));
+
 const { POST } = await import("./route");
 
 function request(body: unknown, init: { headers?: Record<string, string>; rawBody?: string } = {}) {
@@ -82,6 +95,14 @@ describe("POST /api/search/text", () => {
     const response = await POST(request({ query: "해운대", extra: "nope" }));
     expect(response.status).toBe(400);
     expect(searchByTextMock).not.toHaveBeenCalled();
+  });
+
+  it("never touches the NVIDIA intent client factory when the feature is not configured (requirement 4)", async () => {
+    searchByTextMock.mockResolvedValue([]);
+    const response = await POST(request({ query: "해운대 맛집" }));
+    expect(response.status).toBe(200);
+    expect(getNvidiaIntentClientMock).not.toHaveBeenCalled();
+    expect(getNvidiaCallBudgetMock).not.toHaveBeenCalled();
   });
 
   it("returns results, parsedQuery, and a null notice for a normal Busan query", async () => {

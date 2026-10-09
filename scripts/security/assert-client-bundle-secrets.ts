@@ -13,6 +13,7 @@ const findings = findClientBundleSecretLeaks(bundleDirectory, [
   process.env.SUPABASE_SERVICE_ROLE_KEY ?? "",
   process.env.KMA_VILLAGE_FORECAST_SERVICE_KEY ?? "",
   process.env.PUBLIC_DATA_PORTAL_SERVICE_KEY ?? "",
+  process.env.NVIDIA_API_KEY ?? "",
 ]);
 
 if (findings.length > 0) {

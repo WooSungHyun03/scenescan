@@ -55,12 +55,13 @@ describe("client bundle secret boundary", () => {
     const directory = createBundle();
     writeFileSync(
       join(directory, "chunks", "provider.js"),
-      "KMA_VILLAGE_FORECAST_SERVICE_KEY PUBLIC_DATA_PORTAL_SERVICE_KEY",
+      "KMA_VILLAGE_FORECAST_SERVICE_KEY PUBLIC_DATA_PORTAL_SERVICE_KEY NVIDIA_API_KEY",
     );
 
     expect(findClientBundleSecretLeaks(directory)).toEqual([
       { file: join("chunks", "provider.js"), token: "KMA_VILLAGE_FORECAST_SERVICE_KEY" },
       { file: join("chunks", "provider.js"), token: "PUBLIC_DATA_PORTAL_SERVICE_KEY" },
+      { file: join("chunks", "provider.js"), token: "NVIDIA_API_KEY" },
     ]);
   });
 });
