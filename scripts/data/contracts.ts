@@ -1,8 +1,8 @@
 import { z } from "zod";
-import type { Location, LocationImage, ParkingInfo } from "../../src/types/domain.ts";
+import type { District, Location, LocationImage, ParkingInfo } from "../../src/types/domain.ts";
 import type { CategoryReviewReason } from "./category-mapping.ts";
 import { PERMIT_GUIDANCE_VALUES } from "./permit-information.ts";
-import { LOCATION_CATEGORY_VALUES } from "../../src/types/location-options.ts";
+import { DISTRICT_VALUES, LOCATION_CATEGORY_VALUES } from "../../src/types/location-options.ts";
 
 // Deliberately NOT src/types/location-options.ts's REGION_VALUES/Region:
 // those now fix the *live, served* catalog to "부산" only for the length of
@@ -69,6 +69,12 @@ export type CanonicalLocationRecord = {
   description: Location["description"];
   category: Location["category"];
   region: KoreaRegion;
+  // Null for every non-Busan record (district only ever makes sense for
+  // region "부산", mirroring the DB's own locations_district_requires_
+  // busan_region constraint) and for any Busan record whose district is
+  // not yet confirmed -- never guessed (requirement 2 of the Busan
+  // collection-pipeline ticket; see scripts/data/busan-district.ts).
+  district: District | null;
   address: Location["address"];
   latitude: Location["point"]["latitude"];
   longitude: Location["point"]["longitude"];
@@ -101,6 +107,7 @@ export const canonicalLocationRecordSchema: z.ZodType<CanonicalLocationRecord> =
   description: z.string().trim(),
   category: z.enum(LOCATION_CATEGORY_VALUES),
   region: z.enum(KOREA_REGION_VALUES),
+  district: z.enum(DISTRICT_VALUES).nullable().default(null),
   address: nonEmptyString,
   latitude: z.number().finite().min(-90).max(90),
   longitude: z.number().finite().min(-180).max(180),
@@ -129,7 +136,18 @@ export const canonicalLocationRecordSchema: z.ZodType<CanonicalLocationRecord> =
   }).strict()),
   sourceUrl: httpUrl,
   provenance: dataProvenanceSchema,
-}).strict();
+}).strict().superRefine((value, context) => {
+  // Mirrors the DB's locations_district_requires_busan_region constraint
+  // (supabase/migrations/20261008000000_busan_district_contract.sql): a
+  // district value only ever makes sense for a Busan record.
+  if (value.district !== null && value.region !== "부산") {
+    context.addIssue({
+      code: "custom",
+      path: ["district"],
+      message: "district requires region to be 부산",
+    });
+  }
+});
 
 const provenanceFieldMappingSchema = z.object({
   source: fieldPath.optional(),

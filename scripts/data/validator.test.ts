@@ -63,6 +63,42 @@ describe("validateLocationDataset", () => {
     expect(inspectImagePath).toHaveBeenCalledWith("images/location.jpg");
   });
 
+  it("accepts a Busan location with a confirmed district", async () => {
+    const location = { ...validLocation(), region: "부산", district: "busan_haeundae_gu" };
+    const report = await validateLocationDataset(dataset([location]), {
+      mode: "require-local-assets",
+      inspectImagePath: async () => "ok" as const,
+    });
+    expect(report.valid).toBe(true);
+  });
+
+  it("rejects a district value outside the 1차 single definition", async () => {
+    const location = { ...validLocation(), region: "부산", district: "해운대구" };
+    const report = await validateLocationDataset(dataset([location]), {
+      mode: "require-local-assets",
+      inspectImagePath: async () => "ok" as const,
+    });
+    expect(report.errors.map((item) => item.code)).toContain("DISTRICT_UNKNOWN");
+  });
+
+  it("rejects a district set on a non-Busan location", async () => {
+    const location = { ...validLocation(), region: "서울", district: "busan_haeundae_gu" };
+    const report = await validateLocationDataset(dataset([location]), {
+      mode: "require-local-assets",
+      inspectImagePath: async () => "ok" as const,
+    });
+    expect(report.errors.map((item) => item.code)).toContain("DISTRICT_REQUIRES_BUSAN_REGION");
+  });
+
+  it("accepts a Busan location with an unconfirmed (null) district, not rejecting ambiguity as an error", async () => {
+    const location = { ...validLocation(), region: "부산", district: null };
+    const report = await validateLocationDataset(dataset([location]), {
+      mode: "require-local-assets",
+      inspectImagePath: async () => "ok" as const,
+    });
+    expect(report.valid).toBe(true);
+  });
+
   it("collects duplicate IDs, required-field, coordinate, category, and image-path errors", async () => {
     const first = validLocation();
     const second = {

@@ -581,18 +581,20 @@ type CliOptions = {
   verifiedAt: string;
   targetMinimumPerCell: number;
   reviewDecisionsPath: string | null;
+  region: KoreaRegion | null;
 };
 
 export function parseDiscoveryArgs(args: string[]): CliOptions {
   const outputPath = args[0];
   if (!outputPath) {
-    throw new Error("Usage: pnpm data:discover-wikidata <output.json> [--base <manifest.json>] [--max N] [--target N] [--review-decisions PATH] [--verified-at ISO]");
+    throw new Error("Usage: pnpm data:discover-wikidata <output.json> [--base <manifest.json>] [--max N] [--target N] [--review-decisions PATH] [--verified-at ISO] [--region <KoreaRegion>]");
   }
   let basePath: string | null = null;
   let maximumNewLocations = 400;
   let verifiedAt = new Date().toISOString();
   let targetMinimumPerCell = MINIMUM_LOCATIONS_PER_CELL;
   let reviewDecisionsPath: string | null = null;
+  let region: KoreaRegion | null = null;
   for (let index = 1; index < args.length; index += 1) {
     const flag = args[index];
     if (flag === "--base") basePath = args[++index] ?? null;
@@ -600,6 +602,7 @@ export function parseDiscoveryArgs(args: string[]): CliOptions {
     else if (flag === "--target") targetMinimumPerCell = Number(args[++index]);
     else if (flag === "--review-decisions") reviewDecisionsPath = args[++index] ?? null;
     else if (flag === "--verified-at") verifiedAt = args[++index] ?? "";
+    else if (flag === "--region") region = (args[++index] ?? null) as KoreaRegion | null;
     else throw new Error(`Unknown option: ${flag}`);
   }
   if (!Number.isInteger(maximumNewLocations) || maximumNewLocations < 1 || maximumNewLocations > 2_000) {
@@ -609,6 +612,9 @@ export function parseDiscoveryArgs(args: string[]): CliOptions {
     throw new Error("--target must be an integer between 1 and 20");
   }
   if (!Number.isFinite(Date.parse(verifiedAt))) throw new Error("--verified-at must be an ISO timestamp");
+  if (region !== null && !KOREA_REGION_VALUES.includes(region)) {
+    throw new Error(`--region must be one of: ${KOREA_REGION_VALUES.join(", ")}`);
+  }
   return {
     outputPath: resolve(outputPath),
     basePath: basePath ? resolve(basePath) : null,
@@ -616,6 +622,7 @@ export function parseDiscoveryArgs(args: string[]): CliOptions {
     verifiedAt,
     targetMinimumPerCell,
     reviewDecisionsPath: reviewDecisionsPath ? resolve(reviewDecisionsPath) : null,
+    region,
   };
 }
 
@@ -632,8 +639,16 @@ async function main(): Promise<void> {
   console.log(
     `Coverage before discovery: under-target=${coverageBefore.summary.underTargetCells}/${coverageBefore.summary.totalCells}, deficit=${coverageBefore.summary.totalDeficit}`,
   );
+  // Requirement 8 ("네트워크 수집은 ... rate limit을 지킨다"): when scoped
+  // to one region, only that region's SPARQL query runs -- not all 17 --
+  // so a focused round (e.g. 부산) never queries 16 regions it has no use
+  // for. Every downstream step (license gate, dedup, stable UUID, resume)
+  // is completely unchanged.
+  const regionsToQuery = options.region
+    ? WIKIDATA_REGIONS.filter(({ region }) => region === options.region)
+    : WIKIDATA_REGIONS;
   const discovered: Candidate[] = [];
-  for (const { id, region } of WIKIDATA_REGIONS) {
+  for (const { id, region } of regionsToQuery) {
     const candidates = await discoverRegion(id, region);
     discovered.push(...candidates);
     console.log(`Wikidata ${region}: ${candidates.length} classified candidates`);

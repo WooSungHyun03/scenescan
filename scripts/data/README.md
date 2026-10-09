@@ -251,6 +251,44 @@ Storage upload first repeats metadata/license-manifest validation, then requires
 
 Use `--insert-only` with metadata `--dry-run` and `--apply` when expanding a live catalog: existing place/image records, including curated permit/contact data, are preserved. Default full upsert remains available for deliberate reviewed metadata refreshes. Install attribution and filtered-search migrations before publishing. Verify DB attribution as well as the license file; use `--attribution-only` for legacy rows instead of a blanket overwrite of operational place metadata. Embedding import remains separate.
 
+## Busan expansion rounds and non-Busan cleanup
+
+The live product now serves Busan only (`docs/database.md`'s Busan-district contract), but `data/production/locations.json` still spans all 17 regions from the earlier nationwide seed. This repository's expansion work narrows the *catalog* to match: growing Busan coverage round by round, and separately planning (never silently executing) the eventual removal of the now out-of-scope non-Busan rows.
+
+### Busan 구·군 coverage and address-based district assignment
+
+`scripts/data/busan-coverage.ts` reports coverage against the 16 Busan districts (`DISTRICT_VALUES`, `src/types/location-options.ts` -- the single 1차 definition), target 3 locations per district, as a Busan-specific counterpart to `coverage.ts`'s nationwide region x category grid (that module is unchanged and still used for the nationwide pipeline elsewhere).
+
+`scripts/data/busan-district.ts`'s `resolveBusanDistrict({ address, latitude, longitude })` assigns a district only when it can do so without guessing:
+
+- The coordinate must fall within a wide, well-known Busan *city*-level bounding box (a coarse sanity check, not an authority for which district).
+- The address text must name **exactly one** district, matched against the real `DISTRICT_LABELS` (longest-alias-first, so e.g. "강서구" is never mistaken for containing "서구").
+
+Any ambiguity -- no district named, two districts named, or a coordinate outside the city bounds -- returns `district: null` with a specific reason instead of assigning one. A `null` district is a normal, valid state (same convention as the live product: "구/군 unconfirmed from its source address, never guessed") and routes the candidate to manual review rather than blocking it from the catalog entirely.
+
+The canonical pipeline (`contracts.ts`'s `CanonicalLocationRecord`, the Commons collection manifest, and `production-importer.ts`'s `LocationRow`) all carry this same `district: District | null` field through to the database column added by the Busan-district migration. It is optional on input (defaults to `null`) and, like the DB's own check constraint, can only be non-null when `region` is `부산`.
+
+### Review rounds
+
+Expansion happens in 30-50 location rounds, each one producing its own files under `data-work/reviews/round-NN/` (git-ignored working files, same as other `data-work/` output): the raw discovery candidate list, accept/reject decisions with a reason for each, and the license evidence those decisions relied on. A round never adds a candidate without a verified CC0/PD/CC BY/CC BY-SA Commons license (the same gate `collect-commons.ts` always re-checks) and never fabricates a photo, tag, or access condition that is not backed by a cited source -- a shortfall against the round's target is recorded as a blocker in the round's report, not padded with invented data.
+
+### Non-Busan cleanup (plan-only by default)
+
+`scripts/data/non-busan-cleanup.ts` plans the eventual removal of non-Busan rows from the database. Running it with no flags -- the default, and the only way its own author ever runs it -- reads the local `locations.json`, writes a deletion-candidate manifest, and **never connects to Supabase at all**:
+
+```bash
+pnpm data:plan-non-busan-cleanup data/production/locations.json data-work/reviews/non-busan-cleanup-plan.json
+```
+
+Deleting anything for real requires BOTH `--apply` and a second, differently-worded `--yes-delete-non-busan-locations` confirmation flag, plus real Supabase admin credentials -- giving only one of the two flags fails closed with an error rather than partially proceeding:
+
+```bash
+pnpm data:plan-non-busan-cleanup data/production/locations.json data-work/reviews/non-busan-cleanup-plan.json \
+  --apply --yes-delete-non-busan-locations
+```
+
+Apply mode deletes each candidate's `parking` rows first (that table's `location_id` is `ON DELETE SET NULL`, not `CASCADE` -- deleting locations first would leave orphaned parking rows behind), then the location rows themselves (which cascades to `location_images`/`user_shortlist` per the schema). It never touches Supabase Storage objects. The restore procedure if a deleted location turns out to still be wanted is documented in full in this script's own header comment: the reviewed source catalog files remain git-committed and untouched by this tool, so restoring is the normal `data:import-production`/`embeddings:import` `--apply` sequence against the same still-existing JSON, not a special recovery path.
+
 ## Validation gates
 
 The validator has two explicit modes. A mode is mandatory so a clean clone cannot accidentally treat intentionally absent working images as corrupt production metadata.

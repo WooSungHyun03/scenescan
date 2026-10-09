@@ -72,6 +72,12 @@ describe("Wikidata location discovery", () => {
     expect(() => parseDiscoveryArgs(["out.json", "--target", "0"])).toThrow("between 1 and 20");
   });
 
+  it("parses an optional --region scope and rejects an unrecognized region", () => {
+    expect(parseDiscoveryArgs(["out.json", "--region", "부산"]).region).toBe("부산");
+    expect(parseDiscoveryArgs(["out.json"]).region).toBeNull();
+    expect(() => parseDiscoveryArgs(["out.json", "--region", "Atlantis"])).toThrow(/--region must be one of/);
+  });
+
   it("uses a reviewed administrative-area fallback when Wikidata has no street address", () => {
     const candidates = collectCandidates([{
       item: { value: "http://www.wikidata.org/entity/Q125" },

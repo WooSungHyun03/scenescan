@@ -7,7 +7,7 @@ import type { NormalizedLocationOutput } from "./contracts.ts";
 import { KOREA_REGION_VALUES, parseNormalizedLocationOutput } from "./contracts.ts";
 import { parseManifest as parseEmbeddingManifest } from "../embeddings/contracts.ts";
 import { applyStaticParkingCatalog, parseStaticParkingCatalog, type StaticParkingCatalog } from "./static-parking.ts";
-import { LOCATION_CATEGORY_VALUES } from "../../src/types/location-options.ts";
+import { DISTRICT_VALUES, LOCATION_CATEGORY_VALUES } from "../../src/types/location-options.ts";
 import { isValidContactPhone } from "./permit-information.ts";
 
 const COMMONS_API = "https://commons.wikimedia.org/w/api.php";
@@ -39,6 +39,12 @@ const locationSchema = z.object({
   description: z.string().trim().min(1),
   category: z.enum(LOCATION_CATEGORY_VALUES),
   region: z.enum(KOREA_REGION_VALUES),
+  // Optional: absent/null for every non-Busan location, and for a Busan
+  // location whose 구/군 is not yet confirmed (scripts/data/busan-district.ts
+  // -- never guessed). Only ever set for region "부산" -- see
+  // buildLocationDataset's own check below, which mirrors the DB's
+  // locations_district_requires_busan_region constraint.
+  district: z.enum(DISTRICT_VALUES).nullable().optional(),
   address: z.string().trim().min(1),
   latitude: z.number().finite().min(-90).max(90),
   longitude: z.number().finite().min(-180).max(180),
@@ -46,7 +52,10 @@ const locationSchema = z.object({
   source_url: httpUrl,
   permit: permitSchema.optional(),
   images: z.array(imageSchema).min(1),
-}).strict();
+}).strict().refine(
+  (value) => !value.district || value.region === "부산",
+  { message: "district requires region to be 부산", path: ["district"] },
+);
 const collectionManifestSchema = z.object({
   schema_version: z.literal(1),
   verified_at: z.iso.datetime({ offset: true }),
@@ -305,6 +314,7 @@ export function buildLocationDataset(
       description: location.description,
       category: location.category,
       region: location.region,
+      district: location.district ?? null,
       address: location.address,
       latitude: location.latitude,
       longitude: location.longitude,

@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { basename } from "node:path";
 import { isPermitGuidance, isValidContactPhone } from "./permit-information.ts";
-import { LOCATION_CATEGORY_VALUES } from "../../src/types/location-options.ts";
+import { DISTRICT_VALUES, LOCATION_CATEGORY_VALUES } from "../../src/types/location-options.ts";
 import {
   parseImageLicenseCatalog,
   type ImageLicenseCatalog,
@@ -10,6 +10,7 @@ import { KOREA_REGION_VALUES } from "./contracts.ts";
 
 const categories = new Set<string>(LOCATION_CATEGORY_VALUES);
 const regions = new Set<string>(KOREA_REGION_VALUES);
+const districts = new Set<string>(DISTRICT_VALUES);
 const uuidSchema = z.string().uuid();
 const isoDateSchema = z.iso.date();
 const isoDateTimeSchema = z.iso.datetime({ offset: true });
@@ -53,6 +54,8 @@ export type DataValidationErrorCode =
   | "NAME_REQUIRED"
   | "CATEGORY_UNKNOWN"
   | "REGION_UNKNOWN"
+  | "DISTRICT_UNKNOWN"
+  | "DISTRICT_REQUIRES_BUSAN_REGION"
   | "ADDRESS_REQUIRED"
   | "LATITUDE_INVALID"
   | "LONGITUDE_INVALID"
@@ -338,6 +341,20 @@ async function validateLocation(
   }
   if (typeof value.region !== "string" || !regions.has(value.region)) {
     errors.push(error("REGION_UNKNOWN", locationIndex, id, "region", `Region must be one of: ${KOREA_REGION_VALUES.join(", ")}`));
+  }
+  // `district` is optional/nullable -- most non-Busan locations never set
+  // it. When present it must be one of the 1차 single definition's 16
+  // values (DISTRICT_VALUES, src/types/location-options.ts) and, mirroring
+  // the DB's own locations_district_requires_busan_region constraint
+  // (supabase/migrations/20261008000000_busan_district_contract.sql), the
+  // record's region must be 부산 -- never guessed, never assigned to a
+  // non-Busan record.
+  if (value.district !== undefined && value.district !== null) {
+    if (typeof value.district !== "string" || !districts.has(value.district)) {
+      errors.push(error("DISTRICT_UNKNOWN", locationIndex, id, "district", `District must be null or one of: ${DISTRICT_VALUES.join(", ")}`));
+    } else if (value.region !== "부산") {
+      errors.push(error("DISTRICT_REQUIRES_BUSAN_REGION", locationIndex, id, "district", "District can only be set when region is 부산"));
+    }
   }
   if (!nonEmptyText(value.address)) {
     errors.push(error("ADDRESS_REQUIRED", locationIndex, id, "address", "Location address must not be blank"));

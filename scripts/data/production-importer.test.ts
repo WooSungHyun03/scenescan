@@ -86,6 +86,18 @@ function database(overrides: Partial<ProductionImportDatabase> = {}): Production
 }
 
 describe("production data importer", () => {
+  it("threads a confirmed Busan district through to the location row", () => {
+    const { data, manifest, licenses } = inputs();
+    data.locations[0].region = "부산";
+    data.locations[0].district = "busan_haeundae_gu";
+    const result = createProductionRows(data, manifest, licenses);
+    expect(result.locations[0].district).toBe("busan_haeundae_gu");
+  });
+
+  it("writes a null district for a non-Busan location", () => {
+    expect(rows().locations[0].district).toBeNull();
+  });
+
   it("maps reviewed static parking with provenance instead of rejecting it", async () => {
     const { data, manifest, licenses } = inputs();
     data.locations[0].parking = [{

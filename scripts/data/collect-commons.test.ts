@@ -108,6 +108,38 @@ describe("Commons production data collection", () => {
     });
   });
 
+  it("passes a confirmed Busan district through to the canonical dataset", () => {
+    const input = JSON.parse(JSON.stringify(manifest())) as Record<string, unknown> & {
+      locations: Array<Record<string, unknown>>;
+    };
+    input.locations[0].region = "부산";
+    input.locations[0].district = "busan_haeundae_gu";
+    const output = buildLocationDataset(parseCollectionManifest(input));
+    expect(output.locations[0].district).toBe("busan_haeundae_gu");
+  });
+
+  it("defaults district to null when the manifest omits it", () => {
+    const output = buildLocationDataset(parseCollectionManifest(manifest()));
+    expect(output.locations[0].district).toBeNull();
+  });
+
+  it("rejects a district set on a non-Busan location at the manifest level", () => {
+    const input = JSON.parse(JSON.stringify(manifest())) as Record<string, unknown> & {
+      locations: Array<Record<string, unknown>>;
+    };
+    input.locations[0].district = "busan_haeundae_gu";
+    expect(() => parseCollectionManifest(input)).toThrow(/부산/);
+  });
+
+  it("rejects a district value outside the 1차 single definition at the manifest level", () => {
+    const input = JSON.parse(JSON.stringify(manifest())) as Record<string, unknown> & {
+      locations: Array<Record<string, unknown>>;
+    };
+    input.locations[0].region = "부산";
+    input.locations[0].district = "해운대구";
+    expect(() => parseCollectionManifest(input)).toThrow();
+  });
+
   it("preserves reviewed permit contact and provenance instead of replacing it with the fallback", () => {
     const input = JSON.parse(JSON.stringify(manifest())) as Record<string, unknown> & {
       locations: Array<Record<string, unknown>>;

@@ -118,6 +118,7 @@ describe("normalizeDataset", () => {
         description: "Licensed sample",
         category: "industrial",
         region: "서울",
+        district: null,
         address: "1 Example-ro",
         latitude: 37.55,
         longitude: 126.97,

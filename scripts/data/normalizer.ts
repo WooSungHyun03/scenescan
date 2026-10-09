@@ -223,6 +223,10 @@ function normalizeRecordWithCategory(
       KOREA_REGION_VALUES,
       "region",
     ),
+    // This generic provider pipeline has no reviewed Busan 구/군 mapping --
+    // district is only ever assigned by the dedicated Busan collection
+    // pipeline (scripts/data/busan-district.ts), never guessed here.
+    district: null,
     address: requiredText(record, mapping.fields.address, "address"),
     latitude: coordinate(record, mapping.fields.latitude, "latitude"),
     longitude: coordinate(record, mapping.fields.longitude, "longitude"),
