@@ -51,7 +51,13 @@ export interface ParsedTextSearchQuery {
   unsupportedConditions: string[];
 }
 
-export type TextSearchNoticeCode = "OUT_OF_SCOPE_REGION";
+// "FILTER_OVERRIDES_QUERY": the request's explicit `filters.district`/
+// `filters.category` (src/types/contracts.ts's textSearchRequestSchema)
+// named a different district/category than the query text itself did --
+// see resolveTextSearchFilters (src/domains/search/server/
+// text-search-filter-resolution.ts). The filter always wins; this notice
+// only explains why the search didn't follow the query text literally.
+export type TextSearchNoticeCode = "OUT_OF_SCOPE_REGION" | "FILTER_OVERRIDES_QUERY";
 
 export interface TextSearchNotice {
   code: TextSearchNoticeCode;
@@ -61,6 +67,11 @@ export interface TextSearchNotice {
 export interface TextSearchResponse {
   results: TextSearchResult[];
   parsedQuery: {
+    // The district/category actually used for this search -- i.e. after
+    // resolveTextSearchFilters merges the query text's own district/
+    // category with the request's explicit `filters` (an explicit filter
+    // always wins on a conflict; see TextSearchNoticeCode above). Not
+    // simply "what the query text named" when a filter was also supplied.
     district: District | null;
     category: LocationCategory | null;
     keywords: string[];

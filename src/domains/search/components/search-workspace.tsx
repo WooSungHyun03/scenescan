@@ -455,7 +455,11 @@ export function SearchWorkspace({ examples }: { examples: Location[] }) {
     setTextNotice(null);
     setActiveLocationId(null);
     try {
-      const response = await fetch("/api/search/text", { method: "POST", signal: AbortSignal.any([controller.signal, AbortSignal.timeout(20_000)]), headers: { "Content-Type": "application/json" }, body: JSON.stringify({ query: trimmed }) });
+      // Sends the same district/category the user picked in "검색 조건" above
+      // alongside the query text -- the server resolves any conflict between
+      // the two (filter wins) and reports it via `notice`, see
+      // resolveTextSearchFilters (src/domains/search/server/text-search-filter-resolution.ts).
+      const response = await fetch("/api/search/text", { method: "POST", signal: AbortSignal.any([controller.signal, AbortSignal.timeout(20_000)]), headers: { "Content-Type": "application/json" }, body: JSON.stringify({ query: trimmed, filters: { district: district || undefined, category: category || undefined } }) });
       if (!response.ok) throw await createSearchApiError(response);
       const data = await response.json() as TextSearchResponse;
       if (!Array.isArray(data.results)) throw new Error("Invalid search response");
@@ -553,7 +557,7 @@ export function SearchWorkspace({ examples }: { examples: Location[] }) {
           <label className="text-sm font-medium">공간 종류<select name="category" className="scene-input mt-2" value={category} disabled={isBusy} onChange={(e) => { setCategory(e.target.value as LocationCategory | ""); setCatalogOffset(0); clearActiveResults(); setVisibleCount(12); }}><option value="">전체</option>{categoryOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label>
         </div>
         <p className="mt-3 text-xs leading-relaxed text-muted">{district ? DISTRICT_LABELS[district] : "부산 전체"} · {categoryOptions.find((option) => option.value === category)?.label ?? "전체 공간"}{catalogLoading || catalog.key !== filterKey ? " — 장소 목록 확인 중…" : catalogError ? " — 목록 연결을 확인해 주세요. 검색은 계속 사용할 수 있습니다." : catalog.hasMore ? ` — 장소 ${filteredExamples.length}곳을 불러왔습니다. 아래에서 더 볼 수 있어요.` : `에 등록된 장소 ${filteredExamples.length}곳.`}</p>
-        {mode === "text" && <p className="mt-2 text-xs leading-relaxed text-stone-500">이 조건은 아래 목록 둘러보기에만 적용됩니다. 텍스트 검색은 검색어 안의 구·군/공간 표현을 우선 사용합니다.</p>}
+        {mode === "text" && <p className="mt-2 text-xs leading-relaxed text-stone-500">텍스트 검색에도 적용됩니다. 검색어 속 구·군/공간 표현과 다르면 이 필터를 우선합니다.</p>}
       </div>
 
       {mode === "image" && <Button onClick={search} disabled={busy} aria-busy={busy} size="lg" className="mt-5 w-full">{busy ? <LoaderCircle size={18} className="animate-spin" aria-hidden="true" /> : <Search size={18} aria-hidden="true" />}{busy ? searchButtonText : results ? "다시 검색하기" : "이 이미지로 장소 찾기"}</Button>}

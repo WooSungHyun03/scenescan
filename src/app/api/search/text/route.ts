@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { searchByText } from "@/domains/locations/server/repository";
+import { resolveTextSearchFilters } from "@/domains/search/server/text-search-filter-resolution";
 import { parseTextSearchQuery } from "@/domains/search/server/text-query-parser";
 import { describeTextSearchRequestError } from "@/domains/search/server/validation";
 import { validationError } from "@/shared/errors/application-error";
@@ -77,18 +78,24 @@ export async function POST(request: Request) {
     return NextResponse.json(response, { headers: { "Cache-Control": "no-store" } });
   }
 
+  // Explicit `filters.district`/`filters.category` (if given) always win
+  // over whatever the query text itself named -- resolveTextSearchFilters
+  // reports a FILTER_OVERRIDES_QUERY notice when they disagree, so the UI
+  // never silently drops a condition the query text asked for.
+  const { district, category, notice: filterNotice } = resolveTextSearchFilters(parsedQuery, parsed.data.filters ?? {});
+
   try {
-    const results = await searchByText(parsedQuery);
+    const results = await searchByText({ ...parsedQuery, district, category });
     const response: TextSearchResponse = {
       results,
       parsedQuery: {
-        district: parsedQuery.district,
-        category: parsedQuery.category,
+        district,
+        category,
         keywords: parsedQuery.keywords,
         districtConflict: parsedQuery.districtConflict,
       },
       unsupportedConditions: parsedQuery.unsupportedConditions,
-      notice: null,
+      notice: filterNotice,
     };
     return NextResponse.json(response, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {

@@ -87,6 +87,67 @@ test("텍스트 모드에서 지역 조건을 바꾸면 이전 결과가 즉시 
   expect(errors).toEqual([]);
 });
 
+test("필터만 지정하면 검색어에 없는 지역 조건으로 결과가 좁혀진다", async ({ page }) => {
+  const errors = collectPageErrors(page);
+  await page.goto("/search");
+  await switchToTextMode(page);
+
+  // "도심" resolves to category=urban via alias, with no district in the
+  // query text itself -- 3 fixture locations match (2 are 해운대구/영도구).
+  await page.getByLabel("검색어", { exact: true }).fill("도심");
+  await page.getByRole("button", { name: "검색", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "추천 장소 3곳" })).toBeVisible();
+
+  await page.getByLabel("지역").selectOption("busan_busanjin_gu");
+  await page.getByRole("button", { name: "검색", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "추천 장소 1곳" })).toBeVisible();
+  await expect(page.getByText(/필터와 달라/)).toHaveCount(0);
+
+  expect(errors).toEqual([]);
+});
+
+test("검색어만 지역을 지정하면 필터 없이도 그 지역이 그대로 적용된다", async ({ page }) => {
+  const errors = collectPageErrors(page);
+  await page.goto("/search");
+  await switchToTextMode(page);
+
+  await page.getByLabel("검색어", { exact: true }).fill("광안리 산책");
+  await page.getByRole("button", { name: "검색", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "추천 장소 1곳" })).toBeVisible();
+  await expect(page.getByText(/인식된 조건.*수영구/)).toBeVisible();
+  await expect(page.getByText(/필터와 달라/)).toHaveCount(0);
+
+  expect(errors).toEqual([]);
+});
+
+test("필터와 검색어 속 지역이 같으면 충돌 안내 없이 그대로 검색된다", async ({ page }) => {
+  const errors = collectPageErrors(page);
+  await page.goto("/search");
+  await switchToTextMode(page);
+
+  await page.getByLabel("지역").selectOption("busan_suyeong_gu");
+  await page.getByLabel("검색어", { exact: true }).fill("광안리 산책");
+  await page.getByRole("button", { name: "검색", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "추천 장소 1곳" })).toBeVisible();
+  await expect(page.getByText(/필터와 달라/)).toHaveCount(0);
+
+  expect(errors).toEqual([]);
+});
+
+test("필터와 검색어 속 지역이 다르면 필터를 우선하고 충돌을 안내한다", async ({ page }) => {
+  const errors = collectPageErrors(page);
+  await page.goto("/search");
+  await switchToTextMode(page);
+
+  await page.getByLabel("지역").selectOption("busan_haeundae_gu");
+  await page.getByLabel("검색어", { exact: true }).fill("광안리 산책");
+  await page.getByRole("button", { name: "검색", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "추천 장소 0곳" })).toBeVisible();
+  await expect(page.getByText(/지역.*조건이 선택한 필터와 달라/)).toBeVisible();
+
+  expect(errors).toEqual([]);
+});
+
 test("확인할 수 없는 조건은 결과가 그 조건을 만족한다고 말하지 않고 별도로 안내한다", async ({ page }) => {
   const errors = collectPageErrors(page);
   await page.goto("/search");

@@ -144,19 +144,30 @@ Basic rule-based natural-language search over the reviewed Busan catalog's name/
 
 ```ts
 // Request
-{ query: string }                 // textSearchRequestSchema, src/types/contracts.ts
+{
+  query: string;                  // textSearchRequestSchema, src/types/contracts.ts
+  filters?: {                     // textSearchFiltersSchema -- optional, .strict()
+    district?: District;          // DISTRICT_VALUES (src/types/location-options.ts)
+    category?: LocationCategory;  // LOCATION_CATEGORY_VALUES
+  };
+}
 
 // Response (always 200 for a well-formed request -- see "Errors" below)
 {
   results: TextSearchResult[];    // max 8, deterministic order
   parsedQuery: {
+    // The district/category actually used for this search, i.e. after
+    // merging the query text's own with `filters` (see "Filters" below) --
+    // NOT simply what the query text named when a filter was also given.
     district: District | null;
     category: LocationCategory | null;
     keywords: string[];
     districtConflict: boolean;
   };
   unsupportedConditions: string[];
-  notice: { code: "OUT_OF_SCOPE_REGION"; message: string } | null;
+  notice: { code: "OUT_OF_SCOPE_REGION"; message: string }
+        | { code: "FILTER_OVERRIDES_QUERY"; message: string }
+        | null;
 }
 
 // TextSearchResult (src/types/text-search.ts)
@@ -169,7 +180,16 @@ Basic rule-based natural-language search over the reviewed Busan catalog's name/
 }
 ```
 
-**Validation** (`textSearchRequestSchema`): `query` is `.trim().min(1).max(200)` inside a `.strict()` object (an unknown top-level field 400s, matching `searchRequestSchema`'s own strictness elsewhere in this file). Blank/whitespace-only and over-length both 400 `VALIDATION_ERROR`, with distinct Korean messages (`describeTextSearchRequestError`, `src/domains/search/server/validation.ts`, keyed off the zod issue code -- `"too_small"` vs `"too_big"` -- since both failures share the same `["query"]` field path). The request body is capped at `MAX_TEXT_SEARCH_REQUEST_BYTES` (2KB) the same streamed-read way `POST /api/search` enforces its own 32KB cap, duplicated rather than shared so neither route can accidentally change the other's behavior.
+**Validation** (`textSearchRequestSchema`): `query` is `.trim().min(1).max(200)` inside a `.strict()` object (an unknown top-level field 400s, matching `searchRequestSchema`'s own strictness elsewhere in this file). Blank/whitespace-only and over-length both 400 `VALIDATION_ERROR`, with distinct Korean messages (`describeTextSearchRequestError`, `src/domains/search/server/validation.ts`, keyed off the zod issue code -- `"too_small"` vs `"too_big"` -- since both failures share the same `["query"]` field path). `filters` (`textSearchFiltersSchema`) is optional and itself `.strict()`: an unrecognized `district`/`category` value or an unknown field inside it (e.g. a client-supplied `region`) 400s `VALIDATION_ERROR` the same way `locationFilterSchema` does for `POST /api/search`. The request body is capped at `MAX_TEXT_SEARCH_REQUEST_BYTES` (2KB) the same streamed-read way `POST /api/search` enforces its own 32KB cap, duplicated rather than shared so neither route can accidentally change the other's behavior.
+
+**Filters** (`filters.district`/`filters.category`, added 2026-10-09): the same `district`/`category` values the UI's "검색 조건" selectors already send to `POST /api/search` (image search) -- no separate `region` here, since text search is always Busan-scoped server-side regardless of input (see "Scope" below). `resolveTextSearchFilters` (`src/domains/search/server/text-search-filter-resolution.ts`) merges this with whatever district/category the query text itself named (`parseTextSearchQuery`'s output):
+
+- Only one side names a value (or both agree): that value is used, no notice.
+- Both name a value and they disagree: the **explicit filter always wins** (the caller chose it deliberately; a query-text district/category is only inferred from free text), and the response carries `notice: { code: "FILTER_OVERRIDES_QUERY", message: "..." }` naming which field(s) (지역/공간 종류) were overridden. `results` and `parsedQuery.district`/`category` reflect the filter's value, not the query text's.
+- A query text that already names two conflicting districts itself (`parsedQuery.district === null`, `districtConflict: true`) has nothing to conflict with a filter -- the filter is applied with no `FILTER_OVERRIDES_QUERY` notice (`districtConflict` in the response still reports the query text's own internal conflict, independent of this).
+- An out-of-scope region query (see below) short-circuits before filters are even considered -- a filter present alongside "서울 카페" does not change the empty-result/`OUT_OF_SCOPE_REGION` response.
+
+`search_locations_by_text`'s SQL-side `filter_district`/`filter_category` parameters (unchanged by this addition -- they already existed, see "SQL" below) receive the *resolved* values, applied in SQL before `LIMIT`, same as every other filtered search RPC in this project.
 
 **Rule-based parsing** (`parseTextSearchQuery`, `src/domains/search/server/text-query-parser.ts`): extracts `district`, `category`, and free-text `keywords` from the raw string using a curated alias dictionary (`src/domains/search/server/text-search-aliases.ts`) -- no model call, no guessing. In order: (1) a non-Busan region mention (서울, 대구, ...) short-circuits the whole request -- see "Out-of-Busan requests" below; (2) known unsupported-condition phrases (조용한, 촬영 가능, ...) are stripped and recorded in `unsupportedConditions`, never used as a keyword; (3) district aliases are matched and stripped (longest alias first, so e.g. "해운대구" is consumed whole before the shorter "해운대" would otherwise leave a stray "구"); naming two different districts sets `districtConflict: true` and `district: null` rather than guessing one; (4) category aliases (literal labels plus a small curated synonym list) are matched the same way; (5) whatever text remains is split into `keywords`, with Korean particle stopwords (은/는/이/가/...) dropped.
 

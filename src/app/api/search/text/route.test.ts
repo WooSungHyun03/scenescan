@@ -167,4 +167,90 @@ describe("POST /api/search/text", () => {
     const body = JSON.parse(text);
     expect(body.error.code).toBe("SEARCH_FAILED");
   });
+
+  describe("filters", () => {
+    it("400s an unrecognized filters.district value", async () => {
+      const response = await POST(request({ query: "해운대", filters: { district: "nowhere" } }));
+      expect(response.status).toBe(400);
+      expect(searchByTextMock).not.toHaveBeenCalled();
+    });
+
+    it("400s an unrecognized filters.category value", async () => {
+      const response = await POST(request({ query: "해운대", filters: { category: "nowhere" } }));
+      expect(response.status).toBe(400);
+      expect(searchByTextMock).not.toHaveBeenCalled();
+    });
+
+    it("400s an unknown field inside filters (strict filters schema)", async () => {
+      const response = await POST(request({ query: "해운대", filters: { region: "부산" } }));
+      expect(response.status).toBe(400);
+      expect(searchByTextMock).not.toHaveBeenCalled();
+    });
+
+    it("applies a filter when the query text names no district/category", async () => {
+      searchByTextMock.mockResolvedValue([]);
+      const response = await POST(request({ query: "맛집", filters: { district: "busan_haeundae_gu" } }));
+      expect(response.status).toBe(200);
+      const body = await response.json();
+      expect(body.parsedQuery.district).toBe("busan_haeundae_gu");
+      expect(body.notice).toBeNull();
+      expect(searchByTextMock).toHaveBeenCalledWith(expect.objectContaining({ district: "busan_haeundae_gu" }));
+    });
+
+    it("keeps the query text's district when no filter is given", async () => {
+      searchByTextMock.mockResolvedValue([]);
+      const response = await POST(request({ query: "해운대 맛집" }));
+      expect(response.status).toBe(200);
+      const body = await response.json();
+      expect(body.parsedQuery.district).toBe("busan_haeundae_gu");
+      expect(body.notice).toBeNull();
+    });
+
+    it("has no conflict notice when the filter and the query text name the same district", async () => {
+      searchByTextMock.mockResolvedValue([]);
+      const response = await POST(request({ query: "해운대 맛집", filters: { district: "busan_haeundae_gu" } }));
+      expect(response.status).toBe(200);
+      const body = await response.json();
+      expect(body.parsedQuery.district).toBe("busan_haeundae_gu");
+      expect(body.notice).toBeNull();
+    });
+
+    it("prefers the filter and reports a conflict notice when the filter and query text name different districts", async () => {
+      searchByTextMock.mockResolvedValue([]);
+      const response = await POST(request({ query: "해운대 맛집", filters: { district: "busan_suyeong_gu" } }));
+      expect(response.status).toBe(200);
+      const body = await response.json();
+      expect(body.parsedQuery.district).toBe("busan_suyeong_gu");
+      expect(body.notice).toEqual({ code: "FILTER_OVERRIDES_QUERY", message: expect.stringContaining("지역") });
+      expect(searchByTextMock).toHaveBeenCalledWith(expect.objectContaining({ district: "busan_suyeong_gu" }));
+    });
+
+    it("prefers the filter and reports a conflict notice when the filter and query text name different categories", async () => {
+      searchByTextMock.mockResolvedValue([]);
+      const response = await POST(request({ query: "실내 카페", filters: { category: "nature" } }));
+      expect(response.status).toBe(200);
+      const body = await response.json();
+      expect(body.parsedQuery.category).toBe("nature");
+      expect(body.notice).toEqual({ code: "FILTER_OVERRIDES_QUERY", message: expect.stringContaining("공간 종류") });
+      expect(searchByTextMock).toHaveBeenCalledWith(expect.objectContaining({ category: "nature" }));
+    });
+
+    it("applies the filter instead of a guessed district when the query text itself conflicts", async () => {
+      searchByTextMock.mockResolvedValue([]);
+      const response = await POST(request({ query: "해운대랑 서면 사진", filters: { district: "busan_haeundae_gu" } }));
+      expect(response.status).toBe(200);
+      const body = await response.json();
+      expect(body.parsedQuery.districtConflict).toBe(true);
+      expect(body.parsedQuery.district).toBe("busan_haeundae_gu");
+      expect(body.notice).toBeNull();
+    });
+
+    it("does not call the repository for an out-of-scope region even with a filter present", async () => {
+      const response = await POST(request({ query: "서울 카페", filters: { district: "busan_haeundae_gu" } }));
+      expect(response.status).toBe(200);
+      const body = await response.json();
+      expect(body.notice).toEqual({ code: "OUT_OF_SCOPE_REGION", message: expect.stringContaining("부산") });
+      expect(searchByTextMock).not.toHaveBeenCalled();
+    });
+  });
 });

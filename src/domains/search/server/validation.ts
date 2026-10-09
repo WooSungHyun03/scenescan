@@ -33,6 +33,12 @@ export function describeSearchRequestError(error: z.ZodError): string {
 // fields above.
 export function describeTextSearchRequestError(error: z.ZodError): string {
   const issue = error.issues[0];
+  const [field, subField] = issue?.path ?? [];
+  if (field === "filters") {
+    if (subField === "district") return "허용되지 않는 구/군입니다.";
+    if (subField === "category") return "허용되지 않는 카테고리입니다.";
+    return "검색 필터 값이 올바르지 않습니다.";
+  }
   if (issue?.code === "too_small") return "검색어를 입력해 주세요.";
   if (issue?.code === "too_big") return "검색어가 너무 깁니다. 200자 이하로 입력해 주세요.";
   return "검색어 형식이 올바르지 않습니다.";

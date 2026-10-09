@@ -99,10 +99,25 @@ export const TEXT_SEARCH_QUERY_MAX_LENGTH = 200;
 // (src/domains/search/server/validation.ts), which maps "too_small"/"too_big"
 // to distinct Korean messages. Same `.trim().min(1)` idiom scripts/data/contracts.ts
 // already uses for `nonEmptyString`.
-export const textSearchRequestSchema = z.object({
-  query: z.string().trim().min(1).max(TEXT_SEARCH_QUERY_MAX_LENGTH),
+// Optional explicit filters alongside the natural-language `query`. Deliberately
+// narrower than `locationFilterSchema`: no `region` (text search is always
+// Busan-scoped server-side, same as image search -- see BUSAN_REGION), only
+// the single 1차 definitions of `district`/`category` (DISTRICT_VALUES/
+// LOCATION_CATEGORY_VALUES, src/types/location-options.ts). When a value here
+// conflicts with a district/category the query text itself named, the filter
+// wins and the response carries a FILTER_OVERRIDES_QUERY notice -- see
+// resolveTextSearchFilters (src/domains/search/server/text-search-filter-resolution.ts).
+export const textSearchFiltersSchema = z.object({
+  district: z.enum(DISTRICT_VALUES).optional(),
+  category: z.enum(LOCATION_CATEGORY_VALUES).optional(),
 }).strict();
 
+export const textSearchRequestSchema = z.object({
+  query: z.string().trim().min(1).max(TEXT_SEARCH_QUERY_MAX_LENGTH),
+  filters: textSearchFiltersSchema.optional(),
+}).strict();
+
+export type TextSearchFilters = z.infer<typeof textSearchFiltersSchema>;
 export type TextSearchRequest = z.infer<typeof textSearchRequestSchema>;
 
 // A real locations.id path/route param (uuid primary key -- see

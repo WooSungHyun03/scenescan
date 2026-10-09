@@ -203,7 +203,7 @@ test("real CLIP 검색, Kakao marker, API health가 정상이다", async ({
       );
     }
     await expect(
-      page.getByRole("heading", { level: 1, name: "이미지로 촬영 장소 찾기" }),
+      page.getByRole("heading", { level: 1, name: "부산 촬영 장소 찾기" }),
     ).toBeVisible();
 
     diagnostics.phase = "clip";

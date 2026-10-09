@@ -68,7 +68,7 @@ for (const viewport of viewports) {
     await expectTouchTargets(page);
 
     await page.goto("/search");
-    await expect(page.getByRole("heading", { level: 1, name: "이미지로 촬영 장소 찾기" })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: "부산 촬영 장소 찾기" })).toBeVisible();
     await expectNoDocumentOverflow(page);
     await expectTouchTargets(page);
     expect(pageErrors).toEqual([]);
