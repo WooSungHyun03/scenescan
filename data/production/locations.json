@@ -6787,7 +6787,7 @@
       "description": "부산의 태종대. 위치와 원본 사진 출처를 확인하고 방문 전 촬영 조건을 문의해 주세요.",
       "category": "nature",
       "region": "부산",
-      "district": null,
+      "district": "busan_yeongdo_gu",
       "aliases": [],
       "tags": [
         "도시 공원"
@@ -7254,7 +7254,7 @@
       "description": "부산의 해운대해수욕장. 위치와 원본 사진 출처를 확인하고 방문 전 촬영 조건을 문의해 주세요.",
       "category": "nature",
       "region": "부산",
-      "district": null,
+      "district": "busan_haeundae_gu",
       "aliases": [],
       "tags": [
         "해수욕장",
@@ -8050,7 +8050,7 @@
       "description": "부산의 송도해수욕장. 위치와 원본 사진 출처를 확인하고 방문 전 촬영 조건을 문의해 주세요.",
       "category": "nature",
       "region": "부산",
-      "district": null,
+      "district": "busan_seo_gu",
       "aliases": [],
       "tags": [
         "해변"
@@ -8372,7 +8372,7 @@
       "description": "해양문화와 해양수산업의 유산을 발굴ㆍ보존ㆍ연구하고 전시를 체계적으로 수행하여 해양문화의 진흥과 해양수산업의 발전에 이바지",
       "category": "interior",
       "region": "부산",
-      "district": null,
+      "district": "busan_yeongdo_gu",
       "aliases": [],
       "tags": [
         "국립박물관",
@@ -8665,7 +8665,7 @@
       "description": "부산광역시 동구 초량동에 있는 경부선의 철도역이자 종착역",
       "category": "urban",
       "region": "부산",
-      "district": null,
+      "district": "busan_dong_gu",
       "aliases": [],
       "tags": [
         "철도역",
@@ -8876,7 +8876,7 @@
       "description": "skyscraper in Busan, South Korea",
       "category": "urban",
       "region": "부산",
-      "district": null,
+      "district": "busan_jung_gu",
       "aliases": [],
       "tags": [
         "건축물"
@@ -8918,7 +8918,7 @@
       "description": "indoor sporting arena in Busan, South Korea",
       "category": "urban",
       "region": "부산",
-      "district": null,
+      "district": "busan_dongnae_gu",
       "aliases": [],
       "tags": [
         "아레나"
@@ -8960,7 +8960,7 @@
       "description": "skyscraper",
       "category": "urban",
       "region": "부산",
-      "district": null,
+      "district": "busan_jung_gu",
       "aliases": [],
       "tags": [
         "마천루"
@@ -9045,7 +9045,7 @@
       "description": "building in Busan, South Korea",
       "category": "urban",
       "region": "부산",
-      "district": null,
+      "district": "busan_haeundae_gu",
       "aliases": [],
       "tags": [
         "건물"
@@ -9129,7 +9129,7 @@
       "description": "부산 중구에 위치한 문화명소. 영화 《인정사정 볼 것 없다》의 오프닝신에 등장하여 많은 사람에게 알려졌다.",
       "category": "urban",
       "region": "부산",
-      "district": null,
+      "district": "busan_jung_gu",
       "aliases": [],
       "tags": [
         "계단"

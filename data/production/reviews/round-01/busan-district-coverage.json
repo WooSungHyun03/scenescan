@@ -3,46 +3,46 @@
   "targetMinimumPerDistrict": 3,
   "targetMinimumLocations": 48,
   "totalLocations": 33,
-  "unassignedCount": 13,
+  "unassignedCount": 3,
   "summary": {
     "totalDistricts": 16,
-    "districtsMeetingTarget": 2,
-    "underTargetDistricts": 14,
-    "emptyDistricts": 4,
-    "totalDeficit": 28
+    "districtsMeetingTarget": 4,
+    "underTargetDistricts": 12,
+    "emptyDistricts": 2,
+    "totalDeficit": 21
   },
   "districts": [
     {
       "district": "busan_jung_gu",
       "label": "중구",
-      "count": 0,
+      "count": 3,
       "target": 3,
-      "deficit": 3,
-      "meetsTarget": false
+      "deficit": 0,
+      "meetsTarget": true
     },
     {
       "district": "busan_seo_gu",
       "label": "서구",
+      "count": 2,
+      "target": 3,
+      "deficit": 1,
+      "meetsTarget": false
+    },
+    {
+      "district": "busan_dong_gu",
+      "label": "동구",
       "count": 1,
       "target": 3,
       "deficit": 2,
       "meetsTarget": false
     },
     {
-      "district": "busan_dong_gu",
-      "label": "동구",
-      "count": 0,
-      "target": 3,
-      "deficit": 3,
-      "meetsTarget": false
-    },
-    {
       "district": "busan_yeongdo_gu",
       "label": "영도구",
-      "count": 2,
+      "count": 4,
       "target": 3,
-      "deficit": 1,
-      "meetsTarget": false
+      "deficit": 0,
+      "meetsTarget": true
     },
     {
       "district": "busan_busanjin_gu",
@@ -55,9 +55,9 @@
     {
       "district": "busan_dongnae_gu",
       "label": "동래구",
-      "count": 1,
+      "count": 2,
       "target": 3,
-      "deficit": 2,
+      "deficit": 1,
       "meetsTarget": false
     },
     {
@@ -79,7 +79,7 @@
     {
       "district": "busan_haeundae_gu",
       "label": "해운대구",
-      "count": 3,
+      "count": 5,
       "target": 3,
       "deficit": 0,
       "meetsTarget": true

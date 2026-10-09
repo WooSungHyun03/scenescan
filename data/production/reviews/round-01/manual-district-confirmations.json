@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "confirmedAt": "2026-10-09",
+  "confirmedBy": "김진석",
+  "method": "카카오맵 주소 확인",
+  "entries": [
+    {
+      "id": "687c5d31-e572-55c8-bdf4-4de745fff604",
+      "name": "해운대해수욕장",
+      "district": "busan_haeundae_gu",
+      "evidence": "수동 확인(카카오맵 주소, 2026-10-09, 김진석)"
+    },
+    {
+      "id": "d8fd2181-ac75-5d7c-92c5-2107d33d9084",
+      "name": "APEC house",
+      "district": "busan_haeundae_gu",
+      "evidence": "수동 확인(카카오맵 주소, 2026-10-09, 김진석)"
+    },
+    {
+      "id": "dbb9dfff-b2af-5343-a66a-b95d6849ed65",
+      "name": "부산타워",
+      "district": "busan_jung_gu",
+      "evidence": "수동 확인(카카오맵 주소, 2026-10-09, 김진석)"
+    },
+    {
+      "id": "cd3ed178-63e2-534f-9e9e-ddfa9688a76a",
+      "name": "40계단",
+      "district": "busan_jung_gu",
+      "evidence": "수동 확인(카카오맵 주소, 2026-10-09, 김진석)"
+    },
+    {
+      "id": "c6bce548-9d12-57a8-9369-71f6b70c438a",
+      "name": "롯데타운타워",
+      "district": "busan_jung_gu",
+      "evidence": "수동 확인(카카오맵 주소, 2026-10-09, 김진석)"
+    },
+    {
+      "id": "0ad72df7-c92f-5db4-92d9-af77f9265ffd",
+      "name": "부산역",
+      "district": "busan_dong_gu",
+      "evidence": "수동 확인(카카오맵 주소, 2026-10-09, 김진석)"
+    },
+    {
+      "id": "1ab083cd-8265-5087-8a11-e3dbd2b64a77",
+      "name": "국립해양박물관",
+      "district": "busan_yeongdo_gu",
+      "evidence": "수동 확인(카카오맵 주소, 2026-10-09, 김진석)"
+    },
+    {
+      "id": "20a1df36-854f-5280-8a70-fbd88a47a42b",
+      "name": "태종대",
+      "district": "busan_yeongdo_gu",
+      "evidence": "수동 확인(카카오맵 주소, 2026-10-09, 김진석)"
+    },
+    {
+      "id": "9655eba5-5ee0-5651-a7cf-4e7ac4ed722f",
+      "name": "송도해수욕장",
+      "district": "busan_seo_gu",
+      "evidence": "수동 확인(카카오맵 주소, 2026-10-09, 김진석)"
+    },
+    {
+      "id": "9de37386-6a26-5963-861a-699e09eed9ce",
+      "name": "사직실내체육관",
+      "district": "busan_dongnae_gu",
+      "evidence": "수동 확인(카카오맵 주소, 2026-10-09, 김진석)"
+    }
+  ],
+  "keptNull": [
+    {
+      "name": "부산항",
+      "reason": "여러 구/군(중구·동구·남구·사하구 등)에 걸쳐 있어 단일 구/군으로 확정하지 않음"
+    },
+    {
+      "name": "거가대교",
+      "reason": "부산 강서구-거제시를 잇는 해상 교량으로 단일 부산 구/군에 속하지 않음"
+    }
+  ]
+}

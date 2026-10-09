@@ -3808,7 +3808,8 @@
       ],
       "tags": [
         "도시 공원"
-      ]
+      ],
+      "district": "busan_yeongdo_gu"
     },
     {
       "id": "4e3c8fcb-ba96-51cb-8fe9-1d4691b66ff3",
@@ -4085,7 +4086,8 @@
       "tags": [
         "해수욕장",
         "해변"
-      ]
+      ],
+      "district": "busan_haeundae_gu"
     },
     {
       "id": "af9bcc19-e6b7-5104-a67f-c9ac5e5a8fe4",
@@ -4515,7 +4517,8 @@
       ],
       "tags": [
         "해변"
-      ]
+      ],
+      "district": "busan_seo_gu"
     },
     {
       "id": "fb91b054-f5d3-5af9-997d-c974d843be86",
@@ -4687,7 +4690,8 @@
       "tags": [
         "국립박물관",
         "해양박물관"
-      ]
+      ],
+      "district": "busan_yeongdo_gu"
     },
     {
       "id": "875a22bc-d5fe-538b-9ddc-d1bb5afebe89",
@@ -4860,7 +4864,8 @@
       "tags": [
         "철도역",
         "지상역"
-      ]
+      ],
+      "district": "busan_dong_gu"
     },
     {
       "id": "cc4a9882-09f6-58e8-b2aa-c829c0bcc246",
@@ -4983,7 +4988,8 @@
       ],
       "tags": [
         "건축물"
-      ]
+      ],
+      "district": "busan_jung_gu"
     },
     {
       "id": "9de37386-6a26-5963-861a-699e09eed9ce",
@@ -5007,7 +5013,8 @@
       ],
       "tags": [
         "아레나"
-      ]
+      ],
+      "district": "busan_dongnae_gu"
     },
     {
       "id": "c6bce548-9d12-57a8-9369-71f6b70c438a",
@@ -5031,7 +5038,8 @@
       ],
       "tags": [
         "마천루"
-      ]
+      ],
+      "district": "busan_jung_gu"
     },
     {
       "id": "791d5276-8593-5573-8e3c-c5ab780af305",
@@ -5081,7 +5089,8 @@
       ],
       "tags": [
         "건물"
-      ]
+      ],
+      "district": "busan_haeundae_gu"
     },
     {
       "id": "76cd246f-b2ae-5c79-85fd-832bee955a42",
@@ -5130,7 +5139,8 @@
       ],
       "tags": [
         "계단"
-      ]
+      ],
+      "district": "busan_jung_gu"
     },
     {
       "id": "76f82bd5-728f-5065-9363-696fdbf5a5cc",
