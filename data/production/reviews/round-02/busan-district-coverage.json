@@ -3,13 +3,13 @@
   "targetMinimumPerDistrict": 3,
   "targetMinimumLocations": 48,
   "totalLocations": 36,
-  "unassignedCount": 4,
+  "unassignedCount": 2,
   "summary": {
     "totalDistricts": 16,
-    "districtsMeetingTarget": 4,
-    "underTargetDistricts": 12,
+    "districtsMeetingTarget": 5,
+    "underTargetDistricts": 11,
     "emptyDistricts": 0,
-    "totalDeficit": 19
+    "totalDeficit": 17
   },
   "districts": [
     {
@@ -31,9 +31,9 @@
     {
       "district": "busan_dong_gu",
       "label": "동구",
-      "count": 1,
+      "count": 2,
       "target": 3,
-      "deficit": 2,
+      "deficit": 1,
       "meetsTarget": false
     },
     {
@@ -135,10 +135,10 @@
     {
       "district": "busan_gijang_gun",
       "label": "기장군",
-      "count": 2,
+      "count": 3,
       "target": 3,
-      "deficit": 1,
-      "meetsTarget": false
+      "deficit": 0,
+      "meetsTarget": true
     }
   ]
 }

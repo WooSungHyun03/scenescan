@@ -7687,7 +7687,7 @@
       "description": "부산의 일광해수욕장. 위치와 원본 사진 출처를 확인하고 방문 전 촬영 조건을 문의해 주세요.",
       "category": "nature",
       "region": "부산",
-      "district": null,
+      "district": "busan_gijang_gun",
       "aliases": [],
       "tags": [
         "해변",
@@ -9214,7 +9214,7 @@
       "description": "부산광역시 범일동에 위치한 조선 시대의 성",
       "category": "urban",
       "region": "부산",
-      "district": null,
+      "district": "busan_dong_gu",
       "aliases": [],
       "tags": [
         "성",

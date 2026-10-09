@@ -4325,7 +4325,8 @@
       "tags": [
         "해변",
         "해수욕장"
-      ]
+      ],
+      "district": "busan_gijang_gun"
     },
     {
       "id": "651d0e16-92f9-5e45-8bc1-9a2b70ff19d6",
@@ -5175,7 +5176,7 @@
       "description": "부산광역시 범일동에 위치한 조선 시대의 성",
       "category": "urban",
       "region": "부산",
-      "district": null,
+      "district": "busan_dong_gu",
       "address": "부산 범일동",
       "latitude": 35.135916666,
       "longitude": 129.061166666,
