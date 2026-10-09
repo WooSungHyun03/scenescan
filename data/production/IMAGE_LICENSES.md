@@ -1,6 +1,6 @@
 # Production image licenses
 
-Generated from verified Wikimedia Commons metadata on 2026-10-02T13:15:30.979Z. These files are not covered by the repository MIT license. Retain the author, source, and license when redistributing an image. CC BY-SA adaptations must use the same or a compatible license.
+Generated from verified Wikimedia Commons metadata on 2026-10-09T00:00:00+09:00. These files are not covered by the repository MIT license. Retain the author, source, and license when redistributing an image. CC BY-SA adaptations must use the same or a compatible license.
 
 | Local file / location | Author | License | Wikimedia Commons source |
 | --- | --- | --- | --- |
@@ -265,5 +265,25 @@ Generated from verified Wikimedia Commons metadata on 2026-10-02T13:15:30.979Z. 
 | `wikidata-q5952045-01.jpg` / 황매산 | Choi2451 | [CC BY-SA 3.0](<https://creativecommons.org/licenses/by-sa/3.0>) | [source](<https://commons.wikimedia.org/wiki/File:Hwangmaesan_Mountain_in_autumn.jpg>) |
 | `wikidata-q12600001-01.jpg` / 산방산 | Korea.net / Korean Culture and Information Service | [CC BY-SA 2.0](<https://creativecommons.org/licenses/by-sa/2.0>) | [source](<https://commons.wikimedia.org/wiki/File:Sanbangsan_(5983281424).jpg>) |
 | `wikidata-q105061220-01.jpg` / 설악산 토왕성폭포 | Camangbarry | [CC BY-SA 3.0](<https://creativecommons.org/licenses/by-sa/3.0>) | [source](<https://commons.wikimedia.org/wiki/File:%ED%86%A0%EC%99%95%EC%84%B1_%ED%8F%AD%ED%8F%AC.jpg>) |
+| `wikidata-q130628-01.jpg` / 국립해양박물관 | 이강철 | [CC BY-SA 3.0](<https://creativecommons.org/licenses/by-sa/3.0>) | [source](<https://commons.wikimedia.org/wiki/File:Korea_National_Maritime_Museum_Maritime_Library.jpg>) |
+| `wikidata-q5366736-01.jpg` / 르노코리아 갤러리 | CEFICEFI | [CC BY 3.0](<https://creativecommons.org/licenses/by/3.0>) | [source](<https://commons.wikimedia.org/wiki/File:RSM_GALLERY_BUSAN.JPG>) |
+| `wikidata-q16689597-01.jpg` / 부산광역시립박물관 | hyolee2 | [CC BY-SA 3.0](<https://creativecommons.org/licenses/by-sa/3.0>) | [source](<https://commons.wikimedia.org/wiki/File:Busan_museum.JPG>) |
+| `wikidata-q18191755-01.jpg` / 임시수도기념관 | hyolee2 | [CC BY-SA 3.0](<https://creativecommons.org/licenses/by-sa/3.0>) | [source](<https://commons.wikimedia.org/wiki/File:Memorial_hall_of_provisional_capital06.JPG>) |
+| `wikidata-q482647-01.jpg` / 금정산 | Rémi Cormier | [CC BY-SA 3.0](<http://creativecommons.org/licenses/by-sa/3.0/>) | [source](<https://commons.wikimedia.org/wiki/File:Godang-bong.jpg>) |
+| `wikidata-q15465499-01.jpg` / 유엔기념공원 | Leon Petrosyan | [CC BY-SA 3.0](<https://creativecommons.org/licenses/by-sa/3.0>) | [source](<https://commons.wikimedia.org/wiki/File:UN_Memorial_Cemetery.JPG>) |
+| `wikidata-q18999434-01.jpg` / 동백섬 | Michiel1972 | [CC BY-SA 3.0](<https://creativecommons.org/licenses/by-sa/3.0>) | [source](<https://commons.wikimedia.org/wiki/File:Dongbaek_island_Busan.jpg>) |
+| `wikidata-q53118-01.jpg` / 부산역 | hyolee2 | [CC BY-SA 3.0](<https://creativecommons.org/licenses/by-sa/3.0>) | [source](<https://commons.wikimedia.org/wiki/File:Busan_Station_3.JPG>) |
+| `wikidata-q487662-01.jpg` / 범어사 | by Paul_Canning | [CC BY 2.0](<https://creativecommons.org/licenses/by/2.0>) | [source](<https://commons.wikimedia.org/wiki/File:Korea-Busan-Beomeosa-01.jpg>) |
+| `wikidata-q489909-01.jpg` / 사직야구장 | Cheolstar | [CC BY-SA 3.0](<https://creativecommons.org/licenses/by-sa/3.0>) | [source](<https://commons.wikimedia.org/wiki/File:Busan_Sajik_Stadium_20080706.JPG>) |
+| `wikidata-q490741-01.jpg` / 거가대교 | Asfreeas | [CC BY-SA 3.0](<https://creativecommons.org/licenses/by-sa/3.0>) | [source](<https://commons.wikimedia.org/wiki/File:Goega_Bridge_Submarine_tunnel.jpg>) |
+| `wikidata-q490746-01.jpg` / 국립한국해양대학교 | Rémi Cormier | [CC BY-SA 3.0](<https://creativecommons.org/licenses/by-sa/3.0>) | [source](<https://commons.wikimedia.org/wiki/File:Korea_Maritime_University.jpg>) |
+| `wikidata-q490777-01.jpg` / 부산타워 | Yeong-Nam from Incheon, South Korea | [CC BY-SA 2.0](<https://creativecommons.org/licenses/by-sa/2.0>) | [source](<https://commons.wikimedia.org/wiki/File:In_late_summer_(29385325145).jpg>) |
+| `wikidata-q496078-01.jpg` / 사직실내체육관 | Fetx2002 | [CC BY-SA 4.0](<https://creativecommons.org/licenses/by-sa/4.0>) | [source](<https://commons.wikimedia.org/wiki/File:Sajik_Gymnasium.jpg>) |
+| `wikidata-q496218-01.jpg` / 롯데타운타워 | Brücke-Osteuropa | [CC0](<http://creativecommons.org/publicdomain/zero/1.0/deed.en>) | [source](<https://commons.wikimedia.org/wiki/File:Construction_site_of_Busan_Lotte_Tower.jpg>) |
+| `wikidata-q626126-01.jpg` / 벡스코 | Michiel1972 | [CC BY-SA 3.0](<https://creativecommons.org/licenses/by-sa/3.0>) | [source](<https://commons.wikimedia.org/wiki/File:Busan_BEXCO.jpg>) |
+| `wikidata-q2071950-01.jpg` / APEC house | Michiel1972 | [CC BY-SA 3.0](<https://creativecommons.org/licenses/by-sa/3.0>) | [source](<https://commons.wikimedia.org/wiki/File:Nurimaru_APEC_House.jpg>) |
+| `wikidata-q2494268-01.jpg` / 해동용궁사 | Anna L Martin | [CC BY 2.0](<https://creativecommons.org/licenses/by/2.0>) | [source](<https://commons.wikimedia.org/wiki/File:Haedong_Yonggungsa_Temple,_Busan,_South_Korea.jpg>) |
+| `wikidata-q3033579-01.jpg` / 40계단 | Original uploader was Filmlove at ko.wikipedia | [CC BY-SA 3.0](<http://creativecommons.org/licenses/by-sa/3.0/>) | [source](<https://commons.wikimedia.org/wiki/File:40_stairs.jpg>) |
+| `wikidata-q3913123-01.jpg` / 기장 죽성리왜성 | 문화재청 (공공누리 제1유형) | [CC BY-SA 4.0](<https://creativecommons.org/licenses/by-sa/4.0>) | [source](<https://commons.wikimedia.org/wiki/File:%EA%B8%B0%EC%9E%A5_%EC%A3%BD%EC%84%B1%EB%A6%AC%EC%99%9C%EC%84%B1.jpg>) |
 
 Exact source dimensions, original and thumbnail URLs, source SHA-1, local SHA-256, byte size, credit text, and modification notes are recorded in `image-licenses.json`.

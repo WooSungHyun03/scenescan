@@ -1,0 +1,1181 @@
+{
+  "schema_version": 1,
+  "decisions": [
+    {
+      "qid": "Q130628",
+      "decision": "accept",
+      "category": "interior",
+      "region": "부산",
+      "note": "국립해양박물관 — 실내 전시관 중심 공공 박물관, 영도구 소재",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q483223",
+      "decision": "reject",
+      "note": "김해국제공항 — 보안시설이며 일반 촬영 허가가 사실상 불가능해 촬영 장소 카탈로그에 부적합",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q487662",
+      "decision": "accept",
+      "category": "urban",
+      "region": "부산",
+      "note": "범어사 — 금정산 소재 전통 사찰, 널리 알려진 촬영 배경",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q489909",
+      "decision": "accept",
+      "category": "urban",
+      "region": "부산",
+      "note": "사직야구장 — 동래구 소재 공공 체육시설",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q625058",
+      "decision": "accept",
+      "category": "urban",
+      "region": "부산",
+      "note": "구덕야구장 — 서구 소재 공공 체육시설",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q2494268",
+      "decision": "accept",
+      "category": "urban",
+      "region": "부산",
+      "note": "해동용궁사 — 기장군 해안가 사찰, 유명 관광·촬영지",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q4796733",
+      "decision": "reject",
+      "note": "아트센터나비 — Wikidata 상 부산으로 연결되어 있으나 실제로는 서울 소재 갤러리로 알려져 있어 지역 정보의 신뢰도를 확인할 수 없음. 이번 회차에서는 보류",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q5116389",
+      "decision": "accept",
+      "category": "urban",
+      "region": "부산",
+      "note": "충렬사 — 동래구 소재 사적지/사당",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q5366736",
+      "decision": "accept",
+      "category": "interior",
+      "region": "부산",
+      "note": "르노코리아 갤러리 — 사상구 소재 실내 전시 공간",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q11648086",
+      "decision": "reject",
+      "note": "부산 해군기지 — 군사보안시설로 촬영 장소 카탈로그에 부적합",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q16689597",
+      "decision": "accept",
+      "category": "interior",
+      "region": "부산",
+      "note": "부산광역시립박물관 — 남구 소재 실내 전시관 중심 공공 박물관",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q18191755",
+      "decision": "accept",
+      "category": "interior",
+      "region": "부산",
+      "note": "임시수도기념관 — 서구 소재 실내 전시 기념관(옛 경무대)",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q124658103",
+      "decision": "accept",
+      "category": "urban",
+      "region": "부산",
+      "note": "삼광사 — 부산진구 소재, 연등 축제로 알려진 사찰",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q15465499",
+      "decision": "accept",
+      "category": "nature",
+      "region": "부산",
+      "note": "유엔기념공원 — 남구 소재 녹지 중심 기념 공원",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q21660653",
+      "decision": "reject",
+      "note": "Wikidata 라벨이 없어(제목이 QID로 표시됨) 신뢰할 수 있는 장소명을 확인할 수 없음",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q482647",
+      "decision": "accept",
+      "category": "nature",
+      "region": "부산",
+      "note": "금정산 — 부산 대표 산, 경계가 명확한 특정 장소",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q18999434",
+      "decision": "accept",
+      "category": "nature",
+      "region": "부산",
+      "note": "동백섬 — 해운대구 소재, 경계가 명확한 소규모 반도형 섬",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q485073",
+      "decision": "reject",
+      "note": "장소명에 '서울'이 포함되어 있어 실제로는 서울 소재일 가능성이 높아 부산으로 분류할 근거가 불충분",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q490746",
+      "decision": "accept",
+      "category": "urban",
+      "region": "부산",
+      "note": "국립한국해양대학교 — 영도구 소재 해안 캠퍼스",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q704940",
+      "decision": "reject",
+      "note": "체육공원역 — 지하철역이며 명칭에 '공원'이 포함되어 자동 분류가 공원으로 오인했을 뿐 실제로는 평범한 도시철도역",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q5472744",
+      "decision": "accept",
+      "category": "urban",
+      "region": "부산",
+      "note": "수영사적공원 — 수영구 소재 사적지(좌수영성지)",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q12593324",
+      "decision": "accept",
+      "category": "urban",
+      "region": "부산",
+      "note": "동명대학교 — 남구 소재 캠퍼스",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q22329176",
+      "decision": "reject",
+      "note": "다대포해수욕장역 — 지하철역이며 명칭에 '해수욕장'이 포함되어 자동 분류가 해안으로 오인했을 뿐 실제 해변과는 별개 장소",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q53118",
+      "decision": "accept",
+      "category": "urban",
+      "region": "부산",
+      "note": "부산역 — KTX/도시철도 환승 거점, 부산진구 소재 랜드마크",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q490741",
+      "decision": "accept",
+      "category": "urban",
+      "region": "부산",
+      "note": "거가대교 — 부산-거제 해상대교, 뚜렷한 랜드마크성 교량",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q107399",
+      "decision": "reject",
+      "note": "금련산역 — 특징 없는 평범한 도시철도역, 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q129839",
+      "decision": "reject",
+      "note": "해운대 두산위브더제니스 — 민간 분양 아파트 단지로 공개 촬영 장소 카탈로그에 부적합(사생활·접근 권한 문제)",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q477420",
+      "decision": "reject",
+      "note": "화명역 — 특징 없는 평범한 도시철도역, 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q477507",
+      "decision": "reject",
+      "note": "구포역 — 특징 없는 평범한 도시철도역, 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q477528",
+      "decision": "reject",
+      "note": "사상역 — 특징 없는 평범한 도시철도역, 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q477549",
+      "decision": "reject",
+      "note": "부산진역 — 특징 없는 평범한 철도역, 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q482935",
+      "decision": "reject",
+      "note": "신평역 — 특징 없는 평범한 도시철도역, 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q483119",
+      "decision": "reject",
+      "note": "사하역 — 특징 없는 평범한 도시철도역, 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q483212",
+      "decision": "reject",
+      "note": "서면역 — 특징 없는 평범한 도시철도역, 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q490777",
+      "decision": "accept",
+      "category": "urban",
+      "region": "부산",
+      "note": "부산타워 — 중구 용두산공원 소재 전망타워, 대표 관광 랜드마크",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q496078",
+      "decision": "accept",
+      "category": "urban",
+      "region": "부산",
+      "note": "사직실내체육관 — 동래구 소재 실내 경기장, KBL 농구 경기장으로 알려짐",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q496218",
+      "decision": "accept",
+      "category": "urban",
+      "region": "부산",
+      "note": "롯데타운타워 — 해운대구 소재 고층 랜드마크 건물",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q497616",
+      "decision": "reject",
+      "note": "센텀시티 — 특정 촬영 지점이 아닌 넓은 복합단지/지구 전체를 가리켜 장소 특정성이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q624165",
+      "decision": "reject",
+      "note": "온천장역 — 특징 없는 평범한 도시철도역, 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q624204",
+      "decision": "reject",
+      "note": "부산대역 — 특징 없는 평범한 도시철도역, 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q624282",
+      "decision": "reject",
+      "note": "범일역 — 특징 없는 평범한 도시철도역, 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q624400",
+      "decision": "reject",
+      "note": "당리역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q624891",
+      "decision": "reject",
+      "note": "부전역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q625055",
+      "decision": "reject",
+      "note": "장산역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q626046",
+      "decision": "reject",
+      "note": "장전역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q626111",
+      "decision": "reject",
+      "note": "부산진역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q626128",
+      "decision": "reject",
+      "note": "범어사역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q626177",
+      "decision": "reject",
+      "note": "화명역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q704815",
+      "decision": "reject",
+      "note": "강서구청역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q704830",
+      "decision": "reject",
+      "note": "공항역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q704848",
+      "decision": "reject",
+      "note": "대사역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q704872",
+      "decision": "reject",
+      "note": "대저역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q704891",
+      "decision": "reject",
+      "note": "덕두역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q704908",
+      "decision": "reject",
+      "note": "등구역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q704925",
+      "decision": "reject",
+      "note": "서부산유통지구역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q704958",
+      "decision": "reject",
+      "note": "평강역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q704977",
+      "decision": "reject",
+      "note": "구서역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q704991",
+      "decision": "reject",
+      "note": "금사역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q705005",
+      "decision": "reject",
+      "note": "남산역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q705026",
+      "decision": "reject",
+      "note": "노포역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q705046",
+      "decision": "reject",
+      "note": "두실역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q705078",
+      "decision": "reject",
+      "note": "서동역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q705107",
+      "decision": "reject",
+      "note": "고촌역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q705127",
+      "decision": "reject",
+      "note": "안평역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q705146",
+      "decision": "reject",
+      "note": "경성대·부경대역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q705159",
+      "decision": "reject",
+      "note": "대연역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q705177",
+      "decision": "reject",
+      "note": "못골역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q705195",
+      "decision": "reject",
+      "note": "국제금융센터·부산은행역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q705215",
+      "decision": "reject",
+      "note": "문현역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q705233",
+      "decision": "reject",
+      "note": "지게골역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q705252",
+      "decision": "reject",
+      "note": "범일역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q705273",
+      "decision": "reject",
+      "note": "부산역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q705299",
+      "decision": "reject",
+      "note": "좌천역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q705321",
+      "decision": "reject",
+      "note": "초량역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q705341",
+      "decision": "reject",
+      "note": "낙민역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q705360",
+      "decision": "reject",
+      "note": "동래역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q705376",
+      "decision": "reject",
+      "note": "명륜역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q705398",
+      "decision": "reject",
+      "note": "명장역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q705415",
+      "decision": "reject",
+      "note": "미남역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q705428",
+      "decision": "reject",
+      "note": "사직역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q705451",
+      "decision": "reject",
+      "note": "수안역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q705470",
+      "decision": "reject",
+      "note": "충렬사역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q705493",
+      "decision": "reject",
+      "note": "가야역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q705514",
+      "decision": "reject",
+      "note": "개금역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q705536",
+      "decision": "reject",
+      "note": "동의대역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q705555",
+      "decision": "reject",
+      "note": "범내골역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q705576",
+      "decision": "reject",
+      "note": "부암역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q705595",
+      "decision": "reject",
+      "note": "부전역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q705625",
+      "decision": "reject",
+      "note": "양정역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q705646",
+      "decision": "reject",
+      "note": "전포역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q705667",
+      "decision": "reject",
+      "note": "구남역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q705690",
+      "decision": "reject",
+      "note": "구명역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q705718",
+      "decision": "reject",
+      "note": "금곡역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q705736",
+      "decision": "reject",
+      "note": "남산정역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q705756",
+      "decision": "reject",
+      "note": "덕천역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q705777",
+      "decision": "reject",
+      "note": "동원역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q705798",
+      "decision": "reject",
+      "note": "만덕역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q705814",
+      "decision": "reject",
+      "note": "수정역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q705836",
+      "decision": "reject",
+      "note": "숙등역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q705857",
+      "decision": "reject",
+      "note": "율리역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q705881",
+      "decision": "reject",
+      "note": "감전역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q705895",
+      "decision": "reject",
+      "note": "괘법르네시떼역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q705912",
+      "decision": "reject",
+      "note": "냉정역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q705940",
+      "decision": "reject",
+      "note": "모덕역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q705959",
+      "decision": "reject",
+      "note": "모라역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q705975",
+      "decision": "reject",
+      "note": "사상역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q705989",
+      "decision": "reject",
+      "note": "주례역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q706006",
+      "decision": "reject",
+      "note": "괴정역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q706026",
+      "decision": "reject",
+      "note": "대티역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q706061",
+      "decision": "reject",
+      "note": "하단역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q706083",
+      "decision": "reject",
+      "note": "동대신역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q706102",
+      "decision": "reject",
+      "note": "서대신역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q706124",
+      "decision": "reject",
+      "note": "토성역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q706140",
+      "decision": "reject",
+      "note": "광안역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q706163",
+      "decision": "reject",
+      "note": "남천역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q706187",
+      "decision": "reject",
+      "note": "망미역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q706207",
+      "decision": "reject",
+      "note": "민락역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q706225",
+      "decision": "reject",
+      "note": "수영역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q706241",
+      "decision": "reject",
+      "note": "거제역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q706257",
+      "decision": "reject",
+      "note": "교대역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q706270",
+      "decision": "reject",
+      "note": "물만골역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q706290",
+      "decision": "reject",
+      "note": "배산역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q706304",
+      "decision": "reject",
+      "note": "시청역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q706322",
+      "decision": "reject",
+      "note": "연산역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q706337",
+      "decision": "reject",
+      "note": "종합운동장역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q706352",
+      "decision": "reject",
+      "note": "남포역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q706369",
+      "decision": "reject",
+      "note": "자갈치역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q706386",
+      "decision": "reject",
+      "note": "중앙역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q706404",
+      "decision": "reject",
+      "note": "동백역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q706423",
+      "decision": "reject",
+      "note": "윗반송역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q706440",
+      "decision": "reject",
+      "note": "반여농산물시장역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q706457",
+      "decision": "reject",
+      "note": "석대역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q706473",
+      "decision": "reject",
+      "note": "센텀시티역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q706510",
+      "decision": "reject",
+      "note": "영산대역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q706536",
+      "decision": "reject",
+      "note": "중동역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q706557",
+      "decision": "reject",
+      "note": "해운대역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q707068",
+      "decision": "reject",
+      "note": "덕포역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q1234097",
+      "decision": "reject",
+      "note": "안락역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q1234102",
+      "decision": "reject",
+      "note": "재송역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q1234112",
+      "decision": "reject",
+      "note": "센텀역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q1234122",
+      "decision": "reject",
+      "note": "신해운대역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q1234185",
+      "decision": "reject",
+      "note": "동래역 (한국철도공사) — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q1234259",
+      "decision": "reject",
+      "note": "송정역 (부산) — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q1234280",
+      "decision": "reject",
+      "note": "기장역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q1234350",
+      "decision": "reject",
+      "note": "일광역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q1598269",
+      "decision": "reject",
+      "note": "가야역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q1598277",
+      "decision": "reject",
+      "note": "거제해맞이역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q1598363",
+      "decision": "reject",
+      "note": "신선대역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q1598378",
+      "decision": "reject",
+      "note": "우암역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q4865427",
+      "decision": "reject",
+      "note": "구포역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q12598823",
+      "decision": "reject",
+      "note": "부산신항역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q22329177",
+      "decision": "reject",
+      "note": "낫개역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q22329178",
+      "decision": "reject",
+      "note": "신장림역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q22329179",
+      "decision": "reject",
+      "note": "장림역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q22329180",
+      "decision": "reject",
+      "note": "동매역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q22329181",
+      "decision": "reject",
+      "note": "다대포항역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q23979106",
+      "decision": "reject",
+      "note": "오시리아역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q39073397",
+      "decision": "reject",
+      "note": "부산원동역 — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q51844758",
+      "decision": "reject",
+      "note": "BEXCO Station — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q131626087",
+      "decision": "reject",
+      "note": "Gyodae — 평범한 도시철도역/철도역으로 촬영 명소로서 변별력이 부족",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q623815",
+      "decision": "reject",
+      "note": "동화사 — 좌표가 부산이 아닌 대구(35.99N) 지역을 가리켜 실제로는 대구 동화사로 추정됨. 지역 정보 불일치로 제외",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    },
+    {
+      "qid": "Q3190014",
+      "decision": "reject",
+      "note": "정선 알파인 경기장 — 좌표가 부산이 아닌 강원도 정선 지역을 가리켜 지역 정보가 명백히 잘못됨",
+      "reviewed_by": "round-01-reviewer",
+      "reviewed_at": "2026-10-09T00:00:00+09:00"
+    }
+  ]
+}

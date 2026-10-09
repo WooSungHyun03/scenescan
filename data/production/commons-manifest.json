@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "verified_at": "2026-10-02T13:15:30.979Z",
+  "verified_at": "2026-10-09T00:00:00+09:00",
   "public_base_url": "https://beceleb.org/locations",
   "attribution_url": "https://github.com/WooSungHyun03/scenescan/blob/main/DATA_LICENSES.md#production-location-images",
   "locations": [
@@ -4619,6 +4619,429 @@
           "alt": "설악산 토왕성폭포 사진 1"
         }
       ]
+    },
+    {
+      "id": "1ab083cd-8265-5087-8a11-e3dbd2b64a77",
+      "slug": "wikidata-q130628",
+      "name": "국립해양박물관",
+      "description": "해양문화와 해양수산업의 유산을 발굴ㆍ보존ㆍ연구하고 전시를 체계적으로 수행하여 해양문화의 진흥과 해양수산업의 발전에 이바지",
+      "category": "interior",
+      "region": "부산",
+      "address": "부산 부산광역시",
+      "latitude": 35.0787,
+      "longitude": 129.08,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q130628",
+      "images": [
+        {
+          "id": "bc21902c-017c-5b05-b6db-bfb9f5a7bf51",
+          "file_title": "File:Korea National Maritime Museum Maritime Library.jpg",
+          "filename": "wikidata-q130628-01.jpg",
+          "alt": "국립해양박물관 전경"
+        }
+      ]
+    },
+    {
+      "id": "875a22bc-d5fe-538b-9ddc-d1bb5afebe89",
+      "slug": "wikidata-q5366736",
+      "name": "르노코리아 갤러리",
+      "description": "automotive museum in Busan, South Korea",
+      "category": "interior",
+      "region": "부산",
+      "address": "부산 부산광역시",
+      "latitude": 35.094,
+      "longitude": 128.881,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q5366736",
+      "images": [
+        {
+          "id": "41cb58e8-0c63-5d23-8961-9657eb858202",
+          "file_title": "File:RSM GALLERY BUSAN.JPG",
+          "filename": "wikidata-q5366736-01.jpg",
+          "alt": "르노코리아 갤러리 전경"
+        }
+      ]
+    },
+    {
+      "id": "8751f6a5-538a-503e-a089-c5dc29aa335b",
+      "slug": "wikidata-q16689597",
+      "name": "부산광역시립박물관",
+      "description": "부산광역시의 시립 박물관",
+      "category": "interior",
+      "region": "부산",
+      "address": "부산 남구",
+      "latitude": 35.12959,
+      "longitude": 129.09405,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q16689597",
+      "images": [
+        {
+          "id": "9a7ca01e-ee42-544e-a46d-a1d4b7f4be8f",
+          "file_title": "File:Busan museum.JPG",
+          "filename": "wikidata-q16689597-01.jpg",
+          "alt": "부산광역시립박물관 전경"
+        }
+      ],
+      "district": "busan_nam_gu"
+    },
+    {
+      "id": "293189c5-d2f2-5866-894c-36cce6a01b31",
+      "slug": "wikidata-q18191755",
+      "name": "임시수도기념관",
+      "description": "부산광역시 서구에 위치한 박물관",
+      "category": "interior",
+      "region": "부산",
+      "address": "부산 부민동",
+      "latitude": 35.1034,
+      "longitude": 129.0174,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q18191755",
+      "images": [
+        {
+          "id": "276c3a6f-fbcd-50ac-a6bd-3c9438b2c608",
+          "file_title": "File:Memorial hall of provisional capital06.JPG",
+          "filename": "wikidata-q18191755-01.jpg",
+          "alt": "임시수도기념관 전경"
+        }
+      ]
+    },
+    {
+      "id": "73c337a1-6a39-5c14-b6b0-d483f16f9073",
+      "slug": "wikidata-q482647",
+      "name": "금정산",
+      "description": "부산광역시의 산, 국립공원",
+      "category": "nature",
+      "region": "부산",
+      "address": "부산 부산광역시",
+      "latitude": 35.283055555,
+      "longitude": 129.055555555,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q482647",
+      "images": [
+        {
+          "id": "cd2e2f44-52f1-580c-aaac-b8d0b7f291c9",
+          "file_title": "File:Godang-bong.jpg",
+          "filename": "wikidata-q482647-01.jpg",
+          "alt": "금정산 전경"
+        }
+      ]
+    },
+    {
+      "id": "ea0d6e57-dcd1-58b3-a2be-4cf5e0958236",
+      "slug": "wikidata-q15465499",
+      "name": "유엔기념공원",
+      "description": "한국전쟁에 참전한 유엔군을 기리는 부산시 소재의 기념묘역",
+      "category": "nature",
+      "region": "부산",
+      "address": "부산 부산광역시",
+      "latitude": 35.12845,
+      "longitude": 129.09623,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q15465499",
+      "images": [
+        {
+          "id": "92018fe4-4259-5a65-b5a7-c787f02965ac",
+          "file_title": "File:UN Memorial Cemetery.JPG",
+          "filename": "wikidata-q15465499-01.jpg",
+          "alt": "유엔기념공원 전경"
+        }
+      ]
+    },
+    {
+      "id": "a3d91aba-78b5-5a48-93f3-c2d47629c74c",
+      "slug": "wikidata-q18999434",
+      "name": "동백섬",
+      "description": "island in Haeundae, Busan, South Korea",
+      "category": "nature",
+      "region": "부산",
+      "address": "부산 부산광역시",
+      "latitude": 35.153844,
+      "longitude": 129.152097,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q18999434",
+      "images": [
+        {
+          "id": "55be9157-44f5-50bd-a5a4-8c2f04afb4aa",
+          "file_title": "File:Dongbaek island Busan.jpg",
+          "filename": "wikidata-q18999434-01.jpg",
+          "alt": "동백섬 전경"
+        }
+      ]
+    },
+    {
+      "id": "0ad72df7-c92f-5db4-92d9-af77f9265ffd",
+      "slug": "wikidata-q53118",
+      "name": "부산역",
+      "description": "부산광역시 동구 초량동에 있는 경부선의 철도역이자 종착역",
+      "category": "urban",
+      "region": "부산",
+      "address": "부산 초량동",
+      "latitude": 35.114722222,
+      "longitude": 129.041944444,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q53118",
+      "images": [
+        {
+          "id": "2676ec46-c18e-5d7e-930e-645d08a2e54b",
+          "file_title": "File:Busan Station 3.JPG",
+          "filename": "wikidata-q53118-01.jpg",
+          "alt": "부산역 전경"
+        }
+      ]
+    },
+    {
+      "id": "cc4a9882-09f6-58e8-b2aa-c829c0bcc246",
+      "slug": "wikidata-q487662",
+      "name": "범어사",
+      "description": "부산시 금정구의 사찰",
+      "category": "urban",
+      "region": "부산",
+      "address": "부산 부산광역시",
+      "latitude": 35.2839135,
+      "longitude": 129.068992,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q487662",
+      "images": [
+        {
+          "id": "194ab5b1-73e1-5e71-90d3-308a74370669",
+          "file_title": "File:Korea-Busan-Beomeosa-01.jpg",
+          "filename": "wikidata-q487662-01.jpg",
+          "alt": "범어사 전경"
+        }
+      ]
+    },
+    {
+      "id": "825cf18b-af52-5a61-bfb1-6ff3586fdb84",
+      "slug": "wikidata-q489909",
+      "name": "사직야구장",
+      "description": "부산광역시 동래구의 야구장",
+      "category": "urban",
+      "region": "부산",
+      "address": "부산 부산광역시",
+      "latitude": 35.194278,
+      "longitude": 129.061306,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q489909",
+      "images": [
+        {
+          "id": "2fd00c94-4e60-5f2f-82ca-68970e7330ec",
+          "file_title": "File:Busan Sajik Stadium 20080706.JPG",
+          "filename": "wikidata-q489909-01.jpg",
+          "alt": "사직야구장 전경"
+        }
+      ]
+    },
+    {
+      "id": "8939408d-0989-5ae3-81fe-a1e0c0c5d40a",
+      "slug": "wikidata-q490741",
+      "name": "거가대교",
+      "description": "bridge",
+      "category": "urban",
+      "region": "부산",
+      "address": "부산 부산광역시",
+      "latitude": 35.01417,
+      "longitude": 128.75389,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q490741",
+      "images": [
+        {
+          "id": "91a2800b-bb04-5947-a4a0-3608e6497910",
+          "file_title": "File:Goega Bridge Submarine tunnel.jpg",
+          "filename": "wikidata-q490741-01.jpg",
+          "alt": "거가대교 전경"
+        }
+      ]
+    },
+    {
+      "id": "9100c8b5-0238-5a4c-a48e-259f373b8267",
+      "slug": "wikidata-q490746",
+      "name": "국립한국해양대학교",
+      "description": "대한민국 부산광역시의 국립 종합대학",
+      "category": "urban",
+      "region": "부산",
+      "address": "부산 부산광역시",
+      "latitude": 35.074472,
+      "longitude": 129.087489,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q490746",
+      "images": [
+        {
+          "id": "a18e3ebc-ebd1-52b9-8dcd-3aab99b26a44",
+          "file_title": "File:Korea Maritime University.jpg",
+          "filename": "wikidata-q490746-01.jpg",
+          "alt": "국립한국해양대학교 전경"
+        }
+      ]
+    },
+    {
+      "id": "dbb9dfff-b2af-5343-a66a-b95d6849ed65",
+      "slug": "wikidata-q490777",
+      "name": "부산타워",
+      "description": "skyscraper in Busan, South Korea",
+      "category": "urban",
+      "region": "부산",
+      "address": "부산 부산광역시",
+      "latitude": 35.101222222,
+      "longitude": 129.032305555,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q490777",
+      "images": [
+        {
+          "id": "12b3a7d4-e543-5a53-a314-e2435715dcca",
+          "file_title": "File:In late summer (29385325145).jpg",
+          "filename": "wikidata-q490777-01.jpg",
+          "alt": "부산타워 전경"
+        }
+      ]
+    },
+    {
+      "id": "9de37386-6a26-5963-861a-699e09eed9ce",
+      "slug": "wikidata-q496078",
+      "name": "사직실내체육관",
+      "description": "indoor sporting arena in Busan, South Korea",
+      "category": "urban",
+      "region": "부산",
+      "address": "부산 부산광역시",
+      "latitude": 35.19231944,
+      "longitude": 129.06053056,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q496078",
+      "images": [
+        {
+          "id": "eb59a858-a847-56da-87b9-415442911ac9",
+          "file_title": "File:Sajik Gymnasium.jpg",
+          "filename": "wikidata-q496078-01.jpg",
+          "alt": "사직실내체육관 전경"
+        }
+      ]
+    },
+    {
+      "id": "c6bce548-9d12-57a8-9369-71f6b70c438a",
+      "slug": "wikidata-q496218",
+      "name": "롯데타운타워",
+      "description": "skyscraper",
+      "category": "urban",
+      "region": "부산",
+      "address": "부산 부산광역시",
+      "latitude": 35.097457,
+      "longitude": 129.037213,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q496218",
+      "images": [
+        {
+          "id": "dfb53add-f705-5029-97dd-4683c1281906",
+          "file_title": "File:Construction site of Busan Lotte Tower.jpg",
+          "filename": "wikidata-q496218-01.jpg",
+          "alt": "롯데타운타워 전경"
+        }
+      ]
+    },
+    {
+      "id": "791d5276-8593-5573-8e3c-c5ab780af305",
+      "slug": "wikidata-q626126",
+      "name": "벡스코",
+      "description": "building in Busan, South Korea",
+      "category": "urban",
+      "region": "부산",
+      "address": "부산 부산광역시",
+      "latitude": 35.169135,
+      "longitude": 129.136288,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q626126",
+      "images": [
+        {
+          "id": "cbb17e36-3832-5980-8d41-5647e486bc83",
+          "file_title": "File:Busan BEXCO.jpg",
+          "filename": "wikidata-q626126-01.jpg",
+          "alt": "벡스코 전경"
+        }
+      ]
+    },
+    {
+      "id": "d8fd2181-ac75-5d7c-92c5-2107d33d9084",
+      "slug": "wikidata-q2071950",
+      "name": "APEC house",
+      "description": "building in Busan, South Korea",
+      "category": "urban",
+      "region": "부산",
+      "address": "부산 부산광역시",
+      "latitude": 35.15225,
+      "longitude": 129.151358,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q2071950",
+      "images": [
+        {
+          "id": "462a3229-e4a9-5170-8aca-6ae0c1b2fac9",
+          "file_title": "File:Nurimaru APEC House.jpg",
+          "filename": "wikidata-q2071950-01.jpg",
+          "alt": "APEC house 전경"
+        }
+      ]
+    },
+    {
+      "id": "76cd246f-b2ae-5c79-85fd-832bee955a42",
+      "slug": "wikidata-q2494268",
+      "name": "해동용궁사",
+      "description": "부산 기장군 기장읍 시랑리에 있는 절",
+      "category": "urban",
+      "region": "부산",
+      "address": "부산 기장군",
+      "latitude": 35.188333333,
+      "longitude": 129.223333333,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q2494268",
+      "images": [
+        {
+          "id": "fdd4d0cb-c1aa-56bb-85f4-e2644d87a70f",
+          "file_title": "File:Haedong Yonggungsa Temple, Busan, South Korea.jpg",
+          "filename": "wikidata-q2494268-01.jpg",
+          "alt": "해동용궁사 전경"
+        }
+      ],
+      "district": "busan_gijang_gun"
+    },
+    {
+      "id": "cd3ed178-63e2-534f-9e9e-ddfa9688a76a",
+      "slug": "wikidata-q3033579",
+      "name": "40계단",
+      "description": "부산 중구에 위치한 문화명소. 영화 《인정사정 볼 것 없다》의 오프닝신에 등장하여 많은 사람에게 알려졌다.",
+      "category": "urban",
+      "region": "부산",
+      "address": "부산 부산광역시",
+      "latitude": 35.1039,
+      "longitude": 129.0345,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q3033579",
+      "images": [
+        {
+          "id": "d6c7f5ac-125b-5232-9976-db265ba75200",
+          "file_title": "File:40 stairs.jpg",
+          "filename": "wikidata-q3033579-01.jpg",
+          "alt": "40계단 전경"
+        }
+      ]
+    },
+    {
+      "id": "76f82bd5-728f-5065-9363-696fdbf5a5cc",
+      "slug": "wikidata-q3913123",
+      "name": "기장 죽성리왜성",
+      "description": "fortress in Busan, South Korea",
+      "category": "urban",
+      "region": "부산",
+      "address": "부산 기장읍",
+      "latitude": 35.242,
+      "longitude": 129.241638888,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q3913123",
+      "images": [
+        {
+          "id": "f667686c-6161-554c-8b78-46272d8ba05f",
+          "file_title": "File:기장 죽성리왜성.jpg",
+          "filename": "wikidata-q3913123-01.jpg",
+          "alt": "기장 죽성리왜성 전경"
+        }
+      ],
+      "district": "busan_gijang_gun"
     }
   ]
 }
