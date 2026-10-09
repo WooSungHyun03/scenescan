@@ -5167,6 +5167,82 @@
         "왜성",
         "요새"
       ]
+    },
+    {
+      "id": "14bb1e35-a79d-5017-94b7-7763c356b420",
+      "slug": "wikidata-q5001277",
+      "name": "부산진성",
+      "description": "부산광역시 범일동에 위치한 조선 시대의 성",
+      "category": "urban",
+      "region": "부산",
+      "district": null,
+      "address": "부산 범일동",
+      "latitude": 35.135916666,
+      "longitude": 129.061166666,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q5001277",
+      "tags": [
+        "성",
+        "요새"
+      ],
+      "images": [
+        {
+          "id": "d9658bf6-3891-5e4d-b6db-1b90f8800af1",
+          "file_title": "File:부산진성.jpg",
+          "filename": "wikidata-q5001277-01.jpg",
+          "alt": "부산진성 전경"
+        }
+      ]
+    },
+    {
+      "id": "f8c0012e-ce19-574d-a2dd-9fa5a076badc",
+      "slug": "wikidata-q5472744",
+      "name": "수영사적공원",
+      "description": "Archaeological site in Busan, South Korea",
+      "category": "urban",
+      "region": "부산",
+      "district": "busan_suyeong_gu",
+      "address": "부산 부산광역시",
+      "latitude": 35.170833333,
+      "longitude": 129.113888888,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q5472744",
+      "tags": [
+        "요새"
+      ],
+      "images": [
+        {
+          "id": "dd7e30ce-39bb-5c8f-8853-8dc528952243",
+          "file_title": "File:Fortress site of Jwasuyeong.JPG",
+          "filename": "wikidata-q5472744-01.jpg",
+          "alt": "수영사적공원 전경"
+        }
+      ]
+    },
+    {
+      "id": "362c086e-d233-5a18-97f2-72f1fad75977",
+      "slug": "wikidata-q12598814",
+      "name": "부산서부시외버스터미널",
+      "description": "부산광역시 사상구에 위치한 버스터미널",
+      "category": "urban",
+      "region": "부산",
+      "district": "busan_sasang_gu",
+      "address": "부산 괘법동",
+      "latitude": 35.163117558,
+      "longitude": 128.981132538,
+      "source": "Wikidata (CC0)",
+      "source_url": "https://www.wikidata.org/wiki/Q12598814",
+      "tags": [
+        "버스 터미널"
+      ],
+      "images": [
+        {
+          "id": "b7b15123-95e1-5df7-bad1-26887fa4d20b",
+          "file_title": "File:Busan West Bus terminal.JPG",
+          "filename": "wikidata-q12598814-01.jpg",
+          "alt": "부산서부시외버스터미널 전경"
+        }
+      ]
     }
   ]
 }

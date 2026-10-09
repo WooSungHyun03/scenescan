@@ -285,5 +285,8 @@ Generated from verified Wikimedia Commons metadata on 2026-10-09T00:00:00+09:00.
 | `wikidata-q2494268-01.jpg` / 해동용궁사 | Anna L Martin | [CC BY 2.0](<https://creativecommons.org/licenses/by/2.0>) | [source](<https://commons.wikimedia.org/wiki/File:Haedong_Yonggungsa_Temple,_Busan,_South_Korea.jpg>) |
 | `wikidata-q3033579-01.jpg` / 40계단 | Original uploader was Filmlove at ko.wikipedia | [CC BY-SA 3.0](<http://creativecommons.org/licenses/by-sa/3.0/>) | [source](<https://commons.wikimedia.org/wiki/File:40_stairs.jpg>) |
 | `wikidata-q3913123-01.jpg` / 기장 죽성리왜성 | 문화재청 (공공누리 제1유형) | [CC BY-SA 4.0](<https://creativecommons.org/licenses/by-sa/4.0>) | [source](<https://commons.wikimedia.org/wiki/File:%EA%B8%B0%EC%9E%A5_%EC%A3%BD%EC%84%B1%EB%A6%AC%EC%99%9C%EC%84%B1.jpg>) |
+| `wikidata-q5001277-01.jpg` / 부산진성 | 문화재청 (공공누리 제1유형) | [CC BY-SA 4.0](<https://creativecommons.org/licenses/by-sa/4.0>) | [source](<https://commons.wikimedia.org/wiki/File:%EB%B6%80%EC%82%B0%EC%A7%84%EC%84%B1.jpg>) |
+| `wikidata-q5472744-01.jpg` / 수영사적공원 | Donggeon | [CC BY-SA 4.0](<https://creativecommons.org/licenses/by-sa/4.0>) | [source](<https://commons.wikimedia.org/wiki/File:Fortress_site_of_Jwasuyeong.JPG>) |
+| `wikidata-q12598814-01.jpg` / 부산서부시외버스터미널 | hyolee2 | [CC BY-SA 3.0](<https://creativecommons.org/licenses/by-sa/3.0>) | [source](<https://commons.wikimedia.org/wiki/File:Busan_West_Bus_terminal.JPG>) |
 
 Exact source dimensions, original and thumbnail URLs, source SHA-1, local SHA-256, byte size, credit text, and modification notes are recorded in `image-licenses.json`.

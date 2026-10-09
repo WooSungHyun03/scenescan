@@ -1,0 +1,1467 @@
+{
+  "schema_version": 1,
+  "discovered_region_matches": 218,
+  "discovered_candidates": 218,
+  "candidates_in_under_target_cells": 32,
+  "licensed_images_accepted": 25,
+  "images_rejected": 7,
+  "existing_locations": 220,
+  "new_locations": 0,
+  "total_locations": 220,
+  "target_minimum_per_region_category": 20,
+  "candidates_without_licensed_image": 24,
+  "candidates_rejected_by_manual_review": 0,
+  "duplicate_candidates_rejected": 0,
+  "candidates_without_unique_image": 0,
+  "coverage_before": {
+    "schemaVersion": 1,
+    "targetMinimumPerCell": 20,
+    "targetMinimumLocations": 1360,
+    "totalLocations": 220,
+    "categoryTotals": {
+      "urban": 139,
+      "nature": 50,
+      "industrial": 10,
+      "interior": 21
+    },
+    "regionTotals": {
+      "서울": 49,
+      "부산": 33,
+      "대구": 3,
+      "인천": 9,
+      "광주": 2,
+      "대전": 5,
+      "울산": 1,
+      "세종": 2,
+      "경기": 31,
+      "강원": 8,
+      "충북": 9,
+      "충남": 10,
+      "전북": 10,
+      "전남": 13,
+      "경북": 16,
+      "경남": 13,
+      "제주": 6
+    },
+    "summary": {
+      "totalCells": 68,
+      "cellsMeetingTarget": 3,
+      "underTargetCells": 65,
+      "emptyCells": 21,
+      "totalDeficit": 1160
+    },
+    "cells": [
+      {
+        "region": "서울",
+        "category": "urban",
+        "count": 36,
+        "target": 20,
+        "deficit": 0,
+        "meetsTarget": true
+      },
+      {
+        "region": "서울",
+        "category": "nature",
+        "count": 3,
+        "target": 20,
+        "deficit": 17,
+        "meetsTarget": false
+      },
+      {
+        "region": "서울",
+        "category": "industrial",
+        "count": 2,
+        "target": 20,
+        "deficit": 18,
+        "meetsTarget": false
+      },
+      {
+        "region": "서울",
+        "category": "interior",
+        "count": 8,
+        "target": 20,
+        "deficit": 12,
+        "meetsTarget": false
+      },
+      {
+        "region": "부산",
+        "category": "urban",
+        "count": 20,
+        "target": 20,
+        "deficit": 0,
+        "meetsTarget": true
+      },
+      {
+        "region": "부산",
+        "category": "nature",
+        "count": 7,
+        "target": 20,
+        "deficit": 13,
+        "meetsTarget": false
+      },
+      {
+        "region": "부산",
+        "category": "industrial",
+        "count": 1,
+        "target": 20,
+        "deficit": 19,
+        "meetsTarget": false
+      },
+      {
+        "region": "부산",
+        "category": "interior",
+        "count": 5,
+        "target": 20,
+        "deficit": 15,
+        "meetsTarget": false
+      },
+      {
+        "region": "대구",
+        "category": "urban",
+        "count": 3,
+        "target": 20,
+        "deficit": 17,
+        "meetsTarget": false
+      },
+      {
+        "region": "대구",
+        "category": "nature",
+        "count": 0,
+        "target": 20,
+        "deficit": 20,
+        "meetsTarget": false
+      },
+      {
+        "region": "대구",
+        "category": "industrial",
+        "count": 0,
+        "target": 20,
+        "deficit": 20,
+        "meetsTarget": false
+      },
+      {
+        "region": "대구",
+        "category": "interior",
+        "count": 0,
+        "target": 20,
+        "deficit": 20,
+        "meetsTarget": false
+      },
+      {
+        "region": "인천",
+        "category": "urban",
+        "count": 4,
+        "target": 20,
+        "deficit": 16,
+        "meetsTarget": false
+      },
+      {
+        "region": "인천",
+        "category": "nature",
+        "count": 3,
+        "target": 20,
+        "deficit": 17,
+        "meetsTarget": false
+      },
+      {
+        "region": "인천",
+        "category": "industrial",
+        "count": 2,
+        "target": 20,
+        "deficit": 18,
+        "meetsTarget": false
+      },
+      {
+        "region": "인천",
+        "category": "interior",
+        "count": 0,
+        "target": 20,
+        "deficit": 20,
+        "meetsTarget": false
+      },
+      {
+        "region": "광주",
+        "category": "urban",
+        "count": 1,
+        "target": 20,
+        "deficit": 19,
+        "meetsTarget": false
+      },
+      {
+        "region": "광주",
+        "category": "nature",
+        "count": 1,
+        "target": 20,
+        "deficit": 19,
+        "meetsTarget": false
+      },
+      {
+        "region": "광주",
+        "category": "industrial",
+        "count": 0,
+        "target": 20,
+        "deficit": 20,
+        "meetsTarget": false
+      },
+      {
+        "region": "광주",
+        "category": "interior",
+        "count": 0,
+        "target": 20,
+        "deficit": 20,
+        "meetsTarget": false
+      },
+      {
+        "region": "대전",
+        "category": "urban",
+        "count": 1,
+        "target": 20,
+        "deficit": 19,
+        "meetsTarget": false
+      },
+      {
+        "region": "대전",
+        "category": "nature",
+        "count": 4,
+        "target": 20,
+        "deficit": 16,
+        "meetsTarget": false
+      },
+      {
+        "region": "대전",
+        "category": "industrial",
+        "count": 0,
+        "target": 20,
+        "deficit": 20,
+        "meetsTarget": false
+      },
+      {
+        "region": "대전",
+        "category": "interior",
+        "count": 0,
+        "target": 20,
+        "deficit": 20,
+        "meetsTarget": false
+      },
+      {
+        "region": "울산",
+        "category": "urban",
+        "count": 1,
+        "target": 20,
+        "deficit": 19,
+        "meetsTarget": false
+      },
+      {
+        "region": "울산",
+        "category": "nature",
+        "count": 0,
+        "target": 20,
+        "deficit": 20,
+        "meetsTarget": false
+      },
+      {
+        "region": "울산",
+        "category": "industrial",
+        "count": 0,
+        "target": 20,
+        "deficit": 20,
+        "meetsTarget": false
+      },
+      {
+        "region": "울산",
+        "category": "interior",
+        "count": 0,
+        "target": 20,
+        "deficit": 20,
+        "meetsTarget": false
+      },
+      {
+        "region": "세종",
+        "category": "urban",
+        "count": 1,
+        "target": 20,
+        "deficit": 19,
+        "meetsTarget": false
+      },
+      {
+        "region": "세종",
+        "category": "nature",
+        "count": 1,
+        "target": 20,
+        "deficit": 19,
+        "meetsTarget": false
+      },
+      {
+        "region": "세종",
+        "category": "industrial",
+        "count": 0,
+        "target": 20,
+        "deficit": 20,
+        "meetsTarget": false
+      },
+      {
+        "region": "세종",
+        "category": "interior",
+        "count": 0,
+        "target": 20,
+        "deficit": 20,
+        "meetsTarget": false
+      },
+      {
+        "region": "경기",
+        "category": "urban",
+        "count": 24,
+        "target": 20,
+        "deficit": 0,
+        "meetsTarget": true
+      },
+      {
+        "region": "경기",
+        "category": "nature",
+        "count": 4,
+        "target": 20,
+        "deficit": 16,
+        "meetsTarget": false
+      },
+      {
+        "region": "경기",
+        "category": "industrial",
+        "count": 1,
+        "target": 20,
+        "deficit": 19,
+        "meetsTarget": false
+      },
+      {
+        "region": "경기",
+        "category": "interior",
+        "count": 2,
+        "target": 20,
+        "deficit": 18,
+        "meetsTarget": false
+      },
+      {
+        "region": "강원",
+        "category": "urban",
+        "count": 3,
+        "target": 20,
+        "deficit": 17,
+        "meetsTarget": false
+      },
+      {
+        "region": "강원",
+        "category": "nature",
+        "count": 5,
+        "target": 20,
+        "deficit": 15,
+        "meetsTarget": false
+      },
+      {
+        "region": "강원",
+        "category": "industrial",
+        "count": 0,
+        "target": 20,
+        "deficit": 20,
+        "meetsTarget": false
+      },
+      {
+        "region": "강원",
+        "category": "interior",
+        "count": 0,
+        "target": 20,
+        "deficit": 20,
+        "meetsTarget": false
+      },
+      {
+        "region": "충북",
+        "category": "urban",
+        "count": 6,
+        "target": 20,
+        "deficit": 14,
+        "meetsTarget": false
+      },
+      {
+        "region": "충북",
+        "category": "nature",
+        "count": 2,
+        "target": 20,
+        "deficit": 18,
+        "meetsTarget": false
+      },
+      {
+        "region": "충북",
+        "category": "industrial",
+        "count": 1,
+        "target": 20,
+        "deficit": 19,
+        "meetsTarget": false
+      },
+      {
+        "region": "충북",
+        "category": "interior",
+        "count": 0,
+        "target": 20,
+        "deficit": 20,
+        "meetsTarget": false
+      },
+      {
+        "region": "충남",
+        "category": "urban",
+        "count": 6,
+        "target": 20,
+        "deficit": 14,
+        "meetsTarget": false
+      },
+      {
+        "region": "충남",
+        "category": "nature",
+        "count": 2,
+        "target": 20,
+        "deficit": 18,
+        "meetsTarget": false
+      },
+      {
+        "region": "충남",
+        "category": "industrial",
+        "count": 0,
+        "target": 20,
+        "deficit": 20,
+        "meetsTarget": false
+      },
+      {
+        "region": "충남",
+        "category": "interior",
+        "count": 2,
+        "target": 20,
+        "deficit": 18,
+        "meetsTarget": false
+      },
+      {
+        "region": "전북",
+        "category": "urban",
+        "count": 6,
+        "target": 20,
+        "deficit": 14,
+        "meetsTarget": false
+      },
+      {
+        "region": "전북",
+        "category": "nature",
+        "count": 3,
+        "target": 20,
+        "deficit": 17,
+        "meetsTarget": false
+      },
+      {
+        "region": "전북",
+        "category": "industrial",
+        "count": 0,
+        "target": 20,
+        "deficit": 20,
+        "meetsTarget": false
+      },
+      {
+        "region": "전북",
+        "category": "interior",
+        "count": 1,
+        "target": 20,
+        "deficit": 19,
+        "meetsTarget": false
+      },
+      {
+        "region": "전남",
+        "category": "urban",
+        "count": 10,
+        "target": 20,
+        "deficit": 10,
+        "meetsTarget": false
+      },
+      {
+        "region": "전남",
+        "category": "nature",
+        "count": 3,
+        "target": 20,
+        "deficit": 17,
+        "meetsTarget": false
+      },
+      {
+        "region": "전남",
+        "category": "industrial",
+        "count": 0,
+        "target": 20,
+        "deficit": 20,
+        "meetsTarget": false
+      },
+      {
+        "region": "전남",
+        "category": "interior",
+        "count": 0,
+        "target": 20,
+        "deficit": 20,
+        "meetsTarget": false
+      },
+      {
+        "region": "경북",
+        "category": "urban",
+        "count": 10,
+        "target": 20,
+        "deficit": 10,
+        "meetsTarget": false
+      },
+      {
+        "region": "경북",
+        "category": "nature",
+        "count": 4,
+        "target": 20,
+        "deficit": 16,
+        "meetsTarget": false
+      },
+      {
+        "region": "경북",
+        "category": "industrial",
+        "count": 1,
+        "target": 20,
+        "deficit": 19,
+        "meetsTarget": false
+      },
+      {
+        "region": "경북",
+        "category": "interior",
+        "count": 1,
+        "target": 20,
+        "deficit": 19,
+        "meetsTarget": false
+      },
+      {
+        "region": "경남",
+        "category": "urban",
+        "count": 6,
+        "target": 20,
+        "deficit": 14,
+        "meetsTarget": false
+      },
+      {
+        "region": "경남",
+        "category": "nature",
+        "count": 4,
+        "target": 20,
+        "deficit": 16,
+        "meetsTarget": false
+      },
+      {
+        "region": "경남",
+        "category": "industrial",
+        "count": 1,
+        "target": 20,
+        "deficit": 19,
+        "meetsTarget": false
+      },
+      {
+        "region": "경남",
+        "category": "interior",
+        "count": 2,
+        "target": 20,
+        "deficit": 18,
+        "meetsTarget": false
+      },
+      {
+        "region": "제주",
+        "category": "urban",
+        "count": 1,
+        "target": 20,
+        "deficit": 19,
+        "meetsTarget": false
+      },
+      {
+        "region": "제주",
+        "category": "nature",
+        "count": 4,
+        "target": 20,
+        "deficit": 16,
+        "meetsTarget": false
+      },
+      {
+        "region": "제주",
+        "category": "industrial",
+        "count": 1,
+        "target": 20,
+        "deficit": 19,
+        "meetsTarget": false
+      },
+      {
+        "region": "제주",
+        "category": "interior",
+        "count": 0,
+        "target": 20,
+        "deficit": 20,
+        "meetsTarget": false
+      }
+    ]
+  },
+  "coverage_after": {
+    "schemaVersion": 1,
+    "targetMinimumPerCell": 20,
+    "targetMinimumLocations": 1360,
+    "totalLocations": 220,
+    "categoryTotals": {
+      "urban": 139,
+      "nature": 50,
+      "industrial": 10,
+      "interior": 21
+    },
+    "regionTotals": {
+      "서울": 49,
+      "부산": 33,
+      "대구": 3,
+      "인천": 9,
+      "광주": 2,
+      "대전": 5,
+      "울산": 1,
+      "세종": 2,
+      "경기": 31,
+      "강원": 8,
+      "충북": 9,
+      "충남": 10,
+      "전북": 10,
+      "전남": 13,
+      "경북": 16,
+      "경남": 13,
+      "제주": 6
+    },
+    "summary": {
+      "totalCells": 68,
+      "cellsMeetingTarget": 3,
+      "underTargetCells": 65,
+      "emptyCells": 21,
+      "totalDeficit": 1160
+    },
+    "cells": [
+      {
+        "region": "서울",
+        "category": "urban",
+        "count": 36,
+        "target": 20,
+        "deficit": 0,
+        "meetsTarget": true
+      },
+      {
+        "region": "서울",
+        "category": "nature",
+        "count": 3,
+        "target": 20,
+        "deficit": 17,
+        "meetsTarget": false
+      },
+      {
+        "region": "서울",
+        "category": "industrial",
+        "count": 2,
+        "target": 20,
+        "deficit": 18,
+        "meetsTarget": false
+      },
+      {
+        "region": "서울",
+        "category": "interior",
+        "count": 8,
+        "target": 20,
+        "deficit": 12,
+        "meetsTarget": false
+      },
+      {
+        "region": "부산",
+        "category": "urban",
+        "count": 20,
+        "target": 20,
+        "deficit": 0,
+        "meetsTarget": true
+      },
+      {
+        "region": "부산",
+        "category": "nature",
+        "count": 7,
+        "target": 20,
+        "deficit": 13,
+        "meetsTarget": false
+      },
+      {
+        "region": "부산",
+        "category": "industrial",
+        "count": 1,
+        "target": 20,
+        "deficit": 19,
+        "meetsTarget": false
+      },
+      {
+        "region": "부산",
+        "category": "interior",
+        "count": 5,
+        "target": 20,
+        "deficit": 15,
+        "meetsTarget": false
+      },
+      {
+        "region": "대구",
+        "category": "urban",
+        "count": 3,
+        "target": 20,
+        "deficit": 17,
+        "meetsTarget": false
+      },
+      {
+        "region": "대구",
+        "category": "nature",
+        "count": 0,
+        "target": 20,
+        "deficit": 20,
+        "meetsTarget": false
+      },
+      {
+        "region": "대구",
+        "category": "industrial",
+        "count": 0,
+        "target": 20,
+        "deficit": 20,
+        "meetsTarget": false
+      },
+      {
+        "region": "대구",
+        "category": "interior",
+        "count": 0,
+        "target": 20,
+        "deficit": 20,
+        "meetsTarget": false
+      },
+      {
+        "region": "인천",
+        "category": "urban",
+        "count": 4,
+        "target": 20,
+        "deficit": 16,
+        "meetsTarget": false
+      },
+      {
+        "region": "인천",
+        "category": "nature",
+        "count": 3,
+        "target": 20,
+        "deficit": 17,
+        "meetsTarget": false
+      },
+      {
+        "region": "인천",
+        "category": "industrial",
+        "count": 2,
+        "target": 20,
+        "deficit": 18,
+        "meetsTarget": false
+      },
+      {
+        "region": "인천",
+        "category": "interior",
+        "count": 0,
+        "target": 20,
+        "deficit": 20,
+        "meetsTarget": false
+      },
+      {
+        "region": "광주",
+        "category": "urban",
+        "count": 1,
+        "target": 20,
+        "deficit": 19,
+        "meetsTarget": false
+      },
+      {
+        "region": "광주",
+        "category": "nature",
+        "count": 1,
+        "target": 20,
+        "deficit": 19,
+        "meetsTarget": false
+      },
+      {
+        "region": "광주",
+        "category": "industrial",
+        "count": 0,
+        "target": 20,
+        "deficit": 20,
+        "meetsTarget": false
+      },
+      {
+        "region": "광주",
+        "category": "interior",
+        "count": 0,
+        "target": 20,
+        "deficit": 20,
+        "meetsTarget": false
+      },
+      {
+        "region": "대전",
+        "category": "urban",
+        "count": 1,
+        "target": 20,
+        "deficit": 19,
+        "meetsTarget": false
+      },
+      {
+        "region": "대전",
+        "category": "nature",
+        "count": 4,
+        "target": 20,
+        "deficit": 16,
+        "meetsTarget": false
+      },
+      {
+        "region": "대전",
+        "category": "industrial",
+        "count": 0,
+        "target": 20,
+        "deficit": 20,
+        "meetsTarget": false
+      },
+      {
+        "region": "대전",
+        "category": "interior",
+        "count": 0,
+        "target": 20,
+        "deficit": 20,
+        "meetsTarget": false
+      },
+      {
+        "region": "울산",
+        "category": "urban",
+        "count": 1,
+        "target": 20,
+        "deficit": 19,
+        "meetsTarget": false
+      },
+      {
+        "region": "울산",
+        "category": "nature",
+        "count": 0,
+        "target": 20,
+        "deficit": 20,
+        "meetsTarget": false
+      },
+      {
+        "region": "울산",
+        "category": "industrial",
+        "count": 0,
+        "target": 20,
+        "deficit": 20,
+        "meetsTarget": false
+      },
+      {
+        "region": "울산",
+        "category": "interior",
+        "count": 0,
+        "target": 20,
+        "deficit": 20,
+        "meetsTarget": false
+      },
+      {
+        "region": "세종",
+        "category": "urban",
+        "count": 1,
+        "target": 20,
+        "deficit": 19,
+        "meetsTarget": false
+      },
+      {
+        "region": "세종",
+        "category": "nature",
+        "count": 1,
+        "target": 20,
+        "deficit": 19,
+        "meetsTarget": false
+      },
+      {
+        "region": "세종",
+        "category": "industrial",
+        "count": 0,
+        "target": 20,
+        "deficit": 20,
+        "meetsTarget": false
+      },
+      {
+        "region": "세종",
+        "category": "interior",
+        "count": 0,
+        "target": 20,
+        "deficit": 20,
+        "meetsTarget": false
+      },
+      {
+        "region": "경기",
+        "category": "urban",
+        "count": 24,
+        "target": 20,
+        "deficit": 0,
+        "meetsTarget": true
+      },
+      {
+        "region": "경기",
+        "category": "nature",
+        "count": 4,
+        "target": 20,
+        "deficit": 16,
+        "meetsTarget": false
+      },
+      {
+        "region": "경기",
+        "category": "industrial",
+        "count": 1,
+        "target": 20,
+        "deficit": 19,
+        "meetsTarget": false
+      },
+      {
+        "region": "경기",
+        "category": "interior",
+        "count": 2,
+        "target": 20,
+        "deficit": 18,
+        "meetsTarget": false
+      },
+      {
+        "region": "강원",
+        "category": "urban",
+        "count": 3,
+        "target": 20,
+        "deficit": 17,
+        "meetsTarget": false
+      },
+      {
+        "region": "강원",
+        "category": "nature",
+        "count": 5,
+        "target": 20,
+        "deficit": 15,
+        "meetsTarget": false
+      },
+      {
+        "region": "강원",
+        "category": "industrial",
+        "count": 0,
+        "target": 20,
+        "deficit": 20,
+        "meetsTarget": false
+      },
+      {
+        "region": "강원",
+        "category": "interior",
+        "count": 0,
+        "target": 20,
+        "deficit": 20,
+        "meetsTarget": false
+      },
+      {
+        "region": "충북",
+        "category": "urban",
+        "count": 6,
+        "target": 20,
+        "deficit": 14,
+        "meetsTarget": false
+      },
+      {
+        "region": "충북",
+        "category": "nature",
+        "count": 2,
+        "target": 20,
+        "deficit": 18,
+        "meetsTarget": false
+      },
+      {
+        "region": "충북",
+        "category": "industrial",
+        "count": 1,
+        "target": 20,
+        "deficit": 19,
+        "meetsTarget": false
+      },
+      {
+        "region": "충북",
+        "category": "interior",
+        "count": 0,
+        "target": 20,
+        "deficit": 20,
+        "meetsTarget": false
+      },
+      {
+        "region": "충남",
+        "category": "urban",
+        "count": 6,
+        "target": 20,
+        "deficit": 14,
+        "meetsTarget": false
+      },
+      {
+        "region": "충남",
+        "category": "nature",
+        "count": 2,
+        "target": 20,
+        "deficit": 18,
+        "meetsTarget": false
+      },
+      {
+        "region": "충남",
+        "category": "industrial",
+        "count": 0,
+        "target": 20,
+        "deficit": 20,
+        "meetsTarget": false
+      },
+      {
+        "region": "충남",
+        "category": "interior",
+        "count": 2,
+        "target": 20,
+        "deficit": 18,
+        "meetsTarget": false
+      },
+      {
+        "region": "전북",
+        "category": "urban",
+        "count": 6,
+        "target": 20,
+        "deficit": 14,
+        "meetsTarget": false
+      },
+      {
+        "region": "전북",
+        "category": "nature",
+        "count": 3,
+        "target": 20,
+        "deficit": 17,
+        "meetsTarget": false
+      },
+      {
+        "region": "전북",
+        "category": "industrial",
+        "count": 0,
+        "target": 20,
+        "deficit": 20,
+        "meetsTarget": false
+      },
+      {
+        "region": "전북",
+        "category": "interior",
+        "count": 1,
+        "target": 20,
+        "deficit": 19,
+        "meetsTarget": false
+      },
+      {
+        "region": "전남",
+        "category": "urban",
+        "count": 10,
+        "target": 20,
+        "deficit": 10,
+        "meetsTarget": false
+      },
+      {
+        "region": "전남",
+        "category": "nature",
+        "count": 3,
+        "target": 20,
+        "deficit": 17,
+        "meetsTarget": false
+      },
+      {
+        "region": "전남",
+        "category": "industrial",
+        "count": 0,
+        "target": 20,
+        "deficit": 20,
+        "meetsTarget": false
+      },
+      {
+        "region": "전남",
+        "category": "interior",
+        "count": 0,
+        "target": 20,
+        "deficit": 20,
+        "meetsTarget": false
+      },
+      {
+        "region": "경북",
+        "category": "urban",
+        "count": 10,
+        "target": 20,
+        "deficit": 10,
+        "meetsTarget": false
+      },
+      {
+        "region": "경북",
+        "category": "nature",
+        "count": 4,
+        "target": 20,
+        "deficit": 16,
+        "meetsTarget": false
+      },
+      {
+        "region": "경북",
+        "category": "industrial",
+        "count": 1,
+        "target": 20,
+        "deficit": 19,
+        "meetsTarget": false
+      },
+      {
+        "region": "경북",
+        "category": "interior",
+        "count": 1,
+        "target": 20,
+        "deficit": 19,
+        "meetsTarget": false
+      },
+      {
+        "region": "경남",
+        "category": "urban",
+        "count": 6,
+        "target": 20,
+        "deficit": 14,
+        "meetsTarget": false
+      },
+      {
+        "region": "경남",
+        "category": "nature",
+        "count": 4,
+        "target": 20,
+        "deficit": 16,
+        "meetsTarget": false
+      },
+      {
+        "region": "경남",
+        "category": "industrial",
+        "count": 1,
+        "target": 20,
+        "deficit": 19,
+        "meetsTarget": false
+      },
+      {
+        "region": "경남",
+        "category": "interior",
+        "count": 2,
+        "target": 20,
+        "deficit": 18,
+        "meetsTarget": false
+      },
+      {
+        "region": "제주",
+        "category": "urban",
+        "count": 1,
+        "target": 20,
+        "deficit": 19,
+        "meetsTarget": false
+      },
+      {
+        "region": "제주",
+        "category": "nature",
+        "count": 4,
+        "target": 20,
+        "deficit": 16,
+        "meetsTarget": false
+      },
+      {
+        "region": "제주",
+        "category": "industrial",
+        "count": 1,
+        "target": 20,
+        "deficit": 19,
+        "meetsTarget": false
+      },
+      {
+        "region": "제주",
+        "category": "interior",
+        "count": 0,
+        "target": 20,
+        "deficit": 20,
+        "meetsTarget": false
+      }
+    ]
+  },
+  "review_queue": [
+    {
+      "qid": "Q483223",
+      "name": "김해국제공항",
+      "regions": [
+        "부산"
+      ],
+      "addressesByRegion": {
+        "부산": "부산 부산광역시"
+      },
+      "latitude": 35.180555555,
+      "longitude": 128.938055555,
+      "categories": [
+        "urban",
+        "industrial"
+      ],
+      "typeLabels": [
+        "commercial traffic aerodrome",
+        "공항",
+        "국제공항",
+        "비행장"
+      ],
+      "representativeCases": [],
+      "reasons": [
+        "MULTIPLE_CATEGORIES"
+      ],
+      "sourceUrl": "https://www.wikidata.org/wiki/Q483223",
+      "coverageCells": [
+        {
+          "region": "부산",
+          "category": "industrial",
+          "count": 1,
+          "target": 20,
+          "deficit": 19
+        }
+      ]
+    },
+    {
+      "qid": "Q11648086",
+      "name": "부산 해군기지",
+      "regions": [
+        "부산"
+      ],
+      "addressesByRegion": {
+        "부산": "부산 남구"
+      },
+      "latitude": 35.0964383,
+      "longitude": 129.1029854,
+      "categories": [
+        "urban",
+        "industrial"
+      ],
+      "typeLabels": [
+        "해군기지"
+      ],
+      "representativeCases": [],
+      "reasons": [
+        "MULTIPLE_CATEGORIES"
+      ],
+      "sourceUrl": "https://www.wikidata.org/wiki/Q11648086",
+      "coverageCells": [
+        {
+          "region": "부산",
+          "category": "industrial",
+          "count": 1,
+          "target": 20,
+          "deficit": 19
+        }
+      ]
+    },
+    {
+      "qid": "Q623815",
+      "name": "동화사",
+      "regions": [
+        "부산"
+      ],
+      "addressesByRegion": {
+        "부산": "부산 동구"
+      },
+      "latitude": 35.9925,
+      "longitude": 128.70444444,
+      "categories": [
+        "urban",
+        "interior"
+      ],
+      "typeLabels": [
+        "한국의 사찰"
+      ],
+      "representativeCases": [
+        "temple"
+      ],
+      "reasons": [
+        "MULTIPLE_CATEGORIES",
+        "REPRESENTATIVE_CASE"
+      ],
+      "sourceUrl": "https://www.wikidata.org/wiki/Q623815",
+      "coverageCells": [
+        {
+          "region": "부산",
+          "category": "interior",
+          "count": 5,
+          "target": 20,
+          "deficit": 15
+        }
+      ]
+    },
+    {
+      "qid": "Q625058",
+      "name": "구덕야구장",
+      "regions": [
+        "부산"
+      ],
+      "addressesByRegion": {
+        "부산": "부산 서구"
+      },
+      "latitude": 35.194278,
+      "longitude": 129.061306,
+      "categories": [
+        "urban",
+        "interior"
+      ],
+      "typeLabels": [
+        "스타디움"
+      ],
+      "representativeCases": [],
+      "reasons": [
+        "MULTIPLE_CATEGORIES"
+      ],
+      "sourceUrl": "https://www.wikidata.org/wiki/Q625058",
+      "coverageCells": [
+        {
+          "region": "부산",
+          "category": "interior",
+          "count": 5,
+          "target": 20,
+          "deficit": 15
+        }
+      ]
+    },
+    {
+      "qid": "Q4796733",
+      "name": "아트센터나비",
+      "regions": [
+        "부산"
+      ],
+      "addressesByRegion": {
+        "부산": "부산 서린동"
+      },
+      "latitude": 37.5699,
+      "longitude": 126.981,
+      "categories": [
+        "urban",
+        "interior"
+      ],
+      "typeLabels": [
+        "미술관"
+      ],
+      "representativeCases": [],
+      "reasons": [
+        "MULTIPLE_CATEGORIES"
+      ],
+      "sourceUrl": "https://www.wikidata.org/wiki/Q4796733",
+      "coverageCells": [
+        {
+          "region": "부산",
+          "category": "interior",
+          "count": 5,
+          "target": 20,
+          "deficit": 15
+        }
+      ]
+    },
+    {
+      "qid": "Q5116389",
+      "name": "충렬사",
+      "regions": [
+        "부산"
+      ],
+      "addressesByRegion": {
+        "부산": "부산 부산광역시"
+      },
+      "latitude": 35.201236111,
+      "longitude": 129.095597222,
+      "categories": [
+        "urban",
+        "interior"
+      ],
+      "typeLabels": [
+        "사적",
+        "사찰",
+        "성전 (장소)"
+      ],
+      "representativeCases": [
+        "temple"
+      ],
+      "reasons": [
+        "MULTIPLE_CATEGORIES",
+        "REPRESENTATIVE_CASE"
+      ],
+      "sourceUrl": "https://www.wikidata.org/wiki/Q5116389",
+      "coverageCells": [
+        {
+          "region": "부산",
+          "category": "interior",
+          "count": 5,
+          "target": 20,
+          "deficit": 15
+        }
+      ]
+    },
+    {
+      "qid": "Q124658103",
+      "name": "Samgwangsa Temple",
+      "regions": [
+        "부산"
+      ],
+      "addressesByRegion": {
+        "부산": "부산 초읍동"
+      },
+      "latitude": 35.17476,
+      "longitude": 129.04367,
+      "categories": [
+        "urban",
+        "interior"
+      ],
+      "typeLabels": [
+        "사찰"
+      ],
+      "representativeCases": [
+        "temple"
+      ],
+      "reasons": [
+        "MULTIPLE_CATEGORIES",
+        "REPRESENTATIVE_CASE"
+      ],
+      "sourceUrl": "https://www.wikidata.org/wiki/Q124658103",
+      "coverageCells": [
+        {
+          "region": "부산",
+          "category": "interior",
+          "count": 5,
+          "target": 20,
+          "deficit": 15
+        }
+      ]
+    },
+    {
+      "qid": "Q21660653",
+      "name": "Q21660653",
+      "regions": [
+        "부산"
+      ],
+      "addressesByRegion": {
+        "부산": "부산 부산광역시"
+      },
+      "latitude": 35.185,
+      "longitude": 129.0475,
+      "categories": [
+        "urban",
+        "nature"
+      ],
+      "typeLabels": [
+        "도시 공원"
+      ],
+      "representativeCases": [
+        "park"
+      ],
+      "reasons": [
+        "MULTIPLE_CATEGORIES",
+        "REPRESENTATIVE_CASE"
+      ],
+      "sourceUrl": "https://www.wikidata.org/wiki/Q21660653",
+      "coverageCells": [
+        {
+          "region": "부산",
+          "category": "nature",
+          "count": 7,
+          "target": 20,
+          "deficit": 13
+        }
+      ]
+    }
+  ]
+}

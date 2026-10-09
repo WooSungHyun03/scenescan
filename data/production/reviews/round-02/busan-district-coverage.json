@@ -1,0 +1,144 @@
+{
+  "schemaVersion": 1,
+  "targetMinimumPerDistrict": 3,
+  "targetMinimumLocations": 48,
+  "totalLocations": 36,
+  "unassignedCount": 4,
+  "summary": {
+    "totalDistricts": 16,
+    "districtsMeetingTarget": 4,
+    "underTargetDistricts": 12,
+    "emptyDistricts": 0,
+    "totalDeficit": 19
+  },
+  "districts": [
+    {
+      "district": "busan_jung_gu",
+      "label": "중구",
+      "count": 3,
+      "target": 3,
+      "deficit": 0,
+      "meetsTarget": true
+    },
+    {
+      "district": "busan_seo_gu",
+      "label": "서구",
+      "count": 2,
+      "target": 3,
+      "deficit": 1,
+      "meetsTarget": false
+    },
+    {
+      "district": "busan_dong_gu",
+      "label": "동구",
+      "count": 1,
+      "target": 3,
+      "deficit": 2,
+      "meetsTarget": false
+    },
+    {
+      "district": "busan_yeongdo_gu",
+      "label": "영도구",
+      "count": 4,
+      "target": 3,
+      "deficit": 0,
+      "meetsTarget": true
+    },
+    {
+      "district": "busan_busanjin_gu",
+      "label": "부산진구",
+      "count": 1,
+      "target": 3,
+      "deficit": 2,
+      "meetsTarget": false
+    },
+    {
+      "district": "busan_dongnae_gu",
+      "label": "동래구",
+      "count": 2,
+      "target": 3,
+      "deficit": 1,
+      "meetsTarget": false
+    },
+    {
+      "district": "busan_nam_gu",
+      "label": "남구",
+      "count": 2,
+      "target": 3,
+      "deficit": 1,
+      "meetsTarget": false
+    },
+    {
+      "district": "busan_buk_gu",
+      "label": "북구",
+      "count": 1,
+      "target": 3,
+      "deficit": 2,
+      "meetsTarget": false
+    },
+    {
+      "district": "busan_haeundae_gu",
+      "label": "해운대구",
+      "count": 5,
+      "target": 3,
+      "deficit": 0,
+      "meetsTarget": true
+    },
+    {
+      "district": "busan_saha_gu",
+      "label": "사하구",
+      "count": 2,
+      "target": 3,
+      "deficit": 1,
+      "meetsTarget": false
+    },
+    {
+      "district": "busan_geumjeong_gu",
+      "label": "금정구",
+      "count": 3,
+      "target": 3,
+      "deficit": 0,
+      "meetsTarget": true
+    },
+    {
+      "district": "busan_gangseo_gu",
+      "label": "강서구",
+      "count": 1,
+      "target": 3,
+      "deficit": 2,
+      "meetsTarget": false
+    },
+    {
+      "district": "busan_yeonje_gu",
+      "label": "연제구",
+      "count": 1,
+      "target": 3,
+      "deficit": 2,
+      "meetsTarget": false
+    },
+    {
+      "district": "busan_suyeong_gu",
+      "label": "수영구",
+      "count": 1,
+      "target": 3,
+      "deficit": 2,
+      "meetsTarget": false
+    },
+    {
+      "district": "busan_sasang_gu",
+      "label": "사상구",
+      "count": 1,
+      "target": 3,
+      "deficit": 2,
+      "meetsTarget": false
+    },
+    {
+      "district": "busan_gijang_gun",
+      "label": "기장군",
+      "count": 2,
+      "target": 3,
+      "deficit": 1,
+      "meetsTarget": false
+    }
+  ]
+}

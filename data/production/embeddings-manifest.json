@@ -2248,6 +2248,30 @@
       "image_url": "https://beceleb.org/locations/wikidata-q3913123-01.jpg",
       "source": "Wikimedia Commons — 문화재청 (공공누리 제1유형) — CC BY-SA 4.0",
       "source_url": "https://commons.wikimedia.org/wiki/File:%EA%B8%B0%EC%9E%A5_%EC%A3%BD%EC%84%B1%EB%A6%AC%EC%99%9C%EC%84%B1.jpg"
+    },
+    {
+      "image_id": "d9658bf6-3891-5e4d-b6db-1b90f8800af1",
+      "location_id": "14bb1e35-a79d-5017-94b7-7763c356b420",
+      "image_path": "../../public/locations/wikidata-q5001277-01.jpg",
+      "image_url": "https://beceleb.org/locations/wikidata-q5001277-01.jpg",
+      "source": "Wikimedia Commons — 문화재청 (공공누리 제1유형) — CC BY-SA 4.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:%EB%B6%80%EC%82%B0%EC%A7%84%EC%84%B1.jpg"
+    },
+    {
+      "image_id": "dd7e30ce-39bb-5c8f-8853-8dc528952243",
+      "location_id": "f8c0012e-ce19-574d-a2dd-9fa5a076badc",
+      "image_path": "../../public/locations/wikidata-q5472744-01.jpg",
+      "image_url": "https://beceleb.org/locations/wikidata-q5472744-01.jpg",
+      "source": "Wikimedia Commons — Donggeon — CC BY-SA 4.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Fortress_site_of_Jwasuyeong.JPG"
+    },
+    {
+      "image_id": "b7b15123-95e1-5df7-bad1-26887fa4d20b",
+      "location_id": "362c086e-d233-5a18-97f2-72f1fad75977",
+      "image_path": "../../public/locations/wikidata-q12598814-01.jpg",
+      "image_url": "https://beceleb.org/locations/wikidata-q12598814-01.jpg",
+      "source": "Wikimedia Commons — hyolee2 — CC BY-SA 3.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Busan_West_Bus_terminal.JPG"
     }
   ]
 }

@@ -9207,6 +9207,133 @@
         "referenceDate": null,
         "lastVerifiedAt": "2026-10-09T00:00:00+09:00"
       }
+    },
+    {
+      "id": "14bb1e35-a79d-5017-94b7-7763c356b420",
+      "name": "부산진성",
+      "description": "부산광역시 범일동에 위치한 조선 시대의 성",
+      "category": "urban",
+      "region": "부산",
+      "district": null,
+      "aliases": [],
+      "tags": [
+        "성",
+        "요새"
+      ],
+      "address": "부산 범일동",
+      "latitude": 35.135916666,
+      "longitude": 129.061166666,
+      "permit": {
+        "type": "문의 필요",
+        "contactName": null,
+        "contactPhone": null,
+        "note": "촬영·시설 이용 조건은 운영기관에 사전 확인이 필요합니다.",
+        "provenance": {
+          "source": "Wikidata (CC0)",
+          "sourceUrl": "https://www.wikidata.org/wiki/Q5001277",
+          "referenceDate": null,
+          "lastVerifiedAt": "2026-10-09T00:00:00+09:00"
+        }
+      },
+      "parking": [],
+      "images": [
+        {
+          "imagePath": "public/locations/wikidata-q5001277-01.jpg",
+          "imageUrl": "https://beceleb.org/locations/wikidata-q5001277-01.jpg",
+          "alt": "부산진성 전경"
+        }
+      ],
+      "sourceUrl": "https://www.wikidata.org/wiki/Q5001277",
+      "provenance": {
+        "source": "Wikidata (CC0)",
+        "sourceUrl": "https://www.wikidata.org/wiki/Q5001277",
+        "referenceDate": null,
+        "lastVerifiedAt": "2026-10-09T00:00:00+09:00"
+      }
+    },
+    {
+      "id": "f8c0012e-ce19-574d-a2dd-9fa5a076badc",
+      "name": "수영사적공원",
+      "description": "Archaeological site in Busan, South Korea",
+      "category": "urban",
+      "region": "부산",
+      "district": "busan_suyeong_gu",
+      "aliases": [],
+      "tags": [
+        "요새"
+      ],
+      "address": "부산 부산광역시",
+      "latitude": 35.170833333,
+      "longitude": 129.113888888,
+      "permit": {
+        "type": "문의 필요",
+        "contactName": null,
+        "contactPhone": null,
+        "note": "촬영·시설 이용 조건은 운영기관에 사전 확인이 필요합니다.",
+        "provenance": {
+          "source": "Wikidata (CC0)",
+          "sourceUrl": "https://www.wikidata.org/wiki/Q5472744",
+          "referenceDate": null,
+          "lastVerifiedAt": "2026-10-09T00:00:00+09:00"
+        }
+      },
+      "parking": [],
+      "images": [
+        {
+          "imagePath": "public/locations/wikidata-q5472744-01.jpg",
+          "imageUrl": "https://beceleb.org/locations/wikidata-q5472744-01.jpg",
+          "alt": "수영사적공원 전경"
+        }
+      ],
+      "sourceUrl": "https://www.wikidata.org/wiki/Q5472744",
+      "provenance": {
+        "source": "Wikidata (CC0)",
+        "sourceUrl": "https://www.wikidata.org/wiki/Q5472744",
+        "referenceDate": null,
+        "lastVerifiedAt": "2026-10-09T00:00:00+09:00"
+      }
+    },
+    {
+      "id": "362c086e-d233-5a18-97f2-72f1fad75977",
+      "name": "부산서부시외버스터미널",
+      "description": "부산광역시 사상구에 위치한 버스터미널",
+      "category": "urban",
+      "region": "부산",
+      "district": "busan_sasang_gu",
+      "aliases": [],
+      "tags": [
+        "버스 터미널"
+      ],
+      "address": "부산 괘법동",
+      "latitude": 35.163117558,
+      "longitude": 128.981132538,
+      "permit": {
+        "type": "문의 필요",
+        "contactName": null,
+        "contactPhone": null,
+        "note": "촬영·시설 이용 조건은 운영기관에 사전 확인이 필요합니다.",
+        "provenance": {
+          "source": "Wikidata (CC0)",
+          "sourceUrl": "https://www.wikidata.org/wiki/Q12598814",
+          "referenceDate": null,
+          "lastVerifiedAt": "2026-10-09T00:00:00+09:00"
+        }
+      },
+      "parking": [],
+      "images": [
+        {
+          "imagePath": "public/locations/wikidata-q12598814-01.jpg",
+          "imageUrl": "https://beceleb.org/locations/wikidata-q12598814-01.jpg",
+          "alt": "부산서부시외버스터미널 전경"
+        }
+      ],
+      "sourceUrl": "https://www.wikidata.org/wiki/Q12598814",
+      "provenance": {
+        "source": "Wikidata (CC0)",
+        "sourceUrl": "https://www.wikidata.org/wiki/Q12598814",
+        "referenceDate": null,
+        "lastVerifiedAt": "2026-10-09T00:00:00+09:00"
+      }
     }
   ],
   "reviewQueue": []

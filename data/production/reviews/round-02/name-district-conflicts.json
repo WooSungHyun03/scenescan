@@ -1,0 +1,11 @@
+[
+  {
+    "qid": "Q5001277",
+    "name": "부산진성",
+    "boundaryDistrict": "busan_dong_gu",
+    "namedDistricts": [
+      "busan_busanjin_gu"
+    ],
+    "note": "명칭/역사적 지명(부산진)이 현재 부산진구와 혼동될 수 있으나 실제 좌표는 동구(범일동)에 위치. 좌표+경계 판정과 이름이 불일치하여 district를 null로 유지, 수동 확인 필요"
+  }
+]

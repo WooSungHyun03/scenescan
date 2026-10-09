@@ -1,0 +1,38 @@
+{
+  "round": 2,
+  "generated_at": "2026-10-09T00:00:00+09:00",
+  "scope": "region=부산 Wikidata/Commons re-discovery, priority districts: 수영구/사상구/동구/중구, industrial search",
+  "wikidata_rerun_result": "discover-wikidata.ts --region 부산 --target 20 --max 60 found 0 new auto-acceptable candidates -- every remaining under-target-cell candidate was already accepted/rejected in round 1, or had no licensed image. See busan-round-02.report.json for the raw run.",
+  "industrial_search_result": "All of Busan has only 4 Wikidata industrial-category candidates total: 김해국제공항(reject, security), 고리원자력발전소(reject, security-sensitive nuclear plant), 부산 해군기지(reject, military), 부산항(already in catalog, district null -- spans multiple districts). No new industrial candidates available from Wikidata/Commons. BLOCKER: a different public data source (e.g. 부산항만공사/해양수산부 공공데이터, data.go.kr industrial-complex datasets) is needed for real industrial-category growth; out of scope for this Wikidata-only pipeline run.",
+  "manually_promoted": [
+    {
+      "qid": "Q5001277",
+      "name": "부산진성",
+      "category": "urban",
+      "district": null,
+      "note": "명칭(부산진)과 부산진구 혼동 가능성 있으나 좌표는 동구 — district 보류, 수동 확인 필요"
+    },
+    {
+      "qid": "Q5472744",
+      "name": "수영사적공원",
+      "category": "urban",
+      "district": "busan_suyeong_gu"
+    },
+    {
+      "qid": "Q12598814",
+      "name": "부산서부시외버스터미널",
+      "category": "urban",
+      "district": "busan_sasang_gu"
+    }
+  ],
+  "promoted_to_catalog": 3,
+  "busan_total_before": 33,
+  "busan_total_after": 36,
+  "needs_manual_review": [
+    {
+      "qid": "Q5001277",
+      "name": "부산진성",
+      "reason": "NAME_MISMATCH: 명칭의 역사적 지명(부산진)이 부산진구와 혼동되나 실제 좌표는 동구(범일동)"
+    }
+  ]
+}
