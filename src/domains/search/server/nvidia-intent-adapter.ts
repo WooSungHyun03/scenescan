@@ -47,13 +47,8 @@ export async function enrichWithNvidiaIntent(
   if (!client) return base;
 
   const budget = dependencies.budget ?? getNvidiaCallBudget();
-  if (!budget.tryConsume()) {
-    logger.warn("NVIDIA intent call budget exhausted; falling back to base text search", {});
-    return base;
-  }
-
   try {
-    const result = await client.extractIntent(query);
+    const result = await client.extractIntent(query, { tryConsume: () => budget.tryConsume() });
     return applyNvidiaIntentOverride(base, result);
   } catch (error) {
     // Never logs the raw query or the API key -- only the error's own

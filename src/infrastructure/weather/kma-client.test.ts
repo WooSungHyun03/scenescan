@@ -30,6 +30,24 @@ function client(fixture: unknown, now: string, overrides: Partial<ConstructorPar
 }
 
 describe("KmaWeatherClient", () => {
+  it.each(["", " ", "\t\n", "NaN", "Infinity"])("preserves an unavailable observation (%j) as null, not zero", async (value) => {
+    const fixture = structuredClone(observationFixture);
+    fixture.response.body.items.item.forEach((item) => { item.obsrValue = value; });
+    const setup = client(fixture, "2026-10-06T05:50:00Z");
+    await expect(setup.client.getWeather({ locationId: LOCATION_ID, point: SEOUL })).resolves.toMatchObject({
+      temperatureCelsius: null, humidityPercent: null, windSpeedMetersPerSecond: null,
+    });
+  });
+
+  it("retains a measured zero and a signed temperature rather than treating them as missing", async () => {
+    const fixture = structuredClone(observationFixture);
+    fixture.response.body.items.item.forEach((item) => { item.obsrValue = item.category === "T1H" ? "-2.5" : "0"; });
+    const setup = client(fixture, "2026-10-06T05:50:00Z");
+    await expect(setup.client.getWeather({ locationId: LOCATION_ID, point: SEOUL })).resolves.toMatchObject({
+      temperatureCelsius: -2.5, humidityPercent: 0, windSpeedMetersPerSecond: 0,
+    });
+  });
+
   it("maps an official observation response and leaves unavailable categories null", async () => {
     const setup = client(observationFixture, "2026-10-06T05:50:00Z");
     const weather = await setup.client.getWeather({ locationId: LOCATION_ID, point: SEOUL });

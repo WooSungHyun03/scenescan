@@ -95,6 +95,9 @@ function decodeServiceKey(value: string): string {
 
 function finiteNumber(value: unknown): number | null {
   if (typeof value !== "string" && typeof value !== "number") return null;
+  // Number("") and Number(" ") are zero, but missing provider measurements
+  // must stay unknown rather than imply 0°C / no wind / no precipitation.
+  if (typeof value === "string" && !value.trim()) return null;
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : null;
 }

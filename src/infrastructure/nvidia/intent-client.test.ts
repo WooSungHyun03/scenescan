@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { NvidiaIntentClient, NvidiaIntentError } from "./intent-client";
+import { NvidiaCallBudget } from "./intent-budget";
 
 function chatResponse(content: unknown, status = 200): Response {
   return new Response(JSON.stringify({ choices: [{ message: { content: JSON.stringify(content) } }] }), {
@@ -26,6 +27,67 @@ function client(overrides: Partial<ConstructorParameters<typeof NvidiaIntentClie
 }
 
 describe("NvidiaIntentClient", () => {
+  it("charges every retry and stops before fetch when the shared budget is exhausted", async () => {
+    const setup = client();
+    setup.fetcher.mockResolvedValue(new Response("", { status: 429 }));
+    const budget = new NvidiaCallBudget({ maxCallsPerMinute: 1, maxCallsPerDay: 1 });
+    await expect(setup.client.extractIntent("해운대", { tryConsume: () => budget.tryConsume() }))
+      .rejects.toMatchObject({ code: "BUDGET_EXHAUSTED" });
+    expect(setup.fetcher).toHaveBeenCalledTimes(1);
+  });
+
+  it("retries a response-body timeout instead of treating it as malformed JSON", async () => {
+    const setup = client({ timeoutMilliseconds: 5 });
+    setup.fetcher.mockImplementationOnce(async (_url, init) => new Response(new ReadableStream({
+      start(controller) {
+        init?.signal?.addEventListener("abort", () => controller.error(new DOMException("Aborted", "AbortError")), { once: true });
+      },
+    }))).mockResolvedValueOnce(chatResponse({ district: null, category: null, keywords: [], unsupportedConditions: [] }));
+    await expect(setup.client.extractIntent("해운대")).resolves.toMatchObject({ keywords: [] });
+    expect(setup.fetcher).toHaveBeenCalledTimes(2);
+  });
+
+  it("shares the budget across concurrent searches and their retries", async () => {
+    const setup = client();
+    setup.fetcher.mockImplementation(async () => new Response("", { status: 503 }));
+    const budget = new NvidiaCallBudget({ maxCallsPerMinute: 2, maxCallsPerDay: 2 });
+    const options = { tryConsume: () => budget.tryConsume() };
+    const results = await Promise.allSettled([
+      setup.client.extractIntent("해운대", options),
+      setup.client.extractIntent("광안리", options),
+      setup.client.extractIntent("태종대", options),
+    ]);
+    expect(setup.fetcher).toHaveBeenCalledTimes(2);
+    for (const result of results) {
+      expect(result).toMatchObject({ status: "rejected", reason: { code: "BUDGET_EXHAUSTED" } });
+    }
+  });
+
+  it("allows a successful retry while charging two reservations", async () => {
+    const setup = client();
+    setup.fetcher.mockResolvedValueOnce(new Response("", { status: 503 }))
+      .mockResolvedValueOnce(chatResponse({ district: null, category: null, keywords: [], unsupportedConditions: [] }));
+    const budget = new NvidiaCallBudget({ maxCallsPerMinute: 2, maxCallsPerDay: 2 });
+    const tryConsume = vi.fn(() => budget.tryConsume());
+    await expect(setup.client.extractIntent("해운대", { tryConsume })).resolves.toMatchObject({ keywords: [] });
+    expect(tryConsume).toHaveBeenCalledTimes(2);
+    expect(budget.tryConsume()).toBe(false);
+  });
+
+  it("does not reserve quota without credentials", async () => {
+    const setup = client({ apiKey: undefined });
+    const tryConsume = vi.fn(() => true);
+    await expect(setup.client.extractIntent("해운대", { tryConsume })).rejects.toMatchObject({ code: "CONFIGURATION" });
+    expect(tryConsume).not.toHaveBeenCalled();
+  });
+
+  it("does not retry malformed HTTP JSON when the response has not timed out", async () => {
+    const setup = client();
+    setup.fetcher.mockImplementation(async () => new Response("{invalid"));
+    await expect(setup.client.extractIntent("해운대")).rejects.toMatchObject({ code: "MALFORMED_RESPONSE" });
+    expect(setup.fetcher).toHaveBeenCalledTimes(1);
+  });
+
   it("extracts a valid structured intent from a well-formed response", async () => {
     const setup = client();
     setup.fetcher.mockResolvedValue(chatResponse({ district: "busan_haeundae_gu", category: "urban", keywords: ["야경"], unsupportedConditions: [] }));

@@ -3,8 +3,9 @@
 // (same sharing shape as KmaWeatherClient's cache, src/infrastructure/
 // weather/kma-client.ts). Deliberately simple counters, not a sliding
 // window: a fixed UTC-minute/UTC-day bucket that resets when the clock
-// crosses into a new bucket. Good enough to bound worst-case spend; not a
-// precise rate limiter.
+// crosses into a new bucket. Bounds this instance's calls only: cold starts
+// reset counters and separate serverless instances have separate budgets.
+// Not an account-wide spending cap or a precise rate limiter.
 export const NVIDIA_INTENT_MAX_CALLS_PER_MINUTE = 10;
 export const NVIDIA_INTENT_MAX_CALLS_PER_DAY = 500;
 

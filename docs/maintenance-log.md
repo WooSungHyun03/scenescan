@@ -1,5 +1,18 @@
 # Maintenance log
 
+## 2026-10-11 — scheduled daily quality routine
+
+- Integrated main through `d776dd4` (reviewed districts for 부산진성/일광해수욕장); preserved the three existing untracked team ticket documents. Automation configuration was not changed.
+- Major: NVIDIA retries bypassed the adapter's one-reservation-per-search budget, allowing up to three upstream attempts per reservation. Reproduced with a failing 429 test; moved reservations to immediately before every client attempt, including retries. Concurrent searches share the budget; exhaustion stops fetch and preserves rule-based search. This remains an instance-local guard, not an account-wide spending cap. No NVIDIA live call or key/feature-flag change was made.
+- Major: a timed-out NVIDIA response body was classified as malformed JSON, preventing the promised timeout retry. Reproduced with an aborting response stream; body timeouts now follow the bounded retry path, while genuine invalid JSON stays non-retryable.
+- Major: empty/whitespace KMA measurements became numeric zero through `Number()`. Reproduced for temperature, humidity and wind; unavailable values now stay null, while measured zero and signed temperatures remain valid. No weather data was fabricated.
+- Minor: corrected README's stale nationwide product description/count; committed source data (223 locations / 36 Busan / 34 reviewed districts) is explicitly distinguished from hosted availability.
+- Hosted SQL inspection confirmed 13 Busan locations, 11 with districts, and no `location_images.embedding_model` column. Applied exactly one reviewed district update for existing 일광해수욕장 UUID/name/Busan scope where district was null, using a transaction; production `기장군` text search now returns that location. No row/image deletion, Auth/RLS change, invented model backfill or new catalog import occurred. Reviewed district coverage on the hosted 13 rows is now 12; 부산항 remains null intentionally.
+- Verification: lint/typecheck/build passed; unit suite 113 files / 741 tests, local Supabase integration 6 files / 25 tests, mock browser 41 tests, and local Auth/Mailpit account-isolation/recovery/deletion flow passed. Docker `scenescan:daily-20261011` built and ran healthy. Client-bundle secret-boundary scan passed; production dependency audit found no known vulnerabilities.
+- Production smoke: actual browser CLIP → HTTP 200 search → 8 results / 8 Kakao markers, 15.6 seconds with cold model download observed and no external failures. Desktop/mobile production text search was visually inspected; key-free error/loading/empty/accessibility flows remain covered by the browser suite.
+
+Remaining external rollout dependencies: approved/configured KMA Village Forecast credentials; hosted migration/history reconciliation and verified model provenance before enabling model-safe/district image RPCs; authorized incremental image/vector imports for the newer Busan source catalog. Do not label the full hosted migration or NVIDIA live evaluation as completed.
+
 ## 2026-10-10 — manually requested daily routine
 
 - Integrated main through `9f6adb0`; preserved the three existing untracked team ticket documents. The recurring automation schedule was not changed or marked as having run.

@@ -26,6 +26,7 @@ const DEFAULT_MAX_INPUT_CHARACTERS = 400;
 
 export type NvidiaIntentErrorCode =
   | "CONFIGURATION"
+  | "BUDGET_EXHAUSTED"
   | "TIMEOUT"
   | "RATE_LIMITED"
   | "UPSTREAM"
@@ -91,7 +92,7 @@ export class NvidiaIntentClient {
    * this without a key in the real app; this check exists so the class is
    * still safe to call directly (e.g. from a test or the eval script).
    */
-  async extractIntent(query: string): Promise<NvidiaIntentResult> {
+  async extractIntent(query: string, options: { tryConsume?: () => boolean } = {}): Promise<NvidiaIntentResult> {
     if (!this.apiKey) throw new NvidiaIntentError("CONFIGURATION", "NVIDIA API key is not configured");
     const bounded = query.length > this.maxInputCharacters ? query.slice(0, this.maxInputCharacters) : query;
 
@@ -99,6 +100,13 @@ export class NvidiaIntentClient {
     for (let attempt = 0; attempt < this.maxAttempts; attempt += 1) {
       if (attempt > 0) {
         await this.sleep(this.retryBaseDelayMilliseconds * 2 ** (attempt - 1));
+      }
+      // Reserve immediately before each fetch, including retries. The callback
+      // is request-scoped; concurrent requests share the caller's budget, not
+      // mutable state on this client singleton. Direct offline evaluations may
+      // omit it; the application adapter always supplies it.
+      if (options.tryConsume && !options.tryConsume()) {
+        throw new NvidiaIntentError("BUDGET_EXHAUSTED", "NVIDIA call budget exhausted");
       }
       try {
         return await this.attemptOnce(bounded);
@@ -155,6 +163,7 @@ export class NvidiaIntentClient {
       try {
         payload = await response.json();
       } catch (cause) {
+        if (controller.signal.aborted) throw new NvidiaIntentError("TIMEOUT", "NVIDIA response body timed out", { cause });
         throw new NvidiaIntentError("MALFORMED_RESPONSE", "NVIDIA response is not valid JSON", { cause });
       }
 

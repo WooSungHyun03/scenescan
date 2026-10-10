@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
-import { NvidiaIntentError } from "@/infrastructure/nvidia/intent-client";
+import { NvidiaIntentClient, NvidiaIntentError } from "@/infrastructure/nvidia/intent-client";
+import { NvidiaCallBudget } from "@/infrastructure/nvidia/intent-budget";
 import type { ParsedTextSearchQuery } from "@/types/text-search";
 import { enrichWithNvidiaIntent } from "./nvidia-intent-adapter";
 import { resolveTextSearchFilters } from "./text-search-filter-resolution";
@@ -34,12 +35,31 @@ describe("enrichWithNvidiaIntent", () => {
     expect(result).toEqual(base());
   });
 
-  it("returns the base parse unchanged, and never calls the client, when the budget is exhausted", async () => {
-    const client = fakeClient(async () => { throw new Error("must never be called"); });
+  it("returns the base parse unchanged, and never calls fetch, when the budget is exhausted", async () => {
+    const fetcher = vi.fn<typeof fetch>();
+    const client = new NvidiaIntentClient({ apiKey: "fake-test-key", fetcher });
     const budget = { tryConsume: () => false };
     const result = await enrichWithNvidiaIntent("해운대", base(), { enabled: true, client, budget });
     expect(result).toEqual(base());
-    expect(client.extractIntent).not.toHaveBeenCalled();
+    expect(fetcher).not.toHaveBeenCalled();
+  });
+
+  it("passes the budget to the client rather than charging one reservation per search", async () => {
+    const client = fakeClient(async () => ({ district: null, category: null, keywords: [], unsupportedConditions: [] }));
+    const budget = { tryConsume: vi.fn(() => true) };
+    await enrichWithNvidiaIntent("해운대", base(), { enabled: true, client, budget });
+    expect(budget.tryConsume).not.toHaveBeenCalled();
+    const options = vi.mocked(client.extractIntent).mock.calls[0]?.[1];
+    expect(options?.tryConsume?.()).toBe(true);
+    expect(budget.tryConsume).toHaveBeenCalledTimes(1);
+  });
+
+  it("falls back after a transient error without letting a retry bypass the budget", async () => {
+    const fetcher = vi.fn<typeof fetch>(async () => new Response("", { status: 429 }));
+    const client = new NvidiaIntentClient({ apiKey: "fake-test-key", fetcher, sleep: async () => {} });
+    const budget = new NvidiaCallBudget({ maxCallsPerMinute: 1, maxCallsPerDay: 1 });
+    await expect(enrichWithNvidiaIntent("해운대", base(), { enabled: true, client, budget })).resolves.toEqual(base());
+    expect(fetcher).toHaveBeenCalledTimes(1);
   });
 
   it("merges a successful NVIDIA result on top of the base parse (fills null slots, unions keywords)", async () => {
