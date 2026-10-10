@@ -52,9 +52,14 @@ function toKeywords(text: string): string[] {
 export function parseTextSearchQuery(rawQuery: string): ParsedTextSearchQuery {
   const normalized = rawQuery.trim();
 
+  // A reviewed Busan alias can contain another region's name:
+  // "해운대구" includes "대구". Resolve aliases before scope detection,
+  // while retaining all other text so mixed-region requests still fail closed.
+  const scopeText = extractAndStrip(normalized, DISTRICT_ALIASES).remaining;
+
   // Requirement 7: a non-Busan region mention short-circuits everything
   // else -- never partially honor a mixed "서울이랑 해운대" query.
-  if (OUT_OF_BUSAN_REGION_KEYWORDS.some((region) => normalized.includes(region))) {
+  if (OUT_OF_BUSAN_REGION_KEYWORDS.some((region) => scopeText.includes(region))) {
     return {
       district: null,
       category: null,

@@ -128,6 +128,17 @@ describe("POST /api/search/text", () => {
     expect(searchByTextMock).toHaveBeenCalledWith(expect.objectContaining({ district: null, districtConflict: true }));
   });
 
+  it("searches the full 해운대구 name rather than returning an out-of-scope notice", async () => {
+    searchByTextMock.mockResolvedValue([fakeResult()]);
+    const response = await POST(request({ query: "해운대구 카페" }));
+    const body = await response.json();
+    expect(response.status).toBe(200);
+    expect(body.notice).toBeNull();
+    expect(body.parsedQuery.district).toBe("busan_haeundae_gu");
+    expect(body.results).toHaveLength(1);
+    expect(searchByTextMock).toHaveBeenCalledWith(expect.objectContaining({ district: "busan_haeundae_gu", keywords: ["카페"] }));
+  });
+
   it("reports unsupportedConditions and never lets them drive the search", async () => {
     searchByTextMock.mockResolvedValue([]);
     const response = await POST(request({ query: "조용한 해운대 카페" }));

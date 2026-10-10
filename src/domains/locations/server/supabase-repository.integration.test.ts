@@ -34,7 +34,7 @@ describe.skipIf(!env)("Supabase repository (live Supabase)", () => {
     const id = randomUUID();
     const { error } = await adminClient.from("locations").insert({
       id, name: overrides.name ?? `장소 ${id.slice(0, 8)}`, description: "설명", category: overrides.category ?? "urban",
-      region: overrides.region ?? "서울", address: "주소", latitude: 37.5, longitude: 127.0,
+      region: overrides.region ?? "부산", address: "부산 테스트 주소", latitude: 35.16, longitude: 129.06,
     });
     if (error) throw error;
     createdLocationIds.push(id);
@@ -76,6 +76,20 @@ describe.skipIf(!env)("Supabase repository (live Supabase)", () => {
   it("getSupabaseLocation: returns null for a missing id, same as the mock repository", async () => {
     expect(await getSupabaseLocation(randomUUID())).toBeNull();
     expect(getMockLocation("missing")).toBeNull();
+  });
+
+  it("excludes non-Busan locations from list, detail, image search, and similar search", async () => {
+    const outsideId = await seedLocation({ region: "서울", name: "범위 밖 장소" });
+    const busanId = await seedLocation({ name: "부산 범위 기준" });
+    const embedding = Array.from({ length: 512 }, (_, index) => (index === 0 ? 1 : 0));
+    await seedImage(outsideId, vec((index) => embedding[index]));
+    await seedImage(busanId, vec((index) => embedding[index]));
+
+    expect((await getSupabaseLocations()).some((location) => location.id === outsideId)).toBe(false);
+    expect(await getSupabaseLocation(outsideId)).toBeNull();
+    expect((await searchSupabaseLocations(embedding)).some((result) => result.location.id === outsideId)).toBe(false);
+    expect((await getSupabaseSimilarLocations(busanId)).some((result) => result.location.id === outsideId)).toBe(false);
+    expect(await getSupabaseSimilarLocations(outsideId)).toEqual([]);
   });
 
   it("searchSupabaseLocations: real RPC search returns the same result shape as mock search", async () => {

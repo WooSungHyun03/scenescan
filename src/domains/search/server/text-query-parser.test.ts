@@ -20,6 +20,15 @@ describe("parseTextSearchQuery", () => {
     expect(parseTextSearchQuery("영도 바다").district).toBe("busan_yeongdo_gu");
   });
 
+  it("does not mistake the 대구 substring in 해운대구 for another region", () => {
+    const result = parseTextSearchQuery("해운대구 카페");
+    expect(result.outOfScope).toBe(false);
+    expect(result.district).toBe("busan_haeundae_gu");
+    expect(result.keywords).toContain("카페");
+    expect(parseTextSearchQuery("대구에서 해운대구 느낌 나는 곳").outOfScope).toBe(true);
+    expect(parseTextSearchQuery("서울 해운대구 카페").outOfScope).toBe(true);
+  });
+
   it("flags a district conflict instead of guessing one, when two districts are named", () => {
     const result = parseTextSearchQuery("해운대랑 서면 사진");
     expect(result.districtConflict).toBe(true);
