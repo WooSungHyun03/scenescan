@@ -3,6 +3,7 @@
 import { useId, useMemo, useState } from "react";
 import { Clock3 } from "lucide-react";
 import { CameraLightingControl } from "@/domains/locations/components/camera-lighting-control";
+import { WeatherPanel } from "@/domains/locations/components/weather-panel";
 import { SolarDirectionVisualization } from "@/domains/locations/components/solar-direction-visualization";
 import {
   DEFAULT_LOCATION_TIME_ZONE,
@@ -37,9 +38,11 @@ function getErrorMessage(code: Extract<SolarCalculation, { state: "error" }>["co
 export function SolarPanel({
   point,
   timeZone,
+  locationId,
 }: {
   point: GeoPoint;
   timeZone?: string;
+  locationId?: string;
 }) {
   const dateInputId = useId();
   const timeInputId = useId();
@@ -174,6 +177,8 @@ export function SolarPanel({
           </div>
         )}
       </div>
+      {locationId && <WeatherPanel locationId={locationId} targetInstant={calculation.state === "ready"
+        ? calculation.instant.toISOString() : !shootDate && !shootTime ? null : undefined} />}
     </div>
   );
 }

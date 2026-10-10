@@ -104,7 +104,7 @@ export default async function LocationPage({ params }: { params: Promise<{ id: s
 
         <section id="lighting" aria-labelledby="solar-title" className="min-w-0">
           <div className="mb-4"><p className="scene-kicker">Sun position</p><h2 id="solar-title" className="mt-2 scene-section-heading">촬영 시간과 빛의 방향</h2></div>
-          <div className="scene-panel p-4 sm:p-6"><SolarPanel point={location.point} /></div>
+          <div className="scene-panel p-4 sm:p-6"><SolarPanel point={location.point} locationId={location.id} /></div>
         </section>
       </div>
 

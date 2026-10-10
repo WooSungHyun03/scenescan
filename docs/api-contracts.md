@@ -97,6 +97,8 @@ Returns one KMA observation or forecast for a location. The optional `at` query 
 
 Successful HTTP responses use a 60-second public cache header. All failures use the shared structured error body and `no-store`. The implementation uses only server modules; mock location lookup remains key-free, while weather itself honestly returns `DATA_UNAVAILABLE` until the dedicated key is configured.
 
+The location detail weather panel reuses the solar panel's Korea-local shooting date/time and sends its offset-aware instant as `at`. With neither field selected it requests the current observation; incomplete/invalid selections disable the request. Fetching is explicit (button only), bounded to ten seconds, and canceled when the location/time changes or the panel unmounts. Previous results are hidden immediately after a selection change. The shared `locationWeatherResponseSchema` validates finite nullable measurements, timestamp/purpose consistency, attribution URLs, and the response location ID before displaying it. Provider failures offer a retry without blocking solar calculations; absent measurements are shown as “정보 없음”, never zero.
+
 `GET /api/locations/:id/similar` delegates ranking to `getSimilarLocations`, excludes the current/seen locations, returns at most eight results, and disables response caching. Mock mode filters stable synthetic category candidates before ranking; real mode uses the model-safe RPC below.
 
 Supabase RPC (see `docs/search-ranking.md` for the full contract and a reproducible filter regression test):

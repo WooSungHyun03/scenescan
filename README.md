@@ -22,6 +22,8 @@ Open `http://localhost:3000`, choose **이미지 업로드**, select an image, a
 Real browser AI mode accepts JPEG, PNG, and WebP images up to 15 MB, 8192 px per axis, and 20 megapixels. Its first search downloads the public CLIP model; later requests reuse the same worker and model instance.
 Production uses the WASM backend for broad browser compatibility and keeps only 20 image-free timing samples for diagnostics. Current browser results and the remaining cold-load/WebGPU matrix are in [AI performance](docs/ai-performance.md).
 
+Location detail includes an explicit weather lookup for the current instant or the selected Korea-local shooting date/time. It requires the dedicated server-only `KMA_VILLAGE_FORECAST_SERVICE_KEY` and service approval; missing credentials produce a retryable unavailable state, not synthetic weather. See the [weather contract](docs/api-contracts.md#get-apilocationsidweather) for forecast limits and attribution.
+
 ## Environment variables
 
 | Variable | Purpose |
