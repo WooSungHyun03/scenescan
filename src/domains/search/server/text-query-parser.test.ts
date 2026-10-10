@@ -36,6 +36,16 @@ describe("parseTextSearchQuery", () => {
     expect(result.conflictingDistricts.sort()).toEqual(["busan_busanjin_gu", "busan_haeundae_gu"]);
   });
 
+  it("keeps 경기장 as a venue keyword without treating it as 경기 province", () => {
+    const result = parseTextSearchQuery("부산아시아드주경기장");
+    expect(result.outOfScope).toBe(false);
+    expect(result.district).toBeNull();
+    expect(result.keywords).toContain("부산아시아드주경기장");
+    expect(parseTextSearchQuery("기장군 경기장")).toMatchObject({ district: "busan_gijang_gun", keywords: ["경기장"], outOfScope: false });
+    expect(parseTextSearchQuery("경기에서 경기장 찾아줘").outOfScope).toBe(true);
+    expect(parseTextSearchQuery("서울 경기장").outOfScope).toBe(true);
+  });
+
   it("does not flag a conflict for the same district mentioned via two different aliases", () => {
     const result = parseTextSearchQuery("해운대 센텀시티");
     expect(result.districtConflict).toBe(false);

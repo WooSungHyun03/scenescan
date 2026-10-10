@@ -31,8 +31,12 @@ function extractAndStrip<T>(text: string, aliases: ReadonlyMap<string, T>): { re
   const matched: T[] = [];
   const seen = new Set<T>();
   for (const key of orderedKeys) {
+    // The short district alias 기장 must not consume the end of 경기장.
+    // Other occurrences (e.g. "기장군 경기장") remain eligible.
+    const venueSafeAlias = key === "기장" ? /(?<!경)기장/gu : null;
+    if (venueSafeAlias && !venueSafeAlias.test(remaining)) continue;
     if (!remaining.includes(key)) continue;
-    remaining = stripAllOccurrences(remaining, key);
+    remaining = venueSafeAlias ? remaining.replace(venueSafeAlias, " ") : stripAllOccurrences(remaining, key);
     const value = aliases.get(key)!;
     if (!seen.has(value)) {
       seen.add(value);
@@ -55,7 +59,9 @@ export function parseTextSearchQuery(rawQuery: string): ParsedTextSearchQuery {
   // A reviewed Busan alias can contain another region's name:
   // "해운대구" includes "대구". Resolve aliases before scope detection,
   // while retaining all other text so mixed-region requests still fail closed.
-  const scopeText = extractAndStrip(normalized, DISTRICT_ALIASES).remaining;
+  // 경기장 is a venue noun, not a request for 경기 province. Keep it in
+  // actual search keywords, but do not let its substring reject 부산 venues.
+  const scopeText = extractAndStrip(normalized, DISTRICT_ALIASES).remaining.replaceAll("경기장", " ");
 
   // Requirement 7: a non-Busan region mention short-circuits everything
   // else -- never partially honor a mixed "서울이랑 해운대" query.
