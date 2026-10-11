@@ -49,6 +49,7 @@ export async function loadAccountShortlist(
   const response = await fetcher("/api/shortlist", {
     credentials: "same-origin",
     cache: "no-store",
+    signal: AbortSignal.timeout(15_000),
   });
   return parseResponse(response, shortlistResponseSchema);
 }
@@ -60,6 +61,7 @@ export async function setAccountShortlistLocation(
 ): Promise<ShortlistResponse> {
   const response = await fetcher("/api/shortlist", {
     method: "PUT",
+    signal: AbortSignal.timeout(15_000),
     credentials: "same-origin",
     cache: "no-store",
     headers: {
@@ -77,6 +79,7 @@ export async function mergeBrowserShortlist(
 ): Promise<ShortlistMergeResponse> {
   const response = await fetcher("/api/shortlist", {
     method: "POST",
+    signal: AbortSignal.timeout(15_000),
     credentials: "same-origin",
     cache: "no-store",
     headers: {

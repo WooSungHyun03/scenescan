@@ -44,6 +44,7 @@ test("Auth 전체 흐름과 계정별 관심 장소가 안전하게 이어진다
   cleanupUserIds.push(await createConfirmedTestUser(request, secondEmail, secondPassword));
 
   await page.goto("/signup");
+  await expect(page.locator("main")).not.toContainText("Supabase");
   await page.getByLabel("이메일").fill(email);
   await page.getByLabel("비밀번호", { exact: true }).fill(password);
   await page.getByLabel("비밀번호 확인").fill(password);
@@ -143,9 +144,12 @@ test("Auth 전체 흐름과 계정별 관심 장소가 안전하게 이어진다
   }, shortlistLocationIds[0]);
   await page.goto("/shortlist");
   await expect(page.getByRole("heading", { name: "이 브라우저의 후보를 계정에 추가할까요?" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "저장한 관심 장소가 없습니다." })).toBeVisible();
+  await expect(page.locator('[aria-label="1곳 저장됨"]')).toHaveCount(0);
   await page.getByRole("button", { name: "계정에 추가", exact: true }).click();
   await expect(page.getByRole("status")).toContainText("계정 관심 장소에 추가");
   await expect(page.getByText("물빛 산책로", { exact: true })).toBeVisible();
+  await expect(page.locator('[aria-label="1곳 저장됨"]')).toBeVisible();
 
   await secondTab.goto("/shortlist");
   await expect(secondTab.getByText("물빛 산책로", { exact: true })).toBeVisible();
@@ -159,6 +163,8 @@ test("Auth 전체 흐름과 계정별 관심 장소가 안전하게 이어진다
   await expect(page).toHaveURL(/\/account$/);
   await page.goto("/shortlist");
   await expect(page.getByText("물빛 산책로", { exact: true })).toHaveCount(0);
+  await expect(page.getByRole("heading", { name: "저장한 관심 장소가 없습니다." })).toBeVisible();
+  await expect(page.locator('[aria-label="1곳 저장됨"]')).toHaveCount(0);
   await expect(page.getByRole("heading", { name: "이 브라우저의 후보를 계정에 추가할까요?" })).toHaveCount(0);
 
   await page.goto(`/locations/${shortlistLocationIds[1]}`);
@@ -169,6 +175,18 @@ test("Auth 전체 흐름과 계정별 관심 장소가 안전하게 이어진다
   await expect((await saveResponse).ok()).toBe(true);
   await page.goto("/shortlist");
   await expect(page.getByText("파란 작업장", { exact: true })).toBeVisible();
+  await expect(page.locator('[aria-label="1곳 저장됨"]')).toBeVisible();
+  await page.getByRole("button", { name: "파란 작업장 관심 장소에서 제거" }).click();
+  await expect(page.getByRole("heading", { name: "저장한 관심 장소가 없습니다." })).toBeVisible();
+  await expect(page.locator('[aria-label="1곳 저장됨"]')).toHaveCount(0);
+  await page.route("**/api/shortlist", (route) => route.fulfill({ status: 503,
+    json: { error: { code: "DATA_UNAVAILABLE", message: "관심 장소 조회 실패" } } }));
+  await page.reload();
+  await expect(page.locator("main").getByRole("alert")).toContainText("조회 실패");
+  await expect(page.getByRole("heading", { name: "저장한 관심 장소가 없습니다." })).toHaveCount(0);
+  await page.unroute("**/api/shortlist");
+  await page.getByRole("button", { name: "다시 확인" }).click();
+  await expect(page.getByRole("heading", { name: "저장한 관심 장소가 없습니다." })).toBeVisible();
 
   await page.goto("/account");
   await page.getByRole("button", { name: "로그아웃", exact: true }).click();

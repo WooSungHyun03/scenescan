@@ -10,7 +10,7 @@ test("업로드부터 Top 8, 지도, 상세, 태양 정보와 shortlist 비교�
   await expect(
     page.getByRole("heading", {
       level: 1,
-      name: /원하는 장면을 올리면, 비슷한 장소를 찾아드려요/,
+      name: /원하는 장면을 알려주면, 비슷한 장소를 찾아드려요/,
     }),
   ).toBeVisible();
   await expect(page.getByRole("heading", { name: "예시 장소 둘러보기" })).toBeVisible();
@@ -72,7 +72,7 @@ test("업로드부터 Top 8, 지도, 상세, 태양 정보와 shortlist 비교�
   const detailMap = page.getByRole("region", { name: `${firstName} 위치 지도` });
   await expect(detailMap).toBeVisible();
   await expect(detailMap).toHaveAttribute("data-map-mode", "mock");
-  await expect(detailMap).toContainText("Kakao Map을 사용할 수 없어 지도 미리보기를 표시합니다.");
+  await expect(detailMap).toContainText("지도 미리보기");
 
   await page.getByLabel("촬영 날짜", { exact: true }).fill("2026-06-21");
   await page.getByLabel("촬영 시간", { exact: true }).fill("12:00");

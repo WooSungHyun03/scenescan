@@ -50,7 +50,7 @@ export default async function AccountPage({
         </div>
       </section>
       <p className="mt-5 max-w-2xl text-sm leading-relaxed text-muted">
-        SceneScan은 별도 profiles 테이블을 만들지 않으며, 이 화면에는 Supabase Auth가 제공한 최소 계정 정보만 표시합니다.
+        이메일을 확인하고, 계정 보안에서 비밀번호를 관리할 수 있습니다.
       </p>
     </main>
   );

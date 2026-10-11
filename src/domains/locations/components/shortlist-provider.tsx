@@ -40,6 +40,7 @@ type ShortlistContextValue = ShortlistSnapshot & {
   remove(locationId: string): Promise<boolean>;
   importBrowserIds(): Promise<boolean>;
   dismissBrowserImport(): void;
+  retry(): void;
 };
 
 const initialSnapshot: ShortlistSnapshot = {
@@ -71,11 +72,9 @@ export function ShortlistProvider({ children }: { children: React.ReactNode }) {
   const channelRef = useRef<BroadcastChannel | null>(null);
 
   const updateSnapshot = useCallback((update: (current: ShortlistSnapshot) => ShortlistSnapshot) => {
-    setSnapshot((current) => {
-      const next = update(current);
-      snapshotRef.current = next;
-      return next;
-    });
+    const next = update(snapshotRef.current);
+    snapshotRef.current = next;
+    setSnapshot(next);
   }, []);
 
   const notifyAccountTabs = useCallback((userId: string, ids: string[]) => {
@@ -93,6 +92,7 @@ export function ShortlistProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     let active = true;
+    let authCheck = 0;
     const timers = new Set<number>();
     const authClient = getSupabaseBrowserAuthClient();
     if ("BroadcastChannel" in window) channelRef.current = new BroadcastChannel("scenescan-shortlist-v1");
@@ -134,6 +134,7 @@ export function ShortlistProvider({ children }: { children: React.ReactNode }) {
     }
 
     function scheduleAuthRefresh() {
+      const check = ++authCheck;
       const timer = window.setTimeout(() => {
         timers.delete(timer);
         if (!active || !authClient) {
@@ -141,8 +142,19 @@ export function ShortlistProvider({ children }: { children: React.ReactNode }) {
           return;
         }
         void authClient.auth.getUser()
-          .then(({ data, error }) => transitionTo(error ? null : (data.user?.id ?? null)))
-          .catch(() => transitionTo(null));
+          .then(({ data, error }) => {
+            if (!active || check !== authCheck) return;
+            // Only a confirmed absent session may use guest storage. Network
+            // and expired-token errors must never display another guest list.
+            if (error && error.name !== "AuthSessionMissingError") throw error;
+            return transitionTo(data.user?.id ?? null);
+          })
+          .catch(() => {
+            if (!active || check !== authCheck) return;
+            transitionRef.current += 1;
+            updateSnapshot(() => ({ ...initialSnapshot, isReady: true,
+              error: "로그인 상태를 확인하지 못했습니다. 다시 확인하거나 로그인해 주세요." }));
+          });
       }, 0);
       timers.add(timer);
     }
@@ -240,11 +252,12 @@ export function ShortlistProvider({ children }: { children: React.ReactNode }) {
     if (current.mode !== "account" || !current.userId) return false;
 
     const userId = current.userId;
+    const transition = transitionRef.current;
     updateSnapshot((value) => ({ ...value, ids: optimisticIds, isSaving: true, error: null }));
     const result = await commitShortlistMutation(previousIds, async () => (
       await setAccountShortlistLocation(id, saved)
     ).ids);
-    if (snapshotRef.current.userId !== userId) return false;
+    if (snapshotRef.current.userId !== userId || transition !== transitionRef.current) return false;
     updateSnapshot((value) => ({ ...value, ids: result.ids, isSaving: false, error: result.committed ? null : errorText(result.error) }));
     if (result.committed) notifyAccountTabs(userId, result.ids);
     return result.committed;
@@ -260,10 +273,11 @@ export function ShortlistProvider({ children }: { children: React.ReactNode }) {
     if (current.mode !== "account" || !current.userId || current.isSaving || current.pendingBrowserIds.length === 0) return false;
     const userId = current.userId;
     const candidates = current.pendingBrowserIds;
+    const transition = transitionRef.current;
     updateSnapshot((value) => ({ ...value, isSaving: true, error: null, migrationMessage: null }));
     try {
       const result = await mergeBrowserShortlist(candidates);
-      if (snapshotRef.current.userId !== userId) return false;
+      if (snapshotRef.current.userId !== userId || transition !== transitionRef.current) return false;
       try {
         window.localStorage.removeItem(SHORTLIST_STORAGE_KEY);
         window.dispatchEvent(new CustomEvent(SHORTLIST_CHANGE_EVENT, { detail: [] }));
@@ -281,7 +295,7 @@ export function ShortlistProvider({ children }: { children: React.ReactNode }) {
       notifyAccountTabs(userId, result.ids);
       return true;
     } catch (error) {
-      if (snapshotRef.current.userId === userId) {
+      if (snapshotRef.current.userId === userId && transition === transitionRef.current) {
         updateSnapshot((value) => ({ ...value, isSaving: false, error: errorText(error) }));
       }
       return false;
@@ -292,6 +306,10 @@ export function ShortlistProvider({ children }: { children: React.ReactNode }) {
     updateSnapshot((current) => ({ ...current, pendingBrowserIds: [], migrationMessage: null }));
   }, [updateSnapshot]);
 
+  const retry = useCallback(() => {
+    window.dispatchEvent(new Event(SHORTLIST_AUTH_RESET_EVENT));
+  }, []);
+
   const value = useMemo<ShortlistContextValue>(() => ({
     ...snapshot,
     count: snapshot.ids.length,
@@ -300,7 +318,8 @@ export function ShortlistProvider({ children }: { children: React.ReactNode }) {
     remove,
     importBrowserIds,
     dismissBrowserImport,
-  }), [snapshot, toggle, remove, importBrowserIds, dismissBrowserImport]);
+    retry,
+  }), [snapshot, toggle, remove, importBrowserIds, dismissBrowserImport, retry]);
 
   return <ShortlistContext.Provider value={value}>{children}</ShortlistContext.Provider>;
 }

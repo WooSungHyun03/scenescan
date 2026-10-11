@@ -69,7 +69,7 @@ export function ParkingInfoPanel({
   const discovery = useParkingDiscovery();
 
   return (
-    <section aria-labelledby="parking-title" className="scene-panel p-5">
+    <section aria-labelledby="parking-title" className="scene-panel min-w-0 p-5">
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-start gap-3">
           <CarFront
@@ -92,8 +92,8 @@ export function ParkingInfoPanel({
       </div>
 
       {sortedParking.length ? (
-        <div className="mt-5 space-y-4">
-          <h3 className="text-sm font-semibold text-stone-800">검증된 등록 주차 정보</h3>
+        <div className="mt-5 grid gap-3 md:grid-cols-2">
+          <h3 className="text-sm font-semibold text-stone-800 md:col-span-2">검증된 등록 주차 정보</h3>
           {sortedParking.map(({ parking: item, distanceMeters }, index) => {
             const relationship = getParkingRelationshipPresentation(item.relationship);
             const isOnSite = relationship.isOnSite;
@@ -192,7 +192,7 @@ export function ParkingInfoPanel({
             );
           })}
 
-          <p className="rounded-lg bg-stone-100 p-3 text-xs leading-relaxed text-stone-600">
+          <p className="rounded-lg bg-stone-100 p-3 text-xs leading-relaxed text-stone-600 md:col-span-2">
             거리는 장소와 주차장 좌표 사이의 직선거리입니다. 원본 데이터에
             공영·민영 유형이 없는 주변 주차장은 통합 표기합니다.
           </p>
@@ -231,7 +231,7 @@ export function ParkingInfoPanel({
                   type="button"
                   onClick={() => discovery.setRadiusMeters(radius)}
                   aria-pressed={discovery.radiusMeters === radius}
-                  className={`min-h-10 rounded-lg border px-3 text-xs font-bold transition-colors ${
+                  className={`min-h-11 rounded-lg border px-3 text-xs font-bold transition-colors ${
                     discovery.radiusMeters === radius
                       ? "border-emerald-800 bg-emerald-800 text-white"
                       : "border-stone-300 bg-white text-stone-700 hover:bg-stone-50"
@@ -270,20 +270,20 @@ export function ParkingInfoPanel({
           )}
 
           {discovery.phase === "ready" && (
-            <div className="mt-4 space-y-3" aria-live="polite">
-              {discovery.candidates.map((candidate, index) => {
+            <div className="mt-4 grid gap-3 md:grid-cols-2" aria-live="polite">
+              {[...discovery.candidates].sort((a, b) => a.distanceMeters - b.distanceMeters || a.id.localeCompare(b.id)).map((candidate, index) => {
                 const selected = discovery.activeCandidateId === candidate.id;
                 const telephone = candidate.phone?.replace(/[^0-9+]/gu, "") ?? null;
                 return (
                   <article
                     key={candidate.id}
-                    className={`rounded-xl border p-4 transition-colors ${
+                    className={`flex min-w-0 flex-col rounded-xl border p-3 transition-colors ${
                       selected
                         ? "border-emerald-700 bg-emerald-50 ring-2 ring-emerald-200"
                         : "border-stone-200 bg-white"
                     }`}
                   >
-                    <div className="flex min-w-0 items-start justify-between gap-3">
+                    <div className="flex min-w-0 flex-col items-start gap-2">
                       <div className="min-w-0">
                         <p className="text-xs font-bold text-emerald-800">
                           {index + 1}. 주변 후보 · {formatDistance(candidate.distanceMeters)}
@@ -298,7 +298,7 @@ export function ParkingInfoPanel({
                         onClick={() => discovery.setActiveCandidateId(candidate.id)}
                         aria-pressed={selected}
                         aria-label={`지도에서 ${candidate.name} 선택`}
-                        className="inline-flex min-h-10 shrink-0 items-center gap-1 rounded-lg border border-stone-300 px-2.5 text-xs font-bold text-stone-700 hover:bg-stone-50"
+                        className="inline-flex min-h-11 shrink-0 items-center gap-1 rounded-lg border border-stone-300 px-2.5 text-xs font-bold text-stone-700 hover:bg-stone-50"
                       >
                         <MapPin size={14} aria-hidden="true" /> 지도
                       </button>
@@ -307,7 +307,7 @@ export function ParkingInfoPanel({
                       {telephone && candidate.phone && (
                         <a
                           href={`tel:${telephone}`}
-                          className="inline-flex min-h-10 items-center gap-1.5 rounded-lg bg-stone-100 px-3 text-xs font-bold text-stone-800"
+                          className="inline-flex min-h-11 items-center gap-1.5 rounded-lg bg-stone-100 px-3 text-xs font-bold text-stone-800"
                         >
                           <Phone size={14} aria-hidden="true" /> {candidate.phone}
                         </a>
@@ -317,17 +317,12 @@ export function ParkingInfoPanel({
                           href={candidate.placeUrl}
                           target="_blank"
                           rel="noreferrer"
-                          className="inline-flex min-h-10 items-center gap-1.5 rounded-lg bg-[#fee500] px-3 text-xs font-bold text-stone-900"
+                          className="inline-flex min-h-11 items-center gap-1.5 rounded-lg bg-[#fee500] px-3 text-xs font-bold text-stone-900"
                         >
                           <Navigation size={14} aria-hidden="true" /> 카카오맵에서 보기
                         </a>
                       )}
                     </div>
-                    <dl className="mt-3 grid grid-cols-3 gap-2 text-center text-[11px] text-stone-500">
-                      <div className="rounded-lg bg-stone-50 p-2"><dt>요금</dt><dd className="mt-0.5 font-semibold">미제공</dd></div>
-                      <div className="rounded-lg bg-stone-50 p-2"><dt>주차구획수</dt><dd className="mt-0.5 font-semibold">미제공</dd></div>
-                      <div className="rounded-lg bg-stone-50 p-2"><dt>운영 시간</dt><dd className="mt-0.5 font-semibold">미제공</dd></div>
-                    </dl>
                     <p className="mt-3 text-[11px] text-stone-500">출처 · {candidate.source}</p>
                   </article>
                 );

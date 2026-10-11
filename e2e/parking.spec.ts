@@ -21,6 +21,28 @@ function candidate(id: string, rank: number) {
   } as const;
 }
 
+test("주차 후보는 거리순으로 정렬되고 데스크톱 두 열로 배치된다", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.route("**/api/locations/*/parking**", (route) => route.fulfill({ json: {
+    locationId, radiusMeters: 1000, sourceMode: "fixture",
+    candidates: [candidate("803", 3), candidate("801", 1), candidate("802", 2)],
+  } }));
+  await page.goto(`/locations/${locationId}`);
+  const panel = page.getByRole("region", { name: "주차 정보" });
+  const cards = panel.locator("article").filter({ hasText: "주변 후보" });
+  await expect(cards).toHaveCount(3);
+  await expect(cards.nth(0)).toContainText("합성 주변 주차장 1");
+  await expect(cards.nth(1)).toContainText("합성 주변 주차장 2");
+  const first = await cards.nth(0).boundingBox();
+  const second = await cards.nth(1).boundingBox();
+  expect(first && second && second.x > first.x && Math.abs(second.y - first.y) < 2).toBe(true);
+  await page.setViewportSize({ width: 390, height: 844 });
+  const mobileFirst = await cards.nth(0).boundingBox();
+  const mobileSecond = await cards.nth(1).boundingBox();
+  expect(mobileFirst && mobileSecond && mobileSecond.y > mobileFirst.y).toBe(true);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+});
+
 test("반경 확대와 목록·지도 선택이 연결되고 모바일에서 넘치지 않는다", async ({ page }) => {
   const errors = collectPageErrors(page);
   const requestedRadii: string[] = [];

@@ -118,7 +118,7 @@ export default async function LocationPage({ params }: { params: Promise<{ id: s
           <h2 id="conditions-title" className="mt-2 scene-section-heading">촬영 전 확인할 정보</h2>
           <p className="mt-3 text-sm leading-relaxed text-muted">허가, 차량 이동, 주변 환경을 확인하고 현장 답사로 최종 점검하세요.</p>
         </div>
-        <div className="scene-grid grid items-start gap-5 md:grid-cols-2 xl:grid-cols-3">
+        <div className="scene-grid grid items-start gap-5 lg:grid-cols-[minmax(0,.8fr)_minmax(0,1.7fr)]">
           <PermitInfoPanel permit={location.permit} />
           <ParkingInfoPanel parking={location.parking} origin={location.point} />
         </div>

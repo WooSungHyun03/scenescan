@@ -5,12 +5,12 @@ import { publicEnv } from "@/env/public";
 import { LocationCard } from "@/domains/locations/components/location-card";
 import { getLocationAreaLabel } from "@/domains/locations/components/location-copy";
 import { getLocations } from "@/domains/locations/server/repository";
-import { ImageSearchEntry } from "@/domains/search/components/image-search-entry";
+import { HomeSearchEntry } from "@/domains/search/components/home-search-entry";
 
 export const dynamic = "force-dynamic";
 
 const steps = [
-  ["사진 한 장으로 시작", "찾고 싶은 분위기와 구도가 담긴 참고 이미지를 선택하세요."],
+  ["사진이나 문장으로 시작", "참고 이미지를 선택하거나, 찾고 싶은 지역과 공간을 문장으로 입력하세요."],
   ["후보를 한눈에 비교", "비슷한 장소 최대 8곳을 사진, 위치, 유사도와 함께 살펴보세요."],
   ["촬영 조건까지 확인", "빛의 방향과 허가·주차 정보를 확인하고 후보를 저장하세요."],
 ] as const;
@@ -31,13 +31,13 @@ export default async function HomePage() {
           <div className="min-w-0">
             <p className="scene-kicker">Location scouting</p>
             <h1 className="mt-4 max-w-3xl text-[2.45rem] font-extrabold leading-[1.12] tracking-[-.06em] sm:text-5xl lg:text-[3.75rem]">
-              원하는 장면을 올리면,
+              원하는 장면을 알려주면,
               <span className="block text-brand">비슷한 장소를 찾아드려요.</span>
             </h1>
             <p className="mt-5 max-w-xl text-base leading-relaxed text-muted sm:text-lg">
-              마음에 둔 사진 한 장으로 촬영 후보를 좁히고, 장소 사진부터 위치와 빛의 방향까지 한 흐름에서 비교하세요.
+              사진이나 문장으로 부산의 촬영 후보를 찾고, 장소 사진부터 위치와 빛의 방향까지 한 흐름에서 비교하세요.
             </p>
-            <ImageSearchEntry />
+            <HomeSearchEntry />
             <div className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-sm font-medium text-stone-600" aria-label="서비스 특징">
               <span className="inline-flex items-center gap-2"><Check size={16} className="text-brand" aria-hidden="true" />최대 8곳 비교</span>
               <span className="inline-flex items-center gap-2"><Check size={16} className="text-brand" aria-hidden="true" />지도·태양 방향 확인</span>
@@ -111,7 +111,7 @@ export default async function HomePage() {
             <h2 id="featured-locations-title" className="mt-3 text-2xl font-extrabold sm:text-3xl">
               {mock ? "예시 장소 둘러보기" : "이런 촬영 장소는 어떠세요?"}
             </h2>
-            <p className="mt-2 text-sm text-muted">사진을 선택하기 전에 다양한 공간과 촬영 조건을 살펴보세요.</p>
+            <p className="mt-2 text-sm text-muted">검색하기 전에 다양한 공간과 촬영 조건을 살펴보세요.</p>
           </div>
           <Link href="/search" className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-lg px-2 text-sm font-bold text-brand hover:bg-brand-soft">
             전체 장소

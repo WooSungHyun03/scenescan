@@ -10,6 +10,19 @@ import {
 const locationId = "00000000-0000-4000-8000-000000000003";
 
 describe("shortlist client", () => {
+  it("keeps a new account empty and bounds requests without substituting guest ids", async () => {
+    const fetcher = vi.fn(async (_input: RequestInfo | URL, init?: RequestInit) => {
+      expect(init?.signal).toBeInstanceOf(AbortSignal);
+      expect(init?.cache).toBe("no-store");
+      return Response.json({ ids: [] });
+    }) as typeof fetch;
+    await expect(loadAccountShortlist(fetcher)).resolves.toEqual({ ids: [] });
+  });
+
+  it("does not report a failed load as an empty account", async () => {
+    const fetcher = vi.fn(async () => Response.json({ error: { message: "접속 실패" } }, { status: 503 })) as typeof fetch;
+    await expect(loadAccountShortlist(fetcher)).rejects.toMatchObject({ status: 503 });
+  });
   it("uses desired-state writes without sending a user id", async () => {
     const fetcher = vi.fn(async (_input: RequestInfo | URL, init?: RequestInit) => {
       expect(init?.method).toBe("PUT");

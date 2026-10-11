@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { useShortlist } from "./use-shortlist";
 
 export function ShortlistNavLink() {
-  const { count, isReady } = useShortlist();
+  const { count, isReady, error, mode } = useShortlist();
   const pathname = usePathname();
 
   return (
@@ -18,7 +18,7 @@ export function ShortlistNavLink() {
     >
       <Heart size={16} aria-hidden="true" />
       <span className="hidden sm:inline">관심 장소</span>
-      {isReady && count > 0 && (
+      {isReady && !error && mode !== "loading" && count > 0 && (
         <span
           className="inline-flex min-w-5 items-center justify-center rounded-full bg-emerald-800 px-1.5 py-0.5 text-[11px] font-bold text-white"
           aria-label={`${count}곳 저장됨`}

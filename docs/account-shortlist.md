@@ -39,4 +39,19 @@ For local verification:
 3. Run `pnpm test:integration` for real two-user RLS, duplicate merge, deleted-location cascade, and second-device reads.
 4. Run `pnpm test:e2e:auth` for the browser consent and account flow.
 
-Production migration application and a hosted two-device smoke test remain the deployment owner's responsibility.
+### Production repair (2026-10-11)
+
+Production returned `PGRST205` because `public.user_shortlist` was missing. The additive,
+repeatable migration `20261011000000_ensure_user_shortlist.sql` restores the table,
+foreign keys, owner policies and grants without deleting saved data. It was applied
+through the production SQL Editor (not the CLI migration history). Verification
+confirmed RLS enabled, three owner-only policies, no anonymous INSERT grant and a
+successful table query. Anonymous `/api/shortlist` remains unauthorized.
+
+An authentication verification failure must not switch to the browser guest list:
+the provider clears the previous account snapshot and shows a retryable error.
+Failed shortlist reads are likewise distinct from a successful empty list, and
+navigation hides a count while authentication/loading has not succeeded.
+
+A hosted signed-in two-device smoke test still requires an authenticated test
+account; local Auth/RLS integration and browser tests cover account isolation.

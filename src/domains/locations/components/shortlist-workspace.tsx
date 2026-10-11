@@ -133,6 +133,7 @@ export function ShortlistWorkspace() {
     migrationMessage,
     importBrowserIds,
     dismissBrowserImport,
+    retry,
   } = useShortlist();
   const key = JSON.stringify(ids);
   const [loaded, setLoaded] = useState<{ key: string; locations: Location[]; error?: string }>({ key: "", locations: [] });
@@ -167,6 +168,13 @@ export function ShortlistWorkspace() {
   });
   const unavailableCount = count - savedLocations.length;
 
+  if (isReady && error) return (
+    <div className="scene-status p-5" data-tone="error" role="alert">
+      <p>{error}</p>
+      <button type="button" onClick={retry} disabled={isSaving} className="mt-3 min-h-11 rounded-lg border px-4 font-bold">다시 확인</button>
+      <Link href="/login?next=%2Fshortlist" className="ml-3 inline-flex min-h-11 items-center font-bold">로그인하기</Link>
+    </div>
+  );
   if (!isReady || loaded.key !== key) return <ShortlistSkeleton />;
   if (loaded.error) return <p role="alert" className="scene-panel p-5">{loaded.error}</p>;
 

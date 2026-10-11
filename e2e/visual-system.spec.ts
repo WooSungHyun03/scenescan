@@ -41,7 +41,9 @@ async function fillSolarDateTime(page: Page, date: string, time: string) {
   const dateInput = page.getByLabel("촬영 날짜", { exact: true });
   const timeInput = page.getByLabel("촬영 시간", { exact: true });
 
-  await page.waitForLoadState("networkidle");
+  // Next development connections and weather requests need not become idle.
+  await expect(dateInput).toBeEditable();
+  await expect(timeInput).toBeEditable();
   for (let attempt = 0; attempt < 3; attempt += 1) {
     await dateInput.fill(date);
     await dateInput.blur();

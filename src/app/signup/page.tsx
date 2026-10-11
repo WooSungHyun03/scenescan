@@ -20,7 +20,7 @@ export default async function SignupPage({
         <p className="scene-kicker justify-center">Join SceneScan</p>
         <h1 className="mt-3 text-3xl font-extrabold sm:text-4xl">회원가입</h1>
         <p className="mt-3 leading-relaxed text-muted">
-          이메일 확인을 완료한 뒤 로그인할 수 있습니다. 비밀번호는 Supabase Auth에만 전달됩니다.
+          가입 후 이메일로 받은 확인 링크를 열면 로그인할 수 있습니다.
         </p>
       </header>
       <AuthForm mode="signup" next={next} />
