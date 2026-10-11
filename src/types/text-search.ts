@@ -57,7 +57,7 @@ export interface ParsedTextSearchQuery {
 // see resolveTextSearchFilters (src/domains/search/server/
 // text-search-filter-resolution.ts). The filter always wins; this notice
 // only explains why the search didn't follow the query text literally.
-export type TextSearchNoticeCode = "OUT_OF_SCOPE_REGION" | "FILTER_OVERRIDES_QUERY";
+export type TextSearchNoticeCode = "OUT_OF_SCOPE_REGION" | "FILTER_OVERRIDES_QUERY" | "INTENT_UNAVAILABLE";
 
 export interface TextSearchNotice {
   code: TextSearchNoticeCode;
@@ -65,6 +65,8 @@ export interface TextSearchNotice {
 }
 
 export interface TextSearchResponse {
+  /** Optional for backwards-compatible stored sessions; set on every new response. */
+  intentSource?: "nvidia" | "rules";
   results: TextSearchResult[];
   parsedQuery: {
     // The district/category actually used for this search -- i.e. after

@@ -1,7 +1,7 @@
 import "server-only";
 
 import { getNvidiaCallBudget, getNvidiaIntentClient } from "@/infrastructure/nvidia/intent-client-factory";
-import type { NvidiaIntentClient } from "@/infrastructure/nvidia/intent-client";
+import { NvidiaIntentError, type NvidiaIntentClient } from "@/infrastructure/nvidia/intent-client";
 import { serverEnv } from "@/env/server";
 import { logger } from "@/shared/observability/logger";
 import type { ParsedTextSearchQuery } from "@/types/text-search";
@@ -14,6 +14,8 @@ export type NvidiaIntentDependencies = {
   client?: NvidiaIntentClient | null;
   /** Overrides the shared call-budget singleton. */
   budget?: { tryConsume(): boolean };
+  /** Request-scoped diagnostics; never exposes upstream bodies or credentials. */
+  onOutcome?: (source: "nvidia" | "rules", failed: boolean) => void;
 };
 
 /**
@@ -41,21 +43,25 @@ export async function enrichWithNvidiaIntent(
   dependencies: NvidiaIntentDependencies = {},
 ): Promise<ParsedTextSearchQuery> {
   const enabled = dependencies.enabled ?? serverEnv.nvidiaIntent?.enabled ?? false;
-  if (!enabled) return base;
+  if (!enabled) { dependencies.onOutcome?.("rules", false); return base; }
 
   const client = dependencies.client !== undefined ? dependencies.client : getNvidiaIntentClient();
-  if (!client) return base;
+  if (!client) { dependencies.onOutcome?.("rules", true); return base; }
 
   const budget = dependencies.budget ?? getNvidiaCallBudget();
   try {
     const result = await client.extractIntent(query, { tryConsume: () => budget.tryConsume() });
+    logger.info("NVIDIA intent enrichment succeeded", { model: serverEnv.nvidiaIntent?.model, keywordCount: result.keywords.length });
+    dependencies.onOutcome?.("nvidia", false);
     return applyNvidiaIntentOverride(base, result);
   } catch (error) {
     // Never logs the raw query or the API key -- only the error's own
     // (always key/query-free) code, see NvidiaIntentError.
     logger.warn("NVIDIA intent enrichment failed; falling back to base text search", {
-      code: error instanceof Error && "code" in error ? String((error as { code: unknown }).code) : "UNKNOWN",
+      code: error instanceof NvidiaIntentError ? error.code : "UNKNOWN",
+      ...(error instanceof NvidiaIntentError && error.httpStatus ? { httpStatus: error.httpStatus } : {}),
     });
+    dependencies.onOutcome?.("rules", true);
     return base;
   }
 }

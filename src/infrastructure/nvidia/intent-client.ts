@@ -9,17 +9,17 @@
 // exactly once, inside the `server-only`-guarded src/env/server.ts
 // (requirement 3) -- see intent-client-factory.ts, the Next-side wiring
 // that is guarded.
-import { buildIntentMessages } from "./intent-prompt";
-import { parseNvidiaIntentResponse, type NvidiaIntentResult } from "./intent-contract";
-import { NVIDIA_INTENT_ALLOWED_MODELS, type NvidiaIntentModel } from "./intent-models";
+import { buildIntentMessages } from "./intent-prompt.ts";
+import { parseNvidiaIntentResponse, type NvidiaIntentResult } from "./intent-contract.ts";
+import { NVIDIA_INTENT_ALLOWED_MODELS, type NvidiaIntentModel } from "./intent-models.ts";
 
 export const NVIDIA_CHAT_COMPLETIONS_URL = "https://integrate.api.nvidia.com/v1/chat/completions";
 
-const DEFAULT_TIMEOUT_MILLISECONDS = 4_000;
-// 1 initial attempt + up to 2 retries (requirement 2: "제한된 재시도").
-const DEFAULT_MAX_ATTEMPTS = 3;
-const DEFAULT_RETRY_BASE_DELAY_MILLISECONDS = 300;
-const DEFAULT_MAX_OUTPUT_TOKENS = 200;
+const DEFAULT_TIMEOUT_MILLISECONDS = 8_000;
+// At most 17 seconds including backoff, below the home's 20s deadline.
+const DEFAULT_MAX_ATTEMPTS = 2;
+const DEFAULT_RETRY_BASE_DELAY_MILLISECONDS = 1_000;
+const DEFAULT_MAX_OUTPUT_TOKENS = 1024;
 // Defense-in-depth only: POST /api/search/text's own textSearchRequestSchema
 // already caps `query` at 200 UTF-16 code units before this is ever called.
 const DEFAULT_MAX_INPUT_CHARACTERS = 400;
@@ -36,11 +36,13 @@ export type NvidiaIntentErrorCode =
 
 export class NvidiaIntentError extends Error {
   readonly code: NvidiaIntentErrorCode;
+  readonly httpStatus?: number;
 
-  constructor(code: NvidiaIntentErrorCode, message: string, options?: ErrorOptions) {
+  constructor(code: NvidiaIntentErrorCode, message: string, options?: ErrorOptions & { httpStatus?: number }) {
     super(message, options);
     this.name = "NvidiaIntentError";
     this.code = code;
+    this.httpStatus = options?.httpStatus;
   }
 }
 
@@ -137,6 +139,9 @@ export class NvidiaIntentClient {
             max_tokens: this.maxOutputTokens,
             temperature: 0,
             stream: false,
+            // Intent extraction needs a final JSON answer, not a thinking trace.
+            reasoning_budget: 0,
+            chat_template_kwargs: { enable_thinking: false },
           }),
         });
       } catch (cause) {
@@ -145,7 +150,7 @@ export class NvidiaIntentClient {
       }
 
       if (response.status === 429) {
-        throw new NvidiaIntentError("RATE_LIMITED", "NVIDIA rejected the request with HTTP 429");
+        throw new NvidiaIntentError("RATE_LIMITED", "NVIDIA rejected the request with HTTP 429", { httpStatus: 429 });
       }
       if (!response.ok) {
         // 5xx is treated as a transient upstream problem (retryable); any
@@ -154,9 +159,9 @@ export class NvidiaIntentClient {
         // retried, so it fails immediately instead of burning the retry
         // budget and the call budget on a request that cannot recover.
         if (response.status >= 500) {
-          throw new NvidiaIntentError("UPSTREAM", `NVIDIA request failed with HTTP ${response.status}`);
+          throw new NvidiaIntentError("UPSTREAM", `NVIDIA request failed with HTTP ${response.status}`, { httpStatus: response.status });
         }
-        throw new NvidiaIntentError("REJECTED", `NVIDIA rejected the request with HTTP ${response.status}`);
+        throw new NvidiaIntentError("REJECTED", `NVIDIA rejected the request with HTTP ${response.status}`, { httpStatus: response.status });
       }
 
       let payload: unknown;
@@ -167,15 +172,21 @@ export class NvidiaIntentClient {
         throw new NvidiaIntentError("MALFORMED_RESPONSE", "NVIDIA response is not valid JSON", { cause });
       }
 
-      const content = (payload as { choices?: { message?: { content?: unknown } }[] } | null)
-        ?.choices?.[0]?.message?.content;
-      if (typeof content !== "string") {
+      const choice = (payload as { choices?: { finish_reason?: unknown; message?: { content?: unknown } }[] } | null)?.choices?.[0];
+      const content = choice?.message?.content;
+      if (choice?.finish_reason === "length" || typeof content !== "string" || !content.trim()) {
         throw new NvidiaIntentError("MALFORMED_RESPONSE", "NVIDIA response is missing message content");
       }
 
       let structured: unknown;
       try {
-        structured = JSON.parse(content);
+        // Some compatible endpoints wrap final JSON in a markdown fence.
+        // Never extract arbitrary braces or parse reasoning_content as an answer.
+        // Hosted Nemotron can emit a leading closing sentinel even with a
+        // zero reasoning budget. Remove only that exact leading marker; an
+        // actual thinking trace, prose or trailing garbage must still fail.
+        const finalContent = content.trim().replace(/^<\/think>\s*/u, "");
+        structured = JSON.parse(finalContent.replace(/^```(?:json)?\s*\n?([\s\S]*?)\n?```$/u, "$1"));
       } catch (cause) {
         throw new NvidiaIntentError("MALFORMED_RESPONSE", "NVIDIA message content is not valid JSON", { cause });
       }

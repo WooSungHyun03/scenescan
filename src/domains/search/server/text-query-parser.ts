@@ -6,7 +6,7 @@ import {
   KEYWORD_STOPWORDS,
   OUT_OF_BUSAN_REGION_KEYWORDS,
   UNSUPPORTED_CONDITION_PHRASES,
-} from "./text-search-aliases";
+} from "./text-search-aliases.ts";
 
 /**
  * Rule-based natural-language extraction for POST /api/search/text --

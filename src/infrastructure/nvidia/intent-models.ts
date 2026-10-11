@@ -3,6 +3,6 @@
 // validates NVIDIA_INTENT_MODEL against it at boot) and intent-client.ts
 // (which defends the same allowlist at construction time) can import it
 // without creating an import cycle through @/env/server.
-export const NVIDIA_INTENT_ALLOWED_MODELS = ["meta/llama-3.1-8b-instruct"] as const;
+export const NVIDIA_INTENT_ALLOWED_MODELS = ["nvidia/nemotron-3-nano-omni-30b-a3b-reasoning"] as const;
 
 export type NvidiaIntentModel = (typeof NVIDIA_INTENT_ALLOWED_MODELS)[number];

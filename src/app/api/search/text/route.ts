@@ -71,6 +71,7 @@ export async function POST(request: Request) {
 
   if (parsedQuery.outOfScope) {
     const response: TextSearchResponse = {
+      intentSource: "rules",
       results: [],
       parsedQuery: { district: null, category: null, keywords: [], districtConflict: false },
       unsupportedConditions: [],
@@ -87,7 +88,11 @@ export async function POST(request: Request) {
   // feature flag is off, no API key is configured, the call budget is
   // exhausted, or the call fails for any reason -- see
   // enrichWithNvidiaIntent's own doc comment.
-  const enrichedQuery = await enrichWithNvidiaIntent(parsed.data.query, parsedQuery);
+  let intentSource: "nvidia" | "rules" = "rules";
+  let intentFailed = false;
+  const enrichedQuery = await enrichWithNvidiaIntent(parsed.data.query, parsedQuery, {
+    onOutcome: (source, failed) => { intentSource = source; intentFailed = failed; },
+  });
 
   // Explicit `filters.district`/`filters.category` (if given) always win
   // over whatever district/category ended up on `enrichedQuery` (from the
@@ -99,6 +104,7 @@ export async function POST(request: Request) {
   try {
     const results = await searchByText({ ...enrichedQuery, district, category });
     const response: TextSearchResponse = {
+      intentSource,
       results,
       parsedQuery: {
         district,
@@ -107,7 +113,10 @@ export async function POST(request: Request) {
         districtConflict: enrichedQuery.districtConflict,
       },
       unsupportedConditions: enrichedQuery.unsupportedConditions,
-      notice: filterNotice,
+      notice: intentFailed ? {
+        code: "INTENT_UNAVAILABLE",
+        message: `문장 해석이 일시적으로 지연되어 기본 검색을 사용했습니다. 장소 이름이나 짧은 검색어로 다시 검색해 주세요.${filterNotice ? ` ${filterNotice.message}` : ""}`,
+      } : filterNotice,
     };
     return NextResponse.json(response, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {

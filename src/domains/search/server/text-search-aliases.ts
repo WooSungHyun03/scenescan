@@ -1,5 +1,5 @@
 import type { District, LocationCategory } from "@/types/domain";
-import { DISTRICT_LABELS } from "@/types/location-options";
+import { DISTRICT_LABELS } from "../../../types/location-options.ts";
 
 /**
  * Curated, rule-based lookup tables for POST /api/search/text's natural-

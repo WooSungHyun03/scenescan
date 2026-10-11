@@ -1,6 +1,11 @@
 {
   "schema_version": 1,
   "queries": [
+    { "id": "sea-view", "text": "부산에서 바다가 보이는 촬영 장소" },
+    { "id": "haeundae-night", "text": "해운대 근처 야경이 예쁜 곳" },
+    { "id": "old-factory", "text": "오래된 공장 분위기의 장소" },
+    { "id": "bridge-view", "text": "광안대교가 보이는 장소" },
+    { "id": "yeongdo-alley", "text": "영도에서 분위기 있는 골목" },
     { "id": "haeundae-night-cafe", "text": "해운대 야경 카페", "note": "district + category both named in the query text" },
     { "id": "gwangalli-walk", "text": "광안리 산책", "note": "neighborhood alias (수영구) + a keyword" },
     { "id": "quiet-walk", "text": "조용한 산책", "note": "unsupported condition (조용한) must be reported, never silently matched" },

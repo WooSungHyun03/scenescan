@@ -2,6 +2,13 @@ import { describe, expect, it } from "vitest";
 import { buildIntentMessages } from "./intent-prompt";
 
 describe("buildIntentMessages", () => {
+  it("maps Korean districts and keeps Korean keyword roots for the Korean metadata index", () => {
+    const [system] = buildIntentMessages("영도에서 분위기 있는 골목");
+    expect(system.content).toContain('"busan_yeongdo_gu":"영도구"');
+    expect(system.content).toContain("short Korean keyword roots without particles");
+    expect(system.content).toContain("야경");
+    expect(system.content).toContain("Do not invent place names");
+  });
   it("separates the system instructions from the user query across two messages", () => {
     const messages = buildIntentMessages("해운대 야경 카페");
     expect(messages).toHaveLength(2);

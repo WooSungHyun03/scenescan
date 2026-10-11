@@ -185,7 +185,7 @@ describe("environment contracts", () => {
       NVIDIA_API_KEY: "nvidia-secret",
       NVIDIA_INTENT_ENABLED: "false",
     })).toEqual({
-      nvidiaIntent: { enabled: false, model: "meta/llama-3.1-8b-instruct", apiKey: "nvidia-secret" },
+      nvidiaIntent: { enabled: false, model: "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning", apiKey: "nvidia-secret" },
     });
   });
 
@@ -194,14 +194,14 @@ describe("environment contracts", () => {
       NVIDIA_API_KEY: "nvidia-secret",
       NVIDIA_INTENT_ENABLED: "true",
     })).toEqual({
-      nvidiaIntent: { enabled: true, model: "meta/llama-3.1-8b-instruct", apiKey: "nvidia-secret" },
+      nvidiaIntent: { enabled: true, model: "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning", apiKey: "nvidia-secret" },
     });
     expect(parsePublicEnvironment({ NVIDIA_API_KEY: "nvidia-secret", NVIDIA_INTENT_ENABLED: "true" }))
       .not.toHaveProperty("nvidiaIntent");
   });
 
   it("accepts an allowlisted NVIDIA model override", () => {
-    expect(parseServerEnvironment({ NVIDIA_INTENT_MODEL: "meta/llama-3.1-8b-instruct" }))
-      .toEqual({ nvidiaIntent: { enabled: false, model: "meta/llama-3.1-8b-instruct" } });
+    expect(parseServerEnvironment({ NVIDIA_INTENT_MODEL: "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning" }))
+      .toEqual({ nvidiaIntent: { enabled: false, model: "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning" } });
   });
 });

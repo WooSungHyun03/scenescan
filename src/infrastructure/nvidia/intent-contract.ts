@@ -1,6 +1,6 @@
 import { z } from "zod";
 import type { District, LocationCategory } from "@/types/domain";
-import { DISTRICT_VALUES, LOCATION_CATEGORY_VALUES } from "@/types/location-options";
+import { DISTRICT_VALUES, LOCATION_CATEGORY_VALUES } from "../../types/location-options.ts";
 
 // Requirement 1: NVIDIA's structured response is allowed to contain
 // *exactly* these four fields. A plain (non-.strict()) z.object already

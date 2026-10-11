@@ -1,5 +1,14 @@
 # Maintenance log
 
+## 2026-10-11 — Hosted Nemotron text search
+
+- Fixed the hardcoded Llama allowlist/default to the requested `nvidia/nemotron-3-nano-omni-30b-a3b-reasoning`. The hosted endpoint was already correct. Production has the server-only key and enable flag; local live verification uses ignored `.env.local` without printing credentials.
+- Direct hosted verification returned HTTP 200 for the minimal request and all five Korean release intents (1.08–3.32s during evaluation). Reproduced `</think>` preceding final JSON with a zero reasoning budget; parse only that exact leading sentinel/final JSON envelope, reject empty/truncated/reasoning/prose content. Requests now use 1024 output tokens and explicit final-answer mode, with two bounded attempts and safe status diagnostics.
+- Removed the evaluation CLI's duplicated model/payload/partial parser; it now reuses production code and reports live failures with a nonzero exit. The broader evaluation also observed intermittent provider HTTP 503 `ResourceExhausted`; this is not a key failure or successful NVIDIA enrichment.
+- `/api/search/text` now reports `intentSource` and shows `INTENT_UNAVAILABLE` on enabled-provider failure, preserving rule fallback, filter precedence and real DB-only retrieval. No model-generated place IDs/names can enter results.
+- Read-only production data audit: 13 Busan rows, all empty `tags`/`aliases`. Valid NVIDIA intents for 야경/공장/광안대교/영도 골목 currently retrieve zero real rows; the sea query displays four existing Busan nature locations. No guessed tags, invented places, data writes or unrelated migrations were applied.
+- Verification: lint/typecheck/build, client-bundle secret scan, 124 unit suites / 811 tests and 51 mock browser regression tests passed. Browser tested all five Korean queries, loading/fallback/empty states, actual Supabase cards and result-to-detail navigation with no console errors. Deployment and production smoke results are reported after release, not presumed here.
+
 ## 2026-10-11 — scheduled daily quality routine
 
 - Integrated main through `d776dd4` (reviewed districts for 부산진성/일광해수욕장); preserved the three existing untracked team ticket documents. Automation configuration was not changed.

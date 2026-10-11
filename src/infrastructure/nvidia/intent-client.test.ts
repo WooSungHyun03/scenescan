@@ -27,6 +27,41 @@ function client(overrides: Partial<ConstructorParameters<typeof NvidiaIntentClie
 }
 
 describe("NvidiaIntentClient", () => {
+  it("uses the specified hosted Nemotron model with a bounded final-answer budget", async () => {
+    const setup = client();
+    setup.fetcher.mockResolvedValue(chatResponse({ district: null, category: null, keywords: ["바다"], unsupportedConditions: [] }));
+    await setup.client.extractIntent("부산에서 바다가 보이는 촬영 장소");
+    expect(setup.fetcher.mock.calls[0]?.[0]).toBe("https://integrate.api.nvidia.com/v1/chat/completions");
+    const body = JSON.parse(String(setup.fetcher.mock.calls[0]?.[1]?.body));
+    expect(body).toMatchObject({ model: "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning", max_tokens: 1024,
+      stream: false, reasoning_budget: 0, chat_template_kwargs: { enable_thinking: false } });
+  });
+
+  it.each(["</think>{\"keywords\":[\"바다\"]}", "```json\n{\"keywords\":[\"바다\"]}\n```", "</think>\n```json\n{\"keywords\":[\"바다\"]}\n```"])("parses only final JSON with a supported envelope: %s", async (content) => {
+    const setup = client();
+    setup.fetcher.mockResolvedValue(new Response(JSON.stringify({ choices: [{ finish_reason: "stop", message: { content, reasoning_content: "Not a search answer" } }] })));
+    await expect(setup.client.extractIntent("바다")).resolves.toMatchObject({ keywords: ["바다"] });
+  });
+
+  it.each(["", "   ", "<think>{\"keywords\":[\"wrong\"]}</think>{\"keywords\":[\"바다\"]}", "Answer: {\"keywords\":[\"바다\"]}"])("rejects empty/prose/reasoning content without treating reasoning as results: %s", async (content) => {
+    const setup = client();
+    setup.fetcher.mockResolvedValue(new Response(JSON.stringify({ choices: [{ message: { content, reasoning_content: '{"keywords":["바다"]}' } }] })));
+    await expect(setup.client.extractIntent("바다")).rejects.toMatchObject({ code: "MALFORMED_RESPONSE" });
+    expect(setup.fetcher).toHaveBeenCalledTimes(1);
+  });
+
+  it("rejects truncated JSON even when the truncated content happens to parse", async () => {
+    const setup = client();
+    setup.fetcher.mockResolvedValue(new Response(JSON.stringify({ choices: [{ finish_reason: "length", message: { content: '{}' } }] })));
+    await expect(setup.client.extractIntent("바다")).rejects.toMatchObject({ code: "MALFORMED_RESPONSE" });
+  });
+
+  it.each([401, 403, 404, 422])("preserves safe upstream status %s without exposing its error body", async (status) => {
+    const setup = client();
+    setup.fetcher.mockResolvedValue(new Response("secret echoed by upstream", { status }));
+    await expect(setup.client.extractIntent("바다")).rejects.toMatchObject({ code: "REJECTED", httpStatus: status });
+    expect(setup.fetcher).toHaveBeenCalledTimes(1);
+  });
   it("charges every retry and stops before fetch when the shared budget is exhausted", async () => {
     const setup = client();
     setup.fetcher.mockResolvedValue(new Response("", { status: 429 }));

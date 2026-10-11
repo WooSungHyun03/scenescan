@@ -23,6 +23,17 @@ function fakeClient(extractIntent: (query: string) => Promise<unknown>) {
 }
 
 describe("enrichWithNvidiaIntent", () => {
+  it("reports successful enrichment separately from fallback without exposing the upstream body", async () => {
+    const onOutcome = vi.fn();
+    const success = fakeClient(async () => ({ district: null, category: null, keywords: ["바다"], unsupportedConditions: [] }));
+    await enrichWithNvidiaIntent("바다", base(), { enabled: true, client: success, onOutcome, budget: { tryConsume: () => true } });
+    expect(onOutcome).toHaveBeenLastCalledWith("nvidia", false);
+    const failure = fakeClient(async () => { throw new NvidiaIntentError("REJECTED", "HTTP 401", { httpStatus: 401 }); });
+    await enrichWithNvidiaIntent("바다", base(), { enabled: true, client: failure, onOutcome, budget: { tryConsume: () => true } });
+    expect(onOutcome).toHaveBeenLastCalledWith("rules", true);
+    await enrichWithNvidiaIntent("바다", base(), { enabled: false, client: success, onOutcome });
+    expect(onOutcome).toHaveBeenLastCalledWith("rules", false);
+  });
   it("returns the base parse unchanged, and never constructs/calls a client, when disabled", async () => {
     const client = fakeClient(async () => { throw new Error("must never be called"); });
     const result = await enrichWithNvidiaIntent("해운대", base(), { enabled: false, client });
