@@ -32,6 +32,6 @@ Totals: PASS 7 (including one superseded removal), PARTIAL 6, BROKEN 1, MOCK-ONL
 
 ## Executed checks
 
-- lint/typecheck/build, 134 suites / 860 unit tests, client-bundle secret boundary; metadata validation and production dependency audit.
+- lint/typecheck/build, 134 suites / 861 unit tests, client-bundle secret boundary; metadata validation and production dependency audit. The address matcher also rejects explicitly conflicting districts despite identical street/building tokens.
 - 59 mock browser regressions (including cancellation, sunrise/sunset and fixed home layout), local Auth account-isolation/recovery/deletion flow, and 25 local database/RLS integration tests.
 - No production rows, Auth accounts, DNS, provider credentials or RLS policies were changed. No destructive migration or guessed contact/data import was performed. Post-push CI/deployment status is verified separately rather than assumed from these local results.
