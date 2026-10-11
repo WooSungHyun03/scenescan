@@ -20,6 +20,13 @@ function location(overrides: Partial<Location> = {}): Location {
 }
 
 describe("Busan reviewed contact file", () => {
+  it("does not accept the same district as physical evidence for a distant reviewed venue", () => {
+    expect(findReviewedLocationContacts(location({
+      address: "부산광역시 사하구 다른로 99",
+      point: { latitude: 35.2, longitude: 129.1 },
+    }))).toBeNull();
+  });
+
   it("rejects a reviewed source URL containing credentials before serving contacts", () => {
     const invalid = structuredClone(busanReviewedContacts);
     invalid.locations[0].contacts[0].sourceUrl = "https://user:password@example.com/contact";

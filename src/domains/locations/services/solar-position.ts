@@ -1,5 +1,5 @@
 import SunCalc from "suncalc";
-import type { GeoPoint, SolarPosition } from "@/types/domain";
+import type { GeoPoint, SolarDayTimes, SolarPosition } from "@/types/domain";
 import {
   DEFAULT_LOCATION_TIME_ZONE,
   locationDateTimeToInstant,
@@ -57,6 +57,24 @@ export function getSolarPosition(point: GeoPoint, date: Date): SolarPosition {
 export type LocalSolarPositionResult =
   | (Extract<ZonedDateTimeResult, { ok: true }> & { position: SolarPosition })
   | Extract<ZonedDateTimeResult, { ok: false }>;
+
+export type LocalSolarDayTimesResult =
+  | (Extract<ZonedDateTimeResult, { ok: true }> & { times: SolarDayTimes })
+  | Extract<ZonedDateTimeResult, { ok: false }>;
+
+/** Anchor the requested calendar day at location-local noon. Never let the
+ * browser's time zone or the chosen shooting hour select a different day. */
+export function getSolarDayTimesAtLocationDate(
+  point: GeoPoint,
+  { date, timeZone = DEFAULT_LOCATION_TIME_ZONE }: { date: string; timeZone?: string },
+): LocalSolarDayTimesResult {
+  const resolved = locationDateTimeToInstant({ date, time: "12:00", timeZone });
+  if (!resolved.ok) return resolved;
+  validateInput(point, resolved.instant);
+  const times = SunCalc.getTimes(resolved.instant, point.latitude, point.longitude);
+  const finiteDate = (value: Date): Date | null => Number.isFinite(value.getTime()) ? value : null;
+  return { ...resolved, times: { sunrise: finiteDate(times.sunrise), sunset: finiteDate(times.sunset) } };
+}
 
 /**
  * Calculates the sun from a location's wall-clock time instead of the

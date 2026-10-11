@@ -222,6 +222,7 @@ export function SearchWorkspace({ examples }: { examples: Location[] }) {
   const [catalogOffset, setCatalogOffset] = useState(0);
   const resultHeadingRef = useRef<HTMLHeadingElement>(null);
   const requestRef = useRef<AbortController | null>(null);
+  const [searchCancelled, setSearchCancelled] = useState(false);
   const [busy, setBusy] = useState(false);
   const [searchStage, setSearchStage] = useState<SearchStage>("idle");
   const [searchError, setSearchError] = useState<SearchErrorState | null>(null);
@@ -307,6 +308,7 @@ export function SearchWorkspace({ examples }: { examples: Location[] }) {
 
   function selectFile(next: File | null) {
     if (!next) return;
+    setSearchCancelled(false);
     // Choosing a file is always an image-mode action, including when it
     // arrives via the home page's draft handoff before the user has ever
     // touched the mode toggle -- see activateImageModeWithDraft's only
@@ -326,6 +328,7 @@ export function SearchWorkspace({ examples }: { examples: Location[] }) {
   }
 
   function removeFile() {
+    setSearchCancelled(false);
     analyzedImageRef.current = null;
     setFile(null);
     setSearchError(null);
@@ -336,6 +339,7 @@ export function SearchWorkspace({ examples }: { examples: Location[] }) {
   }
 
   function clearImageResults() {
+    setSearchCancelled(false);
     setSearchError(null);
     setResults(null);
     setActiveLocationId(null);
@@ -343,6 +347,7 @@ export function SearchWorkspace({ examples }: { examples: Location[] }) {
   }
 
   function clearTextResults() {
+    setSearchCancelled(false);
     setTextError(null);
     setTextResults(null);
     setTextParsedQuery(null);
@@ -360,6 +365,7 @@ export function SearchWorkspace({ examples }: { examples: Location[] }) {
 
   function switchMode(next: SearchMode) {
     if (next === mode || isBusy) return;
+    setSearchCancelled(false);
     setMode(next);
     if (next === "image") setImageModeActivated(true);
     setActiveLocationId(null);
@@ -397,6 +403,7 @@ export function SearchWorkspace({ examples }: { examples: Location[] }) {
       return;
     }
     const controller = new AbortController();
+    setSearchCancelled(false);
     requestRef.current = controller;
     searchInFlightRef.current = true;
     setBusy(true);
@@ -416,6 +423,7 @@ export function SearchWorkspace({ examples }: { examples: Location[] }) {
       const response = await fetch("/api/search", { method: "POST", signal: AbortSignal.any([controller.signal, AbortSignal.timeout(20_000)]), headers: { "Content-Type": "application/json" }, body: JSON.stringify({ embedding, filters: { district: district || undefined, category: category || undefined } }) });
       if (!response.ok) throw await createSearchApiError(response);
       const data = await response.json() as SearchResponse;
+      if (controller.signal.aborted) return;
       if (!Array.isArray(data.results)) throw new Error("Invalid search response");
       // A late reply from a superseded request can never land here: the
       // single-flight guard above means a second search() cannot start
@@ -445,6 +453,7 @@ export function SearchWorkspace({ examples }: { examples: Location[] }) {
       return;
     }
     const controller = new AbortController();
+    setSearchCancelled(false);
     textRequestRef.current = controller;
     textSearchInFlightRef.current = true;
     setTextBusy(true);
@@ -462,6 +471,7 @@ export function SearchWorkspace({ examples }: { examples: Location[] }) {
       const response = await fetch("/api/search/text", { method: "POST", signal: AbortSignal.any([controller.signal, AbortSignal.timeout(20_000)]), headers: { "Content-Type": "application/json" }, body: JSON.stringify({ query: trimmed, filters: { district: district || undefined, category: category || undefined } }) });
       if (!response.ok) throw await createSearchApiError(response);
       const data = await response.json() as TextSearchResponse;
+      if (controller.signal.aborted) return;
       if (!Array.isArray(data.results)) throw new Error("Invalid search response");
       // Same single-flight guard as image search() -- a second searchText()
       // call cannot start while this one is in flight, so a late reply from
@@ -549,6 +559,14 @@ export function SearchWorkspace({ examples }: { examples: Location[] }) {
           </Button>
         </div>
       </form>}
+
+      {isBusy && <Button type="button" variant="outline" className="mt-3 w-full" onClick={() => {
+        requestRef.current?.abort();
+        textRequestRef.current?.abort();
+        setSearchStage("idle");
+        setSearchCancelled(true);
+      }}>검색 취소</Button>}
+      {searchCancelled && !isBusy && <p role="status" className="mt-3 text-sm text-muted">검색을 취소했습니다. 조건을 변경하거나 다시 검색할 수 있습니다.</p>}
 
       <div className="mt-5 border-t border-line pt-4">
         <div className="flex items-center justify-between"><h3 className="text-sm font-semibold">검색 조건 <span className="font-normal text-muted">(선택)</span></h3><button type="button" disabled={isBusy || !hasActiveFilters} onClick={resetFilters} className="min-h-11 px-2 text-sm font-semibold text-brand disabled:text-stone-400">초기화</button></div>

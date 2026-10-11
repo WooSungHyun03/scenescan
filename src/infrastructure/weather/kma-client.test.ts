@@ -30,6 +30,30 @@ function client(fixture: unknown, now: string, overrides: Partial<ConstructorPar
 }
 
 describe("KmaWeatherClient", () => {
+  it("does not retain credential-bearing transport errors or malformed provider codes", async () => {
+    const setup = client({}, "2026-10-06T05:50:00Z", {
+      fetcher: async () => { throw new Error("GET https://provider.invalid/?serviceKey=private-canary-value"); },
+    });
+    const failure = await setup.client.getWeather({ locationId: LOCATION_ID, point: SEOUL })
+      .catch((cause: unknown) => cause);
+    expect(failure).toMatchObject({ code: "UPSTREAM" });
+    expect(failure).not.toHaveProperty("cause");
+    expect(String(failure)).not.toContain("private-canary-value");
+    const invalidCode = client({ response: { header: { resultCode: "private-canary-value" } } }, "2026-10-06T05:50:00Z");
+    await expect(invalidCode.client.getWeather({ locationId: LOCATION_ID, point: SEOUL }))
+      .rejects.toMatchObject({ message: "KMA request failed (unknown)" });
+  });
+
+  it("does not forward provider error text containing credentials into loggable errors", async () => {
+    const setup = client({ response: { header: {
+      resultCode: "30", resultMsg: "Rejected serviceKey=private-canary-value",
+    } } }, "2026-10-06T05:50:00Z");
+    const error = await setup.client.getWeather({ locationId: LOCATION_ID, point: SEOUL })
+      .catch((cause: unknown) => cause);
+    expect(error).toMatchObject({ code: "CONFIGURATION" });
+    expect(String(error)).not.toContain("private-canary-value");
+  });
+
   it.each(["", " ", "\t\n", "NaN", "Infinity"])("preserves an unavailable observation (%j) as null, not zero", async (value) => {
     const fixture = structuredClone(observationFixture);
     fixture.response.body.items.item.forEach((item) => { item.obsrValue = value; });

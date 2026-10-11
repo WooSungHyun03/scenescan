@@ -1,5 +1,14 @@
 # Maintenance log
 
+## 2026-10-12 — independent full-ticket release audit
+
+- Restored 15 original tickets; evidence/status matrix in `ticket-verification-2026-10-12.md` distinguishes partial source implementations from actual hosted rollout. Protected the three original team documents and the owned home-layout change while syncing latest main.
+- Reproduced two contact address false positives (district-only reviewed match and unrelated nearby branch); shared facility-level matcher now requires significant address tokens/numbered evidence rather than one common administrative token. Existing official/name/coordinate/type guards remain intact.
+- Reproduced KMA error-message credential reflection using a fake canary. External messages, malformed codes, parser and transport causes no longer enter loggable provider errors; safe numeric codes and structured public errors remain.
+- Added explicit image/text search cancellation and late-response guards; cancellation is feedback, not an error. Added date-only, timezone-explicit nullable sunrise/sunset calculations/display with the existing SunCalc, including invalid/polar regressions. UI skills guided preservation of the established design, top-aligned home hero, accessible feedback and semantic time elements rather than a redesign.
+- Local gates: 860 unit tests, 59 mock browser tests, 25 DB/RLS integration tests, Auth/Mailpit flow, lint/typecheck/build and secret-boundary scan pass. Clean baseline clone install/metadata/vector/schema/build reproduction passed. Actual Production CLIP/search/Kakao/health passed (12.8s).
+- Hosted blockers independently reproduced: image district filter 503, missing model column, zero static parking, only 13 Busan places with empty tags/aliases. All 261 hosted vectors differ from reviewed q8 records; no unverified model backfill or wholesale migration was applied. Production NVIDIA attempts fell back, so they are not counted as successful live enrichment.
+
 ## 2026-10-12 — contact and comparison integration audit
 
 - Integrated team changes through `8a0287b`; preserved the three untracked team documents. Audited new contact resolution, reviewed provenance, weather-grid comparison, request sharing, route validation and existing Auth/secret boundaries without changing production data, RLS, credentials or provider configuration.

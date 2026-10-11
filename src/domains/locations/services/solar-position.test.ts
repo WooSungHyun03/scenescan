@@ -1,9 +1,37 @@
 import { describe, expect, it } from "vitest";
 import {
   getSolarPosition,
+  getSolarDayTimesAtLocationDate,
   radiansToDegrees,
   sunCalcAzimuthToCompassDegrees,
 } from "./solar-position";
+
+describe("getSolarDayTimesAtLocationDate", () => {
+  const busan = { latitude: 35.1585, longitude: 129.1605 };
+  it.each(["UTC", "America/New_York", "Asia/Seoul"])("selects the same Busan date under host TZ %s", (zone) => {
+    const previous = process.env.TZ;
+    process.env.TZ = zone;
+    try {
+      const result = getSolarDayTimesAtLocationDate(busan, { date: "2026-06-21" });
+      expect(result.ok).toBe(true);
+      if (!result.ok) return;
+      const format = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Seoul", year: "numeric", month: "2-digit", day: "2-digit" });
+      expect(format.format(result.times.sunrise!)).toBe("2026-06-21");
+      expect(format.format(result.times.sunset!)).toBe("2026-06-21");
+      expect(result.times.sunrise!.getTime()).toBeLessThan(result.times.sunset!.getTime());
+      expect(result.instant.toISOString()).toBe("2026-06-21T03:00:00.000Z");
+    } finally {
+      if (previous === undefined) delete process.env.TZ;
+      else process.env.TZ = previous;
+    }
+  });
+  it("rejects invalid calendar dates and retains missing polar events as null", () => {
+    expect(getSolarDayTimesAtLocationDate(busan, { date: "2026-02-30" }).ok).toBe(false);
+    const result = getSolarDayTimesAtLocationDate({ latitude: 89, longitude: 0 }, { date: "2026-06-21", timeZone: "UTC" });
+    if (!result.ok) throw new Error("valid date expected");
+    expect(result.times).toEqual({ sunrise: null, sunset: null });
+  });
+});
 
 describe("sunCalcAzimuthToCompassDegrees", () => {
   it.each([

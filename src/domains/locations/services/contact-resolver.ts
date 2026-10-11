@@ -4,6 +4,7 @@ import type { LocationContact, LocationContactsResponse } from "@/types/location
 import { isValidContactPhone } from "./permit-verification";
 import { getStraightLineDistanceMeters } from "./parking-distance";
 import type { ReviewedLocationContacts } from "./contact-review";
+import { contactAddressesMatch } from "./contact-address-match";
 
 const TYPE_PRIORITY = {
   permit_contact: 0,
@@ -18,22 +19,9 @@ function normalize(value: string): string {
   return value.normalize("NFKC").toLocaleLowerCase("ko-KR").replace(/[^\p{L}\p{N}]/gu, "");
 }
 
-function addressTokens(value: string | null): Set<string> {
-  if (!value) return new Set();
-  return new Set(value.normalize("NFKC")
-    .toLocaleLowerCase("ko-KR")
-    .split(/[^\p{L}\p{N}]+/u)
-    .filter((token) => token.length >= 2 && !["대한민국", "부산", "부산광역시"].includes(token)));
-}
-
 function addressesRelated(locationAddress: string, place: DiscoveredPlace): boolean {
-  const expected = addressTokens(locationAddress);
-  if (expected.size === 0) return false;
-  const candidate = new Set([
-    ...addressTokens(place.address),
-    ...addressTokens(place.roadAddress),
-  ]);
-  return [...expected].some((token) => candidate.has(token));
+  return contactAddressesMatch(locationAddress, place.address)
+    || contactAddressesMatch(locationAddress, place.roadAddress);
 }
 
 function safeHttpUrl(value: string | null | undefined): string | null {

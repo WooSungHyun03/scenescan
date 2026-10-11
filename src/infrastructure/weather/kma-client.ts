@@ -129,30 +129,33 @@ function isSuccessfulProviderCode(code: string): boolean {
   return code === "0" || code === "00";
 }
 
-function throwForProviderCode(code: string, message: string): never {
+function throwForProviderCode(code: string): never {
+  // Provider messages and even malformed codes can echo the credential-bearing
+  // request URL. Keep only a bounded numeric code in loggable errors.
+  const safeCode = /^\d{1,2}$/u.test(code) ? code : "unknown";
   if (code === "22" || code === "23") {
-    throw new KmaWeatherError("QUOTA", `KMA quota rejected the request (${code}): ${message}`);
+    throw new KmaWeatherError("QUOTA", `KMA quota rejected the request (${safeCode})`);
   }
   if (code === "03") {
-    throw new KmaWeatherError("NO_DATA", `KMA returned no data (${code}): ${message}`);
+    throw new KmaWeatherError("NO_DATA", `KMA returned no data (${safeCode})`);
   }
   if (code === "20" || code === "30" || code === "31") {
-    throw new KmaWeatherError("CONFIGURATION", `KMA rejected the service key (${code}): ${message}`);
+    throw new KmaWeatherError("CONFIGURATION", `KMA rejected the service key (${safeCode})`);
   }
-  throw new KmaWeatherError("UPSTREAM", `KMA request failed (${code}): ${message}`);
+  throw new KmaWeatherError("UPSTREAM", `KMA request failed (${safeCode})`);
 }
 
 function parseItems(body: string): KmaItem[] {
   const xmlCode = errorCodeFromBody(body);
   if (xmlCode && !isSuccessfulProviderCode(xmlCode)) {
-    throwForProviderCode(xmlCode, "XML error response");
+    throwForProviderCode(xmlCode);
   }
 
   let parsed: unknown;
   try {
     parsed = JSON.parse(body);
-  } catch (cause) {
-    throw new KmaWeatherError("UPSTREAM", "KMA returned malformed JSON", { cause });
+  } catch {
+    throw new KmaWeatherError("UPSTREAM", "KMA returned malformed JSON");
   }
   if (!parsed || typeof parsed !== "object") {
     throw new KmaWeatherError("UPSTREAM", "KMA response is not an object");
@@ -166,8 +169,7 @@ function parseItems(body: string): KmaItem[] {
     throw new KmaWeatherError("UPSTREAM", "KMA response header is missing");
   }
   const resultCode = String((header as { resultCode?: unknown }).resultCode ?? "");
-  const resultMessage = String((header as { resultMsg?: unknown }).resultMsg ?? "Unknown error");
-  if (!isSuccessfulProviderCode(resultCode)) throwForProviderCode(resultCode, resultMessage);
+  if (!isSuccessfulProviderCode(resultCode)) throwForProviderCode(resultCode);
 
   const bodyValue = (response as { body?: unknown }).body;
   const rawItems = bodyValue && typeof bodyValue === "object"
@@ -360,16 +362,16 @@ export class KmaWeatherClient {
       const body = await response.text();
       if (!response.ok) {
         const providerCode = errorCodeFromBody(body);
-        if (providerCode) throwForProviderCode(providerCode, `HTTP ${response.status}`);
+        if (providerCode) throwForProviderCode(providerCode);
         throw new KmaWeatherError("UPSTREAM", `KMA returned HTTP ${response.status}`);
       }
       return parseItems(body);
     } catch (error) {
       if (error instanceof KmaWeatherError) throw error;
       if (controller.signal.aborted) {
-        throw new KmaWeatherError("TIMEOUT", "KMA request timed out", { cause: error });
+        throw new KmaWeatherError("TIMEOUT", "KMA request timed out");
       }
-      throw new KmaWeatherError("UPSTREAM", "KMA request failed", { cause: error });
+      throw new KmaWeatherError("UPSTREAM", "KMA request failed");
     } finally {
       clearTimeout(timeout);
     }

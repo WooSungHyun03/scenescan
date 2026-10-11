@@ -6,6 +6,42 @@ import {
   evaluationImagePath,
 } from "./helpers";
 
+for (const mode of ["image", "text"] as const) {
+  test(`${mode} 검색 취소 후 늦은 응답을 무시하고 다시 검색할 수 있다`, async ({ page }) => {
+    const errors = collectPageErrors(page);
+    const endpoint = mode === "image" ? "**/api/search" : "**/api/search/text";
+    let release!: () => void;
+    const held = new Promise<void>((resolve) => { release = resolve; });
+    let calls = 0;
+    await page.route(endpoint, async (route) => {
+      calls++;
+      if (calls === 1) {
+        await held;
+        await route.fulfill({ json: { results: [] } }).catch(() => undefined);
+      } else await route.continue();
+    });
+    await page.goto("/search");
+    if (mode === "image") await chooseEvaluationImage(page);
+    else {
+      await page.getByRole("button", { name: "텍스트로 검색", exact: true }).click();
+      await page.getByLabel("검색어", { exact: true }).fill("해운대");
+    }
+    const submit = page.getByRole("button", { name: mode === "image" ? "이 이미지로 장소 찾기" : "검색", exact: true });
+    await submit.click();
+    await expect.poll(() => calls).toBe(1);
+    await page.getByRole("button", { name: "검색 취소", exact: true }).click();
+    await expect(page.getByText("검색을 취소했습니다. 조건을 변경하거나 다시 검색할 수 있습니다.")).toBeVisible();
+    release();
+    await expect(page.getByRole("heading", { name: "추천 장소 0곳" })).toHaveCount(0);
+    await expect(submit).toBeEnabled();
+    await submit.click();
+    await expect.poll(() => calls).toBe(2);
+    await expect(page.getByRole("heading", { name: /^추천 장소 \d+곳$/ })).toBeVisible();
+    await expect(page.getByText("검색을 취소했습니다. 조건을 변경하거나 다시 검색할 수 있습니다.")).toHaveCount(0);
+    expect(errors).toEqual([]);
+  });
+}
+
 test("초기 스크립트가 늦어도 업로드는 준비된 뒤 활성화된다", async ({ page }) => {
   let releaseScripts!: () => void;
   const scriptsReady = new Promise<void>((resolve) => { releaseScripts = resolve; });

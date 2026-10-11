@@ -84,6 +84,8 @@ Shortlist APIs also require a fresh user and never accept an owner ID. `PUT` exp
 
 `classifyLighting` returns `back-light` when the camera points within 45 degrees of the sun, `front-light` when the sun is within 45 degrees of directly behind the camera, and `side-light` for the angles between them. It returns `null` when the sun is below the horizon or either heading is not finite. The UI translates these values to 순광, 측광, and 역광 without duplicating the angular thresholds.
 
+`getSolarDayTimesAtLocationDate` resolves the chosen date at location-local noon before calling the installed SunCalc 1.9 API. It returns nullable sunrise/sunset UTC instants under the shared `SolarDayTimes` type, never device-local calendar parsing. Detail displays the times in the location's explicit IANA zone once a date is selected, even without a shooting hour; invalid dates/zones and polar missing events never produce invented times. Values are labelled as astronomical calculations, not KMA observations or terrain-aware visibility predictions.
+
 `sortParkingByDistance` calculates straight-line distance from the location point, sorts nearest first without mutating the input, and returns `null` distance for invalid coordinates. `ParkingInfo.relationship` is the reviewed `on_site`/`nearby` classification; `locationId` is the location whose detail page owns the option and is not used to infer that classification. Each parking row carries nullable `sourceUrl`, `referenceDate`, and `lastVerifiedAt`; the UI sanitizes the URL, links the official record, and shows the verification/reference date. Nearby parking remains public/private-neutral when the official source does not distinguish it.
 
 ## `GET /api/locations/[id]/weather`
@@ -128,6 +130,8 @@ Kakao Local is a last-resort transient suggestion. One bounded 500m keyword requ
 The permit panel labels the three types separately. A place representative number always states that it is not a verified filming-permit number. Displaying any phone does not change `PermitInfo.type` or its reviewed state. Mock mode uses deterministic synthetic records; production provider records are neither cached nor imported into the catalogue.
 
 Reviewed file ingestion reuses the HTTP contact schema's phone and safe source URL validators, rejecting malformed numbers and credential-bearing URLs before they reach the API/UI. Client external-info deduplication shares only active raw response bodies for the same grouping key **and URL**; each consumer independently validates its contract. A changed weather-grid representative cannot reuse another location's response, and an already-aborted consumer starts no network request. Provider results are never retained after settlement.
+
+Address identity ignores country/city/district tokens and requires all significant expected facility tokens plus numbered evidence. The same district or road alone, and tokens combined across unrelated address/road-address fields, cannot prove a facility match. Coordinate/name/category checks remain independent; an uncertain provider number stays unconfirmed rather than becoming a permit contact.
 
 `GET /api/locations/:id/similar` delegates ranking to `getSimilarLocations`, excludes the current/seen locations, returns at most eight results, and disables response caching. Mock mode filters stable synthetic category candidates before ranking; real mode uses the model-safe RPC below.
 

@@ -11,7 +11,7 @@ import {
   resolveLocationTimeZone,
   type ZonedDateTimeErrorCode,
 } from "@/domains/locations/services/location-timezone";
-import { getSolarPositionAtLocationTime } from "@/domains/locations/services/solar-position";
+import { getSolarDayTimesAtLocationDate, getSolarPositionAtLocationTime } from "@/domains/locations/services/solar-position";
 import type { GeoPoint, SolarPosition } from "@/types/domain";
 
 type SolarCalculation =
@@ -54,6 +54,24 @@ export function SolarPanel({
   const timeZoneNoteId = useId();
   const [cameraHeadingDegrees, setCameraHeadingDegrees] = useState(0);
   const locationTimeZone = resolveLocationTimeZone(timeZone);
+  const dayTimes = useMemo(() => {
+    if (!shootDate) return null;
+    try {
+      const result = getSolarDayTimesAtLocationDate(point, { date: shootDate, timeZone: locationTimeZone });
+      return result.ok ? result.times : null;
+    } catch {
+      return null;
+    }
+  }, [point, shootDate, locationTimeZone]);
+  const clockFormatter = useMemo(() => {
+    try {
+      return new Intl.DateTimeFormat("ko-KR", {
+        timeZone: locationTimeZone, hour: "2-digit", minute: "2-digit", hourCycle: "h23",
+      });
+    } catch {
+      return null;
+    }
+  }, [locationTimeZone]);
 
   const calculation = useMemo<SolarCalculation>(() => {
     if (!shootDate || !shootTime) return { state: "idle" };
@@ -79,10 +97,13 @@ export function SolarPanel({
     }
   }, [locationTimeZone, point, shootDate, shootTime]);
 
-  const timeZoneLabel = formatTimeZoneWithOffset(
-    locationTimeZone,
-    calculation.state === "ready" ? calculation.instant : new Date(),
-  );
+  let timeZoneLabel = "시간대 확인 불가";
+  if (clockFormatter) {
+    timeZoneLabel = formatTimeZoneWithOffset(
+      locationTimeZone,
+      calculation.state === "ready" ? calculation.instant : new Date(),
+    );
+  }
   const timeZoneName = locationTimeZone === DEFAULT_LOCATION_TIME_ZONE ? "한국 표준시 · " : "";
 
   return (
@@ -133,6 +154,21 @@ export function SolarPanel({
       </p>
 
       <div aria-live="polite" className="mt-4">
+        {dayTimes && clockFormatter && (
+          <div className="mb-4 text-sm text-stone-700">
+            <dl aria-label="촬영일 일출·일몰" className="grid grid-cols-2 gap-3 rounded-lg border border-stone-200 bg-white p-3">
+              {([['일출', dayTimes.sunrise], ['일몰', dayTimes.sunset]] as const).map(([label, instant]) => (
+                <div key={label}>
+                  <dt className="text-xs text-stone-500">{label}</dt>
+                  <dd className="mt-1 font-semibold tabular-nums">
+                    {instant ? <time dateTime={instant.toISOString()}>{clockFormatter.format(instant)}</time> : "계산 가능한 시각 없음"}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+            <p className="mt-2 text-xs leading-relaxed text-stone-500">촬영지 시간대 기준 SunCalc 계산값입니다. 지형·건물·날씨에 따라 실제 보이는 시각은 달라질 수 있습니다.</p>
+          </div>
+        )}
         {calculation.state === "idle" && (
           <div className="rounded-lg border border-dashed border-stone-300 bg-stone-50 p-4 text-sm text-stone-600">
             날짜와 시간을 모두 선택하면 태양 위치를 계산합니다.

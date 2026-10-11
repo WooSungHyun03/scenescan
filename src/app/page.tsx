@@ -27,7 +27,7 @@ export default async function HomePage() {
   return (
     <main>
       <section className="border-b border-line bg-white">
-        <div className="scene-container grid items-center gap-10 py-10 md:grid-cols-[minmax(0,1.02fr)_minmax(340px,.98fr)] md:py-16 lg:gap-16 lg:py-20">
+        <div className="scene-container grid items-start gap-10 py-10 md:grid-cols-[minmax(0,1.02fr)_minmax(340px,.98fr)] md:py-16 lg:gap-16 lg:py-20">
           <div className="min-w-0">
             <p className="scene-kicker">Location scouting</p>
             <h1 className="mt-4 max-w-3xl text-[2.45rem] font-extrabold leading-[1.12] tracking-[-.06em] sm:text-5xl lg:text-[3.75rem]">

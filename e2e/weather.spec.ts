@@ -56,6 +56,16 @@ test("빈 입력은 현재 날씨를, 같은 한국 촬영 시각은 선택 시�
   expect(times).toEqual([null]);
 
   await page.getByLabel("촬영 날짜", { exact: true }).fill("2026-10-12");
+  const sunlight = page.locator('dl[aria-label="촬영일 일출·일몰"]');
+  await expect(sunlight).toBeVisible();
+  await expect(sunlight.locator("time")).toHaveCount(2);
+  await expect(sunlight).toContainText("일출");
+  await expect(sunlight).toContainText("일몰");
+  expect(await sunlight.locator("time").evaluateAll((elements) => elements.every((element) => (
+    new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Asia/Seoul", year: "numeric", month: "2-digit", day: "2-digit",
+    }).format(new Date(element.getAttribute("datetime")!)) === "2026-10-12"
+  )))).toBe(true);
   await expect(panel.getByText("촬영 날짜와 시간을 모두 올바르게 선택해 주세요.")).toBeVisible();
   await expect(panel.getByText("현재 날씨 · 실황", { exact: true })).toHaveCount(0);
   await page.waitForTimeout(450);

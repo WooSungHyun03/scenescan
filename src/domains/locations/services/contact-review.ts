@@ -3,6 +3,7 @@ import reviewedContactData from "../../../../data/production/busan-contacts.revi
 import { getStraightLineDistanceMeters } from "./parking-distance";
 import { locationContactSchema, locationContactTypeSchema, type LocationContact } from "@/types/location-contact";
 import type { Location } from "@/types/domain";
+import { contactAddressesMatch } from "./contact-address-match";
 
 const pointSchema = z.object({
   latitude: z.number().finite().min(-90).max(90),
@@ -77,19 +78,6 @@ function normalizeName(value: string): string {
   return value.normalize("NFKC").toLocaleLowerCase("ko-KR").replace(/[^\p{L}\p{N}]/gu, "");
 }
 
-function significantAddressTokens(value: string): string[] {
-  return value.normalize("NFKC")
-    .toLocaleLowerCase("ko-KR")
-    .split(/[^\p{L}\p{N}]+/u)
-    .filter((token) => token.length >= 2 && !["대한민국", "부산", "부산광역시"].includes(token));
-}
-
-function addressMatches(locationAddress: string, reviewedAddress: string): boolean {
-  const locationTokens = new Set(significantAddressTokens(locationAddress));
-  const reviewedTokens = significantAddressTokens(reviewedAddress);
-  return reviewedTokens.some((token) => locationTokens.has(token));
-}
-
 export function findReviewedLocationContacts(
   location: Location,
   file: ReviewedContactFile = busanReviewedContacts,
@@ -101,7 +89,7 @@ export function findReviewedLocationContacts(
   const nameMatched = acceptedNames.includes(normalizeName(location.name));
   const distance = getStraightLineDistanceMeters(location.point, reviewed.point);
   const coordinateMatched = distance !== null && distance <= 500;
-  const addressMatched = addressMatches(location.address, reviewed.address);
+  const addressMatched = contactAddressesMatch(location.address, reviewed.address);
 
   // The stable ID alone is insufficient: a reviewed row must still agree with
   // the place name and at least one physical-location signal.

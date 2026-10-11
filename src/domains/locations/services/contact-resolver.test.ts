@@ -49,6 +49,18 @@ function place(overrides: Partial<DiscoveredPlace> = {}): DiscoveredPlace {
 }
 
 describe("location contact resolver", () => {
+  it("does not treat a shared district or road alone as the same facility address", () => {
+    for (const address of ["부산광역시 남구 다른로 99", "부산광역시 남구 테스트로 99"]) {
+      const result = resolveLocationContacts({
+        location: location(), reviewed: null,
+        providerPlaces: [place({ name: "테스트미술관 별관", address, roadAddress: address })],
+        providerAvailable: true, sourceMode: "live",
+      });
+      expect(result.contacts).toEqual([]);
+      expect(result.reason).toBe("no_match");
+    }
+  });
+
   it("keeps a Kakao number as a place contact and requires review", () => {
     const result = resolveLocationContacts({
       location: location(), reviewed: null, providerPlaces: [place()], providerAvailable: true,

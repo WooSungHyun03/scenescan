@@ -8,6 +8,22 @@ const viewports = [
   { width: 1440, height: 900 },
 ] as const;
 
+for (const width of [768, 1440]) {
+  test(`${width}px 홈 검색 모드 전환 시 추천 로케이션은 움직이지 않는다`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 1000 });
+    await page.goto("/");
+    const recommendation = page.getByRole("link", { name: /추천 로케이션/ });
+    await expect(recommendation).toBeVisible();
+    const position = () => recommendation.evaluate((element) => element.getBoundingClientRect().top + scrollY);
+    const before = await position();
+    for (const mode of ["텍스트로 검색", "사진으로 검색", "텍스트로 검색", "사진으로 검색"]) {
+      await page.getByRole("button", { name: mode, exact: true }).click();
+      expect(await position()).toBeCloseTo(before, 1);
+    }
+    await expectNoDocumentOverflow(page);
+  });
+}
+
 async function expectNoDocumentOverflow(page: Page) {
   await expect.poll(() => page.evaluate(() => ({
     clientWidth: document.documentElement.clientWidth,

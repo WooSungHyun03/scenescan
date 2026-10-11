@@ -134,6 +134,11 @@ export interface SolarPosition {
   isAboveHorizon: boolean;
 }
 
+export interface SolarDayTimes {
+  sunrise: Date | null;
+  sunset: Date | null;
+}
+
 export type LightingClassification =
   | "front-light"
   | "side-light"
