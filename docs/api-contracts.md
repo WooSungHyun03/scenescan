@@ -127,6 +127,8 @@ Kakao Local is a last-resort transient suggestion. One bounded 500m keyword requ
 
 The permit panel labels the three types separately. A place representative number always states that it is not a verified filming-permit number. Displaying any phone does not change `PermitInfo.type` or its reviewed state. Mock mode uses deterministic synthetic records; production provider records are neither cached nor imported into the catalogue.
 
+Reviewed file ingestion reuses the HTTP contact schema's phone and safe source URL validators, rejecting malformed numbers and credential-bearing URLs before they reach the API/UI. Client external-info deduplication shares only active raw response bodies for the same grouping key **and URL**; each consumer independently validates its contract. A changed weather-grid representative cannot reuse another location's response, and an already-aborted consumer starts no network request. Provider results are never retained after settlement.
+
 `GET /api/locations/:id/similar` delegates ranking to `getSimilarLocations`, excludes the current/seen locations, returns at most eight results, and disables response caching. Mock mode filters stable synthetic category candidates before ranking; real mode uses the model-safe RPC below.
 
 Supabase RPC (see `docs/search-ranking.md` for the full contract and a reproducible filter regression test):

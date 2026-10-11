@@ -1,7 +1,7 @@
 import { z } from "zod";
 import reviewedContactData from "../../../../data/production/busan-contacts.reviewed.json";
 import { getStraightLineDistanceMeters } from "./parking-distance";
-import { locationContactTypeSchema, type LocationContact } from "@/types/location-contact";
+import { locationContactSchema, locationContactTypeSchema, type LocationContact } from "@/types/location-contact";
 import type { Location } from "@/types/domain";
 
 const pointSchema = z.object({
@@ -28,10 +28,10 @@ const reviewedContactFileSchema = z.object({
     contacts: z.array(z.object({
       contactType: locationContactTypeSchema,
       contactName: z.string().trim().min(1),
-      phone: z.string().trim().min(1),
+      phone: locationContactSchema.shape.phone,
       facilityRelationship: relationshipSchema,
       source: z.string().trim().min(1),
-      sourceUrl: z.string().url().refine((value) => value.startsWith("https://")),
+      sourceUrl: locationContactSchema.shape.sourceUrl.refine((value) => value.startsWith("https://")),
       lastVerifiedAt: z.iso.datetime({ offset: true }),
     }).strict()).min(1).max(3),
   }).strict()).superRefine((locations, context) => {

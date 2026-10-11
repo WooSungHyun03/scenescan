@@ -20,6 +20,18 @@ function location(overrides: Partial<Location> = {}): Location {
 }
 
 describe("Busan reviewed contact file", () => {
+  it("rejects a reviewed source URL containing credentials before serving contacts", () => {
+    const invalid = structuredClone(busanReviewedContacts);
+    invalid.locations[0].contacts[0].sourceUrl = "https://user:password@example.com/contact";
+    expect(() => parseReviewedContactFile(invalid)).toThrow();
+  });
+
+  it.each(["not a phone", "123", "051-204-1444<script>"])("rejects invalid reviewed phone %s", (phone) => {
+    const invalid = structuredClone(busanReviewedContacts);
+    invalid.locations[0].contacts[0].phone = phone;
+    expect(() => parseReviewedContactFile(invalid)).toThrow();
+  });
+
   it("parses the committed file and classifies the guide center as a place contact", () => {
     expect(busanReviewedContacts.locations.length).toBeGreaterThan(0);
     const resolved = findReviewedLocationContacts(location());

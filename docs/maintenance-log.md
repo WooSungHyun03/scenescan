@@ -1,5 +1,15 @@
 # Maintenance log
 
+## 2026-10-12 — contact and comparison integration audit
+
+- Integrated team changes through `8a0287b`; preserved the three untracked team documents. Audited new contact resolution, reviewed provenance, weather-grid comparison, request sharing, route validation and existing Auth/secret boundaries without changing production data, RLS, credentials or provider configuration.
+- Major: external-info request sharing reused the first consumer's parsed value solely by a logical key. A weather comparison representative changing within the same grid could receive a different location's response; different consumers also skipped their own validation. Share raw bodies only for the same key/URL and validate separately. Pre-aborted consumers no longer start a provider call. Regressions cover distinct URLs, distinct parsers, independent validation failure, cancellation and retries.
+- Minor: reviewed contact ingestion accepted malformed phone numbers and credential-bearing HTTPS source URLs that the output contract rejected later. Reuse the shared contact schema at ingestion; retain strict contact types and the distinction between representative numbers and filming-permit contacts.
+- Verification: lint/typecheck/build and client-bundle secret scan passed; 132 unit suites / 844 tests and 55 mock browser tests passed. Production real CLIP → search → Kakao markers → health passed (17.9s). Desktop detail displayed actual KMA observations with nullable missing values and five distance-sorted Kakao parking candidates; large-site contacts remained explicitly unconfirmed. A 390px detail viewport had no horizontal overflow or console errors. Deployment/CI results are reported after release.
+- NVIDIA release `501994c` was Ready and its CI passed. Production intent enrichment succeeded for three of the five release queries; two requests fell back with explicit `INTENT_UNAVAILABLE` during provider congestion. Existing metadata coverage still yields no matches for several valid intents; HTTP 200 is not treated as proof of model success or retrieval quality.
+
+Remaining rollout dependencies: intermittent NVIDIA upstream 503 capacity; reviewed searchable metadata and authorized additional Busan records/images; hosted migration/model-provenance reconciliation. KMA live credentials are now working in Production, so the earlier missing-key note below is historical rather than a current weather blocker.
+
 ## 2026-10-11 — Hosted Nemotron text search
 
 - Fixed the hardcoded Llama allowlist/default to the requested `nvidia/nemotron-3-nano-omni-30b-a3b-reasoning`. The hosted endpoint was already correct. Production has the server-only key and enable flag; local live verification uses ignored `.env.local` without printing credentials.

@@ -11,6 +11,42 @@ afterEach(() => {
 });
 
 describe("requestExternalInfo", () => {
+  it("validates each consumer independently without sharing parsed types", async () => {
+    const fetcher = vi.fn().mockResolvedValue(new Response(JSON.stringify({ value: 7 })));
+    vi.stubGlobal("fetch", fetcher);
+    const options = { key: "shared", url: "/api/weather" };
+    await expect(Promise.all([
+      requestExternalInfo({ ...options, parse: () => "first" }),
+      requestExternalInfo({ ...options, parse: () => 7 }),
+      requestExternalInfo({ ...options, parse: () => { throw new Error("invalid contract"); } })
+        .catch((error: Error) => error.message),
+    ])).resolves.toEqual(["first", 7, "invalid contract"]);
+    expect(fetcher).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not reuse another location's response for the same provider grouping key", async () => {
+    const fetcher = vi.fn()
+      .mockResolvedValueOnce(new Response(JSON.stringify({ locationId: "first" })))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ locationId: "second" })));
+    vi.stubGlobal("fetch", fetcher);
+    const options = { key: "same-grid", parse: (value: unknown) => value };
+    await expect(Promise.all([
+      requestExternalInfo({ ...options, url: "/api/locations/first/weather" }),
+      requestExternalInfo({ ...options, url: "/api/locations/second/weather" }),
+    ])).resolves.toEqual([{ locationId: "first" }, { locationId: "second" }]);
+    expect(fetcher).toHaveBeenCalledTimes(2);
+  });
+
+  it("does not start a provider request for an already cancelled consumer", async () => {
+    const fetcher = vi.fn();
+    vi.stubGlobal("fetch", fetcher);
+    await expect(requestExternalInfo({
+      key: "cancelled", url: "/api/weather", parse: (value: unknown) => value,
+      signal: AbortSignal.abort(),
+    })).rejects.toMatchObject({ name: "AbortError" });
+    expect(fetcher).not.toHaveBeenCalled();
+  });
+
   it("merges concurrent requests with the same provider key", async () => {
     const fetcher = vi.fn().mockResolvedValue(new Response(JSON.stringify({ value: 7 })));
     vi.stubGlobal("fetch", fetcher);

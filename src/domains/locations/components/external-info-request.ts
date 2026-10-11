@@ -38,20 +38,25 @@ export function requestExternalInfo<T>({
   signal?: AbortSignal;
   timeoutMilliseconds?: number;
 }): Promise<T> {
-  let request = inflightRequests.get(key) as Promise<T> | undefined;
+  if (signal?.aborted) return Promise.reject(new DOMException("Request aborted", "AbortError"));
+  // A provider grouping key is not a response identity: another panel can
+  // select a different representative location for the same weather grid.
+  const requestKey = JSON.stringify([key, url]);
+  let request = inflightRequests.get(requestKey);
   if (!request) {
     request = fetch(url, {
       cache: "no-store",
       signal: AbortSignal.timeout(timeoutMilliseconds),
     }).then(async (response) => {
       if (!response.ok) throw new ExternalInfoHttpError(response.status);
-      return parse(await response.json().catch(() => null));
+      return response.json().catch(() => null);
     }).finally(() => {
-      if (inflightRequests.get(key) === request) inflightRequests.delete(key);
+      if (inflightRequests.get(requestKey) === request) inflightRequests.delete(requestKey);
     });
-    inflightRequests.set(key, request);
+    inflightRequests.set(requestKey, request);
   }
-  return consumerAbort(request, signal);
+  // Share transport only; every consumer must validate its own contract.
+  return consumerAbort(request, signal).then(parse);
 }
 
 export function clearExternalInfoRequestsForTest(): void {
