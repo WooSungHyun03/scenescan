@@ -3,7 +3,6 @@
 import { useId, useMemo, useState } from "react";
 import { Clock3 } from "lucide-react";
 import { CameraLightingControl } from "@/domains/locations/components/camera-lighting-control";
-import { WeatherPanel } from "@/domains/locations/components/weather-panel";
 import { SolarDirectionVisualization } from "@/domains/locations/components/solar-direction-visualization";
 import {
   DEFAULT_LOCATION_TIME_ZONE,
@@ -38,17 +37,21 @@ function getErrorMessage(code: Extract<SolarCalculation, { state: "error" }>["co
 export function SolarPanel({
   point,
   timeZone,
-  locationId,
+  shootDate,
+  shootTime,
+  onShootDateChange,
+  onShootTimeChange,
 }: {
   point: GeoPoint;
   timeZone?: string;
-  locationId?: string;
+  shootDate: string;
+  shootTime: string;
+  onShootDateChange: (value: string) => void;
+  onShootTimeChange: (value: string) => void;
 }) {
   const dateInputId = useId();
   const timeInputId = useId();
   const timeZoneNoteId = useId();
-  const [shootDate, setShootDate] = useState("");
-  const [shootTime, setShootTime] = useState("");
   const [cameraHeadingDegrees, setCameraHeadingDegrees] = useState(0);
   const locationTimeZone = resolveLocationTimeZone(timeZone);
 
@@ -96,7 +99,7 @@ export function SolarPanel({
             name="shoot-date"
             aria-describedby={timeZoneNoteId}
             value={shootDate}
-            onChange={(event) => setShootDate(event.target.value)}
+            onChange={(event) => onShootDateChange(event.target.value)}
             className="mt-2 block w-full rounded-md border border-stone-300 bg-white p-2.5 font-normal text-stone-900 focus:border-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-100"
           />
         </label>
@@ -112,7 +115,7 @@ export function SolarPanel({
             aria-describedby={timeZoneNoteId}
             step={60}
             value={shootTime}
-            onChange={(event) => setShootTime(event.target.value)}
+            onChange={(event) => onShootTimeChange(event.target.value)}
             className="mt-2 block w-full rounded-md border border-stone-300 bg-white p-2.5 font-normal text-stone-900 focus:border-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-100"
           />
         </label>
@@ -177,8 +180,6 @@ export function SolarPanel({
           </div>
         )}
       </div>
-      {locationId && <WeatherPanel locationId={locationId} targetInstant={calculation.state === "ready"
-        ? calculation.instant.toISOString() : !shootDate && !shootTime ? null : undefined} />}
     </div>
   );
 }

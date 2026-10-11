@@ -7,7 +7,7 @@ import { ParkingInfoPanel } from "@/domains/locations/components/parking-info-pa
 import { PermitInfoPanel } from "@/domains/locations/components/permit-info-panel";
 import { SimilarLocationsSection } from "@/domains/locations/components/similar-locations-section";
 import { ShortlistButton } from "@/domains/locations/components/shortlist-button";
-import { SolarPanel } from "@/domains/locations/components/solar-panel";
+import { ShootingConditionsPanel } from "@/domains/locations/components/shooting-conditions-panel";
 import { SourceAttribution } from "@/domains/locations/components/source-attribution";
 import { getLocation, getSimilarLocations } from "@/domains/locations/server/repository";
 import { getKoreanDescription, getLocationAreaLabel } from "@/domains/locations/components/location-copy";
@@ -104,7 +104,9 @@ export default async function LocationPage({ params }: { params: Promise<{ id: s
 
         <section id="lighting" aria-labelledby="solar-title" className="min-w-0">
           <div className="mb-4"><p className="scene-kicker">Sun position</p><h2 id="solar-title" className="mt-2 scene-section-heading">촬영 시간과 빛의 방향</h2></div>
-          <div className="scene-panel p-4 sm:p-6"><SolarPanel point={location.point} locationId={location.id} /></div>
+          <div className="scene-panel p-4 sm:p-6">
+            <ShootingConditionsPanel locationId={location.id} point={location.point} />
+          </div>
         </section>
       </div>
 
