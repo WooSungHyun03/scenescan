@@ -5,9 +5,12 @@ import { RefreshCw } from "lucide-react";
 import { formatInstantInTimeZone } from "@/domains/locations/services/location-timezone";
 import { SHOOTING_TIME_ZONE } from "@/domains/locations/services/shooting-time";
 import { locationWeatherResponseSchema, type LocationWeather } from "@/types/weather";
+import {
+  ExternalInfoHttpError,
+  requestExternalInfo,
+} from "./external-info-request";
 
 const WEATHER_DEBOUNCE_MILLISECONDS = 350;
-const WEATHER_TIMEOUT_MILLISECONDS = 10_000;
 
 type WeatherState =
   | { key: string; phase: "loading" }
@@ -54,30 +57,33 @@ export function WeatherPanel({
     const timer = window.setTimeout(() => {
       setState({ key, phase: "loading" });
       const query = targetInstant ? `?${new URLSearchParams({ at: targetInstant })}` : "";
+      const url = `/api/locations/${encodeURIComponent(locationId)}/weather${query}`;
 
-      void fetch(`/api/locations/${encodeURIComponent(locationId)}/weather${query}`, {
-        cache: "no-store",
-        signal: AbortSignal.any([
-          controller.signal,
-          AbortSignal.timeout(WEATHER_TIMEOUT_MILLISECONDS),
-        ]),
-      }).then(async (response) => {
-        if (!response.ok) throw new Error(requestErrorMessage(response.status));
-        const parsed = locationWeatherResponseSchema.safeParse(
-          await response.json().catch(() => null),
-        );
-        if (!parsed.success || parsed.data.weather.locationId !== locationId) {
-          throw new Error("날씨 응답을 확인할 수 없습니다. 다시 확인해 주세요.");
-        }
+      void requestExternalInfo({
+        key: `weather:${url}`,
+        url,
+        signal: controller.signal,
+        parse(value) {
+          const parsed = locationWeatherResponseSchema.safeParse(
+            value,
+          );
+          if (!parsed.success || parsed.data.weather.locationId !== locationId) {
+            throw new Error("날씨 응답을 확인할 수 없습니다. 다시 확인해 주세요.");
+          }
+          return parsed.data.weather;
+        },
+      }).then((weather) => {
         if (!controller.signal.aborted && requestRef.current === controller) {
-          setState({ key, phase: "ready", weather: parsed.data.weather });
+          setState({ key, phase: "ready", weather });
         }
       }).catch((error: unknown) => {
         if (controller.signal.aborted || requestRef.current !== controller) return;
         setState({
           key,
           phase: "error",
-          message: error instanceof DOMException || error instanceof TypeError
+          message: error instanceof ExternalInfoHttpError
+            ? requestErrorMessage(error.status)
+            : error instanceof DOMException || error instanceof TypeError
             ? "날씨 조회 연결이 지연되었습니다. 태양 정보는 계속 확인할 수 있습니다."
             : error instanceof Error
               ? error.message
@@ -150,7 +156,7 @@ export function WeatherPanel({
   );
 }
 
-function WeatherReadout({
+export function WeatherReadout({
   mode,
   weather,
 }: {

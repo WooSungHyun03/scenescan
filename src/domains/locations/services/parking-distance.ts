@@ -38,6 +38,15 @@ export function getStraightLineDistanceMeters(origin: GeoPoint, destination: Geo
   return earthRadiusMeters * angularDistance;
 }
 
+/** One distance label shared by detail and comparison surfaces. */
+export function formatStraightLineDistance(distanceMeters: number | null): string {
+  if (distanceMeters === null) return "거리 정보 없음";
+  if (distanceMeters < 1_000) return `직선거리 ${Math.round(distanceMeters)}m`;
+  return `직선거리 ${(distanceMeters / 1_000).toLocaleString("ko-KR", {
+    maximumFractionDigits: 1,
+  })}km`;
+}
+
 export function sortParkingByDistance(
   origin: GeoPoint,
   parking: ParkingInfo[],

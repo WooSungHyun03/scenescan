@@ -6,6 +6,8 @@ import { useId, useMemo, useState, type ReactNode } from "react";
 import {
   CalendarClock,
   CarFront,
+  ChevronDown,
+  CloudSun,
   Database,
   ExternalLink,
   ImageOff,
@@ -13,7 +15,10 @@ import {
   ShieldQuestion,
   Sun,
 } from "lucide-react";
-import { sortParkingByDistance } from "@/domains/locations/services/parking-distance";
+import {
+  formatStraightLineDistance,
+  sortParkingByDistance,
+} from "@/domains/locations/services/parking-distance";
 import { getLocationAreaLabel } from "@/domains/locations/components/location-copy";
 import {
   DEFAULT_LOCATION_TIME_ZONE,
@@ -24,6 +29,11 @@ import {
 } from "@/domains/locations/services/location-timezone";
 import { getSolarPosition } from "@/domains/locations/services/solar-position";
 import type { Location, SolarPosition } from "@/types/domain";
+import {
+  CandidateExternalInfo,
+  ComparisonWeatherSummary,
+  useComparisonWeather,
+} from "./comparison-external-info";
 import { SourceAttribution } from "./source-attribution";
 
 const categoryLabels: Record<Location["category"], string> = {
@@ -91,8 +101,6 @@ function MissingValue({ children = "확인된 정보 없음" }: { children?: Rea
 function PermitSummary({ location }: { location: Location }) {
   const fields = [
     ["유형", location.permit.type],
-    ["담당자", location.permit.contactName],
-    ["연락처", location.permit.contactPhone],
     ["참고", location.permit.note],
   ] as const;
 
@@ -106,16 +114,11 @@ function PermitSummary({ location }: { location: Location }) {
           </dd>
         </div>
       ))}
+      <p className="rounded-md bg-amber-50 p-2 text-xs leading-relaxed text-amber-900">
+        공식 허가·관리기관과 장소 대표 연락처는 아래 외부 정보에서 구분해 표시합니다.
+      </p>
     </dl>
   );
-}
-
-function formatDistance(distanceMeters: number | null) {
-  if (distanceMeters === null) return "거리 정보 없음";
-  if (distanceMeters < 1_000) return `${Math.round(distanceMeters)}m`;
-  return `${(distanceMeters / 1_000).toLocaleString("ko-KR", {
-    maximumFractionDigits: 1,
-  })}km`;
 }
 
 function ParkingSummary({ location }: { location: Location }) {
@@ -136,7 +139,7 @@ function ParkingSummary({ location }: { location: Location }) {
               {displayValue(parking.name)}
             </p>
             <span className="shrink-0 text-xs font-semibold text-sky-800">
-              {formatDistance(distanceMeters)}
+              {formatStraightLineDistance(distanceMeters)}
             </span>
           </div>
           <p className="mt-1.5 text-xs leading-relaxed text-stone-600">
@@ -241,6 +244,8 @@ export function ShortlistComparison({
   const timeZoneNoteId = useId();
   const [shootDate, setShootDate] = useState("");
   const [shootTime, setShootTime] = useState("");
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(() => new Set());
+  const [requestedIds, setRequestedIds] = useState<Set<string>>(() => new Set());
   const hasCompleteInput = Boolean(shootDate && shootTime);
   const locationTimeZone = resolveLocationTimeZone(timeZone);
   const dateTimeResult = useMemo(() => {
@@ -256,6 +261,31 @@ export function ShortlistComparison({
     dateTimeResult?.ok ? dateTimeResult.instant : new Date(),
   );
   const timeZoneName = locationTimeZone === DEFAULT_LOCATION_TIME_ZONE ? "한국 표준시 · " : "";
+  const targetInstant = !shootDate && !shootTime
+    ? null
+    : dateTimeResult?.ok
+      ? dateTimeResult.instant.toISOString()
+      : undefined;
+  const weatherLocations = useMemo(
+    () => locations.length >= 2 ? locations : [],
+    [locations],
+  );
+  const comparisonWeather = useComparisonWeather(weatherLocations, targetInstant);
+
+  function toggleExternalInfo(locationId: string) {
+    setExpandedIds((current) => {
+      const next = new Set(current);
+      if (next.has(locationId)) next.delete(locationId);
+      else next.add(locationId);
+      return next;
+    });
+    setRequestedIds((current) => {
+      if (current.has(locationId)) return current;
+      const next = new Set(current);
+      next.add(locationId);
+      return next;
+    });
+  }
 
   return (
     <section className="mt-10" aria-labelledby="comparison-title">
@@ -288,9 +318,9 @@ export function ShortlistComparison({
             <div className="flex items-start gap-2">
               <CalendarClock size={18} className="mt-0.5 shrink-0 text-emerald-800" aria-hidden="true" />
               <div>
-                <h3 className="font-semibold">태양 조건 비교 시각</h3>
+                <h3 className="font-semibold">태양·날씨 조건 비교 시각</h3>
                 <p className="mt-1 text-xs leading-relaxed text-stone-500">
-                  모든 후보에 같은 촬영 시각을 적용합니다.
+                  모든 후보에 같은 촬영 시각을 적용하고 현재 날씨와 선택 시각 예보를 구분합니다.
                 </p>
               </div>
             </div>
@@ -336,7 +366,7 @@ export function ShortlistComparison({
           >
             <table className="w-full min-w-max border-collapse text-left text-sm">
               <caption className="sr-only">
-                선택된 촬영 후보의 이미지, 주소, 허가, 주변 주차, 태양 조건 비교표
+                선택된 촬영 후보의 이미지, 주소, 태양, 날씨, 허가, 주변 주차와 문의 정보 비교표
               </caption>
               <thead>
                 <tr className="border-b border-stone-200 bg-stone-50">
@@ -364,12 +394,6 @@ export function ShortlistComparison({
                 <ComparisonRow icon={<MapPin size={16} />} label="주소" locations={locations}>
                   {(location) => displayValue(location.address)}
                 </ComparisonRow>
-                <ComparisonRow icon={<ShieldQuestion size={16} />} label="허가 정보" locations={locations}>
-                  {(location) => <PermitSummary location={location} />}
-                </ComparisonRow>
-                <ComparisonRow icon={<CarFront size={16} />} label="주변 주차" locations={locations}>
-                  {(location) => <ParkingSummary location={location} />}
-                </ComparisonRow>
                 <ComparisonRow icon={<Sun size={16} />} label="태양 조건" locations={locations}>
                   {(location) => (
                     <SolarSummary
@@ -378,6 +402,44 @@ export function ShortlistComparison({
                       hasCompleteInput={hasCompleteInput}
                     />
                   )}
+                </ComparisonRow>
+                <ComparisonRow icon={<CloudSun size={16} />} label="날씨" locations={locations}>
+                  {(location) => (
+                    <ComparisonWeatherSummary
+                      state={comparisonWeather.stateByLocationId.get(location.id)}
+                      targetInstant={targetInstant}
+                      retry={comparisonWeather.retry}
+                    />
+                  )}
+                </ComparisonRow>
+                <ComparisonRow icon={<ShieldQuestion size={16} />} label="허가 정보" locations={locations}>
+                  {(location) => <PermitSummary location={location} />}
+                </ComparisonRow>
+                <ComparisonRow icon={<CarFront size={16} />} label="주변 주차" locations={locations}>
+                  {(location) => <ParkingSummary location={location} />}
+                </ComparisonRow>
+                <ComparisonRow icon={<Database size={16} />} label="외부 정보" locations={locations}>
+                  {(location) => {
+                    const expanded = expandedIds.has(location.id);
+                    return (
+                      <div>
+                        <button
+                          type="button"
+                          aria-expanded={expanded}
+                          onClick={() => toggleExternalInfo(location.id)}
+                          className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-lg border border-emerald-700 px-3 text-xs font-bold text-emerald-900 hover:bg-emerald-50"
+                        >
+                          {expanded ? "외부 정보 접기" : "외부 정보 펼치기"}
+                          <ChevronDown size={14} className={expanded ? "rotate-180" : ""} aria-hidden="true" />
+                        </button>
+                        {requestedIds.has(location.id) && (
+                          <div hidden={!expanded} className="mt-4">
+                            <CandidateExternalInfo locationId={location.id} />
+                          </div>
+                        )}
+                      </div>
+                    );
+                  }}
                 </ComparisonRow>
                 <ComparisonRow icon={<Database size={16} />} label="데이터 출처" locations={locations}>
                   {(location) => (

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { sortParkingByDistance } from "./parking-distance";
+import { formatStraightLineDistance, sortParkingByDistance } from "./parking-distance";
 import type { ParkingInfo } from "@/types/domain";
 
 function parking(
@@ -59,5 +59,13 @@ describe("sortParkingByDistance", () => {
     ]);
     expect(result[1].distanceMeters).toBeNull();
     expect(items.map((item) => item.id)).toEqual(originalOrder);
+  });
+});
+
+describe("formatStraightLineDistance", () => {
+  it("uses one Korean distance rule for every location surface", () => {
+    expect(formatStraightLineDistance(null)).toBe("거리 정보 없음");
+    expect(formatStraightLineDistance(412.4)).toBe("직선거리 412m");
+    expect(formatStraightLineDistance(1_250)).toBe("직선거리 1.3km");
   });
 });

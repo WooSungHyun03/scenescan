@@ -14,7 +14,10 @@ import {
   Rows3,
 } from "lucide-react";
 import type { ReactNode } from "react";
-import { sortParkingByDistance } from "@/domains/locations/services/parking-distance";
+import {
+  formatStraightLineDistance,
+  sortParkingByDistance,
+} from "@/domains/locations/services/parking-distance";
 import type { GeoPoint, ParkingInfo } from "@/types/domain";
 import { NEARBY_PARKING_RADIUS_OPTIONS } from "@/types/place-discovery";
 import { useParkingDiscovery } from "./parking-discovery-context";
@@ -22,14 +25,6 @@ import { SourceAttribution } from "./source-attribution";
 
 function getValue(value: string | null | undefined) {
   return value?.trim() || null;
-}
-
-function formatDistance(distanceMeters: number | null) {
-  if (distanceMeters === null) return "거리 정보 없음";
-  if (distanceMeters < 1_000) return `직선거리 ${Math.round(distanceMeters)}m`;
-  return `직선거리 ${(distanceMeters / 1_000).toLocaleString("ko-KR", {
-    maximumFractionDigits: 1,
-  })}km`;
 }
 
 export function getParkingRelationshipPresentation(relationship: ParkingInfo["relationship"]) {
@@ -127,7 +122,7 @@ export function ParkingInfoPanel({
                     {relationship.label}
                   </span>
                   <span className="text-xs font-semibold text-stone-600">
-                    {index + 1}. {formatDistance(distanceMeters)}
+                    {index + 1}. {formatStraightLineDistance(distanceMeters)}
                   </span>
                 </div>
 
@@ -286,7 +281,7 @@ export function ParkingInfoPanel({
                     <div className="flex min-w-0 flex-col items-start gap-2">
                       <div className="min-w-0">
                         <p className="text-xs font-bold text-emerald-800">
-                          {index + 1}. 주변 후보 · {formatDistance(candidate.distanceMeters)}
+                          {index + 1}. 주변 후보 · {formatStraightLineDistance(candidate.distanceMeters)}
                         </p>
                         <h4 className="mt-1 break-words font-semibold text-stone-900">{candidate.name}</h4>
                         <p className="mt-1 break-words text-sm text-stone-600">

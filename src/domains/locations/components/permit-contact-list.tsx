@@ -7,6 +7,7 @@ import {
   locationContactsResponseSchema,
   type LocationContactsResponse,
 } from "@/types/location-contact";
+import { requestExternalInfo } from "./external-info-request";
 
 type Phase = "loading" | "ready" | "empty" | "error";
 
@@ -108,21 +109,28 @@ export function PermitContactList({ locationId }: { locationId: string }) {
     activeController.current?.abort();
     activeController.current = controller;
 
-    void fetch(`/api/locations/${encodeURIComponent(locationId)}/contacts`, {
+    const url = `/api/locations/${encodeURIComponent(locationId)}/contacts`;
+    void requestExternalInfo({
+      key: `contacts:${locationId}`,
+      url,
       signal: controller.signal,
-      cache: "no-store",
-    }).then(async (result) => {
-      if (!result.ok) throw new Error(`Contact API returned ${result.status}`);
-      return locationContactsResponseSchema.parse(await result.json());
+      parse(value) {
+        const body = locationContactsResponseSchema.parse(value);
+        if (body.locationId !== locationId) throw new Error("Contact response location mismatch");
+        return body;
+      },
     }).then((body) => {
-      if (controller.signal.aborted) return;
+      if (controller.signal.aborted || activeController.current !== controller) return;
       setResponse(body);
       setPhase(body.contacts.length > 0 ? "ready" : "empty");
     }).catch(() => {
-      if (!controller.signal.aborted) setPhase("error");
+      if (!controller.signal.aborted && activeController.current === controller) setPhase("error");
     });
 
-    return () => controller.abort();
+    return () => {
+      controller.abort();
+      if (activeController.current === controller) activeController.current = null;
+    };
   }, [locationId, requestVersion]);
 
   if (phase === "loading") {

@@ -14,6 +14,7 @@ import {
   nearbyParkingResponseSchema,
   type NearbyParkingCandidate,
 } from "@/types/place-discovery";
+import { requestExternalInfo } from "./external-info-request";
 
 type ParkingDiscoveryPhase = "loading" | "ready" | "empty" | "error";
 
@@ -47,23 +48,27 @@ export function ParkingDiscoveryProvider({
   useEffect(() => {
     const controller = new AbortController();
     let current = true;
-    void fetch(
-      `/api/locations/${encodeURIComponent(locationId)}/parking?radius=${radiusMeters}`,
-      { signal: controller.signal, cache: "no-store" },
-    ).then(async (response) => {
-      if (!response.ok) throw new Error(`Parking request failed: ${response.status}`);
-      const parsed = nearbyParkingResponseSchema.safeParse(await response.json());
-      if (!parsed.success || parsed.data.locationId !== locationId) {
-        throw new Error("Parking response contract is invalid");
-      }
+    const url = `/api/locations/${encodeURIComponent(locationId)}/parking?radius=${radiusMeters}`;
+    void requestExternalInfo({
+      key: `parking:${locationId}:${radiusMeters}`,
+      url,
+      signal: controller.signal,
+      parse(value) {
+        const parsed = nearbyParkingResponseSchema.safeParse(value);
+        if (!parsed.success || parsed.data.locationId !== locationId) {
+          throw new Error("Parking response contract is invalid");
+        }
+        return parsed.data;
+      },
+    }).then((body) => {
       if (!current) return;
-      setCandidates(parsed.data.candidates);
+      setCandidates(body.candidates);
       setActiveCandidateId((selected) => (
-        parsed.data.candidates.some((candidate) => candidate.id === selected)
+        body.candidates.some((candidate) => candidate.id === selected)
           ? selected
           : null
       ));
-      setPhase(parsed.data.candidates.length ? "ready" : "empty");
+      setPhase(body.candidates.length ? "ready" : "empty");
     }).catch((error: unknown) => {
       if (!current || controller.signal.aborted) return;
       setCandidates([]);
