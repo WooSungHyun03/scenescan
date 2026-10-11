@@ -256,7 +256,7 @@ export function ParkingInfoPanel({
               <button
                 type="button"
                 onClick={discovery.retry}
-                className="mt-3 inline-flex min-h-10 items-center gap-2 rounded-lg border border-red-300 bg-white px-3 font-bold"
+                className="mt-3 inline-flex min-h-11 items-center gap-2 rounded-lg border border-red-300 bg-white px-3 font-bold"
               >
                 <RefreshCw size={15} aria-hidden="true" /> 다시 확인
               </button>

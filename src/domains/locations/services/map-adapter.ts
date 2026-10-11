@@ -35,7 +35,7 @@ export interface MapAdapter {
 }
 
 const markerBaseClass =
-  "z-10 grid h-9 min-w-9 place-items-center rounded-full border-2 px-2 text-xs font-bold shadow-md transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-950";
+  "z-10 grid h-11 min-w-11 place-items-center rounded-full border-2 px-2 text-xs font-bold shadow-md transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-950";
 const markerIdleClass = "border-white bg-stone-900 text-white hover:scale-110";
 const markerActiveClass =
   "z-20 scale-110 border-emerald-950 bg-emerald-300 text-emerald-950 ring-4 ring-white/80";

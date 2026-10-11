@@ -29,6 +29,8 @@ describe("Kakao adapter lifecycle", () => {
     ]);
     expect(host.setAttribute).toHaveBeenCalledWith("data-map-mode", "kakao");
     expect(overlays).toHaveLength(2);
+    expect(nodes[1]).toMatchObject({ className: expect.stringContaining("h-11 min-w-11") });
+    expect(nodes[2]).toMatchObject({ className: expect.stringContaining("h-11 min-w-11") });
     controller.setActiveMarker("b");
     controller.destroy();
     overlays.forEach((overlay) => expect(overlay.setMap).toHaveBeenCalledWith(null));
