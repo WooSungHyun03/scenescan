@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "reviewedAt": "2026-10-11T00:00:00+09:00",
+  "locations": [
+    {
+      "locationId": "5fec204b-6a5a-50f9-8bc7-8cbacf5a94ff",
+      "canonicalName": "감천문화마을",
+      "aliases": [],
+      "address": "부산광역시 사하구 감내2로 203",
+      "point": {
+        "latitude": 35.0975,
+        "longitude": 129.00916667
+      },
+      "scale": "large",
+      "contacts": [
+        {
+          "contactType": "place_contact",
+          "contactName": "감천문화마을 안내센터",
+          "phone": "051-204-1444",
+          "facilityRelationship": "represents_location",
+          "source": "감천문화마을 공식 홈페이지",
+          "sourceUrl": "https://www.gamcheon.or.kr/gamcheon/page/user/intro4",
+          "lastVerifiedAt": "2026-10-11T00:00:00+09:00"
+        }
+      ]
+    },
+    {
+      "locationId": "8751f6a5-538a-503e-a089-c5dc29aa335b",
+      "canonicalName": "부산광역시립박물관",
+      "aliases": [
+        "부산박물관"
+      ],
+      "address": "부산광역시 남구 유엔평화로 63",
+      "point": {
+        "latitude": 35.12959,
+        "longitude": 129.09405
+      },
+      "scale": "bounded",
+      "contacts": [
+        {
+          "contactType": "management_contact",
+          "contactName": "부산박물관 관리팀",
+          "phone": "051-610-7118",
+          "facilityRelationship": "manages_location",
+          "source": "부산광역시 부산박물관 공식 홈페이지",
+          "sourceUrl": "https://museum.busan.go.kr/busan/bsmap",
+          "lastVerifiedAt": "2026-10-11T00:00:00+09:00"
+        },
+        {
+          "contactType": "place_contact",
+          "contactName": "부산박물관 안내데스크",
+          "phone": "051-610-7150",
+          "facilityRelationship": "represents_location",
+          "source": "부산광역시 부산박물관 관람 안내",
+          "sourceUrl": "https://museum.busan.go.kr/busan/bsview",
+          "lastVerifiedAt": "2026-10-11T00:00:00+09:00"
+        }
+      ]
+    }
+  ]
+}

@@ -19,12 +19,11 @@ function permit(overrides: Partial<PermitInfo> = {}): PermitInfo {
 }
 
 describe("permit info panel view model", () => {
-  it("keeps the permit source separate from the location source and exposes a callable contact", () => {
+  it("keeps the permit source separate and recognizes reviewed permit provenance", () => {
     expect(getPermitPanelViewModel(permit(), new Date("2026-10-03T12:00:00+09:00"))).toMatchObject({
       source: "공식 예약 안내",
       sourceUrl: "https://example.com/permit",
-      phoneHref: "tel:0226319368",
-      hasContactMethod: true,
+      hasOfficialPermitSource: true,
       isStale: false,
     });
   });
@@ -37,29 +36,28 @@ describe("permit info panel view model", () => {
     expect(model.isStale).toBe(true);
   });
 
-  it("preserves the honest fallback when no contact method was verified", () => {
+  it("preserves the honest fallback when no permit source was verified", () => {
     expect(getPermitPanelViewModel(permit({
       type: "문의 필요",
       contactName: null,
       contactPhone: null,
       sourceUrl: "https://example.com/location-only",
-    }))).toMatchObject({ isReviewed: false, hasContactMethod: false });
+    }))).toMatchObject({ isReviewed: false, hasOfficialPermitSource: false });
   });
 
-  it("does not treat malformed phone or unsafe URL metadata as a contact method", () => {
+  it("does not treat malformed phone or unsafe URL metadata as permit verification", () => {
     expect(getPermitPanelViewModel(permit({
       contactPhone: "담당자에게 문의",
       sourceUrl: "javascript:alert(1)",
     }))).toMatchObject({
-      contactPhone: null,
-      phoneHref: null,
       phoneInvalid: true,
-      hasContactMethod: false,
+      hasOfficialPermitSource: false,
     });
   });
 
-  it("renders the official source, callable phone number, dates, and stale warning", () => {
+  it("renders the official permit source, dates, and stale warning separately from contacts", () => {
     const html = renderToStaticMarkup(createElement(PermitInfoPanel, {
+      locationId: "11111111-1111-4111-8111-111111111111",
       permit: permit({
         source: "수원문화재단 공식 답변",
         sourceUrl: "https://www.swcf.or.kr/?idx=26798&p=356",
@@ -67,10 +65,10 @@ describe("permit info panel view model", () => {
       }),
     }));
 
-    expect(html).toContain('href="tel:0226319368"');
     expect(html).toContain('href="https://www.swcf.or.kr/?idx=26798&amp;p=356"');
     expect(html).toContain("수원문화재단 공식 답변");
     expect(html).toContain("원문 기준");
     expect(html).toContain("1년을 지났습니다");
+    expect(html).toContain("연락처를 확인하고 있습니다");
   });
 });
