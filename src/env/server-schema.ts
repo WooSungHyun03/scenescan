@@ -34,6 +34,7 @@ const serverEnvironmentSchema = z.object({
   SUPABASE_SERVICE_ROLE_KEY: optionalEnvironmentString,
   PUBLIC_DATA_PORTAL_SERVICE_KEY: optionalEnvironmentString,
   KMA_VILLAGE_FORECAST_SERVICE_KEY: optionalEnvironmentString,
+  KAKAO_LOCAL_REST_API_KEY: optionalEnvironmentString,
   NVIDIA_API_KEY: optionalEnvironmentString,
   NVIDIA_INTENT_ENABLED: optionalBooleanStringDefaultingFalse,
   NVIDIA_INTENT_MODEL: optionalNvidiaIntentModel,
@@ -68,6 +69,7 @@ export type ServerEnvironment = {
   };
   publicDataPortalServiceKey?: string;
   kmaVillageForecastServiceKey?: string;
+  kakaoLocalRestApiKey?: string;
   nvidiaIntent?: {
     enabled: boolean;
     model: NvidiaIntentModel;
@@ -80,6 +82,7 @@ const forbiddenPublicSecretName = /^NEXT_PUBLIC_(?=.*SUPABASE)(?=.*(?:SECRET|SER
 // assertNoPublicSupabaseSecrets below for the same reason (Next.js inlines
 // any NEXT_PUBLIC_* variable into the browser bundle at build time).
 const forbiddenPublicNvidiaKeyName = /^NEXT_PUBLIC_(?=.*NVIDIA)(?=.*KEY)/i;
+const forbiddenPublicKakaoRestKeyName = /^NEXT_PUBLIC_(?=.*KAKAO)(?=.*(?:REST|LOCAL))(?=.*KEY)/i;
 
 export function assertNoPublicSupabaseSecrets(environment: EnvironmentInput): void {
   const leakedName = Object.keys(environment).find(
@@ -107,11 +110,25 @@ export function assertNoPublicNvidiaKey(environment: EnvironmentInput): void {
   }
 }
 
+export function assertNoPublicKakaoRestKey(environment: EnvironmentInput): void {
+  const leakedName = Object.keys(environment).find(
+    (name) => forbiddenPublicKakaoRestKeyName.test(name)
+      && Boolean(environment[name]?.trim()),
+  );
+
+  if (leakedName) {
+    throw new Error(
+      `${leakedName} must not be set: the Kakao Local REST API key can never use NEXT_PUBLIC_`,
+    );
+  }
+}
+
 export function parseServerEnvironment(
   environment: EnvironmentInput,
 ): ServerEnvironment {
   assertNoPublicSupabaseSecrets(environment);
   assertNoPublicNvidiaKey(environment);
+  assertNoPublicKakaoRestKey(environment);
   const result = serverEnvironmentSchema.safeParse(environment);
   if (!result.success) throw formatEnvironmentError("server", result.error);
 
@@ -130,6 +147,9 @@ export function parseServerEnvironment(
       : {}),
     ...(result.data.KMA_VILLAGE_FORECAST_SERVICE_KEY
       ? { kmaVillageForecastServiceKey: result.data.KMA_VILLAGE_FORECAST_SERVICE_KEY }
+      : {}),
+    ...(result.data.KAKAO_LOCAL_REST_API_KEY
+      ? { kakaoLocalRestApiKey: result.data.KAKAO_LOCAL_REST_API_KEY }
       : {}),
     ...(nvidiaEnabled || nvidiaApiKey || nvidiaModelOverride ? { nvidiaIntent: Object.freeze({
       enabled: nvidiaEnabled,

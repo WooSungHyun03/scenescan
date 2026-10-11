@@ -99,6 +99,14 @@ Successful HTTP responses use a 60-second public cache header. All failures use 
 
 The location detail weather panel reuses the solar panel's Korea-local shooting date/time and sends its offset-aware instant as `at`. With neither field selected it requests the current observation; incomplete/invalid selections disable the request. Fetching is explicit (button only), bounded to ten seconds, and canceled when the location/time changes or the panel unmounts. Previous results are hidden immediately after a selection change. The shared `locationWeatherResponseSchema` validates finite nullable measurements, timestamp/purpose consistency, attribution URLs, and the response location ID before displaying it. Provider failures offer a retry without blocking solar calculations; absent measurements are shown as “정보 없음”, never zero.
 
+## Kakao Local place discovery adapter
+
+`PlaceDiscoveryAdapter` is an internal server-side contract, not a browser or public HTTP API. `searchByKeyword` and `searchByCategory` both return one `PlaceDiscoveryPage` with at most 15 normalized `DiscoveredPlace` records. Requests use the shared schemas in `src/types/place-discovery.ts`: page 1–45, size 1–15, radius 0–20,000 metres, finite WGS84 coordinates, and Kakao's documented category group allow-list. Category search requires a center and radius; distance sorting requires a center.
+
+The real adapter always calls the fixed `https://dapi.kakao.com` host, authenticates only with the server-side `KAKAO_LOCAL_REST_API_KEY`, times out after five seconds, and accepts caller cancellation. The browser-safe `NEXT_PUBLIC_KAKAO_MAP_KEY` is only for the JavaScript map SDK and is never accepted as a Local REST credential. Missing credentials, invalid input, rejected credentials (401/403), quota exhaustion (429), timeout, cancellation, malformed responses, and other upstream failures use distinct `KakaoLocalError.code` values.
+
+Provider place IDs are de-duplicated within the returned page. Coordinates and numeric distance strings are validated before normalization. A place link is emitted only when it exactly matches the provider ID on `place.map.kakao.com`; accepted HTTP links are upgraded to canonical HTTPS and every other URL becomes `null`. Phone and address fields remain `null` when Kakao omits them. The adapter sets `cache: no-store`, does not auto-page, and has no persistence layer; consumers must not use it for bulk or permanent replication. `createFakeKakaoLocalAdapter` provides the same keyword/category contract for key-free mock and consumer tests.
+
 `GET /api/locations/:id/similar` delegates ranking to `getSimilarLocations`, excludes the current/seen locations, returns at most eight results, and disables response caching. Mock mode filters stable synthetic category candidates before ranking; real mode uses the model-safe RPC below.
 
 Supabase RPC (see `docs/search-ranking.md` for the full contract and a reproducible filter regression test):

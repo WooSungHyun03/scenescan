@@ -18,6 +18,7 @@ describe("environment contracts", () => {
     );
 
     expect(Object.keys(example).sort()).toEqual([
+      "KAKAO_LOCAL_REST_API_KEY",
       "KMA_VILLAGE_FORECAST_SERVICE_KEY",
       "NEXT_PUBLIC_CLIP_DEVICE",
       "NEXT_PUBLIC_KAKAO_MAP_KEY",
@@ -147,6 +148,20 @@ describe("environment contracts", () => {
       .toEqual({ kmaVillageForecastServiceKey: "kma-secret" });
     expect(parsePublicEnvironment({ KMA_VILLAGE_FORECAST_SERVICE_KEY: "kma-secret" }))
       .not.toHaveProperty("kmaVillageForecastServiceKey");
+  });
+
+  it("keeps the Kakao Local REST key separate from the public map JavaScript key", () => {
+    expect(parseServerEnvironment({ KAKAO_LOCAL_REST_API_KEY: "local-rest-secret" }))
+      .toEqual({ kakaoLocalRestApiKey: "local-rest-secret" });
+    expect(parsePublicEnvironment({
+      KAKAO_LOCAL_REST_API_KEY: "local-rest-secret",
+      NEXT_PUBLIC_KAKAO_MAP_KEY: "browser-map-key",
+    })).toMatchObject({ kakaoMapKey: "browser-map-key" });
+    expect(parsePublicEnvironment({ KAKAO_LOCAL_REST_API_KEY: "local-rest-secret" }))
+      .not.toHaveProperty("kakaoLocalRestApiKey");
+    expect(() => parseServerEnvironment({
+      NEXT_PUBLIC_KAKAO_LOCAL_REST_API_KEY: "must-not-ship",
+    })).toThrow(/NEXT_PUBLIC_KAKAO_LOCAL_REST_API_KEY/);
   });
 
   it("defaults the NVIDIA intent feature to fully off and omits it entirely when unconfigured", () => {

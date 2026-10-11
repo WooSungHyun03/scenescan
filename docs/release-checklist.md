@@ -77,6 +77,7 @@ pnpm test:integration
 | `SUPABASE_SECRET_KEY` | 계정 삭제·관리 작업의 현재 server secret |
 | `SUPABASE_SERVICE_ROLE_KEY` | 이전 프로젝트의 임시 fallback; 새 설정은 secret key 우선 |
 | `KMA_VILLAGE_FORECAST_SERVICE_KEY` | 승인된 기상청 단기예보 서비스 전용 키 |
+| `KAKAO_LOCAL_REST_API_KEY` | Kakao Local 장소 검색용 REST API 키; 공개 지도 JavaScript 키와 별도 |
 | `PUBLIC_DATA_PORTAL_SERVICE_KEY` | 오프라인 주차 수집 도구 전용; 일반 Vercel runtime에는 불필요 |
 | `NVIDIA_API_KEY` | 텍스트 검색 의도 구조화(P1, 기본 OFF) 전용. 비어 있거나 `NVIDIA_INTENT_ENABLED=false`면 외부 호출이 전혀 없다 |
 | `NVIDIA_INTENT_ENABLED` | 위 기능의 kill switch. Production 기본값은 `false` |
