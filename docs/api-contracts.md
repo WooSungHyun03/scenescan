@@ -1,6 +1,6 @@
 # Shared contracts
 
-The source of truth for TypeScript shapes is `src/types/domain.ts`, `src/types/contracts.ts`, and `src/types/weather.ts`. Change these and this document together.
+The source of truth for TypeScript shapes is `src/types/domain.ts`, `src/types/contracts.ts`, `src/types/weather.ts`, and `src/types/place-discovery.ts`. Change these and this document together.
 
 | Operation | Input | Output | Owner |
 | --- | --- | --- | --- |
@@ -11,6 +11,7 @@ The source of truth for TypeScript shapes is `src/types/domain.ts`, `src/types/c
 | `getSimilarLocations` / `GET /api/locations/[id]/similar` | path param `id` (uuid), optional repeated `exclude` UUIDs (max 200) | `{ results: LocationSearchResult[] }`, selected and seen locations excluded, maximum 8 | Member 1 with 3 |
 | `GET /api/locations` | region/category/limit/offset, or repeated `id` (max 50) | `LocationListResponse`, bounded metadata reads | Member 3 with 2 |
 | `getLocationWeather` / `GET /api/locations/[id]/weather` | location UUID, optional offset-aware ISO 8601 `at` | `{ weather: LocationWeather }` | Member 3 |
+| `getNearbyParking` / `GET /api/locations/[id]/parking` | location UUID, optional radius in metres (default 1000, 100–20000) | `NearbyParkingResponse`, transient PK6 candidates, maximum 5 | Member 3 with 2/4 |
 | `getVerifiedAuthClaims` | request-scoped Supabase auth client or `null` | verified JWT claims or `null`; never trusts `getSession()`/cookie payload alone | Member 3 with 1 |
 | `getVerifiedAuthUser` | request-scoped Supabase auth client or `null` | fresh Auth user only when verified claim subject and `getUser()` id agree, otherwise `null` | Member 3 with 1 |
 | Supabase `signUp` / `signInWithPassword` / `resend` / `signOut` | validated email and transient password in the browser; resend stores only a timestamp | Supabase Auth session/error; no application password persistence or profile row | Member 2 with 3 |
@@ -106,6 +107,14 @@ The location detail weather panel reuses the solar panel's Korea-local shooting 
 The real adapter always calls the fixed `https://dapi.kakao.com` host, authenticates only with the server-side `KAKAO_LOCAL_REST_API_KEY`, times out after five seconds, and accepts caller cancellation. The browser-safe `NEXT_PUBLIC_KAKAO_MAP_KEY` is only for the JavaScript map SDK and is never accepted as a Local REST credential. Missing credentials, invalid input, rejected credentials (401/403), quota exhaustion (429), timeout, cancellation, malformed responses, and other upstream failures use distinct `KakaoLocalError.code` values.
 
 Provider place IDs are de-duplicated within the returned page. Coordinates and numeric distance strings are validated before normalization. A place link is emitted only when it exactly matches the provider ID on `place.map.kakao.com`; accepted HTTP links are upgraded to canonical HTTPS and every other URL becomes `null`. Phone and address fields remain `null` when Kakao omits them. The adapter sets `cache: no-store`, does not auto-page, and has no persistence layer; consumers must not use it for bulk or permanent replication. `createFakeKakaoLocalAdapter` provides the same keyword/category contract for key-free mock and consumer tests.
+
+## `GET /api/locations/[id]/parking`
+
+Returns transient nearby parking candidates for the selected location. `id` must pass `locationIdSchema`. The optional integer `radius` is measured in metres, defaults to 1,000, and is bounded to 100–20,000. The server performs one Kakao category lookup with category `PK6`, distance sort, page 1, and size 15, then independently recomputes straight-line WGS84 distance, removes duplicate provider IDs and records matching reviewed static parking by normalized name or coordinates within 20m, sorts by distance then stable ID, and returns at most five candidates.
+
+Each candidate contains a stable request-time ID, provider place ID, name, nullable address/phone/sanitized Kakao place URL, coordinates, straight-line distance, `relationship: "nearby"`, and source label. `capacity`, `openingHours`, and `priceInfo` are always `null`; the endpoint never infers live availability, prices, hours, or filming-vehicle permission. Production uses the server-only `KAKAO_LOCAL_REST_API_KEY`. Key-free mock mode returns explicitly labelled deterministic synthetic fixtures. Responses use `Cache-Control: no-store` and are never imported into the location catalogue. Missing locations return `LOCATION_NOT_FOUND`, provider quota returns `RATE_LIMITED`, and missing configuration/provider failures return `DATA_UNAVAILABLE`.
+
+The detail client validates the full response with `nearbyParkingResponseSchema`, cancels an in-flight request when the radius changes or the component unmounts, and keeps reviewed `ParkingInfo[]` visible if dynamic lookup fails. The 1km/3km/5km controls only change the transient lookup. Candidate selection and map markers share one client state; an unavailable Kakao JavaScript SDK falls back to the key-free multi-marker preview.
 
 `GET /api/locations/:id/similar` delegates ranking to `getSimilarLocations`, excludes the current/seen locations, returns at most eight results, and disables response caching. Mock mode filters stable synthetic category candidates before ranking; real mode uses the model-safe RPC below.
 

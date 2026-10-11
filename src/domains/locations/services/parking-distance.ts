@@ -21,7 +21,7 @@ function toRadians(degrees: number) {
   return (degrees * Math.PI) / 180;
 }
 
-function getDistanceMeters(origin: GeoPoint, destination: GeoPoint) {
+export function getStraightLineDistanceMeters(origin: GeoPoint, destination: GeoPoint) {
   if (!isValidPoint(origin) || !isValidPoint(destination)) return null;
 
   const latitudeDelta = toRadians(destination.latitude - origin.latitude);
@@ -45,7 +45,7 @@ export function sortParkingByDistance(
   return parking
     .map((item, index) => ({
       parking: item,
-      distanceMeters: getDistanceMeters(origin, item.point),
+      distanceMeters: getStraightLineDistanceMeters(origin, item.point),
       index,
     }))
     .sort((left, right) => {

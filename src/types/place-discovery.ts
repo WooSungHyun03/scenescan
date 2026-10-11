@@ -106,12 +106,51 @@ export const placeDiscoveryPageSchema = z.object({
   isEnd: z.boolean(),
 }).strict();
 
+export const DEFAULT_NEARBY_PARKING_RADIUS_METERS = 1_000;
+export const MAX_NEARBY_PARKING_RESULTS = 5;
+export const NEARBY_PARKING_RADIUS_OPTIONS = [1_000, 3_000, 5_000] as const;
+
+export const nearbyParkingQuerySchema = z.object({
+  radius: z.coerce.number().int().min(100).max(20_000)
+    .default(DEFAULT_NEARBY_PARKING_RADIUS_METERS),
+}).strict();
+
+const safePhoneSchema = z.string().trim().min(1).max(40)
+  .regex(/^[0-9()+\-\s]+$/u)
+  .nullable();
+
+export const nearbyParkingCandidateSchema = z.object({
+  id: z.string().regex(/^(?:kakao-local|fixture):\d+$/u),
+  providerPlaceId: z.string().regex(/^\d+$/u),
+  relationship: z.literal("nearby"),
+  name: z.string().trim().min(1),
+  address: nullableTrimmedText,
+  phone: safePhoneSchema,
+  placeUrl: safeKakaoPlaceUrlSchema.nullable(),
+  point: searchCenterSchema,
+  distanceMeters: z.number().int().nonnegative(),
+  capacity: z.null(),
+  openingHours: z.null(),
+  priceInfo: z.null(),
+  source: z.enum(["Kakao Local", "SceneScan synthetic fixture"]),
+}).strict();
+
+export const nearbyParkingResponseSchema = z.object({
+  locationId: z.string().uuid(),
+  radiusMeters: z.number().int().min(100).max(20_000),
+  candidates: z.array(nearbyParkingCandidateSchema)
+    .max(MAX_NEARBY_PARKING_RESULTS),
+  sourceMode: z.enum(["live", "fixture"]),
+}).strict();
+
 export type KakaoCategoryGroupCode = z.infer<typeof kakaoCategoryGroupCodeSchema>;
 export type PlaceSearchSort = z.infer<typeof placeSearchSortSchema>;
 export type KeywordPlaceSearchRequest = z.input<typeof keywordPlaceSearchRequestSchema>;
 export type CategoryPlaceSearchRequest = z.input<typeof categoryPlaceSearchRequestSchema>;
 export type DiscoveredPlace = z.infer<typeof discoveredPlaceSchema>;
 export type PlaceDiscoveryPage = z.infer<typeof placeDiscoveryPageSchema>;
+export type NearbyParkingCandidate = z.infer<typeof nearbyParkingCandidateSchema>;
+export type NearbyParkingResponse = z.infer<typeof nearbyParkingResponseSchema>;
 
 export type PlaceDiscoveryRequestOptions = {
   signal?: AbortSignal;

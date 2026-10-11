@@ -4,6 +4,7 @@ import { ArrowLeft, MapPin } from "lucide-react";
 import { LocationImageGallery } from "@/domains/locations/components/location-image-gallery";
 import { LocationMap } from "@/domains/locations/components/location-map";
 import { ParkingInfoPanel } from "@/domains/locations/components/parking-info-panel";
+import { ParkingDiscoveryProvider } from "@/domains/locations/components/parking-discovery-context";
 import { PermitInfoPanel } from "@/domains/locations/components/permit-info-panel";
 import { SimilarLocationsSection } from "@/domains/locations/components/similar-locations-section";
 import { ShortlistButton } from "@/domains/locations/components/shortlist-button";
@@ -37,6 +38,7 @@ export default async function LocationPage({ params }: { params: Promise<{ id: s
   catch (error) { similarUnavailable = true; logger.error("Similar locations unavailable", error, { locationId: id }); }
 
   return (
+    <ParkingDiscoveryProvider locationId={location.id}>
     <main className="scene-container pb-14 sm:pb-20">
       <header className="pt-5 sm:pt-8">
         <Link href="/search" className="inline-flex min-h-11 items-center gap-2 rounded-[var(--radius-control)] px-2 text-sm font-bold text-brand hover:bg-brand-soft">
@@ -124,5 +126,6 @@ export default async function LocationPage({ params }: { params: Promise<{ id: s
 
       <SimilarLocationsSection key={location.id} locationId={location.id} initialResults={similar} initialUnavailable={similarUnavailable} />
     </main>
+    </ParkingDiscoveryProvider>
   );
 }
