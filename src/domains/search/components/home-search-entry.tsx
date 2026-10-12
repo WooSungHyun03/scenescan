@@ -41,7 +41,10 @@ export function HomeSearchEntry() {
       if (controller.signal.aborted) return;
       const previous = getSearchSession();
       setSearchSession({
-        mode: "text", file: previous?.file ?? null, results: previous?.results ?? null,
+        mode: "text", file: previous?.file ?? null,
+        // This unfiltered home query resets the shared filters. A previous
+        // filtered image result cannot survive under the new filter labels.
+        results: previous?.district || previous?.category ? null : previous?.results ?? null,
         district: "", category: "",
         text: { query: trimmed, results: data.results, parsedQuery: data.parsedQuery,
           unsupportedConditions: data.unsupportedConditions, notice: data.notice ?? null },

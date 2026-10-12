@@ -68,7 +68,13 @@ function categoryCode(value: string): KakaoCategoryGroupCode | null {
 }
 
 function parseCoordinate(value: string, minimum: number, maximum: number): number {
-  const parsed = Number(value);
+  const trimmed = value.trim();
+  // Number("") invents a zero coordinate and Number("0x10") accepts a
+  // non-geographic encoding. The provider contract supplies decimal strings.
+  if (!/^[+-]?\d+(?:\.\d+)?$/u.test(trimmed)) {
+    throw new KakaoLocalError("MALFORMED_RESPONSE", "Kakao Local returned invalid coordinates");
+  }
+  const parsed = Number(trimmed);
   if (!Number.isFinite(parsed) || parsed < minimum || parsed > maximum) {
     throw new KakaoLocalError("MALFORMED_RESPONSE", "Kakao Local returned invalid coordinates");
   }
@@ -239,9 +245,10 @@ export class KakaoLocalClient implements PlaceDiscoveryAdapter {
       }
 
       const raw = await response.json().catch((cause: unknown) => {
-        throw new KakaoLocalError("MALFORMED_RESPONSE", "Kakao Local returned invalid JSON", {
-          cause,
-        });
+        // Body reads share the request deadline and cancellation signal.
+        // Let the outer boundary classify aborts instead of masking them as JSON errors.
+        if (signal.aborted) throw cause;
+        throw new KakaoLocalError("MALFORMED_RESPONSE", "Kakao Local returned invalid JSON");
       });
       const parsed = rawResponseSchema.safeParse(raw);
       if (!parsed.success) {

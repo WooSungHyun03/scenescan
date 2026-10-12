@@ -1,5 +1,15 @@
 # Maintenance log
 
+## 2026-10-13 — shared search state and Kakao boundary reliability
+
+- Latest main remained `8b8ad67`; preserved the existing untracked team documents and screenshot. No credentials, production data, schema, RLS, DNS or paid settings were changed.
+- Major: changing a shared district/category filter cleared only the visible search mode. Reproduced stale image results after switching back from text; invalidate both snapshots while retaining inputs and cached embeddings. Home text handoff now also discards previously filtered image results when resetting filters.
+- Minor: SSR filter controls were operable before hydration; a selection could disappear when event handlers attached. Reuse the existing upload-readiness guard. Added delayed-script and desktop/mobile filter/reset/home-navigation regressions; ordinary mode switches still preserve results.
+- Major: Kakao blank coordinates became fabricated zero through `Number()` and hexadecimal strings were accepted. Validate decimal notation before numeric/range checks, preserving actual zero and signed decimal values. Response-body timeout/cancellation previously became malformed JSON; reproduced both and preserve the structured codes without raw JSON-parser details.
+- Verification: lint/typecheck, 134 unit suites / 870 tests, 63 mock browser tests, 25 local DB/RLS integration tests and the local Auth/Mailpit account-isolation/recovery/deletion flow pass. Production build and browser client secret scan pass; production dependency audit reports no known vulnerabilities. The Auth suite was rerun sequentially after the first launch encountered the mock dev server's shared Next lock. Release status is reported after push, not presumed here.
+- UI/React skills guided state consistency and existing hydration/event-handler reuse without a redesign or new dependency. Deployment uses the existing main Git integration.
+- Remaining hosted rollout dependencies are unchanged: verified embedding-model provenance and compatible district/vector RPC rollout; authorized searchable Busan metadata/images; intermittent NVIDIA upstream capacity. No unverified model backfill or wholesale migration was attempted.
+
 ## 2026-10-12 — independent full-ticket release audit
 
 - Restored 15 original tickets; evidence/status matrix in `ticket-verification-2026-10-12.md` distinguishes partial source implementations from actual hosted rollout. Protected the three original team documents and the owned home-layout change while syncing latest main.

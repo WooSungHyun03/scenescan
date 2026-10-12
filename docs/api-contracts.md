@@ -266,6 +266,22 @@ Basic rule-based natural-language search over the reviewed Busan catalog's name/
 
 ## Busan district contract (2026-10-08)
 
+### Client search-state consistency (2026-10-13)
+
+District/category filters are shared by image and text search. Changing or resetting
+either filter invalidates both result snapshots, including the hidden mode's results,
+but preserves the selected image, cached embedding and text input. A mode switch
+without a filter change still restores each mode's own results. A new unfiltered
+home text query clears any previous filtered image results before handing off to
+`/search`. Filter controls remain disabled until client handlers are ready, so early
+SSR selections cannot appear accepted and then disappear during hydration.
+
+Kakao Local coordinates must be nonempty finite decimal strings within WGS84 bounds;
+missing coordinates are errors, never inferred zero. Cancellation or timeout during
+response-body reading retains its respective provider error code, rather than being
+reported as malformed JSON. Invalid JSON remains `MALFORMED_RESPONSE` and raw parser
+details are not retained in the loggable error.
+
 The catalog's region dimension is being narrowed from all 17 first-level regions to Busan's 16 구/군 (see `docs/database.md`'s migration 17 entry and `docs/search-ranking.md`). This is a transition-period contract, not a finished data migration:
 
 - `Region`/`REGION_VALUES` (`src/types/location-options.ts`) now contain only `"부산"`. `LocationFilter.region` still validates (accepts only `"부산"`) so an old stored client session/URL doesn't 400, but the application never trusts it: every read (`getLocations`, `getLocation`, `POST /api/search`, `GET /api/locations/[id]/similar`) enforces Busan scope unconditionally and server-side (`BUSAN_REGION` in `src/domains/locations/server/supabase-repository.ts`), not from `filters.region`. A non-Busan id behaves exactly like a missing one through `getLocation` (`null` → 404 via `GET /api/locations/[id]/similar`'s `LOCATION_NOT_FOUND`, or Next's `notFound()` on the detail page) -- there is no separate "wrong region" error code.

@@ -6,6 +6,32 @@ async function switchToTextMode(page: import("@playwright/test").Page) {
   await expect(page.getByLabel("검색어", { exact: true })).toBeVisible();
 }
 
+for (const change of ["district", "category", "reset"] as const) {
+  test(`공유 필터 ${change} 변경은 숨겨진 모드의 이전 결과도 무효화한다`, async ({ page }) => {
+    const errors = collectPageErrors(page);
+    await page.goto("/search");
+    if (change === "reset") await page.getByLabel("지역").selectOption("busan_suyeong_gu");
+    await chooseEvaluationImage(page);
+    await page.getByRole("button", { name: "이 이미지로 장소 찾기" }).click();
+    await expect(page.getByRole("heading", { name: /^추천 장소 \d+곳$/ })).toBeVisible();
+    await switchToTextMode(page);
+    await page.getByLabel("검색어", { exact: true }).fill("산책");
+    await page.getByRole("button", { name: "검색", exact: true }).click();
+    await expect(page.getByRole("heading", { name: "추천 장소 1곳" })).toBeVisible();
+    if (change === "district") await page.getByLabel("지역").selectOption("busan_haeundae_gu");
+    else if (change === "category") await page.getByLabel("공간 종류").selectOption("industrial");
+    else await page.getByRole("button", { name: "초기화", exact: true }).click();
+    await page.getByRole("button", { name: "사진으로 검색", exact: true }).click();
+    await expect(page.getByRole("heading", { name: /^추천 장소 \d+곳$/ })).toHaveCount(0);
+    await expect(page.getByRole("heading", { name: "촬영 장소 둘러보기" })).toBeVisible();
+    await expect(page.getByAltText("선택한 참고 이미지")).toBeVisible();
+    await page.getByRole("button", { name: "텍스트로 검색", exact: true }).click();
+    await expect(page.getByLabel("검색어", { exact: true })).toHaveValue("산책");
+    await expect(page.getByRole("heading", { name: /^추천 장소 \d+곳$/ })).toHaveCount(0);
+    expect(errors).toEqual([]);
+  });
+}
+
 test("텍스트 검색: 검색 → 결과 → 상세 → 뒤로 가도 결과가 유지된다", async ({ page }) => {
   const errors = collectPageErrors(page);
   await page.goto("/search");
@@ -37,6 +63,27 @@ test("텍스트 검색: 검색 → 결과 → 상세 → 뒤로 가도 결과가
   await expect(page.getByLabel("검색어", { exact: true })).toHaveValue("산책");
   await expect(page.getByRole("heading", { name: "추천 장소 1곳" })).toBeVisible();
 
+  expect(errors).toEqual([]);
+});
+
+test("홈의 새 텍스트 검색은 이전 필터의 이미지 결과를 재사용하지 않는다", async ({ page }) => {
+  const errors = collectPageErrors(page);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/search");
+  await page.getByLabel("지역").selectOption("busan_suyeong_gu");
+  await chooseEvaluationImage(page);
+  await page.getByRole("button", { name: "이 이미지로 장소 찾기" }).click();
+  await expect(page.getByRole("heading", { name: /^추천 장소 \d+곳$/ })).toBeVisible();
+  // Client navigation keeps the prior transient search session.
+  await page.getByRole("navigation", { name: "주 메뉴" }).getByRole("link", { name: "SceneScan 홈", exact: true }).click();
+  await page.getByRole("button", { name: "텍스트로 검색", exact: true }).click();
+  await page.getByLabel("어떤 촬영 장소를 찾으세요?").fill("산책");
+  await page.getByRole("button", { name: "장소 검색", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "추천 장소 1곳" })).toBeVisible();
+  await expect(page.getByLabel("지역")).toHaveValue("");
+  await page.getByRole("button", { name: "사진으로 검색", exact: true }).click();
+  await expect(page.getByRole("heading", { name: /^추천 장소 \d+곳$/ })).toHaveCount(0);
+  await expect(page.getByAltText("선택한 참고 이미지")).toBeVisible();
   expect(errors).toEqual([]);
 });
 

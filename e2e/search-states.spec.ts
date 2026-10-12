@@ -55,8 +55,12 @@ test("초기 스크립트가 늦어도 업로드는 준비된 뒤 활성화된�
     await expect(upload).toBeVisible();
     await expect(upload).toBeDisabled();
     await expect(page.getByLabel("참고 이미지 파일 선택")).toBeDisabled();
+    await expect(page.getByLabel("지역")).toBeDisabled();
+    await expect(page.getByLabel("공간 종류")).toBeDisabled();
     releaseScripts();
     await expect(upload).toBeEnabled();
+    await expect(page.getByLabel("지역")).toBeEnabled();
+    await expect(page.getByLabel("공간 종류")).toBeEnabled();
     await chooseEvaluationImage(page);
   } finally {
     releaseScripts();

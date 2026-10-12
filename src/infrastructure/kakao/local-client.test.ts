@@ -45,6 +45,22 @@ afterEach(() => {
 });
 
 describe("KakaoLocalClient", () => {
+  it.each(["", " ", "\t", "0x10", "Infinity", "NaN"])("rejects missing/non-decimal provider coordinates %j instead of inventing zero", async (coordinate) => {
+    const setup = client();
+    for (const field of ["x", "y"]) {
+      setup.fetcher.mockResolvedValueOnce(response([rawPlace({ [field]: coordinate })]));
+      await expect(setup.client.searchByKeyword({ query: "주차장" }))
+        .rejects.toMatchObject({ code: "MALFORMED_RESPONSE" });
+    }
+  });
+
+  it("retains genuine zero and signed decimal coordinates", async () => {
+    const setup = client();
+    setup.fetcher.mockResolvedValue(response([rawPlace({ x: "0", y: "-35.1667" })]));
+    await expect(setup.client.searchByKeyword({ query: "주차장" }))
+      .resolves.toMatchObject({ places: [{ point: { longitude: 0, latitude: -35.1667 } }] });
+  });
+
   it("uses one fixed-host request path for keyword search and deduplicates place IDs", async () => {
     const setup = client();
     setup.fetcher.mockResolvedValue(response([rawPlace(), rawPlace()]));
@@ -159,6 +175,26 @@ describe("KakaoLocalClient", () => {
     const cancelled = adapter.searchByKeyword({ query: "주차장" }, { signal: controller.signal });
     controller.abort();
     await expect(cancelled).rejects.toMatchObject({ code: "CANCELLED" });
+  });
+
+  it.each(["TIMEOUT", "CANCELLED"] as const)("classifies response-body abort as %s, not malformed JSON", async (code) => {
+    vi.useFakeTimers();
+    const controller = new AbortController();
+    const fetcher = vi.fn<typeof fetch>(async (_url, init) => new Response(new ReadableStream({
+      start(stream) {
+        init?.signal?.addEventListener("abort", () => stream.error(new DOMException("Aborted", "AbortError")), { once: true });
+      },
+    })));
+    const setup = client(fetcher);
+    const pending = setup.client.searchByKeyword({ query: "주차장" }, { signal: controller.signal });
+    const assertion = expect(pending).rejects.toMatchObject({ code });
+    if (code === "TIMEOUT") await vi.advanceTimersByTimeAsync(100);
+    else {
+      // Let headers arrive and begin reading the body before cancellation.
+      await vi.advanceTimersByTimeAsync(0);
+      controller.abort();
+    }
+    await assertion;
   });
 });
 

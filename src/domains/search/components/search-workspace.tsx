@@ -356,11 +356,11 @@ export function SearchWorkspace({ examples }: { examples: Location[] }) {
     setActiveLocationId(null);
   }
 
-  // Whichever mode is active -- used so a district/category change never
-  // leaves a stale result from the mode currently on screen (requirement:
-  // invalidate instead of showing stale results).
-  function clearActiveResults() {
-    if (mode === "image") clearImageResults(); else clearTextResults();
+  // Filters belong to both modes. Invalidate both result snapshots, including
+  // the hidden one, but retain each input and the reusable image embedding.
+  function clearFilteredResults() {
+    clearImageResults();
+    clearTextResults();
   }
 
   function switchMode(next: SearchMode) {
@@ -379,7 +379,7 @@ export function SearchWorkspace({ examples }: { examples: Location[] }) {
     setCatalogOffset(0);
     setDistrict("");
     setCategory("");
-    clearActiveResults();
+    clearFilteredResults();
   }
 
   function handleDrop(event: DragEvent<HTMLDivElement>) {
@@ -569,10 +569,10 @@ export function SearchWorkspace({ examples }: { examples: Location[] }) {
       {searchCancelled && !isBusy && <p role="status" className="mt-3 text-sm text-muted">검색을 취소했습니다. 조건을 변경하거나 다시 검색할 수 있습니다.</p>}
 
       <div className="mt-5 border-t border-line pt-4">
-        <div className="flex items-center justify-between"><h3 className="text-sm font-semibold">검색 조건 <span className="font-normal text-muted">(선택)</span></h3><button type="button" disabled={isBusy || !hasActiveFilters} onClick={resetFilters} className="min-h-11 px-2 text-sm font-semibold text-brand disabled:text-stone-400">초기화</button></div>
+        <div className="flex items-center justify-between"><h3 className="text-sm font-semibold">검색 조건 <span className="font-normal text-muted">(선택)</span></h3><button type="button" disabled={!uploadReady || isBusy || !hasActiveFilters} onClick={resetFilters} className="min-h-11 px-2 text-sm font-semibold text-brand disabled:text-stone-400">초기화</button></div>
         <div className="mt-2 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-2">
-          <label className="text-sm font-medium">지역<select name="district" className="scene-input mt-2" value={district} disabled={isBusy} onChange={(e) => { setDistrict(toValidDistrict(e.target.value)); setCatalogOffset(0); clearActiveResults(); setVisibleCount(12); }}><option value="">부산 전체</option>{districtOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label>
-          <label className="text-sm font-medium">공간 종류<select name="category" className="scene-input mt-2" value={category} disabled={isBusy} onChange={(e) => { setCategory(e.target.value as LocationCategory | ""); setCatalogOffset(0); clearActiveResults(); setVisibleCount(12); }}><option value="">전체</option>{categoryOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label>
+          <label className="text-sm font-medium">지역<select name="district" className="scene-input mt-2" value={district} disabled={!uploadReady || isBusy} onChange={(e) => { setDistrict(toValidDistrict(e.target.value)); setCatalogOffset(0); clearFilteredResults(); setVisibleCount(12); }}><option value="">부산 전체</option>{districtOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label>
+          <label className="text-sm font-medium">공간 종류<select name="category" className="scene-input mt-2" value={category} disabled={!uploadReady || isBusy} onChange={(e) => { setCategory(e.target.value as LocationCategory | ""); setCatalogOffset(0); clearFilteredResults(); setVisibleCount(12); }}><option value="">전체</option>{categoryOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label>
         </div>
         <p className="mt-3 text-xs leading-relaxed text-muted">{district ? DISTRICT_LABELS[district] : "부산 전체"} · {categoryOptions.find((option) => option.value === category)?.label ?? "전체 공간"}{catalogLoading || catalog.key !== filterKey ? " — 장소 목록 확인 중…" : catalogError ? " — 목록 연결을 확인해 주세요. 검색은 계속 사용할 수 있습니다." : catalog.hasMore ? ` — 장소 ${filteredExamples.length}곳을 불러왔습니다. 아래에서 더 볼 수 있어요.` : `에 등록된 장소 ${filteredExamples.length}곳.`}</p>
         {mode === "text" && <p className="mt-2 text-xs leading-relaxed text-stone-500">텍스트 검색에도 적용됩니다. 검색어 속 구·군/공간 표현과 다르면 이 필터를 우선합니다.</p>}
