@@ -79,6 +79,7 @@ test("초기 스크립트가 늦어도 업로드는 준비된 뒤 활성화된�
     await expect(page.getByLabel("참고 이미지 파일 선택")).toBeDisabled();
     await expect(page.getByLabel("지역")).toBeDisabled();
     await expect(page.getByLabel("공간 종류")).toBeDisabled();
+    await expect(page.getByRole("button", { name: "텍스트로 검색", exact: true })).toBeDisabled();
     releaseScripts();
     await expect(upload).toBeEnabled();
     await expect(page.getByLabel("지역")).toBeEnabled();
@@ -86,6 +87,27 @@ test("초기 스크립트가 늦어도 업로드는 준비된 뒤 활성화된�
     await chooseEvaluationImage(page);
   } finally {
     releaseScripts();
+  }
+});
+
+test("홈 검색 방식은 초기 스크립트 준비 후 활성화되어 첫 클릭을 잃지 않는다", async ({ page }) => {
+  let release!: () => void;
+  const scriptsReady = new Promise<void>((resolve) => { release = resolve; });
+  await page.route("**/_next/static/**", async (route) => {
+    if (route.request().resourceType() === "script") await scriptsReady;
+    await route.continue();
+  });
+  try {
+    await page.goto("/", { waitUntil: "commit" });
+    const toggle = page.getByRole("button", { name: "텍스트로 검색", exact: true });
+    await expect(toggle).toBeVisible();
+    await expect(toggle).toBeDisabled();
+    release();
+    await expect(toggle).toBeEnabled();
+    await toggle.click();
+    await expect(page.getByLabel("어떤 촬영 장소를 찾으세요?")).toBeVisible();
+  } finally {
+    release();
   }
 });
 

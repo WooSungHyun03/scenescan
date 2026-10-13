@@ -6,10 +6,12 @@ import { LoaderCircle, Search } from "lucide-react";
 import type { TextSearchResponse } from "@/types/text-search";
 import { ImageSearchEntry } from "./image-search-entry";
 import { getSearchSession, setSearchSession, type SearchMode } from "./search-image-draft";
+import { useUploadReady } from "./use-upload-ready";
 
 const examples = ["해운대 바다", "감천문화마을 골목", "부산 카페"];
 
 export function HomeSearchEntry() {
+  const ready = useUploadReady();
   const router = useRouter();
   const [mode, setMode] = useState<SearchMode>("image");
   const [query, setQuery] = useState("");
@@ -61,7 +63,7 @@ export function HomeSearchEntry() {
     <div className="mt-7 max-w-xl">
       <div role="group" aria-label="장소 검색 방식" className="grid grid-cols-2 gap-1 rounded-lg border border-line bg-stone-50 p-1">
         {([['image', '사진으로 검색'], ['text', '텍스트로 검색']] as const).map(([value, label]) => (
-          <button key={value} type="button" aria-pressed={mode === value} disabled={busy}
+          <button key={value} type="button" aria-pressed={mode === value} disabled={!ready || busy}
             onClick={() => { setMode(value); setError(null); }}
             className={`min-h-11 rounded-md px-3 text-sm font-bold ${mode === value ? "bg-brand text-white" : "text-muted hover:bg-brand-soft"}`}>{label}</button>
         ))}

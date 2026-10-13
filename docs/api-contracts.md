@@ -282,6 +282,8 @@ without a filter change still restores each mode's own results. A new unfiltered
 home text query clears any previous filtered image results before handing off to
 `/search`. Filter controls remain disabled until client handlers are ready, so early
 SSR selections cannot appear accepted and then disappear during hydration.
+The same readiness guard applies to both home/workspace search-mode buttons:
+they cannot accept a click until React has attached the switching handlers.
 
 Kakao Local coordinates must be nonempty finite decimal strings within WGS84 bounds;
 missing coordinates are errors, never inferred zero. Cancellation or timeout during

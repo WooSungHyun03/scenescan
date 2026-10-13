@@ -522,7 +522,7 @@ export function SearchWorkspace({ examples }: { examples: Location[] }) {
 
       <div className="mt-4 inline-flex rounded-[var(--radius-control)] border border-line bg-white p-1 shadow-sm" role="group" aria-label="검색 방식 선택">
         {([{ value: "image", label: "사진으로 검색", Icon: ImagePlus }, { value: "text", label: "텍스트로 검색", Icon: MessageSquareText }] as const).map(({ value, label, Icon }) => (
-          <button key={value} type="button" aria-pressed={mode === value} disabled={isBusy} onClick={() => switchMode(value)} className={`inline-flex min-h-11 items-center gap-2 rounded-md px-3 text-sm font-bold disabled:cursor-not-allowed disabled:opacity-60 ${mode === value ? "bg-brand text-white" : "text-muted hover:bg-brand-soft"}`}>
+          <button key={value} type="button" aria-pressed={mode === value} disabled={!uploadReady || isBusy} onClick={() => switchMode(value)} className={`inline-flex min-h-11 items-center gap-2 rounded-md px-3 text-sm font-bold disabled:cursor-not-allowed disabled:opacity-60 ${mode === value ? "bg-brand text-white" : "text-muted hover:bg-brand-soft"}`}>
             <Icon size={16} aria-hidden="true" />{label}
           </button>
         ))}
