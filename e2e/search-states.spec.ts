@@ -6,6 +6,28 @@ import {
   evaluationImagePath,
 } from "./helpers";
 
+test("카탈로그 조회 실패 후 같은 조건으로 명시적으로 다시 불러올 수 있다", async ({ page }) => {
+  let calls = 0;
+  let shouldFail = true;
+  await page.route("**/api/locations?*", async (route) => {
+    calls++;
+    if (shouldFail) await route.fulfill({ status: 503, json: { error: { code: "DATA_UNAVAILABLE" } } });
+    else await route.continue();
+  });
+  const errors = collectPageErrors(page);
+  await page.goto("/search");
+  const alert = page.getByRole("alert").filter({ hasText: "장소 목록을 불러오지 못했습니다" });
+  await expect(alert).toBeVisible();
+  const before = calls;
+  shouldFail = false;
+  await page.getByRole("button", { name: "장소 목록 다시 불러오기", exact: true }).click();
+  await expect.poll(() => calls).toBeGreaterThan(before);
+  await expect(alert).toHaveCount(0);
+  await expect(page.getByRole("heading", { name: "촬영 장소 둘러보기" })).toBeVisible();
+  await expect(page.locator("main article")).toHaveCount(10);
+  expect(errors).toEqual([]);
+});
+
 for (const mode of ["image", "text"] as const) {
   test(`${mode} 검색 취소 후 늦은 응답을 무시하고 다시 검색할 수 있다`, async ({ page }) => {
     const errors = collectPageErrors(page);

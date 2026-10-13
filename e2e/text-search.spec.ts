@@ -6,6 +6,23 @@ async function switchToTextMode(page: import("@playwright/test").Page) {
   await expect(page.getByLabel("검색어", { exact: true })).toBeVisible();
 }
 
+test("반복한 검색어는 API 점수와 화면의 일치 근거를 중복 가산하지 않는다", async ({ page }) => {
+  const errors = collectPageErrors(page);
+  await page.goto("/search");
+  await switchToTextMode(page);
+  await page.getByLabel("검색어", { exact: true }).fill("산책 산책 산책");
+  const reply = page.waitForResponse((response) => response.url().endsWith("/api/search/text") && response.request().method() === "POST");
+  await page.getByRole("button", { name: "검색", exact: true }).click();
+  const response = await reply;
+  expect(response.status()).toBe(200);
+  const body = await response.json();
+  expect(body.parsedQuery.keywords).toEqual(["산책"]);
+  expect(body.results[0].score).toBe(1);
+  await expect(page.getByRole("heading", { name: "추천 장소 1곳" })).toBeVisible();
+  await expect(page.getByText("이름 “산책”", { exact: true })).toHaveCount(1);
+  expect(errors).toEqual([]);
+});
+
 for (const change of ["district", "category", "reset"] as const) {
   test(`공유 필터 ${change} 변경은 숨겨진 모드의 이전 결과도 무효화한다`, async ({ page }) => {
     const errors = collectPageErrors(page);

@@ -28,6 +28,9 @@ function fakeLocation(overrides: Partial<Location> = {}): Location {
 }
 
 describe("buildMatchReasons", () => {
+  it("does not duplicate reasons or claim every field matches a blank keyword", () => {
+    expect(buildMatchReasons(fakeLocation({ name: "산책" }), ["산책", "산책", " "])).toEqual([{ field: "name", keyword: "산책" }]);
+  });
   it("reports which field a keyword matched, for each of name/alias/description/tag", () => {
     const location = fakeLocation({
       name: "광안리 뷰 카페",
@@ -63,6 +66,9 @@ describe("buildMatchReasons", () => {
 });
 
 describe("countMatchingKeywords", () => {
+  it("counts repeated keywords only once", () => {
+    expect(countMatchingKeywords(fakeLocation({ name: "산책" }), ["산책", "산책"])).toBe(1);
+  });
   it("counts a keyword once even when it matches multiple fields", () => {
     const location = fakeLocation({ name: "바다 전망대", tags: ["바다"] });
     expect(countMatchingKeywords(location, ["바다"])).toBe(1);

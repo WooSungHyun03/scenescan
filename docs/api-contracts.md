@@ -252,6 +252,13 @@ Basic rule-based natural-language search over the reviewed Busan catalog's name/
 
 **Ranking**: deterministic score-descending-then-`location_id`-ascending (`rankTextSearchHits`, `src/domains/locations/services/text-search-ranking.ts`), re-applied in application code rather than trusted from the RPC's row order -- the same defensive stance `groupImageMatches`/`rankSimilarLocations` already take for image search. `matchedOn` is re-derived in application code (case-insensitive substring check against the already-hydrated location's own fields) rather than returned by the RPC, since it only needs to run over the final ≤8 results.
 
+Identical repeated keyword tokens are removed before retrieval, preserving first
+occurrence order; repeating a word does not increase its weight. Mock scoring and
+match-reason display defensively deduplicate too, and blank keywords never imply
+a match. This does not add stemming or inferred metadata. Catalog read failures
+offer an explicit same-filter/same-offset retry; they are not silently replaced
+with empty results or retried indefinitely.
+
 **Alias dictionary**: `src/domains/search/server/text-search-aliases.ts` is the single place to add a district/category alias, an unsupported-condition phrase, or a keyword stopword -- see that file's own header comment for exactly how. District aliases include every district's full label and "-구"/"-군"-stripped short form (auto-generated from `DISTRICT_LABELS`, never hand-duplicated), plus a small hand-curated list of well-known neighborhood/landmark names (e.g. "광안리" -> `busan_suyeong_gu`) that don't literally match a district label. A short-form alias is never registered below 2 characters -- 중구/서구/동구/남구/북구 match only by their full label, since their stripped forms (중/서/동/남/북) are common enough to false-positive-match almost any unrelated text (caught by exercising the route manually, not by a unit test).
 
 **Mock mode**: `searchMockLocationsByText` (`src/domains/locations/server/mock-repository.ts`) mirrors the same filter -> score -> `rankTextSearchHits` division of labor as the Supabase path, against fixture `aliases`/`tags` added for this feature (`src/domains/locations/fixtures/locations.ts`).

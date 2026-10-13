@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatStraightLineDistance, sortParkingByDistance } from "./parking-distance";
+import { formatStraightLineDistance, getStraightLineDistanceMeters, sortParkingByDistance } from "./parking-distance";
 import type { ParkingInfo } from "@/types/domain";
 
 function parking(
@@ -63,9 +63,19 @@ describe("sortParkingByDistance", () => {
 });
 
 describe("formatStraightLineDistance", () => {
+  it.each([Number.NaN, Number.POSITIVE_INFINITY, -1])("does not label invalid distance %s as a real measurement", (distance) => {
+    expect(formatStraightLineDistance(distance)).toBe("거리 정보 없음");
+  });
   it("uses one Korean distance rule for every location surface", () => {
     expect(formatStraightLineDistance(null)).toBe("거리 정보 없음");
     expect(formatStraightLineDistance(412.4)).toBe("직선거리 412m");
     expect(formatStraightLineDistance(1_250)).toBe("직선거리 1.3km");
   });
+});
+
+it("returns a finite distance for antipodal valid coordinates despite floating point rounding", () => {
+  const distance = getStraightLineDistanceMeters({ latitude: 8, longitude: 0 }, { latitude: -8, longitude: 180 });
+  expect(distance).not.toBeNull();
+  expect(Number.isFinite(distance)).toBe(true);
+  expect(distance!).toBeCloseTo(Math.PI * 6_371_000, 3);
 });

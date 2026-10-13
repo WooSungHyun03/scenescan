@@ -47,10 +47,10 @@ function extractAndStrip<T>(text: string, aliases: ReadonlyMap<string, T>): { re
 }
 
 function toKeywords(text: string): string[] {
-  return text
+  return [...new Set(text
     .split(TOKEN_SPLIT_PATTERN)
     .map((token) => token.trim())
-    .filter((token) => token.length > 0 && !KEYWORD_STOPWORDS.has(token));
+    .filter((token) => token.length > 0 && !KEYWORD_STOPWORDS.has(token)))];
 }
 
 export function parseTextSearchQuery(rawQuery: string): ParsedTextSearchQuery {

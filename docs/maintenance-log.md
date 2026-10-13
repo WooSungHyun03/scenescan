@@ -1,5 +1,14 @@
 # Maintenance log
 
+## 2026-10-14 — search weighting and catalog recovery
+
+- Synced main through `1e95bdd` (no newer team commits); preserved untracked team documents/screenshot. No production data, credentials, schema, RLS or paid settings changed.
+- Major: repeated text query tokens multiplied the documented distinct-keyword score in rules/mock retrieval. Reproduced parser/scorer failures; deduplicate before RPC retrieval and defensively in mock scoring/match reasons, preserving order and existing intent/filter contracts. Blank reasons cannot imply a match. HTTP/browser regression verifies one token, one score and one badge per matching field without calling NVIDIA.
+- Major: catalog fetch failures had no same-condition recovery action; a failed pagination offset could not trigger another fetch. Added explicit same-filter/same-offset retry with the existing abort/timeout/loading handling; no automatic retry loop or fake empty data. UI skill guided the existing outlined button plus accessible error feedback, not a redesign.
+- Minor: valid antipodal points produced NaN because the Haversine intermediate rounded above one. Reproduced at (8, 0)/(-8, 180), clamped the mathematical intermediate, and prevented NaN/infinity/negative distance labels. Existing nearby parking order/zero-distance behavior remains covered.
+- Verification: lint/typecheck/build, 134 unit suites / 877 tests, 65 mock browser tests, 25 local DB/RLS tests, local Auth/Mailpit flow and client-bundle secret scan pass; production dependency audit reports no known vulnerabilities. The Auth check initially selected both a hidden streamed loading fallback and the signup page; wait for the resolved page and use the accessible main landmark without removing its assertion. Post-release production/CI results are verified after push.
+- Hosted district/vector RPC model-provenance reconciliation and authorized Busan catalog expansion remain external rollout dependencies; no guessed embedding-model backfill was applied.
+
 ## 2026-10-13 — shared search state and Kakao boundary reliability
 
 - Latest main remained `8b8ad67`; preserved the existing untracked team documents and screenshot. No credentials, production data, schema, RLS, DNS or paid settings were changed.

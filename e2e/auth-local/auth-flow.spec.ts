@@ -44,7 +44,10 @@ test("Auth 전체 흐름과 계정별 관심 장소가 안전하게 이어진다
   cleanupUserIds.push(await createConfirmedTestUser(request, secondEmail, secondPassword));
 
   await page.goto("/signup");
-  await expect(page.locator("main")).not.toContainText("Supabase");
+  // Next's streamed loading fallback can remain hidden in the DOM. Assert
+  // against the resolved accessible page, not every hidden <main> element.
+  await expect(page.getByRole("heading", { level: 1, name: "회원가입", exact: true })).toBeVisible();
+  await expect(page.getByRole("main")).not.toContainText("Supabase");
   await page.getByLabel("이메일").fill(email);
   await page.getByLabel("비밀번호", { exact: true }).fill(password);
   await page.getByLabel("비밀번호 확인").fill(password);

@@ -33,14 +33,17 @@ export function getStraightLineDistanceMeters(origin: GeoPoint, destination: Geo
     Math.cos(originLatitude) *
       Math.cos(destinationLatitude) *
       Math.sin(longitudeDelta / 2) ** 2;
+  // Rounding at antipodal points can produce 1 + epsilon despite valid
+  // WGS84 inputs; clamp only this mathematical [0, 1] intermediate.
+  const boundedHaversine = Math.max(0, Math.min(1, haversine));
   const angularDistance =
-    2 * Math.atan2(Math.sqrt(haversine), Math.sqrt(1 - haversine));
+    2 * Math.atan2(Math.sqrt(boundedHaversine), Math.sqrt(1 - boundedHaversine));
   return earthRadiusMeters * angularDistance;
 }
 
 /** One distance label shared by detail and comparison surfaces. */
 export function formatStraightLineDistance(distanceMeters: number | null): string {
-  if (distanceMeters === null) return "거리 정보 없음";
+  if (distanceMeters === null || !Number.isFinite(distanceMeters) || distanceMeters < 0) return "거리 정보 없음";
   if (distanceMeters < 1_000) return `직선거리 ${Math.round(distanceMeters)}m`;
   return `직선거리 ${(distanceMeters / 1_000).toLocaleString("ko-KR", {
     maximumFractionDigits: 1,

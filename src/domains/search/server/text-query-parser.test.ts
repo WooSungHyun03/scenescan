@@ -2,6 +2,9 @@ import { describe, expect, it } from "vitest";
 import { parseTextSearchQuery } from "./text-query-parser";
 
 describe("parseTextSearchQuery", () => {
+  it("does not multiply keyword weight when a query repeats a word", () => {
+    expect(parseTextSearchQuery("산책 산책 산책").keywords).toEqual(["산책"]);
+  });
   it("resolves a district alias and leaves the remaining text as a keyword", () => {
     const result = parseTextSearchQuery("해운대 맛집");
     expect(result.district).toBe("busan_haeundae_gu");
