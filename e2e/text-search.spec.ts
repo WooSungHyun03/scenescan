@@ -93,6 +93,7 @@ test("홈의 새 텍스트 검색은 이전 필터의 이미지 결과를 재사
   await expect(page.getByRole("heading", { name: /^추천 장소 \d+곳$/ })).toBeVisible();
   // Client navigation keeps the prior transient search session.
   await page.getByRole("navigation", { name: "주 메뉴" }).getByRole("link", { name: "SceneScan 홈", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "원하는 장면을 알려주면, 비슷한 장소를 찾아드려요." })).toBeVisible();
   await page.getByRole("button", { name: "텍스트로 검색", exact: true }).click();
   await page.getByLabel("어떤 촬영 장소를 찾으세요?").fill("산책");
   await page.getByRole("button", { name: "장소 검색", exact: true }).click();

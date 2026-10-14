@@ -1,7 +1,23 @@
 import { describe, expect, it } from "vitest";
-import { getAttributionViewModel, getSafeSourceUrl } from "./source-attribution";
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import { getAttributionViewModel, getSafeSourceUrl, SourceAttribution } from "./source-attribution";
 
 describe("getSafeSourceUrl", () => {
+  it("renders honest invalid-link feedback without disclosing rejected URLs", () => {
+    const unsafe = "https://user:fake-render-canary@example.com/source";
+    const html = renderToStaticMarkup(createElement(SourceAttribution, {
+      source: unsafe, sourceUrl: unsafe, licenseUrl: unsafe, showDetails: true,
+    }));
+    expect(html).not.toContain("fake-render-canary");
+    expect(html).not.toContain("href=");
+    expect(html).toContain("형식");
+  });
+  it("does not expose credential-bearing source URLs as links or fallback text", () => {
+    const unsafe = "https://user:fake-source-canary@data.example/private";
+    expect(getSafeSourceUrl(unsafe)).toBeNull();
+    expect(getAttributionViewModel({ source: unsafe, sourceUrl: unsafe, licenseUrl: unsafe })).toMatchObject({ source: null, sourceUrl: null, licenseUrl: null });
+  });
   it("accepts trimmed HTTP and HTTPS source links", () => {
     expect(getSafeSourceUrl(" https://data.example/location?id=1 ")).toBe(
       "https://data.example/location?id=1",

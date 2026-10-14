@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { getSafeHttpUrl, getSafeImageUrl, getSafeSourceText } from "@/shared/http/safe-url";
 import type { District, Location, ParkingInfo } from "@/types/domain";
 import type { ImageMatch } from "@/domains/locations/services/group-image-matches";
 import type { TextSearchHit } from "@/types/text-search";
@@ -170,32 +171,23 @@ function optionalStringArray(value: unknown): string[] {
   return value.filter((item): item is string => isNonEmptyString(item));
 }
 
-function isHttpUrl(value: unknown): value is string {
-  if (!isNonEmptyString(value)) return false;
-  try {
-    const url = new URL(value);
-    return url.protocol === "http:" || url.protocol === "https:";
-  } catch {
-    return false;
-  }
-}
-
 function mapImage(row: LocationImageRow, locationId: string, fallbackAlt: string, warnings: MapperWarning[]): Location["images"][number] | null {
+  const imageUrl = getSafeImageUrl(row?.image_url);
   if (!isNonEmptyString(row?.id) || !isNonEmptyString(row?.image_url)
-    || !((row.image_url.startsWith("/") && !row.image_url.startsWith("//")) || isHttpUrl(row.image_url))) {
+    || !imageUrl) {
     warnings.push({ field: "location_images", reason: "missing required id or image_url", value: row });
     return null;
   }
   return {
     id: row.id,
     locationId,
-    imageUrl: row.image_url,
+    imageUrl,
     alt: optionalString(row.alt) ?? fallbackAlt,
-    source: optionalString(row.source),
-    sourceUrl: optionalString(row.source_url),
+    source: getSafeSourceText(row.source),
+    sourceUrl: getSafeHttpUrl(row.source_url),
     author: optionalString(row.author),
     license: optionalString(row.license),
-    licenseUrl: optionalString(row.license_url),
+    licenseUrl: getSafeHttpUrl(row.license_url),
     lastVerifiedAt: optionalString(row.last_verified_at),
   };
 }
@@ -215,8 +207,8 @@ function mapParking(row: ParkingRow, locationId: string, warnings: MapperWarning
     capacity: isFiniteNumber(row.capacity) ? row.capacity : null,
     openingHours: optionalString(row.opening_hours),
     priceInfo: optionalString(row.price_info),
-    source: optionalString(row.source),
-    sourceUrl: optionalString(row.source_url),
+    source: getSafeSourceText(row.source),
+    sourceUrl: getSafeHttpUrl(row.source_url),
     referenceDate: optionalString(row.reference_date),
     lastVerifiedAt: optionalString(row.last_verified_at),
   };
@@ -254,17 +246,17 @@ export function toLocation(row: LocationRow): MapLocationResult {
       contactName: row.contact_name,
       contactPhone: row.contact_phone,
       note: row.permit_note,
-      source: optionalString(row.permit_source),
-      sourceUrl: optionalString(row.permit_source_url),
+      source: getSafeSourceText(row.permit_source),
+      sourceUrl: getSafeHttpUrl(row.permit_source_url),
       referenceDate: optionalString(row.permit_reference_date),
       lastVerifiedAt: optionalString(row.permit_last_verified_at),
     },
     parking,
-    source: optionalString(row.source),
-    sourceUrl: row.source_url,
+    source: getSafeSourceText(row.source),
+    sourceUrl: getSafeHttpUrl(row.source_url),
     author: optionalString(row.author),
     license: optionalString(row.license),
-    licenseUrl: optionalString(row.license_url),
+    licenseUrl: getSafeHttpUrl(row.license_url),
     lastVerifiedAt: optionalString(row.last_verified_at),
   };
   return { location, warnings };

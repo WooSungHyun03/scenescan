@@ -100,7 +100,10 @@ function warnAboutLegacyParkingSchema(error: unknown): void {
 
 function logRowWarnings(locationId: string, warnings: ReturnType<typeof toLocation>["warnings"]): void {
   if (warnings.length === 0) return;
-  logger.warn("Dropped malformed location sub-resource row", { locationId, warnings });
+  logger.warn("Dropped malformed location sub-resource row", {
+    locationId,
+    warnings: warnings.map(({ field, reason }) => ({ field, reason })),
+  });
 }
 
 function mapRows(data: unknown): Location[] {

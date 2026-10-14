@@ -1,6 +1,25 @@
 import { expect, test } from "@playwright/test";
 import { chooseEvaluationImage, collectPageErrors } from "./helpers";
 
+test("unsafe image credentials never become a browser request or visible source text", async ({ page }) => {
+  const errors = collectPageErrors(page);
+  const { locations } = await (await page.request.get("/api/locations?limit=50")).json();
+  const unsafe = "https://user:fake-browser-canary@images.example/a.jpg";
+  const candidate = { ...locations[0], images: [{ ...locations[0].images[0], imageUrl: unsafe, source: unsafe, sourceUrl: unsafe }] };
+  const unsafeRequests: string[] = [];
+  page.on("request", (request) => {
+    if (request.url().includes("fake-browser-canary") || request.url().includes("images.example")) unsafeRequests.push(request.url());
+  });
+  await page.addInitScript((id) => localStorage.setItem("scenescan.shortlist.location-ids.v1", JSON.stringify([id])), candidate.id);
+  await page.route("**/api/locations?**", (route) => route.fulfill({ json: { locations: [candidate], filters: {} } }));
+  await page.goto("/shortlist");
+  await expect(page.getByRole("heading", { name: candidate.name })).toBeVisible();
+  await expect(page.locator("main article img")).toHaveAttribute("src", /\/images\/placeholder\.svg$/);
+  await expect(page.locator("body")).not.toContainText("fake-browser-canary");
+  expect(unsafeRequests).toEqual([]);
+  expect(errors).toEqual([]);
+});
+
 test("filter candidates outside the initial browse page do not short-circuit search", async ({ page }) => {
   const errors = collectPageErrors(page);
   const response = await page.request.get("/api/locations?limit=50");

@@ -1,21 +1,12 @@
 import { ExternalLink } from "lucide-react";
+import { getSafeHttpUrl, getSafeSourceText } from "@/shared/http/safe-url";
 
 function getValue(value: string | null | undefined) {
   return value?.trim() || null;
 }
 
 export function getSafeSourceUrl(value: string | null | undefined) {
-  const candidate = getValue(value);
-  if (!candidate) return null;
-
-  try {
-    const url = new URL(candidate);
-    return url.protocol === "http:" || url.protocol === "https:"
-      ? url.toString()
-      : null;
-  } catch {
-    return null;
-  }
+  return getSafeHttpUrl(value);
 }
 
 function getVerifiedDate(value: string | null | undefined) {
@@ -46,7 +37,7 @@ export function getAttributionViewModel({
   licenseUrl?: string | null;
   lastVerifiedAt?: string | null;
 }) {
-  const sourceName = getValue(source);
+  const sourceName = getSafeSourceText(source);
   const sourceAsUrl = getSafeSourceUrl(sourceName);
   const explicitSourceUrl = getSafeSourceUrl(sourceUrl);
   return {

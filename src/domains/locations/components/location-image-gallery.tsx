@@ -5,28 +5,13 @@ import Image from "next/image";
 import { ImageOff, Images } from "lucide-react";
 import type { LocationImage } from "@/types/domain";
 import { SourceAttribution } from "./source-attribution";
+import { getSafeImageUrl } from "@/shared/http/safe-url";
+export { getSafeImageUrl } from "@/shared/http/safe-url";
 
 type LocationImageGalleryProps = {
   images: LocationImage[];
   locationName: string;
 };
-
-export function getSafeImageUrl(value: string | null | undefined) {
-  const trimmed = value?.trim();
-  if (!trimmed) return null;
-  if (trimmed.startsWith("/") && !trimmed.startsWith("//")) {
-    return trimmed;
-  }
-
-  try {
-    const url = new URL(trimmed);
-    return url.protocol === "http:" || url.protocol === "https:"
-      ? url.toString()
-      : null;
-  } catch {
-    return null;
-  }
-}
 
 export function getAvailableGalleryImages(images: LocationImage[]) {
   return images.flatMap((image) => {

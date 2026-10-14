@@ -109,6 +109,18 @@ beforeEach(() => {
 });
 
 describe("SupabaseLocationRepository / MockLocationRepository contract parity", () => {
+  it("logs malformed row diagnostics without raw URL credentials", async () => {
+    const { client } = fakeClient({ query: { data: [locationRow({
+      location_images: [{ id: "img-1", image_url: "https://user:fake-warning-canary@example.com/a.jpg" }],
+    })], error: null } });
+    getSupabaseClientMock.mockReturnValue(client);
+    expect((await getSupabaseLocations())[0].images).toEqual([]);
+    expect(loggerWarnMock).toHaveBeenCalled();
+    expect(JSON.stringify(loggerWarnMock.mock.calls)).not.toContain("fake-warning-canary");
+    expect(loggerWarnMock.mock.calls[0][1]).toEqual({
+      locationId: "loc-1", warnings: [{ field: "location_images", reason: "missing required id or image_url" }],
+    });
+  });
   it("getLocations: both return a Location[] no larger than the default page size, missing → []", async () => {
     expect(getMockLocations()).toHaveLength(10);
 

@@ -22,6 +22,9 @@ function image(id: string, imageUrl: string, author: string): LocationImage {
 }
 
 describe("location image gallery attribution", () => {
+  it.each(["https://user:fake-image-canary@images.example/a.jpg", "/\\images.example/a.jpg", "/images/a\nb.jpg"])("rejects credential-bearing or ambiguous image path %j", (url) => {
+    expect(getSafeImageUrl(url)).toBeNull();
+  });
   it("accepts local and HTTP images while dropping unsafe image URLs", () => {
     expect(getSafeImageUrl("/images/demo.svg")).toBe("/images/demo.svg");
     expect(getSafeImageUrl("https://images.example/test.jpg")).toBe("https://images.example/test.jpg");

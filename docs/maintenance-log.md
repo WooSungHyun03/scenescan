@@ -1,5 +1,14 @@
 # Maintenance log
 
+## 2026-10-15 — public URL and diagnostic-log boundaries
+
+- Synced main at `6498e8a`; preserved untracked team documents/screenshot. No credentials, production rows, schema, RLS or paid settings changed.
+- Major: fake-canary regressions reproduced credential-bearing HTTP image/source URLs being accepted; rejected URLs could also be shown as plain source labels. Reuse one small public-display URL validator across gallery/cards, attribution and the Supabase mapper. Reject userinfo, backslashes, network paths and embedded control characters, retain ordinary HTTP(S) provenance and root-relative mock assets, and return null/drop malformed images without inventing data. This is not an SSRF allowlist.
+- Major: malformed sub-resource warnings included the complete original row. Repository logs now retain only location ID, field and reason; regression proves raw credential canaries never reach logger arguments. There is no evidence of an actual production key leak.
+- UI skill guided preserving existing missing-image/invalid-source feedback; React review retained existing state, component contracts and accessibility. SSR and real browser regressions check that rejected credentials are neither rendered nor requested.
+- Gates: 135 unit suites / 894 tests, 67 mock browser tests, 25 local DB/RLS tests, lint/typecheck and production build pass. Initial browser run hit a navigation race: it clicked the search workspace's same-named mode button before home navigation completed. Waiting for the actual home heading preserves the flow assertions; complete rerun passes. Client secret-boundary scan and production dependency audit pass; 30 embedding schema checks and 284 validate-only vectors pass. Auth and post-push deployment/CI verification are reported separately after completion.
+- Remaining hosted dependencies: compatible district/vector RPC rollout with verified embedding-model provenance and authorized searchable Busan data expansion. Do not blindly backfill model IDs or apply all historical migrations.
+
 ## 2026-10-14 — search weighting and catalog recovery
 
 - Synced main through `1e95bdd` (no newer team commits); preserved untracked team documents/screenshot. No production data, credentials, schema, RLS or paid settings changed.

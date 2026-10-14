@@ -35,6 +35,15 @@ function baseRow(overrides: Partial<LocationRow> = {}): LocationRow {
 }
 
 describe("toLocation", () => {
+  it("removes credential-bearing provenance before emitting the public Location", () => {
+    const unsafe = "https://user:fake-source-canary@data.example/private";
+    const { location } = toLocation(baseRow({
+      source: unsafe, source_url: unsafe, license_url: unsafe, permit_source_url: unsafe,
+      location_images: [{ id: "image-1", image_url: "https://images.example/a.jpg", alt: null, source: unsafe, source_url: unsafe, license_url: unsafe }],
+      parking: [{ id: "p-1", name: "주차장", latitude: 35, longitude: 129, capacity: null, opening_hours: null, price_info: null, source: unsafe, source_url: unsafe }],
+    }));
+    expect(JSON.stringify(location)).not.toContain("fake-source-canary");
+  });
   it("drops unsafe images and parking coordinates, rejecting invalid location coordinates", () => {
     const { location, warnings } = toLocation(baseRow({ location_images: [{ id: "bad", image_url: "javascript:alert(1)", alt: null }], parking: [{ id: "bad", name: "invalid", latitude: 100, longitude: 0, capacity: null, opening_hours: null, price_info: null, source: null }] }));
     expect(location.images).toEqual([]);
