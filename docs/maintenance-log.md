@@ -1,5 +1,14 @@
 # Maintenance log
 
+## 2026-10-16 — deterministic text fallback and keyword identity
+
+- Synced main at `381daad` with no newer team commits; preserved the existing untracked team documents/screenshot. No credentials, provider/model configuration, production data, schema, RLS or paid services changed.
+- Major: exact-only keyword deduplication counted `Beach BEACH beach` multiple times despite case-insensitive retrieval. Three failing parser/merge/scorer regressions reproduced it. Reuse a pure shared trim/case-identity helper before RPC retrieval, NVIDIA additive merging, mock scoring and match-reason display; preserve first spelling/order without stemming or accent folding.
+- Major: basic fallback retained attached particles and request grammar in `광안대교가 보이는 장소`, losing literal metadata matches. Normalize only the explicit noun + 이/가 보이는 construction; preserve its full noun after district/category extraction. Keep the original sightline phrase in unsupported conditions so results never imply verified visibility. Scope rejection, district conflict and explicit-filter precedence remain unchanged. Unit and key-free browser regressions cover noun/category retention, scope rejection, arbitrary names and visible unverified-condition feedback.
+- Direct existing-client NVIDIA probe returned safe error code `UPSTREAM`, HTTP 503, in 1.7s. This is an upstream failure, not proof that keys/models are wrong or fixed; no alternate provider/model was introduced. The existing structured fallback notice remains active.
+- Gates: lint/typecheck/production build and client-bundle secret scan pass; 136 unit suites / 904 tests, 68 mock browser tests, 25 DB/RLS integration tests and the local Auth/Mailpit/account-isolation flow pass. Initial concurrent build/dev-browser run timed out in four Auth checks; the complete browser rerun after build passed without suppressing assertions or changing timeouts. Offline schema audit passes 30 checks, embedding validation passes 284 vectors, metadata validation passes 223 rows, and production dependency audit reports no known vulnerabilities. Post-push CI and production flows are verified separately.
+- Hosted district/vector RPC and embedding-model provenance reconciliation, authorized Busan metadata expansion and intermittent NVIDIA availability remain external rollout/provider dependencies. No blind migration/model backfill or production account mutation was attempted.
+
 ## 2026-10-15 — public URL and diagnostic-log boundaries
 
 - Synced main at `6498e8a`; preserved untracked team documents/screenshot. No credentials, production rows, schema, RLS or paid settings changed.

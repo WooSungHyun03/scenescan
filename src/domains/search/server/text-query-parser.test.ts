@@ -2,6 +2,27 @@ import { describe, expect, it } from "vitest";
 import { parseTextSearchQuery } from "./text-query-parser";
 
 describe("parseTextSearchQuery", () => {
+  it.each([
+    ["광안대교가 보이는 장소", "광안대교", "광안대교가 보이는"],
+    ["바다가 보이는 곳", "바다", "바다가 보이는"],
+    ["건물이 보이는 장소", "건물", "건물이 보이는"],
+  ])("separates a literal sightline noun from the unverified condition: %s", (query, noun, condition) => {
+    expect(parseTextSearchQuery(query)).toMatchObject({ keywords: [noun], unsupportedConditions: [condition] });
+  });
+  it("preserves scope rejection and does not strip particles from arbitrary names", () => {
+    expect(parseTextSearchQuery("서울에서 광안대교가 보이는 장소").outOfScope).toBe(true);
+    expect(parseTextSearchQuery("벼락부자가").keywords).toEqual(["벼락부자가"]);
+  });
+  it("keeps the full landmark noun after district/category alias extraction", () => {
+    const parsed = parseTextSearchQuery("해운대해수욕장이 보이는 장소");
+    expect(parsed.district).toBe("busan_haeundae_gu");
+    expect(parsed.keywords).toContain("해운대해수욕장");
+    expect(parsed.keywords).not.toContain("보이는");
+    expect(parsed.unsupportedConditions).toContain("해운대해수욕장이 보이는");
+  });
+  it("deduplicates case variants using retrieval's case-insensitive identity", () => {
+    expect(parseTextSearchQuery("Beach BEACH beach").keywords).toEqual(["Beach"]);
+  });
   it("does not multiply keyword weight when a query repeats a word", () => {
     expect(parseTextSearchQuery("산책 산책 산책").keywords).toEqual(["산책"]);
   });

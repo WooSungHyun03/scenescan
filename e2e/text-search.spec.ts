@@ -6,6 +6,25 @@ async function switchToTextMode(page: import("@playwright/test").Page) {
   await expect(page.getByLabel("검색어", { exact: true })).toBeVisible();
 }
 
+test("기본 검색도 조망 문장의 명사를 찾되 조망을 보장하지 않는다", async ({ page }) => {
+  const errors = collectPageErrors(page);
+  await page.goto("/search");
+  await switchToTextMode(page);
+  await page.getByLabel("검색어", { exact: true }).fill("바다가 보이는 장소");
+  const reply = page.waitForResponse((response) => response.url().endsWith("/api/search/text") && response.request().method() === "POST");
+  await page.getByRole("button", { name: "검색", exact: true }).click();
+  const response = await reply;
+  expect(response.status()).toBe(200);
+  const body = await response.json();
+  expect(body.intentSource).toBe("rules");
+  expect(body.parsedQuery.keywords).toEqual(["바다"]);
+  expect(body.unsupportedConditions).toContain("바다가 보이는");
+  expect(body.results.length).toBeGreaterThan(0);
+  await expect(page.getByText(/다음 조건은 확인할 수 있는 정보가 없어 반영하지 못했습니다: 바다가 보이는/)).toBeVisible();
+  await expect(page.locator("main article")).toHaveCount(body.results.length);
+  expect(errors).toEqual([]);
+});
+
 test("반복한 검색어는 API 점수와 화면의 일치 근거를 중복 가산하지 않는다", async ({ page }) => {
   const errors = collectPageErrors(page);
   await page.goto("/search");

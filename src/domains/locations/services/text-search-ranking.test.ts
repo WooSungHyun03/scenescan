@@ -66,6 +66,12 @@ describe("buildMatchReasons", () => {
 });
 
 describe("countMatchingKeywords", () => {
+  it("does not multiply scores or reasons for case/whitespace variants", () => {
+    const location = fakeLocation({ name: "Beach" });
+    const keywords = [" Beach ", "BEACH", "beach"];
+    expect(countMatchingKeywords(location, keywords)).toBe(1);
+    expect(buildMatchReasons(location, keywords)).toEqual([{ field: "name", keyword: "Beach" }]);
+  });
   it("counts repeated keywords only once", () => {
     expect(countMatchingKeywords(fakeLocation({ name: "산책" }), ["산책", "산책"])).toBe(1);
   });

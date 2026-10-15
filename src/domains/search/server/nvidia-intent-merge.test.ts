@@ -16,6 +16,12 @@ function base(overrides: Partial<ParsedTextSearchQuery> = {}): ParsedTextSearchQ
 }
 
 describe("applyNvidiaIntentOverride", () => {
+  it("does not boost the same keyword when NVIDIA returns different casing", () => {
+    const merged = applyNvidiaIntentOverride(base({ keywords: ["Beach"] }), {
+      district: null, category: null, keywords: ["beach", "BEACH"], unsupportedConditions: [],
+    });
+    expect(merged.keywords).toEqual(["Beach"]);
+  });
   it("keeps the base parser's district/category and never lets NVIDIA override an already-found value", () => {
     const merged = applyNvidiaIntentOverride(
       base({ district: "busan_haeundae_gu", category: "urban" }),

@@ -1,5 +1,6 @@
 import type { District, LocationCategory } from "@/types/domain";
 import type { ParsedTextSearchQuery } from "@/types/text-search";
+import { uniqueSearchKeywords } from "../../../shared/text/search-keywords.ts";
 import {
   CATEGORY_ALIASES,
   DISTRICT_ALIASES,
@@ -47,10 +48,10 @@ function extractAndStrip<T>(text: string, aliases: ReadonlyMap<string, T>): { re
 }
 
 function toKeywords(text: string): string[] {
-  return [...new Set(text
+  return uniqueSearchKeywords(text
     .split(TOKEN_SPLIT_PATTERN)
     .map((token) => token.trim())
-    .filter((token) => token.length > 0 && !KEYWORD_STOPWORDS.has(token)))];
+    .filter((token) => token.length > 0 && !KEYWORD_STOPWORDS.has(token)));
 }
 
 export function parseTextSearchQuery(rawQuery: string): ParsedTextSearchQuery {
@@ -77,10 +78,21 @@ export function parseTextSearchQuery(rawQuery: string): ParsedTextSearchQuery {
     };
   }
 
+  // Normalize only this explicit Korean sightline construction, not arbitrary
+  // trailing particles in names. Metadata can match the noun but cannot prove
+  // visibility from a shooting position, so retain the literal condition too.
+  const sightlineNouns: string[] = [];
+  const sightlineConditions: string[] = [];
+  const withoutSightlineGrammar = normalized.replace(/([\p{L}\p{N}]+?)(?:이|가)\s+보이는/gu, (phrase, noun: string) => {
+    sightlineNouns.push(noun);
+    sightlineConditions.push(phrase);
+    return noun;
+  });
+
   // Strip unsupported-condition phrases first so they never leak into the
   // keyword list and never coincidentally drive a text match (requirement 6).
   const conditionMap = new Map(UNSUPPORTED_CONDITION_PHRASES.map((phrase) => [phrase, phrase] as const));
-  const { remaining: afterConditions, matched: unsupportedConditions } = extractAndStrip(normalized, conditionMap);
+  const { remaining: afterConditions, matched: unsupportedConditions } = extractAndStrip(withoutSightlineGrammar, conditionMap);
 
   const { remaining: afterDistrict, matched: districtMatches } = extractAndStrip(afterConditions, DISTRICT_ALIASES);
   const districtConflict = districtMatches.length > 1;
@@ -90,10 +102,11 @@ export function parseTextSearchQuery(rawQuery: string): ParsedTextSearchQuery {
   return {
     district: districtConflict ? null : ((districtMatches[0] as District | undefined) ?? null),
     category: (categoryMatches[0] as LocationCategory | undefined) ?? null,
-    keywords: toKeywords(afterCategory),
+    // A category alias (e.g. 바다) must not erase the explicit sightline noun.
+    keywords: uniqueSearchKeywords([...toKeywords(afterCategory), ...sightlineNouns]),
     districtConflict,
     conflictingDistricts: districtConflict ? districtMatches : [],
     outOfScope: false,
-    unsupportedConditions,
+    unsupportedConditions: [...new Set([...unsupportedConditions, ...sightlineConditions])],
   };
 }

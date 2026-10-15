@@ -1,4 +1,5 @@
 import type { Location } from "@/types/domain";
+import { uniqueSearchKeywords } from "@/shared/text/search-keywords";
 import type { TextSearchHit, TextSearchMatchReason, TextSearchResult } from "@/types/text-search";
 
 function compareText(left: string, right: string): number {
@@ -24,7 +25,7 @@ function matchesAnyField(location: Location, keyword: string): boolean {
  * still counts once, same as the SQL `count(*) from unnest(keywords) ...`.
  */
 export function countMatchingKeywords(location: Location, keywords: readonly string[]): number {
-  return [...new Set(keywords)].filter((keyword) => keyword.trim().length > 0 && matchesAnyField(location, keyword)).length;
+  return uniqueSearchKeywords(keywords).filter((keyword) => matchesAnyField(location, keyword)).length;
 }
 
 /**
@@ -36,8 +37,7 @@ export function countMatchingKeywords(location: Location, keywords: readonly str
  */
 export function buildMatchReasons(location: Location, keywords: readonly string[]): TextSearchMatchReason[] {
   const reasons: TextSearchMatchReason[] = [];
-  for (const keyword of new Set(keywords)) {
-    if (!keyword.trim()) continue;
+  for (const keyword of uniqueSearchKeywords(keywords)) {
     if (containsKeyword(location.name, keyword)) reasons.push({ field: "name", keyword });
     if (location.aliases.some((alias) => containsKeyword(alias, keyword))) reasons.push({ field: "alias", keyword });
     if (containsKeyword(location.description, keyword)) reasons.push({ field: "description", keyword });

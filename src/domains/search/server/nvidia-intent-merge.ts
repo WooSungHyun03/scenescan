@@ -1,5 +1,6 @@
 import type { NvidiaIntentResult } from "@/infrastructure/nvidia/intent-contract";
 import type { ParsedTextSearchQuery } from "@/types/text-search";
+import { uniqueSearchKeywords } from "../../../shared/text/search-keywords.ts";
 
 function dedupe(items: readonly string[]): string[] {
   return [...new Set(items)];
@@ -38,7 +39,7 @@ function dedupe(items: readonly string[]): string[] {
  * unaffected by whether the value it's overriding came from the base
  * parser or from NVIDIA.
  *
- * Type-only imports only (no runtime dependency) so this module is safe to
+ * Only type imports and a pure keyword utility, so this module is safe to
  * import from both the Next.js-side adapter (nvidia-intent-adapter.ts,
  * server-only-guarded) and the plain-Node eval script
  * (scripts/nvidia/evaluate-intent.ts) without pulling in anything
@@ -52,7 +53,7 @@ export function applyNvidiaIntentOverride(
     ...base,
     district: base.districtConflict ? base.district : (base.district ?? nvidia.district),
     category: base.category ?? nvidia.category,
-    keywords: dedupe([...base.keywords, ...nvidia.keywords]),
+    keywords: uniqueSearchKeywords([...base.keywords, ...nvidia.keywords]),
     unsupportedConditions: dedupe([...base.unsupportedConditions, ...nvidia.unsupportedConditions]),
   };
 }

@@ -252,10 +252,16 @@ Basic rule-based natural-language search over the reviewed Busan catalog's name/
 
 **Ranking**: deterministic score-descending-then-`location_id`-ascending (`rankTextSearchHits`, `src/domains/locations/services/text-search-ranking.ts`), re-applied in application code rather than trusted from the RPC's row order -- the same defensive stance `groupImageMatches`/`rankSimilarLocations` already take for image search. `matchedOn` is re-derived in application code (case-insensitive substring check against the already-hydrated location's own fields) rather than returned by the RPC, since it only needs to run over the final ≤8 results.
 
-Identical repeated keyword tokens are removed before retrieval, preserving first
+Case-insensitively identical repeated keyword tokens are removed before retrieval, preserving first
 occurrence order; repeating a word does not increase its weight. Mock scoring and
 match-reason display defensively deduplicate too, and blank keywords never imply
-a match. This does not add stemming or inferred metadata. Catalog read failures
+a match. The first trimmed spelling is retained across rule parsing, NVIDIA
+keyword merging and scoring/reasons. This does not add general stemming or inferred metadata.
+The explicit Korean sightline construction `명사+이/가 보이는` is separately
+normalized to its literal noun, even if that noun is also a category alias (e.g.
+바다). The original phrase remains an unsupported condition: a metadata hit
+never proves actual visibility. Arbitrary trailing particles in names are not
+stripped, and out-of-Busan rejection still runs before normalization. Catalog read failures
 offer an explicit same-filter/same-offset retry; they are not silently replaced
 with empty results or retried indefinitely.
 
