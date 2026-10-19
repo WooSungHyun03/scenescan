@@ -1,0 +1,40 @@
+<mxfile host="app.diagrams.net" modified="2026-10-11T00:00:00.000Z" agent="draw.io" version="26.0.0" type="device">
+  <diagram id="scenescan-use-case" name="Page-1">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <mxCell id="system" value="SceneScan System" style="swimlane;html=1;startSize=28;horizontal=1;rounded=0;strokeWidth=1.5;fillColor=none;swimlaneFillColor=none;fontStyle=1;fontSize=16;align=center;verticalAlign=top;spacingTop=4;" vertex="1" parent="1">
+          <mxGeometry x="185" y="80" width="470" height="420" as="geometry"/>
+        </mxCell>
+        <mxCell id="actor" value="일반 사용자" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="65" y="235" width="55" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="uc-search" value="이미지 기반 장소 검색" style="ellipse;whiteSpace=wrap;html=1;strokeWidth=1.5;fontSize=14;" vertex="1" parent="system">
+          <mxGeometry x="130" y="60" width="250" height="68" as="geometry"/>
+        </mxCell>
+        <mxCell id="uc-detail" value="장소 상세 정보 조회" style="ellipse;whiteSpace=wrap;html=1;strokeWidth=1.5;fontSize=14;" vertex="1" parent="system">
+          <mxGeometry x="130" y="148" width="250" height="68" as="geometry"/>
+        </mxCell>
+        <mxCell id="uc-shortlist" value="즐겨찾기 관리" style="ellipse;whiteSpace=wrap;html=1;strokeWidth=1.5;fontSize=14;" vertex="1" parent="system">
+          <mxGeometry x="130" y="236" width="250" height="68" as="geometry"/>
+        </mxCell>
+        <mxCell id="uc-account" value="회원 인증 및 계정 관리" style="ellipse;whiteSpace=wrap;html=1;strokeWidth=1.5;fontSize=14;" vertex="1" parent="system">
+          <mxGeometry x="130" y="324" width="250" height="68" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge-search" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=none;endFill=0;strokeWidth=1.25;" edge="1" parent="1" source="actor" target="uc-search">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge-detail" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=none;endFill=0;strokeWidth=1.25;" edge="1" parent="1" source="actor" target="uc-detail">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge-shortlist" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=none;endFill=0;strokeWidth=1.25;" edge="1" parent="1" source="actor" target="uc-shortlist">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge-account" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=none;endFill=0;strokeWidth=1.25;" edge="1" parent="1" source="actor" target="uc-account">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
