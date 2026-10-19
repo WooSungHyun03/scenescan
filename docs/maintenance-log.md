@@ -1,5 +1,15 @@
 # Maintenance log
 
+## 2026-10-19 — image-analysis cancellation boundaries
+
+- Synced main at `5391235`; preserved the existing untracked team documents/screenshot. No credentials, model/provider configuration, production data, schema, RLS or paid services changed.
+- Major: a request cancelled during image decode or shared model loading still ran inference when another request kept the worker alive. Failing controlled-stage regressions reproduced unnecessary inference and late result/error publication. Check cancellation after each asynchronous stage; preserve the reusable model and unrelated queued requests. Already-running inference remains non-preemptive, but its cancelled output is discarded.
+- Minor: unknown/already-settled cancellation IDs were retained without a future cleanup path. Track pending IDs and clean both sets on every request exit. Mock mode also returned a vector if cancelled during its asynchronous image read; it now rejects with `AbortError`. Six new regressions cover these boundaries without model downloads or timing-dependent sleeps.
+- Corrected architecture's stale 200/261 source counts: committed metadata has 223 locations (36 Busan, 34 reviewed districts) and 284 validated embeddings; hosted public browsing independently returns 13 Busan locations. Source files are not proof of import or model provenance.
+- Gates: lint/typecheck/build and client-bundle secret scan pass; 136 unit suites / 910 tests, 68 desktop/mobile mock browser tests, 25 DB/RLS integration tests and the local Auth/Mailpit account flow pass. Offline migration audit passes 30 checks, vector validation passes 284 records, metadata validation passes 223 rows, offline intent evaluation passes, and production dependency audit reports no known vulnerabilities.
+- Pre-release production browser verified Korean home search → actual Haeundae result → detail, live Kakao parking/map and KMA weather with missing values shown honestly. Read-only API checks: parking 200/live/five distance-sorted candidates, weather 200/기상청, contacts 200/live; no production account mutation. Release CI/deployment and real CLIP smoke are checked separately after push, not presumed here.
+- Remaining hosted rollout dependencies: compatible district/vector RPCs and verified embedding-model provenance, authorized searchable Busan catalog expansion, intermittent NVIDIA capacity. No blind migration or model backfill was attempted.
+
 ## 2026-10-16 — deterministic text fallback and keyword identity
 
 - Synced main at `381daad` with no newer team commits; preserved the existing untracked team documents/screenshot. No credentials, provider/model configuration, production data, schema, RLS or paid services changed.

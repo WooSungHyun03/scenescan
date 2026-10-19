@@ -33,6 +33,7 @@ export function createEmbeddingWorkerHandler<Input>({
 }: EmbeddingWorkerDependencies<Input>) {
   let extractorPromise: Promise<LoadedFeatureExtractor<Input>> | null = null;
   let requestChain = Promise.resolve();
+  const pending = new Set<number>();
   const cancelled = new Set<number>();
 
   async function getExtractor(): Promise<LoadedFeatureExtractor<Input>> {
@@ -67,20 +68,24 @@ export function createEmbeddingWorkerHandler<Input>({
     receivedAt: number,
   ): Promise<void> {
     const { id, image } = request;
-    if (cancelled.delete(id)) return;
     const queueWaitMs = now() - receivedAt;
     try {
+      if (cancelled.has(id)) return;
       const decodeStartedAt = now();
       const decodedImage = await decodeImage(image);
+      if (cancelled.has(id)) return;
       const decodeMs = now() - decodeStartedAt;
       const { width, height } = getDimensions(decodedImage);
       validateImageDimensions(width, height);
       const modelWasCached = extractorPromise !== null;
       const modelWaitStartedAt = now();
       const { extractor, device } = await getExtractor();
+      if (cancelled.has(id)) return;
       const modelWaitMs = now() - modelWaitStartedAt;
       const inferenceStartedAt = now();
       const features = await extractor(decodedImage);
+      // Active inference cannot be preempted, but its cancelled result is unused.
+      if (cancelled.has(id)) return;
       const inferenceMs = now() - inferenceStartedAt;
       postMessage({
         type: "result",
@@ -97,17 +102,22 @@ export function createEmbeddingWorkerHandler<Input>({
         },
       });
     } catch (error) {
-      postMessage({ type: "error", id, error: errorMessage(error) });
+      if (!cancelled.has(id)) {
+        postMessage({ type: "error", id, error: errorMessage(error) });
+      }
     } finally {
+      pending.delete(id);
       cancelled.delete(id);
     }
   }
 
   return (request: EmbeddingWorkerRequest): Promise<void> => {
     if (request.type === "cancel") {
-      cancelled.add(request.id);
+      // A late cancel may arrive after a result; do not retain orphan IDs.
+      if (pending.has(request.id)) cancelled.add(request.id);
       return Promise.resolve();
     }
+    pending.add(request.id);
     const receivedAt = now();
     const result = requestChain.then(() => processRequest(request, receivedAt));
     requestChain = result.catch(() => undefined);

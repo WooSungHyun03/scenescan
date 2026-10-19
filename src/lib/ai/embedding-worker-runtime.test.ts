@@ -6,6 +6,93 @@ import type { EmbeddingWorkerReply } from "./embedding-worker-protocol";
 const image = new Blob(["image"]);
 
 describe("embedding worker runtime", () => {
+  it.each(["decode", "model", "inference"] as const)(
+    "drops a request cancelled during %s without blocking the next request",
+    async (stage) => {
+      const replies: EmbeddingWorkerReply[] = [];
+      let release!: () => void;
+      let entered!: () => void;
+      const blocked = new Promise<void>((resolve) => { release = resolve; });
+      const started = new Promise<void>((resolve) => { entered = resolve; });
+      const pause = async () => { entered(); await blocked; };
+      const extractor = vi.fn(async () => {
+        if (stage === "inference") await pause();
+        return { data: new Float32Array(CLIP_EMBEDDING_DIMENSION).fill(0.5) };
+      });
+      const loadExtractor = vi.fn(async () => {
+        if (stage === "model") await pause();
+        return extractor;
+      });
+      const handle = createEmbeddingWorkerHandler({
+        loadExtractor,
+        decodeImage: async (blob) => {
+          if (stage === "decode") await pause();
+          return blob;
+        },
+        getDimensions: () => ({ width: 800, height: 600 }),
+        postMessage: (reply) => replies.push(reply),
+      });
+
+      const cancelled = handle({ type: "embed", id: 1, image });
+      const retained = handle({ type: "embed", id: 2, image });
+      await started;
+      await handle({ type: "cancel", id: 1 });
+      release();
+      await Promise.all([cancelled, retained]);
+
+      expect(extractor).toHaveBeenCalledTimes(stage === "inference" ? 2 : 1);
+      expect(loadExtractor).toHaveBeenCalledTimes(1);
+      expect(replies.filter((reply) => reply.type !== "status")).toEqual([
+        expect.objectContaining({ type: "result", id: 2 }),
+      ]);
+    },
+  );
+
+  it("ignores cancellation for IDs which are not pending", async () => {
+    const replies: EmbeddingWorkerReply[] = [];
+    const handle = createEmbeddingWorkerHandler({
+      loadExtractor: async () => async () => ({
+        data: new Float32Array(CLIP_EMBEDDING_DIMENSION).fill(0.5),
+      }),
+      decodeImage: async (blob) => blob,
+      getDimensions: () => ({ width: 800, height: 600 }),
+      postMessage: (reply) => replies.push(reply),
+    });
+
+    await handle({ type: "cancel", id: 9 });
+    await handle({ type: "embed", id: 9, image });
+    await handle({ type: "cancel", id: 9 });
+    await handle({ type: "embed", id: 9, image });
+
+    expect(replies.filter((reply) => reply.type === "result")).toHaveLength(2);
+  });
+
+  it("does not publish a late decode error after cancellation", async () => {
+    const replies: EmbeddingWorkerReply[] = [];
+    let fail!: (error: Error) => void;
+    let entered!: () => void;
+    const started = new Promise<void>((resolve) => { entered = resolve; });
+    const loadExtractor = vi.fn(async () => async () => ({ data: [] }));
+    const handle = createEmbeddingWorkerHandler({
+      loadExtractor,
+      decodeImage: async () => {
+        entered();
+        return new Promise<Blob>((_resolve, reject) => { fail = reject; });
+      },
+      getDimensions: () => ({ width: 800, height: 600 }),
+      postMessage: (reply) => replies.push(reply),
+    });
+
+    const request = handle({ type: "embed", id: 1, image });
+    await started;
+    await handle({ type: "cancel", id: 1 });
+    fail(new Error("Decode failed after cancellation"));
+    await request;
+
+    expect(replies).toEqual([]);
+    expect(loadExtractor).not.toHaveBeenCalled();
+  });
+
   it("loads the model once and correlates concurrent results by request ID", async () => {
     const replies: EmbeddingWorkerReply[] = [];
     const extractor = vi.fn(async () => ({

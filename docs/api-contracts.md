@@ -82,6 +82,13 @@ Shortlist APIs also require a fresh user and never accept an owner ID. `PUT` exp
 
 `ImageEmbeddingService` also exposes `getStatus()`, `subscribe(listener)`, and a bounded `getPerformanceSnapshot()`. Status is one of `idle`, `loading`, `ready`, or `error`; loading status can include progress from 0 to 100. Real-mode performance samples split worker queue, decode, model wait, inference, worker total, and main-thread transfer/queue time, record the actual `wasm`/`webgpu` device, retain only the latest 20 completed requests, and never include image bytes or embeddings. Mock mode returns an empty snapshot. Both modes accept JPEG, PNG, and WebP inputs with the limits documented in `docs/architecture.md`. The default inference timeout is 120 seconds.
 
+Cancellation is checked before decode and after each asynchronous worker stage.
+If cancelled during decode/model loading, inference is skipped; already-running
+inference is not preempted, but its result/error is discarded. Other pending
+requests continue on the same worker and reuse its model. Unknown/settled IDs
+cannot accumulate cancellation markers. Mock mode also rejects with `AbortError`
+when cancellation occurs during its asynchronous byte read.
+
 `classifyLighting` returns `back-light` when the camera points within 45 degrees of the sun, `front-light` when the sun is within 45 degrees of directly behind the camera, and `side-light` for the angles between them. It returns `null` when the sun is below the horizon or either heading is not finite. The UI translates these values to 순광, 측광, and 역광 without duplicating the angular thresholds.
 
 `getSolarDayTimesAtLocationDate` resolves the chosen date at location-local noon before calling the installed SunCalc 1.9 API. It returns nullable sunrise/sunset UTC instants under the shared `SolarDayTimes` type, never device-local calendar parsing. Detail displays the times in the location's explicit IANA zone once a date is selected, even without a shooting hour; invalid dates/zones and polar missing events never produce invented times. Values are labelled as astronomical calculations, not KMA observations or terrain-aware visibility predictions.

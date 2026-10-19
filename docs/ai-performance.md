@@ -7,7 +7,7 @@
 - Output contract: finite 512-dimensional projected image vectors; real browser/offline inference returns the same raw model projection. Cosine distance normalizes by vector norms at comparison time. Mock vectors are explicitly normalized; real vectors are not necessarily unit-length.
 - Browser backend: Transformers.js `wasm` by default; build-time `webgpu` experiment with automatic WASM initialization fallback
 - Lifecycle: one lazily created Worker per service and one shared model promise per Worker
-- Concurrency: Worker decode and inference are serialized; cancelled queued requests are skipped before decode
+- Concurrency: Worker decode and inference are serialized; cancellation is checked before decode and after each asynchronous stage. Requests cancelled during decode/model loading never start inference; already-running inference is non-preemptive and its result/error is discarded.
 - Diagnostics: the latest 20 successful requests only; no image bytes or embeddings are retained
 
 WASM is the production baseline because it works without WebGPU. `NEXT_PUBLIC_CLIP_DEVICE=webgpu` enables a controlled experimental build; initialization failure retries with WASM, while failure of both backends remains a structured model-load error. Docker accepts the same option through `--build-arg NEXT_PUBLIC_CLIP_DEVICE=webgpu`, and Compose forwards the variable with `wasm` as its default. WebGPU is never selected from browser capability alone and needs a device matrix covering model load, output parity, repeated inference, cancellation, and worker restart before it can become the default.
@@ -29,6 +29,17 @@ The measurement used `beceleb.org/search` in the Codex in-app Chromium browser, 
 All six searches returned eight results with 선유도공원 ranked first at 88% similarity, and the browser console contained no warning or error. This is a cache-warm model baseline, not a first-visit network download benchmark. The automation environment did not expose a trustworthy browser heap metric, so model-memory growth remains open rather than being inferred from process memory.
 
 The worker now reports `queueWaitMs`, `decodeMs`, `modelWaitMs`, `inferenceMs`, `totalMs`, the actual execution device, and whether its model promise was already cached. The main-thread service adds total elapsed and transfer/queue overhead, returns defensive copies, and drops samples beyond 20. Worker request serialization bounds decoded-image/model concurrency at one. Cancellation messages remove queued work before decoding while preserving unrelated requests. Unit tests verify singleton model loading, serialization, queued cancellation, repeated requests, timeout, crash recreation, WebGPU-to-WASM fallback, timing boundaries, and bounded retention.
+
+## Cancellation regression verification — 2026-10-19
+
+Controlled asynchronous tests reproduce cancellation during decode, model loading,
+and inference while another request remains pending. Only the retained request
+publishes a result; cancellation before inference skips that call entirely. Late
+request errors are suppressed, and cancellation IDs are retained only while their
+requests are pending (including queued work), then removed on every exit path.
+The shared model load remains reusable by the next request. Mock mode also checks
+for cancellation after its asynchronous byte read. These are correctness checks,
+not a new hardware latency or memory benchmark.
 
 ## Remaining device matrix
 
