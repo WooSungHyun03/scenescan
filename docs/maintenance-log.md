@@ -1,5 +1,15 @@
 # Maintenance log
 
+## 2026-10-21 — bounded personal-data API input
+
+- Integrated main through `d6581db` (requirements/use-case deliverables only); previous `df8793d` CI passed. Preserved the untracked team documents/screenshot and all new deliverables. No credentials, model/provider settings, production data, schema, RLS or paid services changed.
+- Major: account deletion and shortlist writes checked actual body size only after `request.text()` buffered the complete body. Four failing streamed regressions reproduced absent/understated Content-Length consuming input beyond the existing 2 KiB / 16 KiB limits. Reuse one bounded reader for these two routes: count actual bytes, stop before decoding excess data, cancel without waiting on the source, release locks, and retain exact-limit/split-UTF-8 behavior. Auth, CSRF, fresh-user checks and RLS remain unchanged; search caps remain independent.
+- Minor: unreadable input crossed into unexpected/server-error handling with transport causes. Map it to private/no-store 400 `VALIDATION_ERROR`, without raw content/cause in logs or responses. Only this reader's own size error is retained; even source-thrown application errors are sanitized. Fake-canary and cancellation-failure/non-settlement tests cover the boundary; there is no evidence of an actual production credential leak.
+- Final gates: lint/typecheck/build and client-bundle secret scan pass; 137 unit suites / 925 tests. Desktop/mobile mock browser rerun passes all 68, local Auth/Mailpit account flow passes, and DB/RLS integration passes 25 tests. Initial browser run passed 64 with four cold navigation timeouts before assertions; the logged filesystem benchmark was 315ms. Same-config full rerun passed in 27.2s without timeout/assertion changes. The final transport-error guard is also covered by unit tests; exact-commit Docker/browser/Auth CI is verified after push.
+- Offline checks: 30 migration/schema checks, 284 validated vectors, 223 valid metadata rows and intent fixtures pass; production dependency audit reports no known vulnerabilities. Build-generated `next-env.d.ts` drift was restored, not committed.
+- Pre-release public checks: health 200; anonymous shortlist 401/private; parking 200/live/five distance-sorted candidates; weather 200/기상청; contacts 200/live. Production `/account` visibly redirects anonymous browsing to login with no console errors. No production account mutation was attempted. Release readiness and real CLIP smoke are checked after push rather than presumed here.
+- Existing hosted follow-up remains: verified embedding-model provenance and compatible district/vector RPC rollout, plus licensed searchable Busan catalog expansion. No blind migration/model backfill was attempted.
+
 ## 2026-10-19 — image-analysis cancellation boundaries
 
 - Synced main at `5391235`; preserved the existing untracked team documents/screenshot. No credentials, model/provider configuration, production data, schema, RLS or paid services changed.

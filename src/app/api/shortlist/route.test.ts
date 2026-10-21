@@ -7,6 +7,7 @@ import { dataAccessError } from "@/shared/errors/application-error";
 import {
   SHORTLIST_WRITE_CSRF_HEADER,
   SHORTLIST_WRITE_CSRF_VALUE,
+  MAX_SHORTLIST_REQUEST_BYTES,
 } from "@/types/contracts";
 import {
   handleGetShortlist,
@@ -81,6 +82,51 @@ function dependencies(repository: UserShortlistRepository, userId: string | null
 
 describe("/api/shortlist", () => {
   afterEach(() => vi.restoreAllMocks());
+
+  it.each(["PUT", "POST"] as const)("maps %s body transport failures without logging details", async (method) => {
+    const log = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const body = new ReadableStream<Uint8Array>({
+      pull(controller) { controller.error(new Error("shortlist-body-private-canary")); },
+    });
+    const init = { method, headers: request(method).headers, body, duplex: "half" as const };
+    const deps = dependencies(memoryRepository(), userA);
+    const handler = method === "PUT" ? handlePutShortlist : handlePostShortlist;
+    const response = await handler(new NextRequest("https://scenescan.example/api/shortlist", init), deps);
+    expect(response.status).toBe(400);
+    expect(await response.text()).not.toContain("shortlist-body-private-canary");
+    expect(JSON.stringify(log.mock.calls)).not.toContain("shortlist-body-private-canary");
+    expect(deps.createAuthClient).not.toHaveBeenCalled();
+  });
+
+  it.each(["PUT", "POST"] as const)("stops oversized streamed %s input before auth", async (method) => {
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+    let reads = 0;
+    const cancel = vi.fn();
+    const body = new ReadableStream<Uint8Array>({
+      pull(controller) {
+        reads++;
+        if (reads === 1) controller.enqueue(new Uint8Array(MAX_SHORTLIST_REQUEST_BYTES + 1));
+        else controller.close();
+      },
+      cancel,
+    }, { highWaterMark: 0 });
+    const headers = new Headers(request(method).headers);
+    headers.set("Content-Length", "1");
+    const init = { method, headers, body, duplex: "half" as const };
+    const deps = dependencies(memoryRepository(), userA);
+    const handler = method === "PUT" ? handlePutShortlist : handlePostShortlist;
+    const response = await handler(new NextRequest("https://scenescan.example/api/shortlist", init), deps);
+
+    expect(response.status).toBe(400);
+    await expect(response.json()).resolves.toMatchObject({ error: { code: "VALIDATION_ERROR" } });
+    expect(cancel).toHaveBeenCalledOnce();
+    expect(reads).toBe(1);
+    expect(body.locked).toBe(false);
+    expect(response.headers.get("Cache-Control")).toContain("private");
+    expect(deps.createAuthClient).not.toHaveBeenCalled();
+    expect(deps.createRepository).not.toHaveBeenCalled();
+  });
+
 
   it("keeps two authenticated accounts isolated and never accepts a user selector", async () => {
     const repository = memoryRepository();

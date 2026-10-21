@@ -13,6 +13,7 @@ import { createSupabaseRequestAuthClientFromCookies } from "@/infrastructure/sup
 import { ApplicationError, dataAccessError, unauthenticatedError, validationError } from "@/shared/errors/application-error";
 import { apiErrorResponse } from "@/shared/http/api-error-response";
 import { applyPrivateResponseCacheHeaders } from "@/shared/http/private-cache";
+import { readBoundedRequestText } from "@/shared/http/read-bounded-request-text";
 import { assertSameOriginMutation } from "@/shared/http/same-origin-mutation";
 import {
   MAX_SHORTLIST_REQUEST_BYTES,
@@ -58,14 +59,10 @@ async function readJson<T>(request: NextRequest, schema: ZodType<T>): Promise<T>
   if (!request.headers.get("content-type")?.toLowerCase().startsWith("application/json")) {
     throw validationError("관심 장소 요청 형식이 올바르지 않습니다.");
   }
-  const declaredLength = Number(request.headers.get("content-length"));
-  if (Number.isFinite(declaredLength) && declaredLength > MAX_SHORTLIST_REQUEST_BYTES) {
-    throw validationError("관심 장소 요청이 너무 큽니다.");
-  }
-  const text = await request.text();
-  if (new TextEncoder().encode(text).byteLength > MAX_SHORTLIST_REQUEST_BYTES) {
-    throw validationError("관심 장소 요청이 너무 큽니다.");
-  }
+  const text = await readBoundedRequestText(request, MAX_SHORTLIST_REQUEST_BYTES, {
+    tooLarge: "관심 장소 요청이 너무 큽니다.",
+    unreadable: "관심 장소 요청 본문을 읽을 수 없습니다.",
+  });
   let body: unknown;
   try {
     body = JSON.parse(text);

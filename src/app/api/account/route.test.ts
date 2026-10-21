@@ -7,6 +7,7 @@ import {
   ACCOUNT_DELETION_CONFIRMATION,
   ACCOUNT_DELETION_CSRF_HEADER,
   ACCOUNT_DELETION_CSRF_VALUE,
+  MAX_ACCOUNT_DELETION_REQUEST_BYTES,
 } from "@/types/contracts";
 import { handleDeleteAccount, type AccountRouteDependencies } from "./route";
 
@@ -51,6 +52,49 @@ function dependencies(deleteAccount = vi.fn().mockResolvedValue(undefined)) {
 
 describe("DELETE /api/account", () => {
   afterEach(() => vi.restoreAllMocks());
+
+  it("maps body transport failures without logging request details", async () => {
+    const log = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const body = new ReadableStream<Uint8Array>({
+      pull(controller) { controller.error(new Error("account-body-private-canary")); },
+    });
+    const init = { method: "DELETE", headers: request().headers, body, duplex: "half" as const };
+    const setup = dependencies();
+    const response = await handleDeleteAccount(new NextRequest("https://scenescan.example/api/account", init), setup.deps);
+    expect(response.status).toBe(400);
+    expect(await response.text()).not.toContain("account-body-private-canary");
+    expect(JSON.stringify(log.mock.calls)).not.toContain("account-body-private-canary");
+    expect(setup.createAuthClient).not.toHaveBeenCalled();
+  });
+
+  it.each([null, "1"])("stops oversized streamed input with declared length %s before auth", async (length) => {
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+    let reads = 0;
+    const cancel = vi.fn();
+    const body = new ReadableStream<Uint8Array>({
+      pull(controller) {
+        reads++;
+        if (reads === 1) controller.enqueue(new Uint8Array(MAX_ACCOUNT_DELETION_REQUEST_BYTES + 1));
+        else controller.close();
+      },
+      cancel,
+    }, { highWaterMark: 0 });
+    const headers = new Headers(request().headers);
+    if (length !== null) headers.set("Content-Length", length);
+    const init = { method: "DELETE", headers, body, duplex: "half" as const };
+    const setup = dependencies();
+    const response = await handleDeleteAccount(new NextRequest("https://scenescan.example/api/account", init), setup.deps);
+
+    expect(response.status).toBe(400);
+    await expect(response.json()).resolves.toMatchObject({ error: { code: "VALIDATION_ERROR" } });
+    expect(cancel).toHaveBeenCalledOnce();
+    expect(reads).toBe(1);
+    expect(body.locked).toBe(false);
+    expect(response.headers.get("Cache-Control")).toContain("private");
+    expect(setup.createAuthClient).not.toHaveBeenCalled();
+    expect(setup.deleteAccount).not.toHaveBeenCalled();
+  });
+
 
   it("requires same-origin Fetch Metadata and the custom CSRF header before auth access", async () => {
     vi.spyOn(console, "error").mockImplementation(() => undefined);

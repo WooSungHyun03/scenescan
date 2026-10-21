@@ -72,6 +72,16 @@ Account deletion requires an exact request `Origin` equal to the application ori
 
 Shortlist APIs also require a fresh user and never accept an owner ID. `PUT` expresses the desired saved state rather than a non-idempotent toggle. `POST` is reserved for explicit guest-browser migration consent: it de-duplicates at most 200 UUIDs, retains only IDs that still exist in `locations`, and upserts on `(user_id, location_id)`. Mutations require `X-SceneScan-CSRF: shortlist-write-v1` plus same-origin metadata. All responses are private/no-store and vary on Cookie/Origin. The browser never stores account IDs in localStorage; failed writes roll back the optimistic snapshot, while logout/account changes clear it. See [Account-backed shortlist](account-shortlist.md).
 
+Account deletion (2 KiB) and shortlist mutations (16 KiB) enforce their existing
+body limits on actual streamed bytes, before JSON parsing or Auth/DB access.
+An absent/understated Content-Length never bypasses the cap. Excess input cancels
+the reader without awaiting an untrusted source's cancellation promise, then
+releases its lock. A split UTF-8 sequence is decoded correctly and exact-limit
+bodies remain accepted. Oversize/unreadable input returns private/no-store 400
+`VALIDATION_ERROR`; raw transport errors and request content never enter logs or
+responses. These two routes share `readBoundedRequestText`; search routes retain
+their independent existing caps and contracts.
+
 `LocationListQuery` extends `LocationFilter` with `limit`/`offset` for bounded browse reads (`getLocations` and `GET /api/locations`). Default limit is 20, capped at 50, offset defaults to 0. `locationListQuerySchema` rejects negative/non-integer/over-limit values; repositories also clamp defensively through `resolveLocationListPagination`. Both repositories order by name and then ID. Search remains fixed Top 8; similar exploration passes already-seen IDs rather than exposing an arbitrary count.
 
 `getLocation` never throws for a missing image or parking row on an otherwise-valid location: `src/domains/locations/server/supabase-mappers.ts`'s `toLocation` drops any image/parking sub-row missing a required field (id, image_url, or for parking name/latitude/longitude), returning it in a separate `warnings` array that the repository logs via `logger.warn` instead of failing the request. Solar position is not part of `LocationDetail` and is never read from or computed by the repository -- `SolarPosition` is computed entirely client-side by `getSolarPosition` (Member 4) from `location.point` and an absolute `Date` instant. UI date/time inputs first pass through `getSolarPositionAtLocationTime`/`locationDateTimeToInstant`; the current Korean catalog defaults to `Asia/Seoul`, never the browser system zone. The resolver rejects invalid and DST-skipped wall times and chooses the earlier instant for a repeated DST fall-back time. A future location-specific IANA zone can be supplied without changing the solar math or adding it to the frontend itself.
